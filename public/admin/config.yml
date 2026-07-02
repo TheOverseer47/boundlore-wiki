@@ -1,0 +1,62 @@
+backend:
+  name: github
+  repo: TheOverseer47/boundlore-wiki
+  branch: main
+
+media_folder: images
+public_folder: /images
+
+collections:
+  - name: creatures
+    label: Creatures
+    folder: content/creatures
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Image, name: image, widget: image, required: false }
+      - { label: Description, name: description, widget: text }
+      - { label: Status, name: status, widget: select, options: [Confirmed, Speculation] }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: biomes
+    label: Biomes
+    folder: content/biomes
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Image, name: image, widget: image, required: false }
+      - { label: Description, name: description, widget: text }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: items
+    label: Items
+    folder: content/items
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Image, name: image, widget: image, required: false }
+      - { label: Description, name: description, widget: text }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: guides
+    label: Guides
+    folder: content/guides
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, widget: text }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: news
+    label: News
+    folder: content/news
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime }
+      - { label: Body, name: body, widget: markdown }
