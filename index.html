@@ -28,13 +28,13 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="/" class="active">Home</a></li>
         <li class="dropdown">
-          <a href="wiki/creatures/">Creatures ▾</a>
+          <a href="wiki/creatures/">Creatures &#9662;</a>
           <ul class="dropdown-menu">
             <li><a href="wiki/creatures/">All Creatures</a></li>
           </ul>
         </li>
         <li class="dropdown">
-          <a href="wiki/biomes/">Biomes ▾</a>
+          <a href="wiki/biomes/">Biomes &#9662;</a>
           <ul class="dropdown-menu">
             <li><a href="wiki/biomes/">All Biomes</a></li>
           </ul>
@@ -50,7 +50,7 @@
           <input type="text" placeholder="Search..." id="searchInput" autocomplete="off" />
           <div class="search-results" id="searchResults"></div>
         </div>
-        <a href="wiki/contribute/" class="btn-contribute">✏️ Contribute</a>
+        <a href="wiki/contribute/" class="btn-contribute">&#9998; Contribute</a>
         <button class="hamburger" id="hamburger" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -58,8 +58,10 @@
     </div>
   </nav>
 
+  <!-- Hero: Banner as background, content on top -->
   <header class="hero" id="hero">
-    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-banner-bg"></div>
+    <div class="hero-overlay"></div>
     <div class="hero-content">
       <img src="/public/images/icon.jpg" alt="BoundLore" class="hero-icon" />
       <p class="hero-eyebrow">Fan-Powered Wiki</p>
@@ -70,13 +72,9 @@
         <a href="wiki/guides/" class="btn-secondary">Read Guides</a>
       </div>
     </div>
-    <div class="hero-overlay"></div>
   </header>
 
-  <section class="banner-section">
-    <img src="/public/images/banner.jpg" alt="BoundLore Banner" class="site-banner" />
-  </section>
-
+  <!-- Stats bar: acts as visual divider after hero -->
   <section class="stats-bar">
     <div class="stats-container">
       <div class="stat"><span class="stat-number" id="statCreatures">0</span><span class="stat-label">Creatures</span></div>
@@ -92,21 +90,21 @@
       <p class="section-subtitle">Explore everything known about the world of Light No Fire</p>
     </div>
     <div class="category-grid">
-      <a href="wiki/creatures/" class="category-card"><div class="card-icon">🐉</div><h3>Creatures</h3><p>Discover all known creatures of the world.</p><span class="card-arrow">→</span></a>
-      <a href="wiki/biomes/" class="category-card"><div class="card-icon">🌍</div><h3>Biomes</h3><p>Explore the diverse biomes and landscapes.</p><span class="card-arrow">→</span></a>
-      <a href="wiki/items/" class="category-card"><div class="card-icon">⚔️</div><h3>Items</h3><p>Find weapons, tools and rare artifacts.</p><span class="card-arrow">→</span></a>
-      <a href="wiki/guides/" class="category-card"><div class="card-icon">📖</div><h3>Guides</h3><p>Tips, tutorials and survival strategies.</p><span class="card-arrow">→</span></a>
-      <a href="wiki/guilds/" class="category-card"><div class="card-icon">⚜️</div><h3>Guilds</h3><p>Player guilds and lore factions of the world.</p><span class="card-arrow">→</span></a>
-      <a href="wiki/community/" class="category-card"><div class="card-icon">🌐</div><h3>Community</h3><p>Discord, Reddit and the BoundLore community.</p><span class="card-arrow">→</span></a>
-      <a href="wiki/news/" class="category-card"><div class="card-icon">📰</div><h3>News</h3><p>Latest updates from the community.</p><span class="card-arrow">→</span></a>
-      <a href="wiki/contribute/" class="category-card featured"><div class="card-icon">✏️</div><h3>Contribute</h3><p>Help us grow – submit articles for review.</p><span class="card-arrow">→</span></a>
+      <a href="wiki/creatures/" class="category-card"><div class="card-icon">&#128009;</div><h3>Creatures</h3><p>Discover all known creatures of the world.</p><span class="card-arrow">&#8594;</span></a>
+      <a href="wiki/biomes/" class="category-card"><div class="card-icon">&#127757;</div><h3>Biomes</h3><p>Explore the diverse biomes and landscapes.</p><span class="card-arrow">&#8594;</span></a>
+      <a href="wiki/items/" class="category-card"><div class="card-icon">&#9876;&#65039;</div><h3>Items</h3><p>Find weapons, tools and rare artifacts.</p><span class="card-arrow">&#8594;</span></a>
+      <a href="wiki/guides/" class="category-card"><div class="card-icon">&#128214;</div><h3>Guides</h3><p>Tips, tutorials and survival strategies.</p><span class="card-arrow">&#8594;</span></a>
+      <a href="wiki/guilds/" class="category-card"><div class="card-icon">&#9868;&#65039;</div><h3>Guilds</h3><p>Player guilds and lore factions of the world.</p><span class="card-arrow">&#8594;</span></a>
+      <a href="wiki/community/" class="category-card"><div class="card-icon">&#127760;</div><h3>Community</h3><p>Discord, Reddit and the BoundLore community.</p><span class="card-arrow">&#8594;</span></a>
+      <a href="wiki/news/" class="category-card"><div class="card-icon">&#128240;</div><h3>News</h3><p>Latest updates from the community.</p><span class="card-arrow">&#8594;</span></a>
+      <a href="wiki/contribute/" class="category-card featured"><div class="card-icon">&#9999;&#65039;</div><h3>Contribute</h3><p>Help us grow - submit articles for review.</p><span class="card-arrow">&#8594;</span></a>
     </div>
   </main>
 
   <section class="recent-section">
     <div class="section-header">
       <h2 class="section-title">Recently Added</h2>
-      <a href="wiki/" class="view-all">View all →</a>
+      <a href="wiki/" class="view-all">View all &#8594;</a>
     </div>
     <div class="recent-grid" id="recentArticles">
       <div class="recent-card placeholder">
@@ -140,7 +138,7 @@
       </ul></div>
     </div>
     <div class="footer-bottom">
-      <p>© 2026 BoundLore Community · Fan project · Not affiliated with Hello Games</p>
+      <p>&#169; 2026 BoundLore Community &middot; Fan project &middot; Not affiliated with Hello Games</p>
     </div>
   </footer>
 
