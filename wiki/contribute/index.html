@@ -54,12 +54,27 @@
 
     <div class="form-box">
       <h2>Submit a Contribution</h2>
-      <form id="contributeForm" action="https://formspree.io/f/mvzjvwed" method="POST">
 
-        <!-- Honeypot: invisible to humans, bots fill this and get rejected -->
+      <!-- SPAM GUARD: Math challenge -->
+      <div id="spamChallenge" class="spam-challenge">
+        <p class="spam-challenge-label">&#128274; Quick check before you submit:</p>
+        <p id="challengeQuestion" class="challenge-q"></p>
+        <input type="number" id="challengeAnswer" placeholder="Your answer" class="challenge-input" />
+        <button type="button" id="unlockBtn" class="form-submit" style="margin-top:12px;">Unlock Form &rarr;</button>
+        <p id="challengeError" class="challenge-error" style="display:none;">&#10007; Wrong answer, try again.</p>
+      </div>
+
+      <form id="contributeForm" action="https://formspree.io/f/mvzjvwed" method="POST" style="display:none;">
+
+        <!-- Layer 1: Honeypot (invisible to humans, bots fill it) -->
         <div class="form-honeypot" aria-hidden="true">
           <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+          <input type="text" name="website" tabindex="-1" autocomplete="off" />
         </div>
+
+        <!-- Layer 2: Time-gate token (hidden, filled by JS after 5 s) -->
+        <input type="hidden" name="_formtime" id="formtime" value="" />
+        <input type="hidden" name="_subject" value="New BoundLore Contribution" />
 
         <div class="form-group">
           <label for="name">Your Name / Username *</label>
@@ -90,7 +105,7 @@
         </div>
         <div class="form-group">
           <label for="content">Content / Description *</label>
-          <textarea id="content" name="content" required placeholder="Describe the creature, biome, item, etc. as detailed as possible."></textarea>
+          <textarea id="content" name="content" required placeholder="Describe the creature, biome, item, etc. as detailed as possible. Minimum 30 characters."></textarea>
         </div>
         <div class="form-group">
           <label for="sources">Sources (optional)</label>
@@ -101,14 +116,16 @@
           <input type="text" id="discord" name="discord" placeholder="e.g. TheOverseer47" />
         </div>
 
-        <!-- Anti-spam confirm checkbox -->
+        <!-- Layer 3: Human confirm checkbox -->
         <div class="form-check">
           <input type="checkbox" id="confirmHuman" required />
-          <label for="confirmHuman">I confirm this is a genuine content submission and not spam, advertising or personal contact information.</label>
+          <label for="confirmHuman">I confirm this is a genuine content submission and not spam, advertising or personal data.</label>
         </div>
 
-        <button type="submit" class="form-submit" id="submitBtn">Submit Contribution &rarr;</button>
+        <button type="submit" class="form-submit" id="submitBtn" disabled>Submit Contribution &rarr;</button>
+        <p id="timerNote" style="font-size:0.78rem;color:var(--text-muted);text-align:center;margin-top:10px;">&#9203; Please wait a moment before submitting...</p>
       </form>
+
       <div class="form-success" id="formSuccess">
         <h3>&#10003; Submission received!</h3>
         <p>Thank you for contributing to BoundLore. We'll review your submission within 1&ndash;3 days.</p>
@@ -117,6 +134,103 @@
   </div>
 
   <footer class="footer"><div class="footer-bottom"><p>&#169; 2026 BoundLore Community &middot; <a href="/">Home</a></p></div></footer>
+
   <script src="../../js/main.js"></script>
+  <script>
+  (function() {
+    // ── SPAM LAYER 1: Math challenge gate ──────────────────────────────
+    var a = Math.floor(Math.random() * 9) + 1;
+    var b = Math.floor(Math.random() * 9) + 1;
+    var correctAnswer = a + b;
+    document.getElementById('challengeQuestion').textContent =
+      'What is ' + a + ' + ' + b + '?';
+
+    document.getElementById('unlockBtn').addEventListener('click', function() {
+      var val = parseInt(document.getElementById('challengeAnswer').value, 10);
+      if (val === correctAnswer) {
+        document.getElementById('spamChallenge').style.display = 'none';
+        document.getElementById('contributeForm').style.display = 'block';
+        // Start time-gate
+        startTimeGate();
+      } else {
+        // Wrong: regenerate question
+        document.getElementById('challengeError').style.display = 'block';
+        a = Math.floor(Math.random() * 9) + 1;
+        b = Math.floor(Math.random() * 9) + 1;
+        correctAnswer = a + b;
+        document.getElementById('challengeQuestion').textContent =
+          'What is ' + a + ' + ' + b + '?';
+        document.getElementById('challengeAnswer').value = '';
+      }
+    });
+
+    // ── SPAM LAYER 2: Time-gate (must spend ≥7 s on form) ─────────────
+    function startTimeGate() {
+      var formOpenTime = Date.now();
+      document.getElementById('formtime').value = formOpenTime;
+      var btn = document.getElementById('submitBtn');
+      var note = document.getElementById('timerNote');
+      var remaining = 7;
+      var interval = setInterval(function() {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(interval);
+          btn.disabled = false;
+          note.style.display = 'none';
+        } else {
+          note.textContent = '\u23F3 Please wait ' + remaining + ' second' + (remaining !== 1 ? 's' : '') + ' before submitting...';
+        }
+      }, 1000);
+    }
+
+    // ── SPAM LAYER 3: Rate limiting (max 2 submissions per 10 min) ─────
+    var FORM = document.getElementById('contributeForm');
+    if (FORM) {
+      FORM.addEventListener('submit', function(e) {
+        // Honeypot check
+        var gotcha = FORM.querySelector('[name="_gotcha"]');
+        var website = FORM.querySelector('[name="website"]');
+        if ((gotcha && gotcha.value !== '') || (website && website.value !== '')) {
+          e.preventDefault(); return;
+        }
+
+        // Content length check
+        var contentVal = document.getElementById('content').value.trim();
+        if (contentVal.length < 30) {
+          e.preventDefault();
+          alert('Please provide a more detailed description (at least 30 characters).');
+          return;
+        }
+
+        // Rate limit check
+        var now = Date.now();
+        var submits = JSON.parse(localStorage.getItem('bl_submits') || '[]');
+        submits = submits.filter(function(t) { return now - t < 10 * 60 * 1000; });
+        if (submits.length >= 2) {
+          e.preventDefault();
+          alert('You have submitted too many times recently. Please wait 10 minutes before submitting again.');
+          return;
+        }
+        submits.push(now);
+        localStorage.setItem('bl_submits', JSON.stringify(submits));
+
+        // Show success
+        e.preventDefault();
+        // Let Formspree handle via fetch
+        var data = new FormData(FORM);
+        fetch(FORM.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+          .then(function(r) {
+            if (r.ok) {
+              FORM.style.display = 'none';
+              document.getElementById('formSuccess').style.display = 'block';
+            } else {
+              alert('Something went wrong. Please try again.');
+            }
+          })
+          .catch(function() { alert('Network error. Please try again.'); });
+      });
+    }
+  })();
+  </script>
 </body>
 </html>
