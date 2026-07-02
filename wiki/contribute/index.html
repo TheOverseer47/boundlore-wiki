@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Contribute to BoundLore – submit articles, creatures, guides and more for review." />
-  <title>Contribute – BoundLore</title>
+  <meta name="description" content="Contribute to BoundLore - submit articles, creatures, guides and more for review." />
+  <title>Contribute - BoundLore</title>
   <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,29 +35,35 @@
   </nav>
 
   <div class="wiki-hero">
-    <p class="breadcrumb"><a href="/">Home</a> › Contribute</p>
-    <h1>✏️ Contribute</h1>
+    <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Contribute</p>
+    <h1>&#9998; Contribute</h1>
     <p>Help build the most complete Light No Fire wiki</p>
   </div>
 
   <div class="contribute-layout">
     <div class="contribute-intro">
       <h2>How it works</h2>
-      <p>BoundLore is a community-driven wiki. Submit your article, guide, creature entry or any other content below. Our team will review it and add it to the wiki – you'll be credited as a contributor.</p>
+      <p>BoundLore is a community-driven wiki. Submit your article, guide, creature entry or any other content below. Our team will review it and add it to the wiki &mdash; you'll be credited as a contributor.</p>
       <ul>
         <li>Fill in the form as completely as possible</li>
         <li>Include sources if you have them (screenshots, videos)</li>
-        <li>Keep content factual – speculation should be marked as such</li>
-        <li>We review submissions within 1–3 days</li>
+        <li>Keep content factual &mdash; speculation should be marked as such</li>
+        <li>We review submissions within 1&ndash;3 days</li>
       </ul>
     </div>
 
     <div class="form-box">
       <h2>Submit a Contribution</h2>
       <form id="contributeForm" action="https://formspree.io/f/mvzjvwed" method="POST">
+
+        <!-- Honeypot: invisible to humans, bots fill this and get rejected -->
+        <div class="form-honeypot" aria-hidden="true">
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+        </div>
+
         <div class="form-group">
           <label for="name">Your Name / Username *</label>
-          <input type="text" id="name" name="name" required placeholder="e.g. TheOverseer47" />
+          <input type="text" id="name" name="name" required placeholder="e.g. TheOverseer47" autocomplete="off" />
         </div>
         <div class="form-group">
           <label for="email">Your E-Mail *</label>
@@ -84,7 +90,7 @@
         </div>
         <div class="form-group">
           <label for="content">Content / Description *</label>
-          <textarea id="content" name="content" required placeholder="Describe the creature, biome, item, etc. as detailed as possible. Include behaviour, habitat, drops, tips..."></textarea>
+          <textarea id="content" name="content" required placeholder="Describe the creature, biome, item, etc. as detailed as possible."></textarea>
         </div>
         <div class="form-group">
           <label for="sources">Sources (optional)</label>
@@ -92,19 +98,25 @@
         </div>
         <div class="form-group">
           <label for="discord">Discord Username (optional)</label>
-          <input type="text" id="discord" name="discord" placeholder="e.g. TheOverseer47#0001" />
-          <small>So we can reach you faster on Discord.</small>
+          <input type="text" id="discord" name="discord" placeholder="e.g. TheOverseer47" />
         </div>
-        <button type="submit" class="form-submit">Submit Contribution →</button>
+
+        <!-- Anti-spam confirm checkbox -->
+        <div class="form-check">
+          <input type="checkbox" id="confirmHuman" required />
+          <label for="confirmHuman">I confirm this is a genuine content submission and not spam, advertising or personal contact information.</label>
+        </div>
+
+        <button type="submit" class="form-submit" id="submitBtn">Submit Contribution &rarr;</button>
       </form>
       <div class="form-success" id="formSuccess">
-        <h3>✅ Submission received!</h3>
-        <p>Thank you for contributing to BoundLore. We'll review your submission within 1–3 days and get back to you.</p>
+        <h3>&#10003; Submission received!</h3>
+        <p>Thank you for contributing to BoundLore. We'll review your submission within 1&ndash;3 days.</p>
       </div>
     </div>
   </div>
 
-  <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community · <a href="/">Home</a></p></div></footer>
+  <footer class="footer"><div class="footer-bottom"><p>&#169; 2026 BoundLore Community &middot; <a href="/">Home</a></p></div></footer>
   <script src="../../js/main.js"></script>
 </body>
 </html>

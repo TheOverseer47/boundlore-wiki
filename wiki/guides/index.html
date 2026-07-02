@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Guides – BoundLore</title>
+  <meta name="description" content="Light No Fire Guides - Tips, tutorials and survival strategies from the BoundLore community." />
+  <title>Guides - BoundLore</title>
+  <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -11,33 +13,180 @@
 <body>
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <a href="/" class="nav-logo"><span class="logo-text">Bound<span class="accent">Lore</span></span></a>
+      <a href="/" class="nav-logo">
+        <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+        <span class="logo-text">Bound<span class="accent">Lore</span></span>
+      </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="/">Home</a></li>
         <li><a href="../creatures/">Creatures</a></li>
         <li><a href="../biomes/">Biomes</a></li>
         <li><a href="../items/">Items</a></li>
         <li><a href="../guides/" class="active">Guides</a></li>
+        <li><a href="../guilds/">Guilds</a></li>
+        <li><a href="../community/">Community</a></li>
         <li><a href="../news/">News</a></li>
       </ul>
       <div class="nav-right">
         <div class="nav-search"><input type="text" placeholder="Search..." id="searchInput" /><div class="search-results" id="searchResults"></div></div>
+        <a href="../contribute/" class="btn-contribute">&#9998; Contribute</a>
         <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
+
   <div class="wiki-hero">
-    <p class="breadcrumb"><a href="/">Home</a> › Guides</p>
-    <h1>📖 Guides</h1>
-    <p>Tips, tutorials and survival strategies for Light No Fire</p>
+    <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Guides</p>
+    <h1>&#128214; Guides</h1>
+    <p>Community-written tips, tutorials and survival strategies for Light No Fire</p>
   </div>
-  <div class="wiki-grid">
-    <div class="empty-state">
-      <h3>No guides yet</h3>
-      <p>Be the first to write a guide for the community!</p>
+
+  <div class="guides-page">
+
+    <!-- Filter bar -->
+    <div class="guides-filter-bar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="survival">Survival</button>
+      <button class="filter-btn" data-filter="exploration">Exploration</button>
+      <button class="filter-btn" data-filter="combat">Combat</button>
+      <button class="filter-btn" data-filter="building">Building</button>
+      <button class="filter-btn" data-filter="lore">Lore & Story</button>
+      <button class="filter-btn" data-filter="beginner">Beginner</button>
     </div>
+
+    <!-- Featured / Popular guides -->
+    <div class="guides-featured">
+      <h2>&#11088; Featured Guides</h2>
+      <div class="guides-grid" id="featuredGuides">
+        <div class="guide-card placeholder-card">
+          <div class="guide-card-meta">
+            <span class="guide-tag">Survival</span>
+            <span class="guide-difficulty beginner">Beginner</span>
+          </div>
+          <h3>Getting Started in Light No Fire</h3>
+          <p>Your first steps in a vast, uncharted world. Learn the basics of survival, resource gathering and exploration.</p>
+          <div class="guide-card-footer">
+            <span>Coming soon</span>
+            <span class="read-more">Read &rarr;</span>
+          </div>
+        </div>
+        <div class="guide-card placeholder-card">
+          <div class="guide-card-meta">
+            <span class="guide-tag">Combat</span>
+            <span class="guide-difficulty intermediate">Intermediate</span>
+          </div>
+          <h3>Combat Fundamentals</h3>
+          <p>Master the core combat mechanics - timing, positioning and creature weaknesses explained.</p>
+          <div class="guide-card-footer">
+            <span>Coming soon</span>
+            <span class="read-more">Read &rarr;</span>
+          </div>
+        </div>
+        <div class="guide-card placeholder-card">
+          <div class="guide-card-meta">
+            <span class="guide-tag">Exploration</span>
+            <span class="guide-difficulty intermediate">Intermediate</span>
+          </div>
+          <h3>Exploration & Navigation</h3>
+          <p>How to navigate the planet-scale world without getting lost, and what to look for in new biomes.</p>
+          <div class="guide-card-footer">
+            <span>Coming soon</span>
+            <span class="read-more">Read &rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All guides by category -->
+    <div class="guides-featured">
+      <h2>&#128218; All Guides by Category</h2>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:20px;">
+
+        <div style="background:rgba(17,17,24,0.72);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;">
+          <div style="font-size:1.8rem;margin-bottom:10px;">&#127978;</div>
+          <h3 style="font-family:'Cinzel',serif;font-size:1rem;margin-bottom:8px;color:var(--text);">Survival</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin-bottom:12px;">Food, shelter, health and staying alive in hostile environments.</p>
+          <span style="font-size:0.78rem;color:var(--text-muted);">0 guides &mdash; <a href="../contribute/" style="color:var(--gold);">Submit one</a></span>
+        </div>
+
+        <div style="background:rgba(17,17,24,0.72);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;">
+          <div style="font-size:1.8rem;margin-bottom:10px;">&#127758;</div>
+          <h3 style="font-family:'Cinzel',serif;font-size:1rem;margin-bottom:8px;color:var(--text);">Exploration</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin-bottom:12px;">Navigation, biome discovery, mapping and points of interest.</p>
+          <span style="font-size:0.78rem;color:var(--text-muted);">0 guides &mdash; <a href="../contribute/" style="color:var(--gold);">Submit one</a></span>
+        </div>
+
+        <div style="background:rgba(17,17,24,0.72);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;">
+          <div style="font-size:1.8rem;margin-bottom:10px;">&#9876;&#65039;</div>
+          <h3 style="font-family:'Cinzel',serif;font-size:1rem;margin-bottom:8px;color:var(--text);">Combat</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin-bottom:12px;">Weapons, tactics, creature strategies and PvP tips.</p>
+          <span style="font-size:0.78rem;color:var(--text-muted);">0 guides &mdash; <a href="../contribute/" style="color:var(--gold);">Submit one</a></span>
+        </div>
+
+        <div style="background:rgba(17,17,24,0.72);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;">
+          <div style="font-size:1.8rem;margin-bottom:10px;">&#127968;</div>
+          <h3 style="font-family:'Cinzel',serif;font-size:1rem;margin-bottom:8px;color:var(--text);">Building</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin-bottom:12px;">Base construction, settlement design and resource management.</p>
+          <span style="font-size:0.78rem;color:var(--text-muted);">0 guides &mdash; <a href="../contribute/" style="color:var(--gold);">Submit one</a></span>
+        </div>
+
+        <div style="background:rgba(17,17,24,0.72);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;">
+          <div style="font-size:1.8rem;margin-bottom:10px;">&#128218;</div>
+          <h3 style="font-family:'Cinzel',serif;font-size:1rem;margin-bottom:8px;color:var(--text);">Lore & Story</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin-bottom:12px;">Lore explanations, story progression and world-building deep dives.</p>
+          <span style="font-size:0.78rem;color:var(--text-muted);">0 guides &mdash; <a href="../contribute/" style="color:var(--gold);">Submit one</a></span>
+        </div>
+
+        <div style="background:rgba(17,17,24,0.72);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;">
+          <div style="font-size:1.8rem;margin-bottom:10px;">&#128640;</div>
+          <h3 style="font-family:'Cinzel',serif;font-size:1rem;margin-bottom:8px;color:var(--text);">Advanced</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin-bottom:12px;">Min-maxing, optimisation and deep mechanics for experienced players.</p>
+          <span style="font-size:0.78rem;color:var(--text-muted);">0 guides &mdash; <a href="../contribute/" style="color:var(--gold);">Submit one</a></span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Submit your guide CTA -->
+    <div class="guides-submit-box">
+      <h2>Write a Guide</h2>
+      <p>Discovered something useful? Worked out a strategy others would benefit from?<br>Submit your guide and it will be reviewed and published here for the whole community.</p>
+      <a href="../contribute/" class="btn-primary">&#9998; Submit a Guide</a>
+    </div>
+
   </div>
-  <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community · <a href="/admin">Wiki Admin</a></p></div></footer>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="/public/images/icon.jpg" alt="BoundLore" class="footer-icon" />
+        <span class="logo-text">Bound<span class="accent">Lore</span></span>
+        <p>A fan-made wiki for Light No Fire.<br>Not affiliated with Hello Games.</p>
+      </div>
+      <div class="footer-links"><h4>Wiki</h4><ul>
+        <li><a href="../creatures/">Creatures</a></li>
+        <li><a href="../biomes/">Biomes</a></li>
+        <li><a href="../items/">Items</a></li>
+        <li><a href="../guides/">Guides</a></li>
+      </ul></div>
+      <div class="footer-links"><h4>Community</h4><ul>
+        <li><a href="../contribute/">Contribute</a></li>
+        <li><a href="../news/">News</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom"><p>&#169; 2026 BoundLore Community &middot; Not affiliated with Hello Games</p></div>
+  </footer>
   <script src="../../js/main.js"></script>
+  <script>
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // When real guides exist, filter .guide-card by data-category here
+      });
+    });
+  </script>
 </body>
 </html>

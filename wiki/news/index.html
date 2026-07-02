@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>News – BoundLore</title>
+  <meta name="description" content="BoundLore News - Latest updates about Light No Fire and the BoundLore wiki community." />
+  <title>News - BoundLore</title>
+  <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -11,33 +13,103 @@
 <body>
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <a href="/" class="nav-logo"><span class="logo-text">Bound<span class="accent">Lore</span></span></a>
+      <a href="/" class="nav-logo">
+        <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+        <span class="logo-text">Bound<span class="accent">Lore</span></span>
+      </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="/">Home</a></li>
         <li><a href="../creatures/">Creatures</a></li>
         <li><a href="../biomes/">Biomes</a></li>
         <li><a href="../items/">Items</a></li>
         <li><a href="../guides/">Guides</a></li>
+        <li><a href="../guilds/">Guilds</a></li>
+        <li><a href="../community/">Community</a></li>
         <li><a href="../news/" class="active">News</a></li>
       </ul>
       <div class="nav-right">
         <div class="nav-search"><input type="text" placeholder="Search..." id="searchInput" /><div class="search-results" id="searchResults"></div></div>
+        <a href="../contribute/" class="btn-contribute">&#9998; Contribute</a>
         <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
+
   <div class="wiki-hero">
-    <p class="breadcrumb"><a href="/">Home</a> › News</p>
-    <h1>📰 News</h1>
-    <p>Latest updates and announcements from the BoundLore community</p>
+    <p class="breadcrumb"><a href="/">Home</a> &rsaquo; News</p>
+    <h1>&#128240; News</h1>
+    <p>The latest updates from BoundLore and the world of Light No Fire</p>
   </div>
-  <div class="wiki-grid">
-    <div class="empty-state">
-      <h3>No news yet</h3>
-      <p>Follow us for updates when Light No Fire news drops!</p>
+
+  <div class="news-page">
+    <div class="news-layout">
+
+      <!-- Main news feed -->
+      <div class="news-list">
+
+        <a href="wiki-launch/" class="news-card">
+          <div class="news-card-body">
+            <div class="news-card-meta">
+              <span class="news-category-tag">Wiki News</span>
+              <span class="news-date">July 3, 2026</span>
+            </div>
+            <h2>BoundLore Goes Live &mdash; The Light No Fire Fan Wiki Has Arrived</h2>
+            <p>After weeks of preparation, BoundLore is officially online. We cover everything known about Hello Games' upcoming title Light No Fire &mdash; from the massive planet-scale world to the ambitious multiplayer vision.</p>
+            <span class="read-more">Read full article &rarr;</span>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="news-sidebar">
+        <div class="news-sidebar-box">
+          <h3>Categories</h3>
+          <ul>
+            <li><a href="#">Wiki News</a></li>
+            <li><a href="#">Game Updates</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Dev Insights</a></li>
+          </ul>
+        </div>
+        <div class="news-sidebar-box">
+          <h3>About Light No Fire</h3>
+          <ul>
+            <li><a href="https://www.hellogames.org/lightnofire" target="_blank" rel="noopener">Official Hello Games Page</a></li>
+            <li><a href="https://www.reddit.com/r/LightNoFire/" target="_blank" rel="noopener">Reddit Community</a></li>
+            <li><a href="https://www.youtube.com/watch?v=b-IhzfRAGYg" target="_blank" rel="noopener">Reveal Trailer (YouTube)</a></li>
+          </ul>
+        </div>
+        <div class="news-sidebar-box">
+          <h3>Contribute</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin-bottom:12px;">Have a news tip or found new info about Light No Fire?</p>
+          <a href="../contribute/" class="btn-primary" style="font-size:0.8rem;padding:10px 20px;">Submit</a>
+        </div>
+      </aside>
+
     </div>
   </div>
-  <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community · <a href="/admin">Wiki Admin</a></p></div></footer>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="/public/images/icon.jpg" alt="BoundLore" class="footer-icon" />
+        <span class="logo-text">Bound<span class="accent">Lore</span></span>
+        <p>A fan-made wiki for Light No Fire.<br>Not affiliated with Hello Games.</p>
+      </div>
+      <div class="footer-links"><h4>Wiki</h4><ul>
+        <li><a href="../creatures/">Creatures</a></li>
+        <li><a href="../biomes/">Biomes</a></li>
+        <li><a href="../items/">Items</a></li>
+        <li><a href="../guides/">Guides</a></li>
+      </ul></div>
+      <div class="footer-links"><h4>Community</h4><ul>
+        <li><a href="../contribute/">Contribute</a></li>
+        <li><a href="../news/">News</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom"><p>&#169; 2026 BoundLore Community &middot; Not affiliated with Hello Games</p></div>
+  </footer>
   <script src="../../js/main.js"></script>
 </body>
 </html>
