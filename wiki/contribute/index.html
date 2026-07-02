@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Contribute to BoundLore – submit articles, creatures, guides and more for review." />
+  <title>Contribute – BoundLore</title>
+  <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+        <span class="logo-text">Bound<span class="accent">Lore</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="../creatures/">Creatures</a></li>
+        <li><a href="../biomes/">Biomes</a></li>
+        <li><a href="../items/">Items</a></li>
+        <li><a href="../guides/">Guides</a></li>
+        <li><a href="../guilds/">Guilds</a></li>
+        <li><a href="../community/">Community</a></li>
+        <li><a href="../news/">News</a></li>
+      </ul>
+      <div class="nav-right">
+        <div class="nav-search"><input type="text" placeholder="Search..." id="searchInput" /><div class="search-results" id="searchResults"></div></div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wiki-hero">
+    <p class="breadcrumb"><a href="/">Home</a> › Contribute</p>
+    <h1>✏️ Contribute</h1>
+    <p>Help build the most complete Light No Fire wiki</p>
+  </div>
+
+  <div class="contribute-layout">
+    <div class="contribute-intro">
+      <h2>How it works</h2>
+      <p>BoundLore is a community-driven wiki. Submit your article, guide, creature entry or any other content below. Our team will review it and add it to the wiki – you'll be credited as a contributor.</p>
+      <ul>
+        <li>Fill in the form as completely as possible</li>
+        <li>Include sources if you have them (screenshots, videos)</li>
+        <li>Keep content factual – speculation should be marked as such</li>
+        <li>We review submissions within 1–3 days</li>
+      </ul>
+    </div>
+
+    <div class="form-box">
+      <h2>Submit a Contribution</h2>
+      <form id="contributeForm" action="https://formspree.io/f/mvzjvwed" method="POST">
+        <div class="form-group">
+          <label for="name">Your Name / Username *</label>
+          <input type="text" id="name" name="name" required placeholder="e.g. TheOverseer47" />
+        </div>
+        <div class="form-group">
+          <label for="email">Your E-Mail *</label>
+          <input type="email" id="email" name="email" required placeholder="your@email.com" />
+          <small>Only used to contact you about your submission. Never shown publicly.</small>
+        </div>
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <select id="category" name="category" required>
+            <option value="" disabled selected>Select a category...</option>
+            <option value="Creature">Creature</option>
+            <option value="Biome">Biome</option>
+            <option value="Item">Item</option>
+            <option value="Guide">Guide</option>
+            <option value="Guild">Guild</option>
+            <option value="Lore">Lore</option>
+            <option value="News">News</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="title">Article Title *</label>
+          <input type="text" id="title" name="title" required placeholder="e.g. Cave Dragon" />
+        </div>
+        <div class="form-group">
+          <label for="content">Content / Description *</label>
+          <textarea id="content" name="content" required placeholder="Describe the creature, biome, item, etc. as detailed as possible. Include behaviour, habitat, drops, tips..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="sources">Sources (optional)</label>
+          <input type="text" id="sources" name="sources" placeholder="Links to screenshots, videos, Reddit posts..." />
+        </div>
+        <div class="form-group">
+          <label for="discord">Discord Username (optional)</label>
+          <input type="text" id="discord" name="discord" placeholder="e.g. TheOverseer47#0001" />
+          <small>So we can reach you faster on Discord.</small>
+        </div>
+        <button type="submit" class="form-submit">Submit Contribution →</button>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <h3>✅ Submission received!</h3>
+        <p>Thank you for contributing to BoundLore. We'll review your submission within 1–3 days and get back to you.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community · <a href="/">Home</a></p></div></footer>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
