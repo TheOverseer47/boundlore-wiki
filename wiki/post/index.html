@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Community post on BoundLore." />
+<title id="pageTitle">Post - BoundLore</title>
+<link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+<link rel="stylesheet" href="../../css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+      <span class="logo-text">Bound<span class="accent">Lore</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="../creatures/">Creatures</a></li>
+      <li><a href="../biomes/">Biomes</a></li>
+      <li><a href="../items/">Items</a></li>
+      <li><a href="../guides/">Guides</a></li>
+      <li><a href="../guilds/">Guilds</a></li>
+      <li><a href="../community/">Community</a></li>
+      <li><a href="../news/">News</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="../create-post/" class="btn-contribute">+ New Post</a>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="wiki-hero">
+  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; <span id="breadcrumbCategory">Post</span></p>
+  <h1 id="postTitleHeading">Loading...</h1>
+  <p id="postMeta">&nbsp;</p>
+</div>
+
+<div class="article-layout" style="grid-template-columns:1fr;max-width:800px;margin:0 auto;padding-bottom:60px;">
+  <article class="article-content">
+
+    <div id="postContent" class="post-content">
+      <p>Loading post...</p>
+    </div>
+
+    <div class="rating-widget">
+      <button id="btn-fire">🔥 <span id="fireCount">0</span></button>
+      <button id="btn-down">👎 <span id="downCount">0</span></button>
+      <button id="reportPostBtn">🚩 Report</button>
+    </div>
+
+    <div class="comments-section">
+      <h3>Comments (<span id="commentCount">0</span>)</h3>
+      <div id="commentsList"></div>
+
+      <form id="commentForm" style="margin-top:20px;">
+        <textarea id="commentInput" required placeholder="Share your thoughts..."></textarea>
+        <button id="commentSubmitBtn" type="submit">Post Comment</button>
+      </form>
+    </div>
+
+  </article>
+</div>
+
+<footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="../imprint/">Imprint</a> &middot; <a href="../privacy/">Privacy Policy</a></p></div></footer>
+
+<script src="../../js/supabase-config.js"></script>
+<script src="../../js/main.js"></script>
+<script src="../../js/post-interactions.js"></script>
+<script>
+async function loadPost() {
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get('id');
+
+  if (!postId) {
+    document.getElementById('postTitleHeading').textContent = 'Post not found';
+    document.getElementById('postContent').innerHTML = '<p>No post ID was provided.</p>';
+    return;
+  }
+
+  const { data: post, error } = await supabaseClient
+    .from('posts')
+    .select('id, title, category, content, created_at, status, profiles(username)')
+    .eq('id', postId)
+    .single();
+
+  if (error || !post) {
+    document.getElementById('postTitleHeading').textContent = 'Post not found';
+    document.getElementById('postContent').innerHTML = '<p>This post does not exist or has been removed.</p>';
+    return;
+  }
+
+  const authorName = post.profiles ? post.profiles.username : 'Unknown';
+
+  document.title = post.title + ' - BoundLore';
+  document.getElementById('pageTitle').textContent = post.title + ' - BoundLore';
+  document.getElementById('breadcrumbCategory').textContent = post.category;
+  document.getElementById('postTitleHeading').textContent = post.title;
+  document.getElementById('postMeta').textContent = 'By ' + authorName + ' · ' + new Date(post.created_at).toLocaleDateString();
+  document.getElementById('postContent').innerHTML = post.content;
+
+  initPostInteractions(post.id);
+}
+
+loadPost();
+</script>
+</body>
+</html>

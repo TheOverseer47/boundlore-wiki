@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Admin dashboard for BoundLore." />
+<title>Admin Dashboard - Boundlore</title>
+<link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+<link rel="stylesheet" href="../../css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+      <span class="logo-text">Bound<span class="accent">Lore</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="../creatures/">Creatures</a></li>
+      <li><a href="../biomes/">Biomes</a></li>
+      <li><a href="../items/">Items</a></li>
+      <li><a href="../guides/">Guides</a></li>
+      <li><a href="../guilds/">Guilds</a></li>
+      <li><a href="../community/">Community</a></li>
+      <li><a href="../news/">News</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="../account/" class="btn-contribute">My Account</a>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="wiki-hero">
+  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Admin Dashboard</p>
+  <h1>Admin Dashboard</h1>
+  <p>Review pending posts and reports</p>
+</div>
+
+<div class="contribute-layout" id="gateBox">
+  <div class="form-box"><p style="text-align:center;">Checking permissions...</p></div>
+</div>
+
+<div class="contribute-layout" id="deniedBox" style="display:none;">
+  <div class="form-box"><h2>Access Denied</h2><p style="color:var(--text-muted);">You do not have permission to view this page.</p></div>
+</div>
+
+<div id="dashboard" style="display:none;max-width:1000px;margin:0 auto 60px;padding:0 20px;">
+
+  <div class="admin-tabs" style="display:flex;gap:10px;margin-bottom:24px;">
+    <button class="tab-btn active" data-tab="pending">Pending Posts (<span id="countPending">0</span>)</button>
+    <button class="tab-btn" data-tab="reports">Reports (<span id="countReports">0</span>)</button>
+  </div>
+
+  <div id="tabPending" class="tab-panel">
+    <div id="pendingList"></div>
+    <p id="pendingEmpty" style="text-align:center;color:var(--text-muted);display:none;">No posts awaiting review.</p>
+  </div>
+
+  <div id="tabReports" class="tab-panel" style="display:none;">
+    <div id="reportsList"></div>
+    <p id="reportsEmpty" style="text-align:center;color:var(--text-muted);display:none;">No open reports.</p>
+  </div>
+
+</div>
+
+<footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="../imprint/">Imprint</a> &middot; <a href="../privacy/">Privacy Policy</a></p></div></footer>
+
+<script src="../../js/supabase-config.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+let isAdmin = false;
+
+async function checkAdmin() {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) { window.location.href = '../login/'; return; }
+
+  const { data: profile, error } = await supabaseClient
+    .from('profiles').select('role').eq('id', sessionData.session.user.id).single();
+
+  if (error || !profile || profile.role !== 'admin') {
+    document.getElementById('gateBox').style.display = 'none';
+    document.getElementById('deniedBox').style.display = 'block';
+    return;
+  }
+
+  isAdmin = true;
+  document.getElementById('gateBox').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  loadPending();
+  loadReports();
+}
+
+async function loadPending() {
+  const { data: posts, error } = await supabaseClient
+    .from('posts')
+    .select('id, title, category, content, created_at, author_id, profiles(username)')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true });
+
+  const list = document.getElementById('pendingList');
+  const empty = document.getElementById('pendingEmpty');
+  list.innerHTML = '';
+
+  if (error || !posts || posts.length === 0) {
+    empty.style.display = 'block';
+    document.getElementById('countPending').textContent = '0';
+    return;
+  }
+
+  empty.style.display = 'none';
+  document.getElementById('countPending').textContent = posts.length;
+
+  posts.forEach(function(post) {
+    const authorName = post.profiles ? post.profiles.username : 'Unknown';
+    const div = document.createElement('div');
+    div.className = 'form-box';
+    div.style.marginBottom = '20px';
+    div.innerHTML =
+      '<h3>' + escapeHtml(post.title) + '</h3>' +
+      '<p style="color:var(--text-muted);font-size:0.85rem;">By ' + escapeHtml(authorName) + ' &middot; ' + post.category + ' &middot; ' + new Date(post.created_at).toLocaleString() + '</p>' +
+      '<div style="background:#fff;color:#111;padding:16px;border-radius:6px;margin:14px 0;max-height:300px;overflow-y:auto;">' + post.content + '</div>' +
+      '<div style="display:flex;gap:10px;">' +
+      '<button class="form-submit" style="width:auto;padding:8px 20px;background:#50c878;" data-action="approve" data-id="' + post.id + '">Approve &amp; Publish</button>' +
+      '<button class="form-submit" style="width:auto;padding:8px 20px;background:#e05555;" data-action="reject" data-id="' + post.id + '">Reject &amp; Delete</button>' +
+      '</div>';
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll('[data-action="approve"]').forEach(function(btn) {
+    btn.addEventListener('click', function() { approvePost(this.dataset.id); });
+  });
+  list.querySelectorAll('[data-action="reject"]').forEach(function(btn) {
+    btn.addEventListener('click', function() { rejectPost(this.dataset.id); });
+  });
+}
+
+async function approvePost(id) {
+  const { error } = await supabaseClient.from('posts').update({ status: 'published' }).eq('id', id);
+  if (!error) loadPending();
+}
+
+async function rejectPost(id) {
+  if (!confirm('Really reject and permanently delete this post?')) return;
+  const { error } = await supabaseClient.from('posts').delete().eq('id', id);
+  if (!error) loadPending();
+}
+
+async function loadReports() {
+  const { data: reports, error } = await supabaseClient
+    .from('reports')
+    .select('id, reason, created_at, post_id, reporter_id, posts(title), profiles(username)')
+    .order('created_at', { ascending: true });
+
+  const list = document.getElementById('reportsList');
+  const empty = document.getElementById('reportsEmpty');
+  list.innerHTML = '';
+
+  if (error || !reports || reports.length === 0) {
+    empty.style.display = 'block';
+    document.getElementById('countReports').textContent = '0';
+    return;
+  }
+
+  empty.style.display = 'none';
+  document.getElementById('countReports').textContent = reports.length;
+
+  reports.forEach(function(report) {
+    const postTitle = report.posts ? report.posts.title : 'Deleted post';
+    const reporterName = report.profiles ? report.profiles.username : 'Unknown';
+    const div = document.createElement('div');
+    div.className = 'form-box';
+    div.style.marginBottom = '20px';
+    div.innerHTML =
+      '<h3>Report on: ' + escapeHtml(postTitle) + '</h3>' +
+      '<p style="color:var(--text-muted);font-size:0.85rem;">Reported by ' + escapeHtml(reporterName) + ' &middot; ' + new Date(report.created_at).toLocaleString() + '</p>' +
+      '<p style="margin:10px 0;"><strong>Reason:</strong> ' + escapeHtml(report.reason) + '</p>' +
+      '<div style="display:flex;gap:10px;">' +
+      '<button class="form-submit" style="width:auto;padding:8px 20px;" data-action="dismiss" data-id="' + report.id + '">Dismiss Report</button>' +
+      '<button class="form-submit" style="width:auto;padding:8px 20px;background:#e05555;" data-action="deletepost" data-id="' + report.id + '" data-postid="' + report.post_id + '">Delete Post</button>' +
+      '</div>';
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll('[data-action="dismiss"]').forEach(function(btn) {
+    btn.addEventListener('click', function() { dismissReport(this.dataset.id); });
+  });
+  list.querySelectorAll('[data-action="deletepost"]').forEach(function(btn) {
+    btn.addEventListener('click', function() { deleteReportedPost(this.dataset.id, this.dataset.postid); });
+  });
+}
+
+async function dismissReport(reportId) {
+  const { error } = await supabaseClient.from('reports').delete().eq('id', reportId);
+  if (!error) loadReports();
+}
+
+async function deleteReportedPost(reportId, postId) {
+  if (!confirm('Delete this post and dismiss the report?')) return;
+  await supabaseClient.from('posts').delete().eq('id', postId);
+  await supabaseClient.from('reports').delete().eq('id', reportId);
+  loadReports();
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.style.display = 'none'; });
+    document.getElementById('tab' + this.dataset.tab.charAt(0).toUpperCase() + this.dataset.tab.slice(1)).style.display = 'block';
+  });
+});
+
+checkAdmin();
+</script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Create a new post on BoundLore." />
+<title>Create Post - BoundLore</title>
+<link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+<link rel="stylesheet" href="../../css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+      <span class="logo-text">Bound<span class="accent">Lore</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="../creatures/">Creatures</a></li>
+      <li><a href="../biomes/">Biomes</a></li>
+      <li><a href="../items/">Items</a></li>
+      <li><a href="../guides/">Guides</a></li>
+      <li><a href="../guilds/">Guilds</a></li>
+      <li><a href="../community/">Community</a></li>
+      <li><a href="../news/">News</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="../account/" class="btn-contribute">My Account</a>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="wiki-hero">
+  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Create Post</p>
+  <h1>Create a Post</h1>
+  <p>Share your knowledge with the BoundLore community</p>
+</div>
+
+<div class="contribute-layout" id="gateBox">
+  <div class="form-box">
+    <p style="text-align:center;">Checking your account...</p>
+  </div>
+</div>
+
+<div class="contribute-layout" id="blockedBox" style="display:none;">
+  <div class="form-box">
+    <h2>Email Verification Required</h2>
+    <p style="color:var(--text-muted);">You need to verify your email address before you can publish posts. Please check your inbox, or go to your <a href="../account/">account page</a> to resend the verification email.</p>
+  </div>
+</div>
+
+<div class="contribute-layout" id="editorBox" style="display:none;">
+  <div class="form-box" style="max-width:800px;">
+    <h2>New Post</h2>
+    <form id="postForm">
+      <div class="form-group">
+        <label for="title">Title *</label>
+        <input type="text" id="title" required maxlength="150" placeholder="e.g. How to Tame a Skyfarer" />
+      </div>
+      <div class="form-group">
+        <label for="category">Category *</label>
+        <select id="category" required>
+          <option value="">Select a category</option>
+          <option value="creatures">Creatures</option>
+          <option value="biomes">Biomes</option>
+          <option value="items">Items</option>
+          <option value="guides">Guides</option>
+          <option value="guilds">Guilds</option>
+          <option value="news">News</option>
+          <option value="community">Community</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Content *</label>
+        <div id="editor" style="background:#fff;color:#111;border-radius:6px;min-height:300px;"></div>
+        <small>Use the toolbar to format text, add links, or embed images. Posts with links or images require admin approval before publishing.</small>
+      </div>
+      <button type="submit" class="form-submit" id="submitBtn">Submit for Review &rarr;</button>
+      <p id="formMessage" style="margin-top:14px;font-size:0.85rem;text-align:center;"></p>
+    </form>
+  </div>
+</div>
+
+<footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="../imprint/">Imprint</a> &middot; <a href="../privacy/">Privacy Policy</a></p></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script src="../../js/supabase-config.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+let currentUser = null;
+let quill = null;
+let containsMedia = false;
+
+async function checkAccess() {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) {
+    window.location.href = '../login/';
+    return;
+  }
+  currentUser = sessionData.session.user;
+
+  const { data: profile, error } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', currentUser.id)
+    .single();
+
+  if (error || !profile) {
+    document.getElementById('gateBox').innerHTML = '<div class="form-box"><p>Could not load your profile. Please try again later.</p></div>';
+    return;
+  }
+
+  if (!profile.email_verified) {
+    document.getElementById('gateBox').style.display = 'none';
+    document.getElementById('blockedBox').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('gateBox').style.display = 'none';
+  document.getElementById('editorBox').style.display = 'block';
+  initEditor();
+}
+
+function initEditor() {
+  const toolbarOptions = [
+    ['bold', 'italic', 'underline', 'strike'],
+    ['blockquote', 'code-block'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['link', 'image'],
+    ['clean']
+  ];
+
+  quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: { toolbar: toolbarOptions },
+    placeholder: 'Write your post here...'
+  });
+
+  quill.on('text-change', function() {
+    const html = quill.root.innerHTML;
+    containsMedia = /<img|<a /.test(html);
+  });
+}
+
+document.getElementById('postForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('formMessage');
+  msg.textContent = '';
+
+  const title = document.getElementById('title').value.trim();
+  const category = document.getElementById('category').value;
+  const contentHtml = quill.root.innerHTML;
+  const contentText = quill.getText().trim();
+
+  if (contentText.length < 20) {
+    msg.textContent = 'Your post content is too short.';
+    msg.style.color = '#e05555';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const needsReview = containsMedia;
+
+  const { error } = await supabaseClient.from('posts').insert({
+    title: title,
+    category: category,
+    content: contentHtml,
+    author_id: currentUser.id,
+    status: needsReview ? 'pending' : 'published',
+    has_media: needsReview
+  });
+
+  if (error) {
+    msg.textContent = 'Error: ' + error.message;
+    msg.style.color = '#e05555';
+    btn.disabled = false;
+    btn.textContent = 'Submit for Review →';
+    return;
+  }
+
+  if (needsReview) {
+    msg.textContent = 'Your post contains links or images and has been submitted for admin review. You will see it live once approved.';
+  } else {
+    msg.textContent = 'Your post has been published!';
+  }
+  msg.style.color = '#50c878';
+  document.getElementById('postForm').reset();
+  quill.setContents([]);
+  btn.disabled = false;
+  btn.textContent = 'Submit for Review →';
+});
+
+checkAccess();
+</script>
+</body>
+</html>
