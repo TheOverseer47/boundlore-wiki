@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Manage your BoundLore account." />
+<title>My Account - BoundLore</title>
+<link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+<link rel="stylesheet" href="../../css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+      <span class="logo-text">Bound<span class="accent">Lore</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="../creatures/">Creatures</a></li>
+      <li><a href="../biomes/">Biomes</a></li>
+      <li><a href="../items/">Items</a></li>
+      <li><a href="../guides/">Guides</a></li>
+      <li><a href="../guilds/">Guilds</a></li>
+      <li><a href="../community/">Community</a></li>
+      <li><a href="../news/">News</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="#" id="logoutBtn" class="btn-contribute">Log Out</a>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="wiki-hero">
+  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; My Account</p>
+  <h1>My Account</h1>
+  <p id="welcomeText">Manage your BoundLore profile</p>
+</div>
+
+<div class="contribute-layout" id="loadingState">
+  <div class="form-box"><p style="text-align:center;">Loading account...</p></div>
+</div>
+
+<div class="contribute-layout" id="accountContent" style="display:none;">
+
+  <div class="form-box">
+    <h2>Account Overview</h2>
+    <table class="info-table" style="width:100%;">
+      <tr><td>Username</td><td id="infoUsername">-</td></tr>
+      <tr><td>Email</td><td id="infoEmail">-</td></tr>
+      <tr><td>Email verified</td><td id="infoVerified">-</td></tr>
+      <tr><td>Role</td><td id="infoRole">-</td></tr>
+      <tr><td>Member since</td><td id="infoSince">-</td></tr>
+    </table>
+    <div id="resendBox" style="margin-top:16px;display:none;">
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:8px;">Your email isn't verified yet. You can't publish posts until you confirm it.</p>
+      <button id="resendBtn" class="form-submit" style="width:auto;padding:8px 20px;">Resend Verification Email</button>
+    </div>
+  </div>
+
+  <div class="form-box">
+    <h2>Change Password</h2>
+    <form id="changePasswordForm">
+      <div class="form-group">
+        <label for="newPassword">New Password *</label>
+        <input type="password" id="newPassword" required minlength="8" placeholder="At least 8 characters" />
+      </div>
+      <div class="form-group">
+        <label for="newPassword2">Confirm New Password *</label>
+        <input type="password" id="newPassword2" required minlength="8" placeholder="Repeat new password" />
+      </div>
+      <button type="submit" class="form-submit" id="pwBtn">Update Password &rarr;</button>
+      <p id="pwMessage" style="margin-top:10px;font-size:0.85rem;text-align:center;"></p>
+    </form>
+  </div>
+
+  <div class="form-box" style="border-color:rgba(224,85,85,0.3);">
+    <h2 style="color:#e05555;">Delete Account</h2>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">This will permanently delete your account. This action cannot be undone. Your posts and comments may be anonymised rather than deleted to preserve wiki coherence. To fully delete your data, contact <a href="mailto:contact@boundlore.com">contact@boundlore.com</a> after deleting your account.</p>
+    <button id="deleteAccountBtn" class="form-submit" style="background:#e05555;">Delete My Account</button>
+    <p id="deleteMessage" style="margin-top:10px;font-size:0.85rem;text-align:center;"></p>
+  </div>
+
+</div>
+
+<footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="../imprint/">Imprint</a> &middot; <a href="../privacy/">Privacy Policy</a></p></div></footer>
+
+<script src="../../js/supabase-config.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+let currentUser = null;
+let currentProfile = null;
+
+async function loadAccount() {
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) {
+    window.location.href = '../login/';
+    return;
+  }
+  currentUser = sessionData.session.user;
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', currentUser.id)
+    .single();
+
+  if (error || !profile) {
+    document.getElementById('loadingState').innerHTML = '<div class="form-box"><p>Could not load your profile. Please try again later.</p></div>';
+    return;
+  }
+
+  currentProfile = profile;
+
+  document.getElementById('welcomeText').textContent = 'Welcome back, ' + profile.username;
+  document.getElementById('infoUsername').textContent = profile.username;
+  document.getElementById('infoEmail').textContent = currentUser.email;
+  document.getElementById('infoVerified').textContent = profile.email_verified ? '✅ Verified' : '❌ Not verified';
+  document.getElementById('infoRole').textContent = profile.role === 'admin' ? '👑 Admin' : 'Member';
+  document.getElementById('infoSince').textContent = new Date(profile.created_at).toLocaleDateString();
+
+  if (!profile.email_verified) {
+    document.getElementById('resendBox').style.display = 'block';
+  }
+
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('accountContent').style.display = 'block';
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+  e.preventDefault();
+  await supabase.auth.signOut();
+  window.location.href = '/';
+});
+
+document.getElementById('resendBtn')?.addEventListener('click', async function() {
+  const { error } = await supabase.auth.resend({ type: 'signup', email: currentUser.email });
+  this.textContent = error ? 'Failed to resend' : 'Sent! Check your inbox';
+});
+
+document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('pwBtn');
+  const msg = document.getElementById('pwMessage');
+  const p1 = document.getElementById('newPassword').value;
+  const p2 = document.getElementById('newPassword2').value;
+
+  if (p1 !== p2) {
+    msg.textContent = 'Passwords do not match.';
+    msg.style.color = '#e05555';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  const { error } = await supabase.auth.updateUser({ password: p1 });
+
+  if (error) {
+    msg.textContent = 'Error: ' + error.message;
+    msg.style.color = '#e05555';
+  } else {
+    msg.textContent = 'Password updated successfully.';
+    msg.style.color = '#50c878';
+    document.getElementById('changePasswordForm').reset();
+  }
+  btn.disabled = false;
+  btn.textContent = 'Update Password →';
+});
+
+document.getElementById('deleteAccountBtn').addEventListener('click', async function() {
+  const confirmed = confirm('Are you sure you want to permanently delete your account? This cannot be undone.');
+  if (!confirmed) return;
+
+  const msg = document.getElementById('deleteMessage');
+  msg.textContent = 'Please contact contact@boundlore.com from your registered email to confirm deletion of your account and personal data. This manual step protects you from unauthorized account deletion.';
+  msg.style.color = 'var(--text-muted)';
+});
+
+loadAccount();
+</script>
+</body>
+</html>

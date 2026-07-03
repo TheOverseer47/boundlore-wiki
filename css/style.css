@@ -410,3 +410,44 @@ a:hover { color: var(--gold-light); }
   .guides-grid { grid-template-columns: 1fr; }
   .btn-steam { font-size: 0.75rem; padding: 12px 18px; }
 }
+
+/* ===== Auth & Account Forms (Phase 1) ===== */
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 16px 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.form-check input[type="checkbox"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.form-check a {
+  color: var(--accent);
+}
+
+.form-success {
+  display: none;
+  text-align: center;
+  padding: 30px 20px;
+}
+.form-success h3 {
+  color: #50c878;
+  margin-bottom: 10px;
+}
+
+.info-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.info-table td {
+  padding: 10px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.9rem;
+}
+.info-table td:first-child {
+  color: var(--text-muted);
+  width: 40%;
+}
