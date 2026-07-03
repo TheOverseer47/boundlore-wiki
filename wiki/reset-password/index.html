@@ -29,6 +29,7 @@
       <li><a href="../news/">News</a></li>
     </ul>
     <div class="nav-right">
+      <span id="authArea"></span>
       <a href="../login/" class="btn-contribute">Login</a>
       <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
     </div>
@@ -78,8 +79,8 @@
 
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="../imprint/">Imprint</a> &middot; <a href="../privacy/">Privacy Policy</a></p></div></footer>
 
-<script src="../../js/supabase-config.js"></script>
-<script src="../../js/main.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth-nav.js"></script><script src="../../js/main.js"></script>
 <script>
 document.getElementById('requestForm').addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -143,3 +144,7 @@ if (window.location.hash.includes('type=recovery') || window.location.hash.inclu
 </script>
 </body>
 </html>
+
+
+
+
