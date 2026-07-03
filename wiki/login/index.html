@@ -82,7 +82,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   btn.disabled = true;
   btn.textContent = 'Logging in...';
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
   if (error) {
     msg.textContent = 'Login failed: ' + error.message;
@@ -98,7 +98,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 (async function checkSession() {
-  const { data } = await supabase.auth.getSession();
+  const { data } = await supabaseClient.auth.getSession();
   if (data.session) {
     window.location.href = '/';
   }

@@ -96,14 +96,14 @@ let currentUser = null;
 let currentProfile = null;
 
 async function loadAccount() {
-  const { data: sessionData } = await supabase.auth.getSession();
+  const { data: sessionData } = await supabaseClient.auth.getSession();
   if (!sessionData.session) {
     window.location.href = '../login/';
     return;
   }
   currentUser = sessionData.session.user;
 
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await supabaseClient
     .from('profiles')
     .select('*')
     .eq('id', currentUser.id)
@@ -133,12 +133,12 @@ async function loadAccount() {
 
 document.getElementById('logoutBtn').addEventListener('click', async function(e) {
   e.preventDefault();
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
   window.location.href = '/';
 });
 
 document.getElementById('resendBtn')?.addEventListener('click', async function() {
-  const { error } = await supabase.auth.resend({ type: 'signup', email: currentUser.email });
+  const { error } = await supabaseClient.auth.resend({ type: 'signup', email: currentUser.email });
   this.textContent = error ? 'Failed to resend' : 'Sent! Check your inbox';
 });
 
@@ -158,7 +158,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', async f
   btn.disabled = true;
   btn.textContent = 'Updating...';
 
-  const { error } = await supabase.auth.updateUser({ password: p1 });
+  const { error } = await supabaseClient.auth.updateUser({ password: p1 });
 
   if (error) {
     msg.textContent = 'Error: ' + error.message;
