@@ -101,7 +101,5 @@ async function handleSubmit(e) {
     return;
   }
 
-  window.location.href = currentPostType === "guide"
-    ? `/wiki/guides/post/?slug=${data.slug}`
-    : `/wiki/${data.category}/post/?slug=${data.slug}`;
+  window.location.href = `/wiki/post/?slug=${data.slug}`;
 }

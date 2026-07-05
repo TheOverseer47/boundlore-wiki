@@ -67,8 +67,7 @@ async function runSearch(query, resultsBox) {
 }
 
 function buildPostPath(post) {
-  if (post.post_type === "guide") return `/wiki/guides/post/?slug=${post.slug}`;
-  return `/wiki/${post.category}/post/?slug=${post.slug}`;
+  return `/wiki/post/?slug=${post.slug}`;
 }
 
 function escapeHtml(str) {

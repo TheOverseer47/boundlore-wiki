@@ -388,6 +388,54 @@ a:hover { color: var(--gold-light); }
 .error-page h2 { font-family: 'Cinzel', serif; font-size: 1.5rem; margin: 16px 0; }
 .error-page p { color: var(--text-muted); margin-bottom: 32px; }
 
+/* Post detail & buttons */
+.reaction-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px 14px;
+  color: #eee;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reaction-btn.active {
+  background: rgba(255,215,0,0.15);
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 8px 14px;
+  color: #ccc;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #ffd700;
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 0;
+  margin-right: 12px;
+}
+
+.post-body {
+  line-height: 1.7;
+  color: #ddd;
+}
+
+.post-body img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 12px 0;
+}
+
 /* RESPONSIVE */
 @media (max-width: 1024px) {
   .nav-links { gap: 0; }
@@ -522,4 +570,58 @@ a:hover { color: var(--gold-light); }
 #authArea {
   display: inline-flex;
   align-items: center;
+}
+.post-type-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.type-btn {
+  flex: 1;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: var(--text-muted, #999);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.type-btn.active {
+  background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.1));
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #eee;
+  font-family: 'Inter', sans-serif;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.field-hint {
+  font-size: 0.85em;
+  color: var(--text-muted, #999);
+  margin-top: -8px;
+  margin-bottom: 16px;
+}
+
+.form-error {
+  padding: 10px;
+  background: rgba(255,107,107,0.1);
+  border: 1px solid rgba(255,107,107,0.3);
+  border-radius: 6px;
 }
