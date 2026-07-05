@@ -22,19 +22,19 @@ async function initPostInteractions(postId) {
 async function loadRatings() {
   const { count: fireCount } = await supabase
     .from('ratings').select('id', { count: 'exact', head: true })
-    .eq('post_id', piPostId).eq('value', 'fire');
+    .eq('post_id', piPostId).eq('rating_type', 'fire');
   const { count: downCount } = await supabase
     .from('ratings').select('id', { count: 'exact', head: true })
-    .eq('post_id', piPostId).eq('value', 'down');
+    .eq('post_id', piPostId).eq('rating_type', 'down');
 
   document.getElementById('fireCount').textContent = fireCount || 0;
   document.getElementById('downCount').textContent = downCount || 0;
 
   if (piCurrentUser) {
     const { data: myRating } = await supabase
-      .from('ratings').select('value').eq('post_id', piPostId).eq('user_id', piCurrentUser.id).maybeSingle();
+      .from('ratings').select('rating_type').eq('post_id', piPostId).eq('user_id', piCurrentUser.id).maybeSingle();
     if (myRating) {
-      document.getElementById('btn-' + myRating.value).classList.add('active-rating');
+      document.getElementById('btn-' + myRating.rating_type).classList.add('active-rating');
     }
   }
 }
@@ -52,14 +52,14 @@ async function setRating(value) {
   }
 
   const { data: existing } = await supabase
-    .from('ratings').select('id, value').eq('post_id', piPostId).eq('user_id', piCurrentUser.id).maybeSingle();
+    .from('ratings').select('id, rating_type').eq('post_id', piPostId).eq('user_id', piCurrentUser.id).maybeSingle();
 
-  if (existing && existing.value === value) {
+    if (existing && existing.rating_type === value) {
     await supabase.from('ratings').delete().eq('id', existing.id);
   } else if (existing) {
-    await supabase.from('ratings').update({ value: value }).eq('id', existing.id);
+    await supabase.from('ratings').update({ rating_type: value }).eq('id', existing.id);
   } else {
-    await supabase.from('ratings').insert({ post_id: piPostId, user_id: piCurrentUser.id, value: value });
+    await supabase.from('ratings').insert({ post_id: piPostId, user_id: piCurrentUser.id, rating_type: value });
   }
 
   document.getElementById('btn-fire').classList.remove('active-rating');
