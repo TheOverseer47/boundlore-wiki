@@ -13,13 +13,29 @@ async function initPostInteractions(postId) {
   const { data: sessionData } = await supabase.auth.getSession();
   piCurrentUser = sessionData.session ? sessionData.session.user : null;
 
+  let piIsBanned = false;
   if (piCurrentUser) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, is_banned')
       .eq('id', piCurrentUser.id)
       .single();
     piIsAdmin = profile && profile.role === 'admin';
+    piIsBanned = profile && profile.is_banned === true;
+
+    if (piIsBanned) {
+      const form = document.getElementById('commentForm');
+      if (form) {
+        form.outerHTML = '<p style="color:#e05555;text-align:center;padding:12px">Dein Account wurde gesperrt und kann keine Kommentare verfassen.</p>';
+      }
+      const reportBtn = document.getElementById('reportPostBtn');
+      if (reportBtn) {
+        reportBtn.disabled = true;
+        reportBtn.textContent = 'Reporting disabled';
+      }
+      document.getElementById('btn-fire')?.setAttribute('disabled', 'true');
+      document.getElementById('btn-down')?.setAttribute('disabled', 'true');
+    }
   }
 
   await loadRatings();

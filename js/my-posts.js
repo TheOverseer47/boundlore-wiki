@@ -43,9 +43,6 @@ async function renderMyPosts(userId) {
     if (post.status === "published") {
       actions.push("<a href=\"/wiki/post/?id=" + post.id + "\" style=\"color:var(--accent);font-size:0.85rem;\">View &rarr;</a>");
     }
-    if (post.slug) {
-      actions.push("<a href=\"/wiki/edit-post/?slug=" + encodeURIComponent(post.slug) + "\" style=\"color:var(--accent);font-size:0.85rem;\">Edit</a>");
-    }
 
     const row = document.createElement("div");
     row.style.cssText = "display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);";

@@ -10,6 +10,25 @@ async function renderAuthNav() {
   const { data: sessionData } = await supabase.auth.getSession();
   const session = sessionData.session;
 
+  if (session) {
+    const { data: banCheck, error: banError } = await supabase
+      .from('profiles')
+      .select('is_banned')
+      .eq('id', session.user.id)
+      .single();
+
+    if (banError) {
+      console.error('Ban check failed:', banError);
+    }
+
+    if (banCheck?.is_banned) {
+      await supabase.auth.signOut();
+      alert('Dein Account wurde gesperrt. Bitte kontaktiere den Support.');
+      window.location.href = '/wiki/login/';
+      return;
+    }
+  }
+
   if (!session) {
     authArea.innerHTML = '<a href="/wiki/login/" class="btn-contribute">Login</a>';
     return;

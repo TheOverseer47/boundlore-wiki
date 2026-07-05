@@ -93,6 +93,32 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     return;
   }
 
+  const user = data.user;
+  if (user) {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_banned')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      msg.textContent = 'Login failed: ' + profileError.message;
+      msg.style.color = '#e05555';
+      btn.disabled = false;
+      btn.textContent = 'Log In →';
+      return;
+    }
+
+    if (profile?.is_banned) {
+      await supabase.auth.signOut();
+      msg.textContent = 'Dein Account wurde gesperrt. Bitte kontaktiere den Support.';
+      msg.style.color = '#e05555';
+      btn.disabled = false;
+      btn.textContent = 'Log In →';
+      return;
+    }
+  }
+
   msg.textContent = 'Success! Redirecting...';
   msg.style.color = '#50c878';
   setTimeout(function() { window.location.href = '/'; }, 800);

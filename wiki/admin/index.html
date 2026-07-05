@@ -283,7 +283,7 @@ async function loadAllPosts() {
 async function loadUsers() {
   const { data: users, error } = await supabase
     .from("profiles")
-    .select("id, username, role, created_at")
+    .select("id, username, role, created_at, is_banned")
     .order("created_at", { ascending: false });
 
   const tbody = document.getElementById("usersBody");
@@ -293,14 +293,17 @@ async function loadUsers() {
   users.forEach(function(u) {
     const roleClass = u.role === "admin" ? "badge-admin" : "badge-member";
     const isSelf = u.id === currentAdminId;
+    const banBadge = u.is_banned ? '<span class="badge" style="background:#8b0000">Banned</span>' : '';
     const tr = document.createElement("tr");
     tr.innerHTML =
-      "<td>" + escapeHtmlA(u.username) + (isSelf ? " (you)" : "") + "</td>" +
+      "<td>" + escapeHtmlA(u.username) + (isSelf ? " (you)" : "") + " " + banBadge + "</td>" +
       "<td><span class=\"badge " + roleClass + "\">" + u.role + "</span></td>" +
       "<td>" + new Date(u.created_at).toLocaleDateString() + "</td>" +
       "<td>" + (isSelf ? "-" :
         "<button class=\"btn-small\" style=\"background:" + (u.role === "admin" ? "#e0a83a" : "#a05ce8") + ";\" data-action=\"togglerole\" data-id=\"" + u.id + "\" data-role=\"" + u.role + "\">" +
-        (u.role === "admin" ? "Revoke Admin" : "Make Admin") + "</button>") + "</td>";
+        (u.role === "admin" ? "Revoke Admin" : "Make Admin") + "</button> " +
+        "<button class=\"btn-small\" style=\"background:" + (u.is_banned ? "#50c878" : "#e05555") + ";\" data-action=\"toggleban\" data-id=\"" + u.id + "\" data-banned=\"" + u.is_banned + "\">" +
+        (u.is_banned ? "Unban" : "Ban") + "</button>") + "</td>";
     tbody.appendChild(tr);
   });
 
@@ -309,6 +312,18 @@ async function loadUsers() {
       const newRole = this.dataset.role === "admin" ? "member" : "admin";
       if (!confirm("Change this user's role to " + newRole + "?")) return;
       await supabase.from("profiles").update({ role: newRole }).eq("id", this.dataset.id);
+      loadUsers();
+    });
+  });
+
+  tbody.querySelectorAll("[data-action=\"toggleban\"]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      const willBan = this.dataset.banned !== 'true';
+      if (!confirm(willBan ? 'Diesen Nutzer wirklich bannen?' : 'Bann wirklich aufheben?')) return;
+      await supabase.from('profiles').update({
+        is_banned: willBan,
+        banned_at: willBan ? new Date().toISOString() : null
+      }).eq('id', this.dataset.id);
       loadUsers();
     });
   });
