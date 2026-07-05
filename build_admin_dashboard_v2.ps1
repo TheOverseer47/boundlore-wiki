@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+# ============================================
+# BoundLore - Admin Dashboard V2 (5 Tabs: Overview, Pending, All Posts, Users, Reports)
+# Run from project ROOT in PowerShell
+# ============================================
+
+Write-Host "Rebuilding wiki/admin/index.html with full Admin Dashboard V2..." -ForegroundColor Cyan
+
+@'
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -386,3 +394,6 @@ checkAdmin();
 </script>
 </body>
 </html>
+'@ | Set-Content -Path "wiki/admin/index.html" -Encoding UTF8
+
+Write-Host "Done. Admin Dashboard V2 created." -ForegroundColor Green
