@@ -3,98 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Post - BoundLore</title>
-<link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Inter:wght@300;400;600&amp;display=swap" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-<nav class="navbar" id="navbar">
-  <div class="nav-container">
-    <a href="/" class="nav-logo">
-      <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
-      <span class="logo-text">Bound<span class="accent">Lore</span></span>
-    </a>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="/">Home</a></li>
-      <li><a href="/wiki/creatures/">Creatures</a></li>
-      <li><a href="/wiki/biomes/">Biomes</a></li>
-      <li><a href="/wiki/items/">Items</a></li>
-      <li><a href="/wiki/guides/">Guides</a></li>
-      <li><a href="/wiki/guilds/">Guilds</a></li>
-      <li><a href="/wiki/community/">Community</a></li>
-      <li><a href="/wiki/news/">News</a></li>
-    </ul>
-    <div class="nav-right">
-      <input type="text" id="searchInput" placeholder="Search..." class="nav-search-input" />
-      <div id="searchResults" class="search-results-dropdown"></div>
-      <span id="authArea"></span>
-      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-    </div>
-  </div>
-</nav>
-
-<div style="max-width:800px;margin:40px auto;padding:0 20px;">
-
-  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; <span id="breadcrumbCategory"></span></p>
-
-  <div id="postLoading" style="text-align:center;padding:60px 0;color:var(--text-muted);">Loading post...</div>
-  <div id="postNotFound" style="display:none;text-align:center;padding:60px 0;">
-    <h1>Post not found</h1>
-    <p>This post may have been removed or the link is incorrect.</p>
-  </div>
-
-  <article id="postContent" style="display:none;">
-    <h1 id="postTitle"></h1>
-    <div class="post-meta" style="color:var(--text-muted);margin-bottom:24px;">
-      By <span id="postAuthor"></span> &middot; <span id="postDate"></span>
-      <span id="postEditedTag" style="display:none;"> (edited)</span>
-    </div>
-
-    <div id="postBody" class="post-body"></div>
-
-    <div class="post-actions" style="margin-top:24px;display:flex;align-items:center;gap:12px;">
-      <button id="btnUpvote" class="reaction-btn">👍 <span id="upvoteCount">0</span></button>
-      <button id="btnDownvote" class="reaction-btn">👎 <span id="downvoteCount">0</span></button>
-      <a href="#" id="btnEditPost" style="display:none;margin-left:auto;" class="btn-secondary">Edit</a>
-      <button id="btnReport" class="btn-secondary">🚩 Report</button>
-    </div>
-
-    <hr style="margin:32px 0;border-color:#333;" />
-
-    <section id="commentsSection">
-      <h2>Comments (<span id="commentCount">0</span>)</h2>
-      <div id="commentsList"></div>
-
-      <div id="commentFormBox" style="margin-top:20px;">
-        <textarea id="newCommentText" class="form-input" rows="3" placeholder="Write a comment..."></textarea>
-        <button id="btnSubmitComment" class="btn-contribute" style="margin-top:8px;">Post Comment</button>
-      </div>
-      <p id="commentLoginPrompt" style="display:none;">Please <a href="/wiki/login/">log in</a> to leave a comment.</p>
-    </section>
-  </article>
-
-</div>
-
-<footer class="footer">
-  <div class="footer-bottom">
-    <p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p>
-  </div>
-</footer>
-
-<script src="/js/supabase-config.js"></script>
-<script src="/js/auth-nav.js"></script>
-<script src="/js/search.js"></script>
-<script src="/js/post-detail.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="Community post on BoundLore." />
 <title id="pageTitle">Post - BoundLore</title>
 <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
@@ -178,7 +86,7 @@ async function loadPost() {
 
   const { data: post, error } = await supabase
     .from('posts')
-    .select('id, title, category, content, created_at, status, profiles(username)')
+    .select('id, title, post_type, guide_subcategory, category, content, created_at, status, profiles(username)')
     .eq('id', postId)
     .single();
 
@@ -189,10 +97,11 @@ async function loadPost() {
   }
 
   const authorName = post.profiles ? post.profiles.username : 'Unknown';
+  const categoryLabel = post.post_type === 'guide' ? post.guide_subcategory : post.category;
 
   document.title = post.title + ' - BoundLore';
   document.getElementById('pageTitle').textContent = post.title + ' - BoundLore';
-  document.getElementById('breadcrumbCategory').textContent = post.category;
+  document.getElementById('breadcrumbCategory').textContent = categoryLabel || 'Uncategorized';
   document.getElementById('postTitleHeading').textContent = post.title;
   document.getElementById('postMeta').textContent = 'By ' + authorName + ' · ' + new Date(post.created_at).toLocaleDateString();
   document.getElementById('postContent').innerHTML = post.content;
