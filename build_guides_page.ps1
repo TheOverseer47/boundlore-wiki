@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+# ============================================
+# BoundLore - Guides Page (Dynamic)
+# Run from project ROOT in PowerShell
+# ============================================
+
+Write-Host "Rebuilding wiki/guides/index.html with dynamic post list..." -ForegroundColor Cyan
+
+@'
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -37,7 +45,7 @@
 
 <div class="wiki-hero">
   <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Guides</p>
-  <h1>ðŸ“– Guides</h1>
+  <h1>📖 Guides</h1>
   <p>Community-written tips, tutorials and survival strategies for Light No Fire</p>
 </div>
 
@@ -51,7 +59,7 @@
   <div class="form-box" style="text-align:center;margin-top:40px;background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,140,0,0.05));">
     <h2>Write a Guide</h2>
     <p style="color:var(--text-muted);margin-bottom:20px;">Discovered something useful? Submit it and it will be reviewed and published here.</p>
-    <a href="/wiki/create-post/" class="btn-contribute" style="display:inline-block;">âœ Submit a Guide</a>
+    <a href="/wiki/create-post/" class="btn-contribute" style="display:inline-block;">✏ Submit a Guide</a>
   </div>
 
 </div>
@@ -68,3 +76,6 @@ renderCategoryPosts("guides");
 </script>
 </body>
 </html>
+'@ | Set-Content -Path "wiki/guides/index.html" -Encoding UTF8
+
+Write-Host "Done." -ForegroundColor Green

@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+# ============================================
+# BoundLore - Account "My Posts" Section
+# Run from project ROOT in PowerShell
+# ============================================
+
+Write-Host "Rebuilding wiki/account/index.html with My Posts section..." -ForegroundColor Cyan
+
+@'
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -107,3 +115,4 @@ loadAccount();
 </script>
 </body>
 </html>
+'@ | Set-Content -Path "wiki/account/index.html" -Encoding UTF8
