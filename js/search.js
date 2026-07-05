@@ -36,7 +36,7 @@ async function runSearch(query, resultsBox) {
     const { data, error } = await supabase
       .from("posts")
       .select("id, title, category, post_type, slug, excerpt")
-      .eq("status", "published")
+      .eq("status", "approved")
       .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%`)
       .limit(8);
 
