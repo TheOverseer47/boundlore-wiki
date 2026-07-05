@@ -10,7 +10,7 @@ async function renderCategoryPosts(categorySlug) {
   // Build query with special handling for the 'guides' pseudo-category
   let query = supabase
     .from("posts")
-    .select("id, title, category, content, is_discovery, created_at, profiles(username)")
+    .select("id, title, category, content, is_discovery, post_type, created_at, profiles(username)")
     .eq("status", "published");
 
   if (categorySlug === "guides") {
@@ -46,6 +46,8 @@ async function renderCategoryPosts(categorySlug) {
       "<p style=\"color:var(--text-muted);font-size:0.8rem;margin-bottom:8px;\">By " + escapeHtmlRP(authorName) + " &middot; " + new Date(post.created_at).toLocaleDateString() + "</p>" +
       "<p style=\"color:var(--text-secondary);\">" + escapeHtmlRP(plainText) + "...</p>";
 
+    card.innerHTML +=
+      "<div class=\"post-rating-summary\" data-post-id=\"" + post.id + "\"></div>";
     card.addEventListener("click", function() {
       window.location.href = "/wiki/post/?id=" + post.id;
     });

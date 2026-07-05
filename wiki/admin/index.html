@@ -352,15 +352,30 @@ async function loadReports() {
 
   list.querySelectorAll("[data-action=\"dismiss\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      await supabase.from("reports").delete().eq("id", this.dataset.id);
+      const { error } = await supabase.from("reports").delete().eq("id", this.dataset.id);
+      if (error) {
+        console.error("Failed to delete report:", error);
+        alert("Failed to delete report: " + error.message);
+        return;
+      }
       loadReports(); loadOverview();
     });
   });
   list.querySelectorAll("[data-action=\"deletepost\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
       if (!confirm("Delete this post and dismiss the report?")) return;
-      await supabase.from("posts").delete().eq("id", this.dataset.postid);
-      await supabase.from("reports").delete().eq("id", this.dataset.id);
+      const { error: postDeleteError } = await supabase.from("posts").delete().eq("id", this.dataset.postid);
+      if (postDeleteError) {
+        console.error("Failed to delete post:", postDeleteError);
+        alert("Failed to delete post: " + postDeleteError.message);
+        return;
+      }
+      const { error: reportDeleteError } = await supabase.from("reports").delete().eq("id", this.dataset.id);
+      if (reportDeleteError) {
+        console.error("Failed to delete report:", reportDeleteError);
+        alert("Failed to delete report: " + reportDeleteError.message);
+        return;
+      }
       loadReports(); loadAllPosts(); loadOverview();
     });
   });

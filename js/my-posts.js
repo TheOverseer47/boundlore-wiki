@@ -9,7 +9,7 @@ async function renderMyPosts(userId) {
 
   const { data: posts, error } = await supabase
     .from("posts")
-    .select("id, title, category, status, is_discovery, created_at")
+    .select("id, slug, title, category, post_type, guide_subcategory, status, created_at")
     .eq("author_id", userId)
     .order("created_at", { ascending: false });
 
@@ -23,14 +23,28 @@ async function renderMyPosts(userId) {
   if (emptyMsg) emptyMsg.style.display = "none";
 
   posts.forEach(function(post) {
-    const cat = typeof getCategoryBySlug === "function" ? getCategoryBySlug(post.category) : null;
-    const catLabel = cat ? (cat.icon + " " + cat.label) : post.category;
+    const isGuide = post.post_type === "guide";
+    const categoryKey = isGuide ? post.guide_subcategory : post.category;
+    const cat = typeof getCategoryBySlug === "function" ? getCategoryBySlug(categoryKey) : null;
+    const catLabel = isGuide
+      ? (post.guide_subcategory || "Guide")
+      : (cat ? (cat.icon + " " + cat.label) : (post.category || "General"));
 
     let statusBadge = "";
     if (post.status === "pending") {
       statusBadge = "<span style=\"background:#e0a83a;color:#111;padding:2px 10px;border-radius:10px;font-size:0.75rem;font-weight:600;\">Pending Review</span>";
     } else if (post.status === "published") {
       statusBadge = "<span style=\"background:#50c878;color:#111;padding:2px 10px;border-radius:10px;font-size:0.75rem;font-weight:600;\">Published</span>";
+    } else if (post.status === "approved") {
+      statusBadge = "<span style=\"background:#4b8bf5;color:#fff;padding:2px 10px;border-radius:10px;font-size:0.75rem;font-weight:600;\">Approved</span>";
+    }
+
+    const actions = [];
+    if (post.status === "published") {
+      actions.push("<a href=\"/wiki/post/?id=" + post.id + "\" style=\"color:var(--accent);font-size:0.85rem;\">View &rarr;</a>");
+    }
+    if (post.slug) {
+      actions.push("<a href=\"/wiki/edit-post/?slug=" + encodeURIComponent(post.slug) + "\" style=\"color:var(--accent);font-size:0.85rem;\">Edit</a>");
     }
 
     const row = document.createElement("div");
@@ -40,9 +54,7 @@ async function renderMyPosts(userId) {
       "<p style=\"font-weight:600;margin:0;\">" + escapeHtmlMP(post.title) + "</p>" +
       "<p style=\"color:var(--text-muted);font-size:0.8rem;margin:2px 0 0;\">" + catLabel + " &middot; " + new Date(post.created_at).toLocaleDateString() + "</p>" +
       "</div>" +
-      "<div style=\"display:flex;align-items:center;gap:10px;\">" + statusBadge +
-      (post.status === "published" ? "<a href=\"/wiki/post/?id=" + post.id + "\" style=\"color:var(--accent);font-size:0.85rem;\">View &rarr;</a>" : "") +
-      "</div>";
+      "<div style=\"display:flex;align-items:center;gap:10px;flex-wrap:wrap;\">" + statusBadge + actions.join("") + "</div>";
     container.appendChild(row);
   });
 }

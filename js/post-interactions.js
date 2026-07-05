@@ -5,12 +5,22 @@
 
 let piCurrentUser = null;
 let piPostId = null;
+let piIsAdmin = false;
 
 async function initPostInteractions(postId) {
   piPostId = postId;
 
   const { data: sessionData } = await supabase.auth.getSession();
   piCurrentUser = sessionData.session ? sessionData.session.user : null;
+
+  if (piCurrentUser) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', piCurrentUser.id)
+      .single();
+    piIsAdmin = profile && profile.role === 'admin';
+  }
 
   await loadRatings();
   await loadComments();
@@ -70,32 +80,71 @@ async function setRating(value) {
 async function loadComments() {
   const { data: comments, error } = await supabase
     .from('comments')
-    .select('id, content, created_at, author_id, profiles(username)')
+    .select('*, profiles:author_id(username)')
     .eq('post_id', piPostId)
     .order('created_at', { ascending: true });
 
   const list = document.getElementById('commentsList');
-  list.innerHTML = '';
+  document.getElementById('commentCount').textContent = comments ? comments.length : 0;
 
   if (error || !comments || comments.length === 0) {
     list.innerHTML = '<p style="color:var(--text-muted);">No comments yet. Be the first to share your thoughts!</p>';
-    document.getElementById('commentCount').textContent = '0';
     return;
   }
 
-  document.getElementById('commentCount').textContent = comments.length;
+  list.innerHTML = comments.map(c => renderComment(c)).join('');
 
   comments.forEach(function(c) {
-    const authorName = c.profiles ? c.profiles.username : 'Unknown';
-    const div = document.createElement('div');
-    div.className = 'comment-item';
-    div.style.cssText = 'padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);';
-    div.innerHTML =
-      '<p style="font-weight:600;margin-bottom:4px;">' + piEscape(authorName) +
-      ' <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">' + new Date(c.created_at).toLocaleString() + '</span></p>' +
-      '<p style="color:var(--text-secondary);white-space:pre-wrap;">' + piEscape(c.content) + '</p>';
-    list.appendChild(div);
+    if (piCurrentUser && (piCurrentUser.id === c.author_id || piIsAdmin)) {
+      const delBtn = document.getElementById(`del-${c.id}`);
+      if (delBtn) delBtn.onclick = () => deleteComment(c.id, piPostId);
+    }
+    if (piCurrentUser && piCurrentUser.id === c.author_id) {
+      const editBtn = document.getElementById(`edit-${c.id}`);
+      if (editBtn) editBtn.onclick = () => enableCommentEdit(c, piPostId);
+    }
   });
+}
+
+function renderComment(c) {
+  const date = new Date(c.created_at).toLocaleDateString();
+  const editedTag = c.updated_at && c.updated_at !== c.created_at ? ' (edited)' : '';
+  const canEdit = piCurrentUser && piCurrentUser.id === c.author_id;
+  const canDelete = piCurrentUser && (piCurrentUser.id === c.author_id || piIsAdmin);
+
+  return `
+    <div class="comment-item" id="comment-${c.id}" style="border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 0;">
+      <div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:6px;">
+        <strong>${piEscape(c.profiles?.username || 'Unknown')}</strong> &middot; ${date}${editedTag}
+      </div>
+      <div class="comment-text" id="text-${c.id}" style="color:var(--text-secondary);white-space:pre-wrap;">${piEscape(c.content)}</div>
+      <div class="comment-actions" style="margin-top:8px;display:flex;gap:8px;">
+        ${canEdit ? `<button id="edit-${c.id}" class="link-btn">Edit</button>` : ''}
+        ${canDelete ? `<button id="del-${c.id}" class="link-btn">Delete</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function enableCommentEdit(comment, postId) {
+  const textEl = document.getElementById(`text-${comment.id}`);
+  if (!textEl) return;
+  textEl.innerHTML = `
+    <textarea id="editArea-${comment.id}" class="form-input" rows="3">${piEscape(comment.content)}</textarea>
+    <button id="saveEdit-${comment.id}" class="btn-contribute" style="margin-top:8px;">Save</button>
+  `;
+  document.getElementById(`saveEdit-${comment.id}`).onclick = async () => {
+    const newText = document.getElementById(`editArea-${comment.id}`).value.trim();
+    if (!newText) return;
+    await supabase.from('comments').update({ content: newText }).eq('id', comment.id);
+    loadComments();
+  };
+}
+
+async function deleteComment(commentId, postId) {
+  if (!confirm('Delete this comment?')) return;
+  await supabase.from('comments').delete().eq('id', commentId);
+  loadComments();
 }
 
 function setupCommentForm() {
