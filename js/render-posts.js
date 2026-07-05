@@ -7,12 +7,20 @@ async function renderCategoryPosts(categorySlug) {
   const emptyMsg = document.getElementById("categoryPostsEmpty");
   if (!container) return;
 
-  const { data: posts, error } = await supabase
+  // Build query with special handling for the 'guides' pseudo-category
+  let query = supabase
     .from("posts")
     .select("id, title, category, content, is_discovery, created_at, profiles(username)")
-    .eq("category", categorySlug)
-    .eq("status", "published")
-    .order("created_at", { ascending: false });
+    .eq("status", "published");
+
+  if (categorySlug === "guides") {
+    // Guides are stored as post_type = 'guide' (category is null)
+    query = query.eq("post_type", "guide");
+  } else {
+    query = query.eq("category", categorySlug);
+  }
+
+  const { data: posts, error } = await query.order("created_at", { ascending: false });
 
   container.innerHTML = "";
 
