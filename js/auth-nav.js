@@ -7,7 +7,7 @@ async function renderAuthNav() {
   const authArea = document.getElementById('authArea');
   if (!authArea) return;
 
-  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const { data: sessionData } = await supabase.auth.getSession();
   const session = sessionData.session;
 
   if (!session) {
@@ -15,7 +15,7 @@ async function renderAuthNav() {
     return;
   }
 
-  const { data: profile } = await supabaseClient
+  const { data: profile } = await supabase
     .from('profiles').select('username, role').eq('id', session.user.id).single();
 
   const username = profile ? profile.username : 'Account';
@@ -46,7 +46,7 @@ async function renderAuthNav() {
 
   document.getElementById('logoutBtn').addEventListener('click', async function(e) {
     e.preventDefault();
-    await supabaseClient.auth.signOut();
+    await supabase.auth.signOut();
     window.location.href = '/';
   });
 }
