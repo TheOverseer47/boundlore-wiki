@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+# ============================================
+# BoundLore - Admin Dashboard Upgrade + Nav CSS Fix
+# Run from project ROOT in PowerShell
+# ============================================
+
+Write-Host "Updating wiki/admin/index.html..." -ForegroundColor Cyan
+
+@'
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -237,3 +245,54 @@ checkAdmin();
 </script>
 </body>
 </html>
+'@ | Set-Content -Path "wiki/admin/index.html" -Encoding UTF8
+
+Write-Host "Appending nav dropdown CSS fix to css/style.css..." -ForegroundColor Cyan
+
+@'
+
+/* ===== Nav Dropdown Layout Fix (Phase 3) ===== */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.account-menu {
+  position: relative;
+  display: inline-block;
+}
+.account-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: #14141a;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  min-width: 180px;
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.account-dropdown.open {
+  display: block;
+}
+.account-dropdown a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.account-dropdown a:hover {
+  background: rgba(255,255,255,0.08);
+}
+#authArea {
+  display: inline-flex;
+  align-items: center;
+}
+'@ | Add-Content -Path "css/style.css" -Encoding UTF8
+
+Write-Host "Done. Review changes, then commit and push." -ForegroundColor Green
