@@ -1,4 +1,4 @@
-﻿// render-posts.js
+// render-posts.js
 // Shared logic to fetch and render published posts for a given category on any category page.
 // Usage on a category page: renderCategoryPosts("guides");
 
@@ -7,7 +7,7 @@ async function renderCategoryPosts(categorySlug) {
   const emptyMsg = document.getElementById("categoryPostsEmpty");
   if (!container) return;
 
-  const { data: posts, error } = await supabaseClient
+  const { data: posts, error } = await supabase
     .from("posts")
     .select("id, title, category, content, is_discovery, created_at, profiles(username)")
     .eq("category", categorySlug)

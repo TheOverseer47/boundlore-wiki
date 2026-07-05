@@ -91,7 +91,7 @@ document.getElementById('requestForm').addEventListener('submit', async function
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: 'https://boundlore.com/wiki/reset-password/'
   });
 
@@ -122,7 +122,7 @@ document.getElementById('updateForm').addEventListener('submit', async function(
   btn.disabled = true;
   btn.textContent = 'Updating...';
 
-  const { error } = await supabaseClient.auth.updateUser({ password: p1 });
+  const { error } = await supabase.auth.updateUser({ password: p1 });
 
   if (error) {
     msg.textContent = 'Error: ' + error.message;

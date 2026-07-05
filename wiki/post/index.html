@@ -84,7 +84,7 @@ async function loadPost() {
     return;
   }
 
-  const { data: post, error } = await supabaseClient
+  const { data: post, error } = await supabase
     .from('posts')
     .select('id, title, category, content, created_at, status, profiles(username)')
     .eq('id', postId)

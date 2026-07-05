@@ -107,7 +107,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
   btn.disabled = true;
   btn.textContent = 'Checking username...';
 
-  const { data: existing, error: checkErr } = await supabaseClient
+  const { data: existing, error: checkErr } = await supabase
     .from('profiles')
     .select('username')
     .eq('username', username)
@@ -131,7 +131,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
   btn.textContent = 'Creating account...';
 
-  const { data, error } = await supabaseClient.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: email,
     password: password,
     options: {

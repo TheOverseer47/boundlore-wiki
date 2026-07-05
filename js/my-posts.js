@@ -1,4 +1,4 @@
-﻿// my-posts.js
+// my-posts.js
 // Renders the logged-in user's own posts (all statuses) on the account page.
 // Usage: renderMyPosts(currentUserId);
 
@@ -7,7 +7,7 @@ async function renderMyPosts(userId) {
   const emptyMsg = document.getElementById("myPostsEmpty");
   if (!container) return;
 
-  const { data: posts, error } = await supabaseClient
+  const { data: posts, error } = await supabase
     .from("posts")
     .select("id, title, category, status, is_discovery, created_at")
     .eq("author_id", userId)

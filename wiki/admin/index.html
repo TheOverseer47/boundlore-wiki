@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -133,12 +133,12 @@
 let currentAdminId = null;
 
 async function checkAdmin() {
-  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData.session) { window.location.href = "/wiki/login/"; return; }
 
   currentAdminId = sessionData.session.user.id;
 
-  const { data: profile, error } = await supabaseClient
+  const { data: profile, error } = await supabase
     .from("profiles").select("role").eq("id", currentAdminId).single();
 
   if (error || !profile || profile.role !== "admin") {
@@ -158,11 +158,11 @@ async function checkAdmin() {
 }
 
 async function loadOverview() {
-  const { count: userCount } = await supabaseClient.from("profiles").select("*", { count: "exact", head: true });
-  const { count: publishedCount } = await supabaseClient.from("posts").select("*", { count: "exact", head: true }).eq("status", "published");
-  const { count: pendingCount } = await supabaseClient.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending");
-  const { count: discoveryCount } = await supabaseClient.from("posts").select("*", { count: "exact", head: true }).eq("is_discovery", true);
-  const { count: reportCount } = await supabaseClient.from("reports").select("*", { count: "exact", head: true });
+  const { count: userCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
+  const { count: publishedCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "published");
+  const { count: pendingCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending");
+  const { count: discoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("is_discovery", true);
+  const { count: reportCount } = await supabase.from("reports").select("*", { count: "exact", head: true });
 
   document.getElementById("statUsers").textContent = userCount || 0;
   document.getElementById("statPublished").textContent = publishedCount || 0;
@@ -170,7 +170,7 @@ async function loadOverview() {
   document.getElementById("statDiscoveries").textContent = discoveryCount || 0;
   document.getElementById("statReports").textContent = reportCount || 0;
 
-  const { data: allPosts } = await supabaseClient.from("posts").select("category").eq("status", "published");
+  const { data: allPosts } = await supabase.from("posts").select("category").eq("status", "published");
   const breakdown = document.getElementById("categoryBreakdown");
   breakdown.innerHTML = "";
   if (allPosts && typeof BOUNDLORE_CATEGORIES !== "undefined") {
@@ -185,7 +185,7 @@ async function loadOverview() {
 }
 
 async function loadPending() {
-  const { data: posts, error } = await supabaseClient
+  const { data: posts, error } = await supabase
     .from("posts")
     .select("id, title, category, content, is_discovery, created_at, author_id, profiles(username)")
     .eq("status", "pending")
@@ -230,21 +230,21 @@ async function loadPending() {
 
   list.querySelectorAll("[data-action=\"approve\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      await supabaseClient.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
+      await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
       loadPending(); loadAllPosts(); loadOverview();
     });
   });
   list.querySelectorAll("[data-action=\"reject\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
       if (!confirm("Really reject and permanently delete this post?")) return;
-      await supabaseClient.from("posts").delete().eq("id", this.dataset.id);
+      await supabase.from("posts").delete().eq("id", this.dataset.id);
       loadPending(); loadAllPosts(); loadOverview();
     });
   });
 }
 
 async function loadAllPosts() {
-  const { data: posts, error } = await supabaseClient
+  const { data: posts, error } = await supabase
     .from("posts")
     .select("id, title, category, status, is_discovery, created_at, profiles(username)")
     .order("created_at", { ascending: false });
@@ -274,14 +274,14 @@ async function loadAllPosts() {
   tbody.querySelectorAll("[data-action=\"deleteany\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
       if (!confirm("Permanently delete this post?")) return;
-      await supabaseClient.from("posts").delete().eq("id", this.dataset.id);
+      await supabase.from("posts").delete().eq("id", this.dataset.id);
       loadAllPosts(); loadPending(); loadOverview();
     });
   });
 }
 
 async function loadUsers() {
-  const { data: users, error } = await supabaseClient
+  const { data: users, error } = await supabase
     .from("profiles")
     .select("id, username, role, created_at")
     .order("created_at", { ascending: false });
@@ -308,14 +308,14 @@ async function loadUsers() {
     btn.addEventListener("click", async function() {
       const newRole = this.dataset.role === "admin" ? "member" : "admin";
       if (!confirm("Change this user's role to " + newRole + "?")) return;
-      await supabaseClient.from("profiles").update({ role: newRole }).eq("id", this.dataset.id);
+      await supabase.from("profiles").update({ role: newRole }).eq("id", this.dataset.id);
       loadUsers();
     });
   });
 }
 
 async function loadReports() {
-  const { data: reports, error } = await supabaseClient
+  const { data: reports, error } = await supabase
     .from("reports")
     .select("id, reason, created_at, post_id, reporter_id, posts(title), profiles(username)")
     .order("created_at", { ascending: true });
@@ -352,15 +352,15 @@ async function loadReports() {
 
   list.querySelectorAll("[data-action=\"dismiss\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      await supabaseClient.from("reports").delete().eq("id", this.dataset.id);
+      await supabase.from("reports").delete().eq("id", this.dataset.id);
       loadReports(); loadOverview();
     });
   });
   list.querySelectorAll("[data-action=\"deletepost\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
       if (!confirm("Delete this post and dismiss the report?")) return;
-      await supabaseClient.from("posts").delete().eq("id", this.dataset.postid);
-      await supabaseClient.from("reports").delete().eq("id", this.dataset.id);
+      await supabase.from("posts").delete().eq("id", this.dataset.postid);
+      await supabase.from("reports").delete().eq("id", this.dataset.id);
       loadReports(); loadAllPosts(); loadOverview();
     });
   });

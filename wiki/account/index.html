@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -79,12 +79,12 @@
 <script src="/js/main.js"></script>
 <script>
 async function loadAccount() {
-  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData.session) { window.location.href = "/wiki/login/"; return; }
 
   const user = sessionData.session.user;
 
-  const { data: profile } = await supabaseClient
+  const { data: profile } = await supabase
     .from("profiles").select("username, role, created_at").eq("id", user.id).single();
 
   document.getElementById("gateBox").style.display = "none";
@@ -98,7 +98,7 @@ async function loadAccount() {
   renderMyPosts(user.id);
 
   document.getElementById("logoutBtn2").addEventListener("click", async function() {
-    await supabaseClient.auth.signOut();
+    await supabase.auth.signOut();
     window.location.href = "/";
   });
 }

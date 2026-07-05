@@ -9,7 +9,7 @@ let piPostId = null;
 async function initPostInteractions(postId) {
   piPostId = postId;
 
-  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const { data: sessionData } = await supabase.auth.getSession();
   piCurrentUser = sessionData.session ? sessionData.session.user : null;
 
   await loadRatings();
@@ -20,10 +20,10 @@ async function initPostInteractions(postId) {
 }
 
 async function loadRatings() {
-  const { count: fireCount } = await supabaseClient
+  const { count: fireCount } = await supabase
     .from('ratings').select('id', { count: 'exact', head: true })
     .eq('post_id', piPostId).eq('value', 'fire');
-  const { count: downCount } = await supabaseClient
+  const { count: downCount } = await supabase
     .from('ratings').select('id', { count: 'exact', head: true })
     .eq('post_id', piPostId).eq('value', 'down');
 
@@ -31,7 +31,7 @@ async function loadRatings() {
   document.getElementById('downCount').textContent = downCount || 0;
 
   if (piCurrentUser) {
-    const { data: myRating } = await supabaseClient
+    const { data: myRating } = await supabase
       .from('ratings').select('value').eq('post_id', piPostId).eq('user_id', piCurrentUser.id).maybeSingle();
     if (myRating) {
       document.getElementById('btn-' + myRating.value).classList.add('active-rating');
@@ -51,15 +51,15 @@ async function setRating(value) {
     return;
   }
 
-  const { data: existing } = await supabaseClient
+  const { data: existing } = await supabase
     .from('ratings').select('id, value').eq('post_id', piPostId).eq('user_id', piCurrentUser.id).maybeSingle();
 
   if (existing && existing.value === value) {
-    await supabaseClient.from('ratings').delete().eq('id', existing.id);
+    await supabase.from('ratings').delete().eq('id', existing.id);
   } else if (existing) {
-    await supabaseClient.from('ratings').update({ value: value }).eq('id', existing.id);
+    await supabase.from('ratings').update({ value: value }).eq('id', existing.id);
   } else {
-    await supabaseClient.from('ratings').insert({ post_id: piPostId, user_id: piCurrentUser.id, value: value });
+    await supabase.from('ratings').insert({ post_id: piPostId, user_id: piCurrentUser.id, value: value });
   }
 
   document.getElementById('btn-fire').classList.remove('active-rating');
@@ -68,7 +68,7 @@ async function setRating(value) {
 }
 
 async function loadComments() {
-  const { data: comments, error } = await supabaseClient
+  const { data: comments, error } = await supabase
     .from('comments')
     .select('id, content, created_at, author_id, profiles(username)')
     .eq('post_id', piPostId)
@@ -116,7 +116,7 @@ function setupCommentForm() {
     const btn = document.getElementById('commentSubmitBtn');
     btn.disabled = true;
 
-    const { error } = await supabaseClient.from('comments').insert({
+    const { error } = await supabase.from('comments').insert({
       post_id: piPostId,
       author_id: piCurrentUser.id,
       content: content
@@ -143,7 +143,7 @@ function setupReportButton() {
     const reason = prompt('Why are you reporting this post? Please describe the issue:');
     if (!reason || reason.trim().length < 3) return;
 
-    const { error } = await supabaseClient.from('reports').insert({
+    const { error } = await supabase.from('reports').insert({
       post_id: piPostId,
       reporter_id: piCurrentUser.id,
       reason: reason.trim()
