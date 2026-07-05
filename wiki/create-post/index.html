@@ -1,22 +1,50 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Submit a Guide or Discovery for Light No Fire on BoundLore." />
 <title>Create Post - BoundLore</title>
 <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
 <link rel="stylesheet" href="/css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<nav class="navbar" id="navbar"></nav>
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+      <span class="logo-text">Bound<span class="accent">Lore</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="/wiki/creatures/">Creatures</a></li>
+      <li><a href="/wiki/biomes/">Biomes</a></li>
+      <li><a href="/wiki/items/">Items</a></li>
+      <li><a href="/wiki/guides/">Guides</a></li>
+      <li><a href="/wiki/guilds/">Guilds</a></li>
+      <li><a href="/wiki/community/">Community</a></li>
+      <li><a href="/wiki/news/">News</a></li>
+    </ul>
+    <div class="nav-right">
+      <input type="text" id="searchInput" placeholder="Search..." class="nav-search-input" />
+      <div id="searchResults" class="search-results-dropdown"></div>
+      <span id="authArea"></span>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
 
 <div class="wiki-hero">
+  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Create Post</p>
   <h1>Create a Post</h1>
   <p>Choose whether you are writing a Guide or reporting a Discovery.</p>
 </div>
 
-<div class="form-box" style="max-width:700px;margin:0 auto;">
+<div class="form-box" style="max-width:700px;margin:40px auto;">
 
   <div class="post-type-toggle">
     <button type="button" id="btnTypeGuide" class="type-btn active">Guide</button>
@@ -26,11 +54,11 @@
   <form id="createPostForm">
 
     <label for="postTitle">Title</label>
-    <input type="text" id="postTitle" required maxlength="120" />
+    <input type="text" id="postTitle" class="form-input" required maxlength="120" />
 
     <div id="guideFields">
       <label for="guideSubcategory">Guide Category</label>
-      <select id="guideSubcategory" required>
+      <select id="guideSubcategory" class="form-input" required>
         <option value="">Select a guide type...</option>
         <option value="survival">Survival</option>
         <option value="exploration">Exploration</option>
@@ -48,7 +76,7 @@
 
     <div id="discoveryFields" style="display:none;">
       <label for="discoveryCategory">Which category does this discovery belong to?</label>
-      <select id="discoveryCategory">
+      <select id="discoveryCategory" class="form-input">
         <option value="">Select a category...</option>
         <option value="creatures">Creatures</option>
         <option value="biomes">Biomes</option>
@@ -62,27 +90,29 @@
       <p class="field-hint">Your discovery will appear in this category with a "Community Discovery" badge, pending admin review.</p>
     </div>
 
-    <label for="postContent">Content</label>
+    <label for="postContent" style="margin-top:16px;display:block;">Content</label>
     <div id="postEditor" style="height:250px;background:#111;border:1px solid #333;"></div>
 
-    <label for="postMedia" style="margin-top:16px;">Attach images (optional)</label>
-    <input type="file" id="postMedia" accept="image/*" multiple />
+    <label for="postMedia" style="margin-top:16px;display:block;">Attach images (optional)</label>
+    <input type="file" id="postMedia" accept="image/*" multiple class="form-input" />
 
-    <p id="formError" class="form-error" style="display:none;color:#ff6b6b;"></p>
+    <p id="formError" class="form-error" style="display:none;color:#ff6b6b;margin-top:12px;"></p>
 
     <button type="submit" class="btn-contribute" style="margin-top:20px;">Submit for Review</button>
   </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p>
+  </div>
+</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script src="/js/supabase-config.js"></script>
 <script src="/js/auth-nav.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
 <script src="/js/create-post.js"></script>
 </body>
 </html>
-
-
-
-
