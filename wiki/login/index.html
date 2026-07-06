@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -89,7 +89,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     msg.textContent = 'Login failed: ' + error.message;
     msg.style.color = '#e05555';
     btn.disabled = false;
-    btn.textContent = 'Log In â†’';
+    btn.textContent = 'Log In →';
     return;
   }
 
@@ -105,7 +105,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
       msg.textContent = 'Login failed: ' + profileError.message;
       msg.style.color = '#e05555';
       btn.disabled = false;
-      btn.textContent = 'Log In â†’';
+      btn.textContent = 'Log In →';
       return;
     }
 
@@ -114,7 +114,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
       msg.textContent = 'Dein Account wurde gesperrt. Bitte kontaktiere den Support.';
       msg.style.color = '#e05555';
       btn.disabled = false;
-      btn.textContent = 'Log In â†’';
+      btn.textContent = 'Log In →';
       return;
     }
   }
@@ -133,6 +133,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 </script>
 </body>
 </html>
+
 
 
 

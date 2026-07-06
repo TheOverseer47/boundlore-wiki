@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -117,7 +117,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     msg.textContent = 'Error checking username. Please try again.';
     msg.style.color = '#e05555';
     btn.disabled = false;
-    btn.textContent = 'Register â†’';
+    btn.textContent = 'Register →';
     return;
   }
 
@@ -125,7 +125,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     msg.textContent = 'This username is already taken.';
     msg.style.color = '#e05555';
     btn.disabled = false;
-    btn.textContent = 'Register â†’';
+    btn.textContent = 'Register →';
     return;
   }
 
@@ -144,7 +144,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     msg.textContent = 'Error: ' + error.message;
     msg.style.color = '#e05555';
     btn.disabled = false;
-    btn.textContent = 'Register â†’';
+    btn.textContent = 'Register →';
     return;
   }
 
@@ -154,6 +154,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 </script>
 </body>
 </html>
+
 
 
 

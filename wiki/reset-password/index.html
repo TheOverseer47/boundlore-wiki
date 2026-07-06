@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -103,7 +103,7 @@ document.getElementById('requestForm').addEventListener('submit', async function
     msg.style.color = '#50c878';
   }
   btn.disabled = false;
-  btn.textContent = 'Send Reset Link â†’';
+  btn.textContent = 'Send Reset Link →';
 });
 
 document.getElementById('updateForm').addEventListener('submit', async function(e) {
@@ -128,7 +128,7 @@ document.getElementById('updateForm').addEventListener('submit', async function(
     msg.textContent = 'Error: ' + error.message;
     msg.style.color = '#e05555';
     btn.disabled = false;
-    btn.textContent = 'Update Password â†’';
+    btn.textContent = 'Update Password →';
     return;
   }
 
@@ -144,6 +144,7 @@ if (window.location.hash.includes('type=recovery') || window.location.hash.inclu
 </script>
 </body>
 </html>
+
 
 
 
