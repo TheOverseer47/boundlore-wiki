@@ -324,14 +324,25 @@ function computeRelatedScorePD(currentPost, currentMeta, candidate) {
   const candidateLabel = getPostLabelSafe(candidate).toLowerCase();
   if (currentLabel && candidateLabel && currentLabel === candidateLabel) score += 1;
 
+  const currentLabelTokens = tokenizeRelatedTermsPD(currentLabel);
+  const candidateLabelTokens = tokenizeRelatedTermsPD(candidateLabel);
+  score += Math.min(countSharedTermsPD(currentLabelTokens, candidateLabelTokens), 2);
+
+  const currentSlugTokens = tokenizeRelatedTermsPD(currentPost.slug || currentPost.title || "");
+  const candidateSlugTokens = tokenizeRelatedTermsPD(candidate.slug || candidate.title || "");
+  score += Math.min(countSharedTermsPD(currentSlugTokens, candidateSlugTokens), 2);
+
   const currentTitleWords = tokenizeRelatedTermsPD(currentPost.title);
   const candidateTitleWords = tokenizeRelatedTermsPD(candidate.title);
-  const sharedWords = currentTitleWords.filter(function(word) {
-    return candidateTitleWords.includes(word);
-  }).length;
-  score += Math.min(sharedWords, 2);
+  score += Math.min(countSharedTermsPD(currentTitleWords, candidateTitleWords), 3);
 
   return score;
+}
+
+function countSharedTermsPD(a, b) {
+  return a.filter(function(word) {
+    return b.includes(word);
+  }).length;
 }
 
 function tokenizeRelatedTermsPD(value) {
