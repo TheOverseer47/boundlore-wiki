@@ -78,7 +78,7 @@ async function renderAuthNav() {
         '<strong style="font-size:0.9rem;">Notifications</strong>' +
         '<div style="display:flex;gap:8px;align-items:center;">' +
           '<button id="markAllReadBtn" class="link-btn" style="font-size:0.75rem;">Mark all read</button>' +
-          '<button id="deleteOldNotifBtn" class="link-btn" style="font-size:0.75rem;">Delete old</button>' +
+          '<button id="deleteAllNotifBtn" class="link-btn" style="font-size:0.75rem;">Delete all</button>' +
         '</div>' +
       '</div>' +
       '<div id="notifList" style="max-height:300px;overflow:auto;"></div>' +
@@ -120,12 +120,12 @@ async function renderAuthNav() {
     });
   }
 
-  const deleteOldNotifBtn = document.getElementById('deleteOldNotifBtn');
-  if (deleteOldNotifBtn) {
-    deleteOldNotifBtn.addEventListener('click', async function(e) {
+  const deleteAllNotifBtn = document.getElementById('deleteAllNotifBtn');
+  if (deleteAllNotifBtn) {
+    deleteAllNotifBtn.addEventListener('click', async function(e) {
       e.stopPropagation();
-      if (window.BLNotify && typeof window.BLNotify.deleteOld === 'function') {
-        await window.BLNotify.deleteOld(session.user.id);
+      if (window.BLNotify && typeof window.BLNotify.clearAll === 'function') {
+        await window.BLNotify.clearAll(session.user.id);
       }
       await renderAuthNav();
     });

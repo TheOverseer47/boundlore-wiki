@@ -1,5 +1,28 @@
 (function() {
   let notificationsTableAvailable = null;
+  const CLEAR_PREFIX = "bl_notifications_cleared_at_";
+
+  function getClearKey(userId) {
+    return CLEAR_PREFIX + userId;
+  }
+
+  function getClearedAt(userId) {
+    if (!userId) return null;
+    try {
+      return localStorage.getItem(getClearKey(userId));
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function setClearedAt(userId, isoDate) {
+    if (!userId) return;
+    try {
+      localStorage.setItem(getClearKey(userId), isoDate);
+    } catch (err) {
+      // Ignore localStorage failures.
+    }
+  }
 
   async function detectNotificationsTable() {
     if (notificationsTableAvailable !== null) return notificationsTableAvailable;
@@ -19,11 +42,18 @@
     if (!userId) return 0;
     if (!(await detectNotificationsTable())) return 0;
 
-    const { count, error } = await supabase
+    let query = supabase
       .from("notifications")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
       .eq("is_read", false);
+
+    const clearedAt = getClearedAt(userId);
+    if (clearedAt) {
+      query = query.gt("created_at", clearedAt);
+    }
+
+    const { count, error } = await query;
 
     if (error) return 0;
     return count || 0;
@@ -33,12 +63,19 @@
     if (!userId) return [];
     if (!(await detectNotificationsTable())) return [];
 
-    const { data, error } = await supabase
+    let query = supabase
       .from("notifications")
       .select("id, type, title, message, target_url, is_read, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(limit || 8);
+
+    const clearedAt = getClearedAt(userId);
+    if (clearedAt) {
+      query = query.gt("created_at", clearedAt);
+    }
+
+    const { data, error } = await query;
 
     if (error || !data) return [];
     return data;
@@ -55,17 +92,13 @@
       .eq("is_read", false);
   }
 
-  async function deleteOld(userId) {
+  async function clearAll(userId) {
     if (!userId) return { ok: false };
     if (!(await detectNotificationsTable())) return { ok: false, skipped: true };
 
-    const { error } = await supabase
-      .from("notifications")
-      .delete()
-      .eq("user_id", userId)
-      .eq("is_read", true);
-
-    if (error) return { ok: false, error };
+    // Policy-safe behavior: mark all as read server-side, then locally hide everything up to now.
+    await markAllRead(userId);
+    setClearedAt(userId, new Date().toISOString());
     return { ok: true };
   }
 
@@ -92,7 +125,7 @@
     fetchUnreadCount,
     fetchLatest,
     markAllRead,
-    deleteOld,
+    clearAll,
     createNotification,
   };
 })();
