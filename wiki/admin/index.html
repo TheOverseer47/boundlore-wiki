@@ -656,19 +656,36 @@ async function publishComposedCategoryPost() {
     (cleanTags.length ? ('<p><strong>Tags:</strong> ' + escapeHtmlA(cleanTags.join(', ')) + '</p>') : '') +
     body + '</div>';
 
-  const { error: insertError } = await supabase.from("posts").insert({
+  const baseInsert = {
     author_id: currentAdminId,
     title: title,
     content: composedContent,
-    status: "published",
+    status: "pending",
     category: finalCategory,
     post_type: "wiki",
     guide_subcategory: null,
     is_discovery: false,
-  });
+  };
+
+  const { data: createdPost, error: insertError } = await supabase
+    .from("posts")
+    .insert(baseInsert)
+    .select("id, slug")
+    .single();
 
   if (insertError) {
     msg.textContent = "Failed to publish category post: " + insertError.message;
+    msg.style.color = "#ff8b8b";
+    return;
+  }
+
+  const { error: publishError } = await supabase
+    .from("posts")
+    .update({ status: "published" })
+    .eq("id", createdPost.id);
+
+  if (publishError) {
+    msg.textContent = "Category post was created as pending, but publish failed: " + publishError.message;
     msg.style.color = "#ff8b8b";
     return;
   }
