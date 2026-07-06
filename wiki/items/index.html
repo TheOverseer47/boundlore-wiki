@@ -32,16 +32,18 @@
     <h1>⚔️ Items</h1>
     <p>Weapons, tools and rare artifacts of Light No Fire</p>
   </div>
-  <div class="wiki-grid">
-    <div class="empty-state">
-      <h3>No items documented yet</h3>
-      <p>Check back after Light No Fire releases!</p>
-    </div>
+  <div class="wiki-grid" id="categoryPostsList"></div>
+  <div class="empty-state" id="categoryPostsEmpty" style="display:none;">
+    <h3>No items documented yet</h3>
+    <p>Check back after Light No Fire releases, or <a href="/wiki/create-post/">contribute a discovery</a>!</p>
   </div>
   <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community · <a href="/admin">Wiki Admin</a></p></div></footer>
   <script src="/js/supabase-config.js"></script>
+  <script src="/js/auth-nav.js"></script>
   <script src="/js/search.js"></script>
   <script src="../../js/main.js"></script>
+  <script src="/js/render-posts.js"></script>
+  <script>renderCategoryPosts("items");</script>
 </body>
 </html>
 

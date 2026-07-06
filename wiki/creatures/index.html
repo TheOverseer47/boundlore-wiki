@@ -38,16 +38,18 @@
     <h1>🐉 Creatures</h1>
     <p>All known creatures discovered in the world of Light No Fire</p>
   </div>
-  <div class="wiki-grid">
-    <div class="empty-state">
-      <h3>No creatures documented yet</h3>
-      <p>Light No Fire hasn't released yet – be the first to <a href="../contribute/">contribute</a>!</p>
-    </div>
+  <div class="wiki-grid" id="categoryPostsList"></div>
+  <div class="empty-state" id="categoryPostsEmpty" style="display:none;">
+    <h3>No creatures documented yet</h3>
+    <p>Light No Fire hasn't released yet – be the first to <a href="/wiki/create-post/">contribute</a>!</p>
   </div>
   <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community</p></div></footer>
   <script src="/js/supabase-config.js"></script>
+  <script src="/js/auth-nav.js"></script>
   <script src="/js/search.js"></script>
   <script src="../../js/main.js"></script>
+  <script src="/js/render-posts.js"></script>
+  <script>renderCategoryPosts("creatures");</script>
 </body>
 </html>
 

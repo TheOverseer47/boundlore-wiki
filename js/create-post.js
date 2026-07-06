@@ -32,8 +32,23 @@ function setPostType(type) {
   currentPostType = type;
   document.getElementById("btnTypeGuide").classList.toggle("active", type === "guide");
   document.getElementById("btnTypeDiscovery").classList.toggle("active", type === "discovery");
-  document.getElementById("guideFields").style.display = type === "guide" ? "block" : "none";
-  document.getElementById("discoveryFields").style.display = type === "discovery" ? "block" : "none";
+
+  const guideFields = document.getElementById("guideFields");
+  const discoveryFields = document.getElementById("discoveryFields");
+  const guideSelect = document.getElementById("guideSubcategory");
+  const discoverySelect = document.getElementById("discoveryCategory");
+
+  if (type === "guide") {
+    guideFields.style.display = "block";
+    discoveryFields.style.display = "none";
+    guideSelect.setAttribute("required", "required");
+    discoverySelect.removeAttribute("required");
+  } else {
+    guideFields.style.display = "none";
+    discoveryFields.style.display = "block";
+    guideSelect.removeAttribute("required");
+    discoverySelect.setAttribute("required", "required");
+  }
 }
 
 async function handleSubmit(e) {
@@ -80,6 +95,7 @@ async function handleSubmit(e) {
     payload.post_type = "guide";
     payload.category = null;
     payload.guide_subcategory = subcat;
+    payload.is_discovery = false;
   } else {
     const cat = document.getElementById("discoveryCategory").value;
     if (!cat) {
@@ -90,6 +106,7 @@ async function handleSubmit(e) {
     payload.post_type = "discovery";
     payload.category = cat;
     payload.guide_subcategory = null;
+    payload.is_discovery = true;
   }
 
   const { data, error } = await supabase.from("posts").insert(payload).select().single();
