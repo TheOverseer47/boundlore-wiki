@@ -3,12 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="BoundLore – The ultimate fan-powered wiki for Light No Fire." />
+  <meta name="description" content="BoundLore is the community-powered Light No Fire Wiki (LNF Wiki) with guides, creatures, biomes, items, guilds, discoveries, and live community updates." />
+  <meta name="keywords" content="BoundLore, Light No Fire, Light No Fire Wiki, LNF, LNF Wiki, Light No Fire guides, Light No Fire community" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="https://boundlore.com/" />
   <meta property="og:title" content="BoundLore – Light No Fire Wiki" />
-  <meta property="og:description" content="The ultimate fan-powered wiki for Light No Fire." />
+  <meta property="og:description" content="BoundLore: the community-powered Light No Fire Wiki (LNF Wiki) for guides, discoveries, and world knowledge." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://boundlore.com" />
+  <meta property="og:url" content="https://boundlore.com/" />
   <meta property="og:image" content="/public/images/banner.jpg" />
+  <meta property="og:site_name" content="BoundLore" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BoundLore – Light No Fire Wiki" />
+  <meta name="twitter:description" content="BoundLore: the community-powered Light No Fire Wiki (LNF Wiki)." />
+  <meta name="twitter:image" content="https://boundlore.com/public/images/banner.jpg" />
   <title>BoundLore – Light No Fire Wiki</title>
   <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
   <link rel="apple-touch-icon" href="/public/images/icon.jpg" />
@@ -16,6 +24,39 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    #navbar .nav-container { height: 58px; }
+    #navbar .nav-links a { padding-top: 5px; padding-bottom: 5px; }
+    #hero .hero-content { padding-top: 96px; }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "BoundLore",
+    "alternateName": ["Light No Fire Wiki", "LNF Wiki", "LNF"],
+    "url": "https://boundlore.com/",
+    "description": "Community-powered Light No Fire Wiki with guides, discoveries, and category knowledge.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://boundlore.com/wiki/search/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "BoundLore",
+    "url": "https://boundlore.com/",
+    "logo": "https://boundlore.com/public/images/icon.jpg",
+    "sameAs": [
+      "https://www.reddit.com/r/LightNoFireHelloGames/",
+      "https://store.steampowered.com/app/2719590/Light_No_Fire/"
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -72,15 +113,6 @@
       </div>
     </div>
   </header>
-
-  <section class="stats-bar">
-    <div class="stats-container">
-      <div class="stat"><span class="stat-number" id="statCreatures">0</span><span class="stat-label">Creatures</span></div>
-      <div class="stat"><span class="stat-number" id="statBiomes">0</span><span class="stat-label">Biomes</span></div>
-      <div class="stat"><span class="stat-number" id="statItems">0</span><span class="stat-label">Items</span></div>
-      <div class="stat"><span class="stat-number" id="statGuides">0</span><span class="stat-label">Guides</span></div>
-    </div>
-  </section>
 
   <main id="categories" class="categories-section">
     <div class="section-header">
@@ -155,7 +187,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase-config.js"></script>
-  <script src="/js/homepage-stats.js"></script>
   <script src="/js/categories-config.js"></script>
   <script src="/js/discovery-home.js"></script>
   <script src="/js/search.js"></script>
