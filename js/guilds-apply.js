@@ -34,12 +34,11 @@ async function handleGuildApplicationSubmit(event) {
   const founder = getInputValue("guildFounder");
   const members = parseInt(getInputValue("guildMemberCount"), 10);
   const website = getInputValue("guildWebsite");
-  const discordServer = getInputValue("guildDiscordServer");
   const discordInvite = getInputValue("guildDiscordInvite");
   const motivation = getInputValue("guildMotivation");
   const description = getInputValue("guildDescription");
 
-  if (!guildName || !founder || !motivation || !description || !discordServer || !discordInvite || Number.isNaN(members)) {
+  if (!guildName || !founder || !motivation || !description || !discordInvite || Number.isNaN(members)) {
     err.textContent = "Please complete all required fields.";
     err.style.display = "block";
     return;
@@ -51,8 +50,8 @@ async function handleGuildApplicationSubmit(event) {
     return;
   }
 
-  if (!isValidUrl(discordServer) || !isValidUrl(discordInvite) || (website && !isValidUrl(website))) {
-    err.textContent = "Please provide valid URLs for Discord links and website.";
+  if (!isValidUrl(discordInvite) || (website && !isValidUrl(website))) {
+    err.textContent = "Please provide a valid Discord invite URL (and website URL if used).";
     err.style.display = "block";
     return;
   }
@@ -65,7 +64,6 @@ async function handleGuildApplicationSubmit(event) {
     founder,
     members,
     website,
-    discordServer,
     discordInvite,
     motivation,
     description,
@@ -120,8 +118,7 @@ function buildGuildPostHtml(data) {
       '<table style="width:100%;border-collapse:collapse;">' +
         '<tr><td style="padding:8px 0;"><strong>Founder</strong></td><td>' + escapeHtml(data.founder) + '</td></tr>' +
         '<tr><td style="padding:8px 0;"><strong>Members</strong></td><td>' + escapeHtml(String(data.members)) + '</td></tr>' +
-        '<tr><td style="padding:8px 0;"><strong>Discord Server</strong></td><td><a href="' + escapeAttr(data.discordServer) + '" target="_blank" rel="noopener">Open Server</a></td></tr>' +
-        '<tr><td style="padding:8px 0;"><strong>Join Link</strong></td><td><a href="' + escapeAttr(data.discordInvite) + '" target="_blank" rel="noopener">Join Guild</a></td></tr>' +
+        '<tr><td style="padding:8px 0;"><strong>Discord Invite</strong></td><td><a href="' + escapeAttr(data.discordInvite) + '" target="_blank" rel="noopener">Join Guild</a></td></tr>' +
         websiteBlock +
       '</table>' +
     '</section>';

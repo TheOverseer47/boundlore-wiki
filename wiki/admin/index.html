@@ -74,6 +74,7 @@
   <div class="admin-tabs">
     <button class="tab-btn active" data-tab="overview">Overview</button>
     <button class="tab-btn" data-tab="pending">Pending Posts (<span id="countPending">0</span>)</button>
+    <button class="tab-btn" data-tab="discoveries">Discovery Queue (<span id="countDiscoveryPending">0</span>)</button>
     <button class="tab-btn" data-tab="allposts">All Posts</button>
     <button class="tab-btn" data-tab="users">Users</button>
     <button class="tab-btn" data-tab="reports">Reports (<span id="countReports">0</span>)</button>
@@ -85,6 +86,8 @@
       <div class="stat-card"><div class="num" id="statPublished">-</div><div class="label">Published Posts</div></div>
       <div class="stat-card"><div class="num" id="statPending">-</div><div class="label">Pending Review</div></div>
       <div class="stat-card"><div class="num" id="statDiscoveries">-</div><div class="label">Discoveries</div></div>
+      <div class="stat-card"><div class="num" id="statPendingDiscoveries">-</div><div class="label">Pending Discoveries</div></div>
+      <div class="stat-card"><div class="num" id="statGuildApplications">-</div><div class="label">Guild Applications</div></div>
       <div class="stat-card"><div class="num" id="statReports">-</div><div class="label">Open Reports</div></div>
     </div>
     <div class="form-box">
@@ -96,6 +99,39 @@
   <div id="tabPending" class="tab-panel" style="display:none;">
     <div id="pendingList"></div>
     <p id="pendingEmpty" style="text-align:center;color:var(--text-muted);display:none;">No posts awaiting review.</p>
+  </div>
+
+  <div id="tabDiscoveries" class="tab-panel" style="display:none;">
+    <div id="discoveryQueueList"></div>
+    <p id="discoveryQueueEmpty" style="text-align:center;color:var(--text-muted);display:none;">No discovery submissions awaiting review.</p>
+
+    <div id="discoveryComposerBox" class="form-box" style="display:none;margin-top:20px;">
+      <h3 style="margin-top:0;">Build Category Post From Discovery</h3>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:12px;">Use this to create a clean, published category post from a discovery submission.</p>
+
+      <input type="hidden" id="composeSourceDiscoveryId" />
+
+      <label for="composeTitle">Post Title</label>
+      <input id="composeTitle" class="form-input" type="text" maxlength="120" />
+
+      <label for="composeCategory">Main Category</label>
+      <select id="composeCategory" class="form-input"></select>
+
+      <label for="composeCustomCategory">Custom Category (optional)</label>
+      <input id="composeCustomCategory" class="form-input" type="text" placeholder="e.g. ancient-ruins" />
+
+      <label for="composeTags">Tags (comma-separated)</label>
+      <input id="composeTags" class="form-input" type="text" placeholder="rare,item,desert" />
+
+      <label for="composeBody">Post Body (HTML allowed)</label>
+      <textarea id="composeBody" class="form-input" rows="10"></textarea>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+        <button id="btnPublishComposed" class="btn-small" style="background:#50c878;" type="button">Publish Category Post</button>
+        <button id="btnCancelCompose" class="btn-small" style="background:#666;" type="button">Cancel</button>
+      </div>
+      <p id="composeMsg" style="margin-top:10px;color:var(--text-muted);"></p>
+    </div>
   </div>
 
   <div id="tabAllposts" class="tab-panel" style="display:none;">
@@ -132,6 +168,7 @@
 <script src="/js/main.js"></script>
 <script>
 let currentAdminId = null;
+let pendingDiscoveriesCache = [];
 
 async function checkAdmin() {
   const { data: sessionData } = await supabase.auth.getSession();
@@ -153,9 +190,11 @@ async function checkAdmin() {
 
   loadOverview();
   loadPending();
+  loadDiscoveries();
   loadAllPosts();
   loadUsers();
   loadReports();
+  initDiscoveryComposer();
 }
 
 async function loadOverview() {
@@ -163,14 +202,218 @@ async function loadOverview() {
   const { count: publishedCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "published");
   const { count: pendingCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending");
   const { count: discoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("is_discovery", true);
+  const { count: pendingDiscoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true);
+  const { count: guildApplicationCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true).eq("category", "guilds");
   const { count: reportCount } = await supabase.from("reports").select("*", { count: "exact", head: true });
 
   document.getElementById("statUsers").textContent = userCount || 0;
   document.getElementById("statPublished").textContent = publishedCount || 0;
   document.getElementById("statPending").textContent = pendingCount || 0;
   document.getElementById("statDiscoveries").textContent = discoveryCount || 0;
+  document.getElementById("statPendingDiscoveries").textContent = pendingDiscoveryCount || 0;
+  document.getElementById("statGuildApplications").textContent = guildApplicationCount || 0;
   document.getElementById("statReports").textContent = reportCount || 0;
 
+
+async function loadDiscoveries() {
+  const { data: discoveries, error } = await supabase
+    .from("posts")
+    .select("id, slug, title, category, content, created_at, author_id, profiles(username)")
+    .eq("status", "pending")
+    .eq("is_discovery", true)
+    .order("created_at", { ascending: true });
+
+  const list = document.getElementById("discoveryQueueList");
+  const empty = document.getElementById("discoveryQueueEmpty");
+  list.innerHTML = "";
+
+  if (error || !discoveries || discoveries.length === 0) {
+    empty.style.display = "block";
+    document.getElementById("countDiscoveryPending").textContent = "0";
+    pendingDiscoveriesCache = [];
+    return;
+  }
+
+  pendingDiscoveriesCache = discoveries;
+  document.getElementById("countDiscoveryPending").textContent = discoveries.length;
+  empty.style.display = "none";
+
+  discoveries.forEach(function(post) {
+    const authorName = post.profiles ? post.profiles.username : "Unknown";
+    const attachmentLinks = extractDiscoveryAttachmentLinks(post.content);
+    const attachmentHtml = attachmentLinks.length
+      ? ('<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">Attachments</p><ul style="margin:0 0 12px 18px;">' +
+         attachmentLinks.map(function(link) {
+           return '<li><a href="' + escapeHtmlA(link.href) + '" target="_blank" rel="noopener" download>' + escapeHtmlA(link.label) + '</a></li>';
+         }).join("") + '</ul>')
+      : '<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">No attachments</p>';
+
+    const div = document.createElement("div");
+    div.className = "form-box";
+    div.style.marginBottom = "14px";
+    div.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">' +
+      '<h3 style="margin:0;">' + escapeHtmlA(post.title) + '</h3>' +
+      '<span class="badge badge-discovery">\u2728 Discovery</span>' +
+      '</div>' +
+      '<p style="color:var(--text-muted);font-size:0.84rem;margin-top:6px;">By ' + escapeHtmlA(authorName) + ' &middot; ' + new Date(post.created_at).toLocaleString() + '</p>' +
+      '<p style="color:var(--text-muted);font-size:0.82rem;margin:6px 0 10px;">Target category: <strong>' + escapeHtmlA(post.category || "-") + '</strong></p>' +
+      attachmentHtml +
+      '<div style="background:#fff;color:#111;padding:12px;border-radius:6px;margin:8px 0;max-height:220px;overflow-y:auto;">' + post.content + '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+      '<button class="btn-small" style="background:#50c878;" data-action="approve-discovery" data-id="' + post.id + '">Approve Discovery</button>' +
+      '<button class="btn-small" style="background:#2a8bdc;" data-action="compose-from-discovery" data-id="' + post.id + '">Build Category Post</button>' +
+      '<button class="btn-small" style="background:#e05555;" data-action="reject-discovery" data-id="' + post.id + '">Reject</button>' +
+      '</div>';
+
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll('[data-action="approve-discovery"]').forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
+      loadDiscoveries();
+      loadPending();
+      loadAllPosts();
+      loadOverview();
+    });
+  });
+
+  list.querySelectorAll('[data-action="reject-discovery"]').forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!confirm("Reject and delete this discovery?")) return;
+      await supabase.from("posts").delete().eq("id", this.dataset.id);
+      loadDiscoveries();
+      loadPending();
+      loadAllPosts();
+      loadOverview();
+    });
+  });
+
+  list.querySelectorAll('[data-action="compose-from-discovery"]').forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      openDiscoveryComposer(this.dataset.id);
+      document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+      document.querySelector('[data-tab="discoveries"]').classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(function(panel) { panel.style.display = 'none'; });
+      document.getElementById('tabDiscoveries').style.display = 'block';
+    });
+  });
+}
+
+function initDiscoveryComposer() {
+  const categorySelect = document.getElementById("composeCategory");
+  if (categorySelect && typeof BOUNDLORE_CATEGORIES !== "undefined") {
+    categorySelect.innerHTML = "";
+    BOUNDLORE_CATEGORIES.forEach(function(cat) {
+      const opt = document.createElement("option");
+      opt.value = cat.slug;
+      opt.textContent = cat.label;
+      categorySelect.appendChild(opt);
+    });
+  }
+
+  const btnPublish = document.getElementById("btnPublishComposed");
+  const btnCancel = document.getElementById("btnCancelCompose");
+  if (btnPublish) {
+    btnPublish.addEventListener("click", publishComposedCategoryPost);
+  }
+  if (btnCancel) {
+    btnCancel.addEventListener("click", function() {
+      document.getElementById("discoveryComposerBox").style.display = "none";
+    });
+  }
+}
+
+function openDiscoveryComposer(discoveryId) {
+  const discovery = pendingDiscoveriesCache.find(function(item) { return item.id === discoveryId; });
+  if (!discovery) return;
+
+  document.getElementById("discoveryComposerBox").style.display = "block";
+  document.getElementById("composeSourceDiscoveryId").value = discovery.id;
+  document.getElementById("composeTitle").value = discovery.title;
+  document.getElementById("composeCategory").value = discovery.category || "biomes";
+  document.getElementById("composeCustomCategory").value = "";
+  document.getElementById("composeTags").value = "discovery,community";
+  document.getElementById("composeBody").value = discovery.content || "";
+  document.getElementById("composeMsg").textContent = "Editing discovery: " + discovery.title;
+}
+
+async function publishComposedCategoryPost() {
+  const sourceId = document.getElementById("composeSourceDiscoveryId").value;
+  const title = document.getElementById("composeTitle").value.trim();
+  const category = document.getElementById("composeCategory").value;
+  const customCategory = document.getElementById("composeCustomCategory").value.trim();
+  const tags = document.getElementById("composeTags").value.trim();
+  const body = document.getElementById("composeBody").value.trim();
+  const msg = document.getElementById("composeMsg");
+
+  if (!sourceId || !title || !body) {
+    msg.textContent = "Title and body are required.";
+    msg.style.color = "#ff8b8b";
+    return;
+  }
+
+  const finalCategory = customCategory || category;
+  if (!finalCategory) {
+    msg.textContent = "Please choose or define a category.";
+    msg.style.color = "#ff8b8b";
+    return;
+  }
+
+  const cleanTags = tags
+    ? tags.split(",").map(function(t) { return t.trim(); }).filter(Boolean)
+    : [];
+
+  const composedContent =
+    '<div class="admin-curated-post">' +
+    '<p><strong>Curated from community discovery.</strong></p>' +
+    (cleanTags.length ? ('<p><strong>Tags:</strong> ' + escapeHtmlA(cleanTags.join(', ')) + '</p>') : '') +
+    body +
+    '</div>';
+
+  const { error: insertError } = await supabase.from("posts").insert({
+    author_id: currentAdminId,
+    title,
+    content: composedContent,
+    status: "published",
+    category: finalCategory,
+    post_type: "wiki",
+    guide_subcategory: null,
+    is_discovery: false,
+  });
+
+  if (insertError) {
+    msg.textContent = "Failed to publish category post: " + insertError.message;
+    msg.style.color = "#ff8b8b";
+    return;
+  }
+
+  await supabase.from("posts").update({ status: "published" }).eq("id", sourceId);
+
+  msg.textContent = "Category post published and source discovery marked as published.";
+  msg.style.color = "#50c878";
+
+  loadDiscoveries();
+  loadPending();
+  loadAllPosts();
+  loadOverview();
+}
+
+function extractDiscoveryAttachmentLinks(content) {
+  if (!content) return [];
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = content;
+  const links = Array.from(wrapper.querySelectorAll("a[href]"));
+  return links.map(function(a) {
+    return {
+      href: a.getAttribute("href") || "",
+      label: (a.textContent || "attachment").trim(),
+    };
+  }).filter(function(link) {
+    return /^https?:\/\//i.test(link.href);
+  });
+}
   const { data: allPosts } = await supabase.from("posts").select("category").eq("status", "published");
   const breakdown = document.getElementById("categoryBreakdown");
   breakdown.innerHTML = "";

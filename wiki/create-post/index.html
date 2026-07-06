@@ -89,13 +89,15 @@
         <option value="crafting">Crafting</option>
       </select>
       <p class="field-hint">Your discovery will appear in this category with a "Community Discovery" badge, pending admin review.</p>
+      <p class="field-hint">Add screenshots/files below. Admins can review and download your attachments directly from the dashboard.</p>
     </div>
 
     <label for="postContent" style="margin-top:16px;display:block;">Content</label>
     <div id="postEditor" style="height:250px;background:#111;border:1px solid #333;"></div>
 
-    <label for="postMedia" style="margin-top:16px;display:block;">Attach images (optional)</label>
-    <input type="file" id="postMedia" accept="image/*" multiple class="form-input" />
+    <label for="postMedia" style="margin-top:16px;display:block;">Attach discovery files (optional)</label>
+    <input type="file" id="postMedia" accept="image/*,.pdf,.zip,.txt,.webp" multiple class="form-input" />
+    <p class="field-hint">Supported: images, PDF, ZIP, TXT. For best results keep total upload size under 20MB.</p>
 
     <p id="formError" class="form-error" style="display:none;color:#ff6b6b;margin-top:12px;"></p>
 
