@@ -58,13 +58,14 @@
     <input type="text" id="postTitle" class="form-input" required maxlength="120" />
 
     <div class="form-group" style="margin-top:8px;">
-      <label for="postUpdatePhase">Update Phase</label>
+      <label for="postUpdatePhase">Update Phase <span class="help-dot" title="Pre-Update: Information before a patch. Post-Update: verified after a patch. Evergreen: generally stable over multiple updates." aria-label="Update Phase help">?</span></label>
       <select id="postUpdatePhase" class="form-input">
         <option value="">Not specified</option>
         <option value="pre-update">Pre-Update</option>
         <option value="post-update">Post-Update</option>
         <option value="evergreen">Evergreen</option>
       </select>
+      <p class="field-hint">Pre-Update = before patch changes, Post-Update = verified after patch, Evergreen = usually stable over time.</p>
     </div>
 
     <div class="form-group">
