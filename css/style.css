@@ -26,19 +26,14 @@ body {
   color: var(--text);
   min-height: 100vh;
   background-color: var(--dark);
-  background-image: url('/public/images/bg.jpg');
+  background-image: linear-gradient(rgba(8,8,14,0.76), rgba(8,8,14,0.76)), url('/public/images/bg.jpg');
   background-size: cover;
   background-attachment: scroll;
   background-position: center top;
   background-repeat: no-repeat;
 }
 body::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(8,8,14,0.76);
-  z-index: 0;
-  pointer-events: none;
+  content: none;
 }
 .navbar, header, section, main, footer,
 .wiki-hero, .contribute-layout, .community-grid,
@@ -1451,7 +1446,3 @@ body.perf-mode .btn-steam {
   transition: border-color 0.14s ease, background-color 0.14s ease, color 0.14s ease !important;
 }
 
-html.perf-mode body::before,
-body.perf-mode::before {
-  position: absolute;
-}
