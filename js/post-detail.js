@@ -232,7 +232,7 @@ async function loadRelatedPosts(post, postMeta) {
     .order("created_at", { ascending: false });
 
   title.textContent = "See also";
-  query = query.limit(12);
+  query = query.limit(18);
 
   const { data, error } = await query;
   if (error || !data || data.length === 0) {
@@ -249,41 +249,47 @@ async function loadRelatedPosts(post, postMeta) {
   }).sort(function(a, b) {
     if (b.relatedScore !== a.relatedScore) return b.relatedScore - a.relatedScore;
     return new Date(b.created_at) - new Date(a.created_at);
-  }).slice(0, 6);
+  });
 
   if (scored.length === 0) {
-    const fallback = data.slice(0, 3);
-    if (fallback.length === 0) {
-      renderRelatedFallbackPD(wrap, list, title, post);
-      return;
-    }
-    title.textContent = "Latest posts";
-    wrap.style.display = "block";
-    list.innerHTML = "";
-    fallback.forEach(function(item) {
-      const link = document.createElement("a");
-      link.className = "bl-related-item";
-      link.href = item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id));
-      link.innerHTML =
-        escapeHtml(item.title || "Untitled") +
-        '<span>' + escapeHtml(getSeeAlsoLabelPD(item)) + ' • ' + new Date(item.created_at).toLocaleDateString() + '</span>';
-      list.appendChild(link);
-    });
+    renderRelatedFallbackPD(wrap, list, title, post);
     return;
   }
 
   wrap.style.display = "block";
   list.innerHTML = "";
 
-  scored.forEach(function(item) {
-    const link = document.createElement("a");
-    link.className = "bl-related-item";
-    link.href = item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id));
-    link.innerHTML =
-      escapeHtml(item.title || "Untitled") +
-      '<span>' + escapeHtml(getSeeAlsoLabelPD(item)) + ' • ' + new Date(item.created_at).toLocaleDateString() + '</span>';
-    list.appendChild(link);
-  });
+  const usedIds = new Set();
+  const bestMatches = scored.slice(0, 4);
+  const topicalMatches = scored.filter(function(item) {
+    return isRelatedByTopicPD(post, item);
+  }).filter(function(item) {
+    return !bestMatches.some(function(best) { return best.id === item.id; });
+  }).slice(0, 4);
+  const metaMatches = scored.filter(function(item) {
+    return isRelatedByMetaPD(postMeta, item.content || "");
+  }).filter(function(item) {
+    return !bestMatches.some(function(best) { return best.id === item.id; }) &&
+      !topicalMatches.some(function(topic) { return topic.id === item.id; });
+  }).slice(0, 4);
+
+  appendRelatedGroupPD(list, "Best matches", bestMatches, usedIds);
+
+  const topicLabel = getRelatedTopicLabelPD(post);
+  if (topicalMatches.length > 0) {
+    appendRelatedGroupPD(list, topicLabel, topicalMatches, usedIds);
+  }
+
+  if (metaMatches.length > 0) {
+    const metaLabel = getRelatedMetaLabelPD(postMeta);
+    if (metaLabel) {
+      appendRelatedGroupPD(list, metaLabel, metaMatches, usedIds);
+    }
+  }
+
+  if (usedIds.size === 0) {
+    renderRelatedFallbackPD(wrap, list, title, post);
+  }
 }
 
 function getPostLabelSafe(post) {
@@ -348,22 +354,109 @@ function renderRelatedFallbackPD(wrap, list, title, post) {
   wrap.style.display = "block";
   list.innerHTML = "";
 
-  const links = [
+  appendRelatedGroupPD(list, "Browse the wiki", [
     { label: "Browse guides", href: "/wiki/guides/", meta: "Guides hub" },
     { label: "Browse creatures", href: "/wiki/creatures/", meta: "Creatures hub" },
     { label: "Browse biomes", href: "/wiki/biomes/", meta: "Biomes hub" },
     { label: "Browse items", href: "/wiki/items/", meta: "Items hub" },
+  ].map(function(item, index) {
+    return Object.assign({ id: "fallback-browse-" + index }, item);
+  }), new Set());
+
+  appendRelatedGroupPD(list, "Community actions", [
     { label: "Community posts", href: "/wiki/community/", meta: "Discussion and updates" },
     { label: "Submit a post", href: "/wiki/create-post/", meta: "Add something new" },
-  ];
+  ].map(function(item, index) {
+    return Object.assign({ id: "fallback-community-" + index }, item);
+  }), new Set());
+}
 
-  links.forEach(function(item) {
-    const link = document.createElement("a");
-    link.className = "bl-related-item";
-    link.href = item.href;
-    link.innerHTML = escapeHtml(item.label) + '<span>' + escapeHtml(item.meta) + '</span>';
-    list.appendChild(link);
+function appendRelatedGroupPD(container, heading, items, usedIds) {
+  if (!items || items.length === 0) return;
+
+  const group = document.createElement("div");
+  group.className = "bl-related-group";
+
+  const title = document.createElement("h4");
+  title.className = "bl-related-group-title";
+  title.textContent = heading;
+  group.appendChild(title);
+
+  const grid = document.createElement("div");
+  grid.className = "bl-related-group-grid";
+
+  items.forEach(function(item) {
+    if (usedIds && usedIds.has(item.id)) return;
+    if (usedIds) usedIds.add(item.id);
+    grid.appendChild(renderRelatedItemPD(item));
   });
+
+  if (!grid.children.length) return;
+  group.appendChild(grid);
+  container.appendChild(group);
+}
+
+function renderRelatedItemPD(item) {
+  const link = document.createElement("a");
+  link.className = "bl-related-item";
+  link.href = item.href || (item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id)));
+  const label = item.label || item.title || "Untitled";
+  const meta = item.meta || getSeeAlsoLabelPD(item);
+  const datePart = item.created_at ? (' • ' + new Date(item.created_at).toLocaleDateString()) : "";
+  link.innerHTML =
+    escapeHtml(label) +
+    '<span>' + escapeHtml(meta) + datePart + '</span>';
+  return link;
+}
+
+function isRelatedByTopicPD(post, candidate) {
+  if (post.post_type === "guide" && post.guide_subcategory && candidate.guide_subcategory === post.guide_subcategory) return true;
+  if (post.category && candidate.category === post.category) return true;
+  return post.post_type && candidate.post_type === post.post_type;
+}
+
+function isRelatedByMetaPD(postMeta, candidateContent) {
+  if (!postMeta || !candidateContent) return false;
+  const candidateMeta = parsePostMetaPD(candidateContent || "");
+  return Boolean(
+    (postMeta.update_phase && candidateMeta.update_phase && postMeta.update_phase === candidateMeta.update_phase) ||
+    (postMeta.patch_tag && candidateMeta.patch_tag && postMeta.patch_tag === candidateMeta.patch_tag)
+  );
+}
+
+function getRelatedTopicLabelPD(post) {
+  if (post.post_type === "guide" && post.guide_subcategory) {
+    return "More in " + formatTopicLabelPD(post.guide_subcategory);
+  }
+  if (post.category) {
+    return "More in " + getPostLabelSafe(post);
+  }
+  if (post.post_type === "discovery") {
+    return "More discoveries";
+  }
+  return "More from this wiki";
+}
+
+function getRelatedMetaLabelPD(postMeta) {
+  if (!postMeta) return "";
+  if (postMeta.update_phase && postMeta.patch_tag) {
+    return "Same update phase and patch";
+  }
+  if (postMeta.update_phase) {
+    return "Same update phase";
+  }
+  if (postMeta.patch_tag) {
+    return "Same patch tag";
+  }
+  return "";
+}
+
+function formatTopicLabelPD(value) {
+  return String(value || "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, function(char) { return char.toUpperCase(); });
 }
 
 async function loadReactions(postId) {
