@@ -41,51 +41,89 @@
   <p>Find answers to common questions or report an issue directly to our team.</p>
 </div>
 
-<div style="max-width:800px;margin:0 auto;padding:0 20px 60px">
+<div class="support-shell">
+  <div class="support-intro-grid">
+    <section class="form-box">
+      <h2 style="margin-top:0;">Support Center</h2>
+      <p style="color:var(--text-muted);line-height:1.6;">Need help with moderation, account access, or broken content? Use this page as the fastest contact route to the team.</p>
+      <div class="support-kpi-row">
+        <div class="support-kpi"><strong>&lt;24h</strong><span>Report Review Target</span></div>
+        <div class="support-kpi"><strong>4</strong><span>Issue Categories</span></div>
+        <div class="support-kpi"><strong>Live</strong><span>Moderation Queue</span></div>
+      </div>
+    </section>
 
-  <div class="form-box" style="margin-bottom:30px">
-    <h2>Frequently Asked Questions</h2>
-    <div class="faq-item" id="faq-banned">
-      <h3 class="faq-question">Why was my account banned?</h3>
-      <p class="faq-answer">Accounts are banned for violating community guidelines (spam, harassment, or repeated rule violations). If you believe this is a mistake, use the report form below to contact an admin.</p>
-    </div>
-    <div class="faq-item" id="faq-post-missing">
-      <h3 class="faq-question">Why is my post not showing up?</h3>
-      <p class="faq-answer">New posts are reviewed by an admin before publishing. Check your Account page under "My Posts" to see the current status (Pending, Published, Rejected).</p>
-    </div>
-    <div class="faq-item" id="faq-password">
-      <h3 class="faq-question">How do I reset my password?</h3>
-      <p class="faq-answer">Go to the <a href="/wiki/login">login page</a> and click "Forgot password" to receive a reset link via email.</p>
-    </div>
-    <div class="faq-item" id="faq-report-user">
-      <h3 class="faq-question">How do I report a user or a post?</h3>
-      <p class="faq-answer">Use the form below. Select the correct category and provide as much detail as possible so our admins can act quickly.</p>
-    </div>
+    <section class="form-box">
+      <h2 style="margin-top:0;">Before You Report</h2>
+      <ul style="margin:0;padding-left:18px;color:var(--text-muted);line-height:1.75;">
+        <li>Collect links, usernames, and timestamps.</li>
+        <li>Use one report per issue to keep moderation clean.</li>
+        <li>Attach screenshots for visual bugs or abuse evidence.</li>
+      </ul>
+    </section>
   </div>
 
-  <div class="form-box" id="reportGateBox">
-    <p style="text-align:center">Loading...</p>
-  </div>
+  <div class="support-main-grid">
+    <section class="form-box">
+      <h2 style="margin-top:0;">Frequently Asked Questions</h2>
+      <div class="support-faq-item" id="faq-banned">
+        <h3>Why was my account banned?</h3>
+        <p>Accounts are banned for violating community guidelines (spam, harassment, repeated abuse). If you think this is a mistake, submit a report below.</p>
+      </div>
+      <div class="support-faq-item" id="faq-post-missing">
+        <h3>Why is my post not visible?</h3>
+        <p>New submissions are reviewed by admins. Check your account page under My Posts for status updates.</p>
+      </div>
+      <div class="support-faq-item" id="faq-password">
+        <h3>How do I reset my password?</h3>
+        <p>Go to the <a href="/wiki/login/">login page</a> and use Forgot password to receive a reset link.</p>
+      </div>
+      <div class="support-faq-item" id="faq-report-user">
+        <h3>How do I report a user or post?</h3>
+        <p>Select the correct category below and provide links/usernames plus clear context.</p>
+      </div>
+    </section>
 
-  <div class="form-box" id="reportFormBox" style="display:none">
-    <h2>Submit a Report</h2>
-    <label class="form-label">Category</label>
-    <select id="reportCategory" class="form-input">
-      <option value="user">Report a User</option>
-      <option value="post">Report a Post/Comment</option>
-      <option value="bug">Report a Bug</option>
-      <option value="general">General Question</option>
-    </select>
-    <label class="form-label">Username or Post/Comment Link (required for User/Post reports)</label>
-    <input type="text" id="reportTarget" class="form-input" placeholder="e.g. FireFrog44 or https://boundlore.com/wiki/post/?slug=...">
-    <label class="form-label" style="margin-top:12px">Attach Screenshot (optional)</label>
-    <input type="file" id="reportScreenshot" accept="image/*" class="form-input">
-    <label class="form-label" style="margin-top:12px">Description</label>
-    <textarea id="reportDescription" class="form-input" rows="5" placeholder="Describe the issue in detail..."></textarea>
-    <button id="btnSubmitReport" class="btn-contribute" style="margin-top:14px">Submit Report</button>
-    <p id="reportSuccessMsg" style="display:none;color:#50c878;margin-top:10px">Report submitted. Our team will review it shortly.</p>
-  </div>
+    <section>
+      <div class="form-box" id="reportGateBox">
+        <p style="text-align:center">Loading...</p>
+      </div>
 
+      <div class="form-box" id="reportFormBox" style="display:none">
+        <h2 style="margin-top:0;">Submit a Report</h2>
+        <div class="support-form-grid">
+          <div class="support-span">
+            <label class="form-label" for="reportCategory">Category</label>
+            <select id="reportCategory" class="form-input">
+              <option value="user">Report a User</option>
+              <option value="post">Report a Post/Comment</option>
+              <option value="bug">Report a Bug</option>
+              <option value="general">General Question</option>
+            </select>
+          </div>
+
+          <div class="support-span">
+            <label class="form-label" id="reportTargetLabel" for="reportTarget">Username or Post/Comment Link</label>
+            <input type="text" id="reportTarget" class="form-input" placeholder="e.g. FireFrog44 or https://boundlore.com/wiki/post/?slug=...">
+          </div>
+
+          <div class="support-span">
+            <label class="form-label" for="reportScreenshot">Attach Screenshot (optional)</label>
+            <input type="file" id="reportScreenshot" accept="image/*" class="form-input">
+          </div>
+
+          <div class="support-span">
+            <label class="form-label" for="reportDescription">Description</label>
+            <textarea id="reportDescription" class="form-input" rows="6" placeholder="Describe the issue in detail..."></textarea>
+          </div>
+        </div>
+
+        <button id="btnSubmitReport" class="form-submit" style="margin-top:14px">Submit Report</button>
+        <p id="reportStatus" class="support-status"></p>
+        <p id="reportSuccessMsg" style="display:none;color:#50c878;margin-top:10px">Report submitted. Our team will review it shortly.</p>
+      </div>
+    </section>
+  </div>
 </div>
 
 <footer class="footer">

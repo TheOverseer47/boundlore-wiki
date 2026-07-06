@@ -521,6 +521,75 @@ a:hover { color: var(--gold-light); }
   margin-bottom: 14px;
 }
 
+.bl-guild-card {
+  margin-bottom: 14px;
+  background: linear-gradient(180deg, rgba(88,101,242,0.16), rgba(17,17,24,0.95));
+  border: 1px solid rgba(88,101,242,0.42);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.bl-guild-card-head {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.bl-guild-preview-wrap {
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0f1017;
+  margin-bottom: 12px;
+}
+
+.bl-guild-discord-preview {
+  width: 100%;
+  height: 310px;
+  border: 0;
+}
+
+.bl-guild-discord-fallback {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #c7ceff;
+  background: radial-gradient(circle at 20% 20%, rgba(88,101,242,0.35), rgba(17,17,24,0.92));
+}
+
+.bl-guild-title {
+  margin: 0 0 8px;
+  font-family: 'Cinzel', serif;
+}
+
+.bl-guild-title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.bl-guild-summary {
+  margin: 0 0 12px;
+  color: #bdc3df;
+  line-height: 1.58;
+}
+
+.bl-guild-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bl-guild-meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
 .bl-guide-card-link {
   display: block;
   background: linear-gradient(180deg, rgba(201,168,76,0.06), rgba(17,17,24,0.93));
@@ -872,6 +941,12 @@ a:hover { color: var(--gold-light); }
   .bl-guild-form-grid {
     grid-template-columns: 1fr;
   }
+  .support-intro-grid,
+  .support-main-grid,
+  .support-kpi-row,
+  .support-form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ===== Auth & Account Forms (Phase 1) ===== */
@@ -913,6 +988,96 @@ a:hover { color: var(--gold-light); }
 .info-table td:first-child {
   color: var(--text-muted);
   width: 40%;
+}
+
+.support-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 20px 70px;
+}
+
+.support-intro-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.support-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.support-kpi {
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,0.03);
+}
+
+.support-kpi strong {
+  display: block;
+  font-size: 1.15rem;
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+}
+
+.support-kpi span {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.support-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 16px;
+}
+
+.support-faq-item {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(255,255,255,0.02);
+  margin-bottom: 10px;
+}
+
+.support-faq-item h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.support-faq-item p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.56;
+}
+
+.support-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.support-span {
+  grid-column: 1 / -1;
+}
+
+.support-status {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.support-status.error {
+  color: #ff8b8b;
+}
+
+.support-status.success {
+  color: #50c878;
 }
 /* ===== Auth Nav Dropdown ===== */
 .account-menu {

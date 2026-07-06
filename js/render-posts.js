@@ -34,6 +34,13 @@ async function renderCategoryPosts(categorySlug) {
   const postsWithScores = await attachReactionStats(posts);
   const sortedPosts = sortPostsByCategoryLogic(postsWithScores, categorySlug);
 
+  if (categorySlug === "guilds") {
+    sortedPosts.forEach(function(post) {
+      container.appendChild(renderGuildCard(post));
+    });
+    return { posts: sortedPosts };
+  }
+
   sortedPosts.forEach(function(post) {
     const authorName = post.profiles ? post.profiles.username : "Unknown";
     const plainText = post.content.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 200);
@@ -78,6 +85,55 @@ async function renderCategoryPosts(categorySlug) {
   });
 
   return { posts: sortedPosts };
+}
+
+function renderGuildCard(post) {
+  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const authorName = post.profiles ? post.profiles.username : "Unknown";
+  const dateLabel = new Date(post.created_at).toLocaleDateString();
+  const plainText = post.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const summary = plainText.slice(0, 180) + (plainText.length > 180 ? "..." : "");
+
+  const discordInvite = extractDiscordInvite(post.content);
+  const discordWidgetSrc = extractDiscordWidget(post.content);
+  const previewHtml = discordWidgetSrc
+    ? '<iframe class="bl-guild-discord-preview" src="' + escapeHtmlRP(discordWidgetSrc) + '" title="Discord Preview" loading="lazy" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>'
+    : '<div class="bl-guild-discord-fallback"><p>Discord-first guild</p><strong>' + escapeHtmlRP(post.title) + '</strong></div>';
+
+  const card = document.createElement("div");
+  card.className = "bl-guild-card";
+  card.innerHTML =
+    '<div class="bl-guild-card-head">' +
+      '<span class="bl-tag bl-tag-type">Guild Listing</span>' +
+      '<span class="bl-tag bl-tag-discovery">Discord Focus</span>' +
+    '</div>' +
+    '<div class="bl-guild-preview-wrap">' + previewHtml + '</div>' +
+    '<h3 class="bl-guild-title"><a href="' + postUrl + '">' + escapeHtmlRP(post.title) + '</a></h3>' +
+    '<p class="bl-guild-summary">' + escapeHtmlRP(summary || "Guild details and onboarding information are available in this listing.") + '</p>' +
+    '<div class="bl-guild-actions">' +
+      (discordInvite ? '<a class="btn-small" style="background:#5865f2;text-decoration:none;display:inline-block;" href="' + escapeHtmlRP(discordInvite) + '" target="_blank" rel="noopener">Join Discord</a>' : '') +
+      '<a class="btn-small" style="background:#2a8bdc;text-decoration:none;display:inline-block;" href="' + postUrl + '">Open Guild</a>' +
+    '</div>' +
+    '<p class="bl-guild-meta">By ' + escapeHtmlRP(authorName) + ' · ' + dateLabel + '</p>';
+
+  return card;
+}
+
+function extractDiscordInvite(html) {
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = html || "";
+  const link = Array.from(wrapper.querySelectorAll("a[href]")).find(function(a) {
+    const href = (a.getAttribute("href") || "").toLowerCase();
+    return href.includes("discord.gg/") || href.includes("discord.com/invite/");
+  });
+  return link ? link.getAttribute("href") : "";
+}
+
+function extractDiscordWidget(html) {
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = html || "";
+  const iframe = wrapper.querySelector("iframe[src*='discord.com/widget']");
+  return iframe ? iframe.getAttribute("src") : "";
 }
 
 async function attachReactionStats(posts) {

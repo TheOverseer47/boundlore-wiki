@@ -25,8 +25,10 @@
     .community-columns { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
     .community-list { margin: 0; padding-left: 18px; }
     .community-list li { margin-bottom: 8px; }
-    .community-list a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,0.3); }
-    .community-list a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+    .community-list a { color: var(--text); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,0.3); }
+    .community-list a:hover { color: var(--gold); border-bottom-color: var(--gold); }
+    .community-feed-panel { background: rgba(17,17,24,0.75); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; }
+    .community-feed-panel .section-header { margin-bottom: 14px; text-align: left; }
     @media (max-width: 900px) {
       .community-top-grid, .community-columns { grid-template-columns: 1fr; }
       .community-actions { grid-template-columns: 1fr; }
@@ -107,7 +109,7 @@
     </div>
 
     <div class="community-columns">
-      <section class="recent-section" style="margin:0; padding:0;">
+      <section class="community-feed-panel" style="margin:0;">
         <div class="section-header">
           <h2 class="section-title">Latest Community Discoveries</h2>
           <a href="/wiki/create-post/?type=discovery" class="view-all">Submit Discovery &#8594;</a>

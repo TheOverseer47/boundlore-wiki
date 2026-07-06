@@ -20,18 +20,57 @@ async function loadHomepageStats() {
       .select("*")
       .single();
 
-    if (error) throw error;
+    if (error || !data) {
+      throw error || new Error("homepage_stats returned no data");
+    }
 
-    animateCount(el.creatures, data.creatures_count || 0);
-    animateCount(el.biomes, data.biomes_count || 0);
-    animateCount(el.items, data.items_count || 0);
-    animateCount(el.guides, data.guides_count || 0);
-  } catch (err) {
-    console.error("Failed to load homepage stats:", err);
-    [el.creatures, el.biomes, el.items, el.guides].forEach((e) => {
-      if (e) e.textContent = "0";
+    updateCounters(el, {
+      creatures: data.creatures_count || 0,
+      biomes: data.biomes_count || 0,
+      items: data.items_count || 0,
+      guides: data.guides_count || 0,
     });
+  } catch (err) {
+    console.warn("homepage_stats view failed, switching to direct count fallback:", err);
+    const fallback = await loadHomepageStatsFallback();
+    updateCounters(el, fallback);
   }
+}
+
+async function loadHomepageStatsFallback() {
+  const [creatures, biomes, items, guides] = await Promise.all([
+    countPostsByFilter({ category: "creatures", status: "published" }),
+    countPostsByFilter({ category: "biomes", status: "published" }),
+    countPostsByFilter({ category: "items", status: "published" }),
+    countPostsByFilter({ post_type: "guide", status: "published" }),
+  ]);
+
+  return {
+    creatures,
+    biomes,
+    items,
+    guides,
+  };
+}
+
+async function countPostsByFilter(filter) {
+  let query = supabase.from("posts").select("id", { count: "exact", head: true });
+  Object.keys(filter).forEach(function(key) {
+    query = query.eq(key, filter[key]);
+  });
+  const { count, error } = await query;
+  if (error) {
+    console.error("Homepage counter fallback failed for", filter, error);
+    return 0;
+  }
+  return count || 0;
+}
+
+function updateCounters(elements, values) {
+  animateCount(elements.creatures, values.creatures || 0);
+  animateCount(elements.biomes, values.biomes || 0);
+  animateCount(elements.items, values.items || 0);
+  animateCount(elements.guides, values.guides || 0);
 }
 
 function animateCount(element, target) {
