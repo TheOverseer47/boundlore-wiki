@@ -235,6 +235,7 @@ let canUseExtendedProfileFields = false;
 let canUseExtendedPostFields = false;
 let canUseAdminActions = false;
 let composeBodyEditor = null;
+let composePublishInFlight = false;
 
 async function checkAdmin() {
   setGateStatus("Checking permissions...");
@@ -636,6 +637,8 @@ function openDiscoveryComposer(discoveryId) {
 }
 
 async function publishComposedCategoryPost() {
+    if (composePublishInFlight) return;
+    composePublishInFlight = true;
   const sourceId = document.getElementById("composeSourceDiscoveryId").value;
   const title = document.getElementById("composeTitle").value.trim();
   const category = document.getElementById("composeCategory").value;
@@ -643,10 +646,14 @@ async function publishComposedCategoryPost() {
   const tags = document.getElementById("composeTags").value.trim();
   const body = composeBodyEditor ? (composeBodyEditor.root.innerHTML || "").trim() : "";
   const msg = document.getElementById("composeMsg");
+  const btnPublish = document.getElementById("btnPublishComposed");
+  if (btnPublish) btnPublish.disabled = true;
 
   if (!sourceId || !title || !body) {
     msg.textContent = "Title and body are required.";
     msg.style.color = "#ff8b8b";
+    composePublishInFlight = false;
+    if (btnPublish) btnPublish.disabled = false;
     return;
   }
 
@@ -676,6 +683,8 @@ async function publishComposedCategoryPost() {
   if (insertError) {
     msg.textContent = "Failed to publish category post: " + insertError.message;
     msg.style.color = "#ff8b8b";
+    composePublishInFlight = false;
+    if (btnPublish) btnPublish.disabled = false;
     return;
   }
 
@@ -687,15 +696,19 @@ async function publishComposedCategoryPost() {
   if (publishError) {
     msg.textContent = "Category post was created as pending, but publish failed: " + publishError.message;
     msg.style.color = "#ff8b8b";
+    composePublishInFlight = false;
+    if (btnPublish) btnPublish.disabled = false;
     return;
   }
 
-  await supabase.from("posts").update({ status: "published" }).eq("id", sourceId);
+  await supabase.from("posts").update({ status: "approved" }).eq("id", sourceId);
   const sourceDiscovery = pendingDiscoveriesCache.find(function(item) { return item.id === sourceId; });
   await notifyPostOwner(sourceDiscovery, "discovery", "Discovery converted into wiki post", "An admin used your discovery to create a curated wiki post.", "/wiki/account/");
   await logAdminAction("compose_from_discovery", "post", sourceId, "Composed curated wiki post");
-  msg.textContent = "Category post published and source discovery marked as published.";
+  msg.textContent = "Category post published. Source discovery was marked as approved (not publicly published).";
   msg.style.color = "#50c878";
+  composePublishInFlight = false;
+  if (btnPublish) btnPublish.disabled = false;
   loadDiscoveries(); loadPending(); loadAllPosts(); loadOverview();
 }
 
