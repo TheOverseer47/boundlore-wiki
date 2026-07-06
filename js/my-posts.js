@@ -41,6 +41,7 @@ async function renderMyPosts(userId) {
     }
       const editUrl = post.slug ? `/wiki/edit-post/?slug=${encodeURIComponent(post.slug)}` : `/wiki/edit-post/?id=${post.id}`;
       actions.push(`<a href="${editUrl}" class="link-btn">Edit</a>`);
+      actions.push(`<button type="button" class="link-btn" data-action="delete-own" data-id="${post.id}" style="color:#ff7b7b;">Delete</button>`);
 
     const row = document.createElement("div");
     row.style.cssText = "display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);";
@@ -51,6 +52,24 @@ async function renderMyPosts(userId) {
       "</div>" +
       "<div style=\"display:flex;align-items:center;gap:10px;flex-wrap:wrap;\">" + statusBadge + actions.join("") + "</div>";
     container.appendChild(row);
+  });
+
+  container.querySelectorAll('[data-action="delete-own"]').forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!confirm("Delete this post permanently?")) return;
+      const { error } = await supabase
+        .from("posts")
+        .delete()
+        .eq("id", this.dataset.id)
+        .eq("author_id", userId);
+
+      if (error) {
+        alert("Could not delete post: " + error.message);
+        return;
+      }
+
+      renderMyPosts(userId);
+    });
   });
 }
 

@@ -77,503 +77,533 @@
     <button class="tab-btn" data-tab="discoveries">Discovery Queue (<span id="countDiscoveryPending">0</span>)</button>
     <button class="tab-btn" data-tab="allposts">All Posts</button>
     <button class="tab-btn" data-tab="users">Users</button>
-    <button class="tab-btn" data-tab="reports">Reports (<span id="countReports">0</span>)</button>
-  </div>
+  let currentAdminId = null;
+  let pendingDiscoveriesCache = [];
 
-  <div id="tabOverview" class="tab-panel">
-    <div class="stat-grid">
-      <div class="stat-card"><div class="num" id="statUsers">-</div><div class="label">Registered Users</div></div>
-      <div class="stat-card"><div class="num" id="statPublished">-</div><div class="label">Published Posts</div></div>
-      <div class="stat-card"><div class="num" id="statPending">-</div><div class="label">Pending Review</div></div>
-      <div class="stat-card"><div class="num" id="statDiscoveries">-</div><div class="label">Discoveries</div></div>
-      <div class="stat-card"><div class="num" id="statPendingDiscoveries">-</div><div class="label">Pending Discoveries</div></div>
-      <div class="stat-card"><div class="num" id="statGuildApplications">-</div><div class="label">Guild Applications</div></div>
-      <div class="stat-card"><div class="num" id="statReports">-</div><div class="label">Open Reports</div></div>
-    </div>
-    <div class="form-box">
-      <h3>Posts by Category</h3>
-      <div id="categoryBreakdown"></div>
-    </div>
-  </div>
+  async function checkAdmin() {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
+      window.location.href = "/wiki/login/";
+      return;
+    }
 
-  <div id="tabPending" class="tab-panel" style="display:none;">
-    <div id="pendingList"></div>
-    <p id="pendingEmpty" style="text-align:center;color:var(--text-muted);display:none;">No posts awaiting review.</p>
-  </div>
+    currentAdminId = sessionData.session.user.id;
 
-  <div id="tabDiscoveries" class="tab-panel" style="display:none;">
-    <div id="discoveryQueueList"></div>
-    <p id="discoveryQueueEmpty" style="text-align:center;color:var(--text-muted);display:none;">No discovery submissions awaiting review.</p>
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", currentAdminId)
+      .single();
 
-    <div id="discoveryComposerBox" class="form-box" style="display:none;margin-top:20px;">
-      <h3 style="margin-top:0;">Build Category Post From Discovery</h3>
-      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:12px;">Use this to create a clean, published category post from a discovery submission.</p>
+    if (error || !profile || profile.role !== "admin") {
+      document.getElementById("gateBox").style.display = "none";
+      document.getElementById("deniedBox").style.display = "block";
+      return;
+    }
 
-      <input type="hidden" id="composeSourceDiscoveryId" />
-
-      <label for="composeTitle">Post Title</label>
-      <input id="composeTitle" class="form-input" type="text" maxlength="120" />
-
-      <label for="composeCategory">Main Category</label>
-      <select id="composeCategory" class="form-input"></select>
-
-      <label for="composeCustomCategory">Custom Category (optional)</label>
-      <input id="composeCustomCategory" class="form-input" type="text" placeholder="e.g. ancient-ruins" />
-
-      <label for="composeTags">Tags (comma-separated)</label>
-      <input id="composeTags" class="form-input" type="text" placeholder="rare,item,desert" />
-
-      <label for="composeBody">Post Body (HTML allowed)</label>
-      <textarea id="composeBody" class="form-input" rows="10"></textarea>
-
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-        <button id="btnPublishComposed" class="btn-small" style="background:#50c878;" type="button">Publish Category Post</button>
-        <button id="btnCancelCompose" class="btn-small" style="background:#666;" type="button">Cancel</button>
-      </div>
-      <p id="composeMsg" style="margin-top:10px;color:var(--text-muted);"></p>
-    </div>
-  </div>
-
-  <div id="tabAllposts" class="tab-panel" style="display:none;">
-    <div class="form-box" style="overflow-x:auto;">
-      <table class="admin-table">
-        <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
-        <tbody id="allPostsBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div id="tabUsers" class="tab-panel" style="display:none;">
-    <div class="form-box" style="overflow-x:auto;">
-      <table class="admin-table">
-        <thead><tr><th>Username</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
-        <tbody id="usersBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div id="tabReports" class="tab-panel" style="display:none;">
-    <div id="reportsList"></div>
-    <p id="reportsEmpty" style="text-align:center;color:var(--text-muted);display:none;">No open reports.</p>
-  </div>
-
-</div>
-
-<footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
-
-<script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js"></script>
-<script src="/js/avatar-utils.js"></script>
-<script src="/js/auth-nav.js"></script>
-<script src="/js/main.js"></script>
-<script>
-let currentAdminId = null;
-let pendingDiscoveriesCache = [];
-
-async function checkAdmin() {
-  const { data: sessionData } = await supabase.auth.getSession();
-  if (!sessionData.session) { window.location.href = "/wiki/login/"; return; }
-
-  currentAdminId = sessionData.session.user.id;
-
-  const { data: profile, error } = await supabase
-    .from("profiles").select("role").eq("id", currentAdminId).single();
-
-  if (error || !profile || profile.role !== "admin") {
     document.getElementById("gateBox").style.display = "none";
-    document.getElementById("deniedBox").style.display = "block";
-    return;
+    document.getElementById("dashboard").style.display = "block";
+
+    initDiscoveryComposer();
+    await Promise.all([
+      loadOverview(),
+      loadPending(),
+      loadDiscoveries(),
+      loadAllPosts(),
+      loadUsers(),
+      loadReports(),
+    ]);
   }
 
-  document.getElementById("gateBox").style.display = "none";
-  document.getElementById("dashboard").style.display = "block";
+  async function loadOverview() {
+    const { count: userCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
+    const { count: publishedCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "published");
+    const { count: pendingCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending");
+    const { count: discoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("is_discovery", true);
+    const { count: pendingDiscoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true);
+    const { count: guildApplicationCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true).eq("category", "guilds");
+    const { count: reportCount } = await supabase.from("reports").select("*", { count: "exact", head: true });
 
-  loadOverview();
-  loadPending();
-  loadDiscoveries();
-  loadAllPosts();
-  loadUsers();
-  loadReports();
-  initDiscoveryComposer();
-}
+    document.getElementById("statUsers").textContent = userCount || 0;
+    document.getElementById("statPublished").textContent = publishedCount || 0;
+    document.getElementById("statPending").textContent = pendingCount || 0;
+    document.getElementById("statDiscoveries").textContent = discoveryCount || 0;
+    document.getElementById("statPendingDiscoveries").textContent = pendingDiscoveryCount || 0;
+    document.getElementById("statGuildApplications").textContent = guildApplicationCount || 0;
+    document.getElementById("statReports").textContent = reportCount || 0;
 
-async function loadOverview() {
-  const { count: userCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
-  const { count: publishedCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "published");
-  const { count: pendingCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending");
-  const { count: discoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("is_discovery", true);
-  const { count: pendingDiscoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true);
-  const { count: guildApplicationCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true).eq("category", "guilds");
-  const { count: reportCount } = await supabase.from("reports").select("*", { count: "exact", head: true });
-
-  document.getElementById("statUsers").textContent = userCount || 0;
-  document.getElementById("statPublished").textContent = publishedCount || 0;
-  document.getElementById("statPending").textContent = pendingCount || 0;
-  document.getElementById("statDiscoveries").textContent = discoveryCount || 0;
-  document.getElementById("statPendingDiscoveries").textContent = pendingDiscoveryCount || 0;
-  document.getElementById("statGuildApplications").textContent = guildApplicationCount || 0;
-  document.getElementById("statReports").textContent = reportCount || 0;
-
-
-async function loadDiscoveries() {
-  const { data: discoveries, error } = await supabase
-    .from("posts")
-    .select("id, slug, title, category, content, created_at, author_id, profiles(username)")
-    .eq("status", "pending")
-    .eq("is_discovery", true)
-    .order("created_at", { ascending: true });
-
-  const list = document.getElementById("discoveryQueueList");
-  const empty = document.getElementById("discoveryQueueEmpty");
-  list.innerHTML = "";
-
-  if (error || !discoveries || discoveries.length === 0) {
-    empty.style.display = "block";
-    document.getElementById("countDiscoveryPending").textContent = "0";
-    pendingDiscoveriesCache = [];
-    return;
+    const { data: allPosts } = await supabase.from("posts").select("category").eq("status", "published");
+    const breakdown = document.getElementById("categoryBreakdown");
+    breakdown.innerHTML = "";
+    if (allPosts && typeof BOUNDLORE_CATEGORIES !== "undefined") {
+      BOUNDLORE_CATEGORIES.forEach(function(cat) {
+        const count = allPosts.filter(function(p) { return p.category === cat.slug; }).length;
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);";
+        row.innerHTML = "<span>" + cat.icon + " " + cat.label + "</span><strong>" + count + "</strong>";
+        breakdown.appendChild(row);
+      });
+    }
   }
 
-  pendingDiscoveriesCache = discoveries;
-  document.getElementById("countDiscoveryPending").textContent = discoveries.length;
-  empty.style.display = "none";
+  async function loadPending() {
+    const { data: posts, error } = await supabase
+      .from("posts")
+      .select("id, title, category, post_type, guide_subcategory, content, is_discovery, created_at, author_id, profiles:author_id(username)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true });
 
-  discoveries.forEach(function(post) {
-    const authorName = post.profiles ? post.profiles.username : "Unknown";
-    const attachmentLinks = extractDiscoveryAttachmentLinks(post.content);
-    const attachmentHtml = attachmentLinks.length
-      ? ('<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">Attachments</p><ul style="margin:0 0 12px 18px;">' +
-         attachmentLinks.map(function(link) {
-           return '<li><a href="' + escapeHtmlA(link.href) + '" target="_blank" rel="noopener" download>' + escapeHtmlA(link.label) + '</a></li>';
-         }).join("") + '</ul>')
-      : '<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">No attachments</p>';
+    const list = document.getElementById("pendingList");
+    const empty = document.getElementById("pendingEmpty");
+    list.innerHTML = "";
 
-    const div = document.createElement("div");
-    div.className = "form-box";
-    div.style.marginBottom = "14px";
-    div.innerHTML =
-      '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">' +
-      '<h3 style="margin:0;">' + escapeHtmlA(post.title) + '</h3>' +
-      '<span class="badge badge-discovery">\u2728 Discovery</span>' +
-      '</div>' +
-      '<p style="color:var(--text-muted);font-size:0.84rem;margin-top:6px;">By ' + escapeHtmlA(authorName) + ' &middot; ' + new Date(post.created_at).toLocaleString() + '</p>' +
-      '<p style="color:var(--text-muted);font-size:0.82rem;margin:6px 0 10px;">Target category: <strong>' + escapeHtmlA(post.category || "-") + '</strong></p>' +
-      attachmentHtml +
-      '<div style="background:#fff;color:#111;padding:12px;border-radius:6px;margin:8px 0;max-height:220px;overflow-y:auto;">' + post.content + '</div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-      '<button class="btn-small" style="background:#50c878;" data-action="approve-discovery" data-id="' + post.id + '">Approve Discovery</button>' +
-      '<button class="btn-small" style="background:#2a8bdc;" data-action="compose-from-discovery" data-id="' + post.id + '">Build Category Post</button>' +
-      '<button class="btn-small" style="background:#e05555;" data-action="reject-discovery" data-id="' + post.id + '">Reject</button>' +
+    if (error || !posts || posts.length === 0) {
+      empty.style.display = "block";
+      document.getElementById("countPending").textContent = "0";
+      return;
+    }
+
+    empty.style.display = "none";
+    document.getElementById("countPending").textContent = posts.length;
+
+    posts.forEach(function(post) {
+      const authorName = post.profiles ? post.profiles.username : "Unknown";
+      const catLabel = getPostCategoryLabel(post);
+      const discoveryBadge = post.is_discovery ? "<span class=\"badge badge-discovery\">\u2728 Discovery</span>" : "";
+
+      const div = document.createElement("div");
+      div.className = "form-box";
+      div.style.marginBottom = "20px";
+      div.innerHTML =
+        "<div style=\"display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;\">" +
+        "<h3 style=\"margin:0;\">" + escapeHtmlA(post.title) + "</h3>" +
+        "<span class=\"badge\" style=\"background:rgba(255,255,255,0.08);\">" + catLabel + "</span>" +
+        discoveryBadge +
+        "</div>" +
+        "<p style=\"color:var(--text-muted);font-size:0.85rem;margin-top:6px;\">By " + escapeHtmlA(authorName) + " &middot; " + new Date(post.created_at).toLocaleString() + "</p>" +
+        "<div style=\"background:#fff;color:#111;padding:16px;border-radius:6px;margin:14px 0;max-height:320px;overflow-y:auto;\">" + post.content + "</div>" +
+        "<div style=\"display:flex;gap:10px;\">" +
+        "<button class=\"btn-small\" style=\"background:#50c878;\" data-action=\"approve\" data-id=\"" + post.id + "\">Approve & Publish</button>" +
+        "<button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"reject\" data-id=\"" + post.id + "\">Reject & Delete</button>" +
+        "</div>";
+      list.appendChild(div);
+    });
+
+    list.querySelectorAll("[data-action=\"approve\"]").forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
+        loadPending();
+        loadDiscoveries();
+        loadAllPosts();
+        loadOverview();
+      });
+    });
+
+    list.querySelectorAll("[data-action=\"reject\"]").forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        if (!confirm("Really reject and permanently delete this post?")) return;
+        await supabase.from("posts").delete().eq("id", this.dataset.id);
+        loadPending();
+        loadDiscoveries();
+        loadAllPosts();
+        loadOverview();
+      });
+    });
+  }
+
+  async function loadDiscoveries() {
+    const { data: discoveries, error } = await supabase
+      .from("posts")
+      .select("id, slug, title, category, content, created_at, author_id, profiles:author_id(username)")
+      .eq("status", "pending")
+      .eq("is_discovery", true)
+      .order("created_at", { ascending: true });
+
+    const list = document.getElementById("discoveryQueueList");
+    const empty = document.getElementById("discoveryQueueEmpty");
+    list.innerHTML = "";
+
+    if (error || !discoveries || discoveries.length === 0) {
+      empty.style.display = "block";
+      document.getElementById("countDiscoveryPending").textContent = "0";
+      pendingDiscoveriesCache = [];
+      return;
+    }
+
+    pendingDiscoveriesCache = discoveries;
+    document.getElementById("countDiscoveryPending").textContent = discoveries.length;
+    empty.style.display = "none";
+
+    discoveries.forEach(function(post) {
+      const authorName = post.profiles ? post.profiles.username : "Unknown";
+      const attachmentLinks = extractDiscoveryAttachmentLinks(post.content);
+      const attachmentHtml = attachmentLinks.length
+        ? ('<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">Attachments</p><ul style="margin:0 0 12px 18px;">' +
+           attachmentLinks.map(function(link) {
+             return '<li><a href="' + escapeHtmlA(link.href) + '" target="_blank" rel="noopener" download>' + escapeHtmlA(link.label) + '</a></li>';
+           }).join("") + '</ul>')
+        : '<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">No attachments</p>';
+
+      const div = document.createElement("div");
+      div.className = "form-box";
+      div.style.marginBottom = "14px";
+      div.innerHTML =
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">' +
+        '<h3 style="margin:0;">' + escapeHtmlA(post.title) + '</h3>' +
+        '<span class="badge badge-discovery">\u2728 Discovery</span>' +
+        '</div>' +
+        '<p style="color:var(--text-muted);font-size:0.84rem;margin-top:6px;">By ' + escapeHtmlA(authorName) + ' &middot; ' + new Date(post.created_at).toLocaleString() + '</p>' +
+        '<p style="color:var(--text-muted);font-size:0.82rem;margin:6px 0 10px;">Target category: <strong>' + escapeHtmlA(post.category || '-') + '</strong></p>' +
+        attachmentHtml +
+        '<div style="background:#fff;color:#111;padding:12px;border-radius:6px;margin:8px 0;max-height:220px;overflow-y:auto;">' + post.content + '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<button class="btn-small" style="background:#50c878;" data-action="approve-discovery" data-id="' + post.id + '">Approve Discovery</button>' +
+        '<button class="btn-small" style="background:#2a8bdc;" data-action="compose-from-discovery" data-id="' + post.id + '">Build Category Post</button>' +
+        '<button class="btn-small" style="background:#e05555;" data-action="reject-discovery" data-id="' + post.id + '">Reject</button>' +
+        '</div>';
+      list.appendChild(div);
+    });
+
+    list.querySelectorAll('[data-action="approve-discovery"]').forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
+        loadDiscoveries();
+        loadPending();
+        loadAllPosts();
+        loadOverview();
+      });
+    });
+
+    list.querySelectorAll('[data-action="reject-discovery"]').forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        if (!confirm("Reject and delete this discovery?")) return;
+        await supabase.from("posts").delete().eq("id", this.dataset.id);
+        loadDiscoveries();
+        loadPending();
+        loadAllPosts();
+        loadOverview();
+      });
+    });
+
+    list.querySelectorAll('[data-action="compose-from-discovery"]').forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        openDiscoveryComposer(this.dataset.id);
+        document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+        document.querySelector('[data-tab="discoveries"]').classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(function(panel) { panel.style.display = 'none'; });
+        document.getElementById('tabDiscoveries').style.display = 'block';
+      });
+    });
+  }
+
+  function initDiscoveryComposer() {
+    const categorySelect = document.getElementById("composeCategory");
+    if (categorySelect && typeof BOUNDLORE_CATEGORIES !== "undefined") {
+      categorySelect.innerHTML = "";
+      BOUNDLORE_CATEGORIES.forEach(function(cat) {
+        const opt = document.createElement("option");
+        opt.value = cat.slug;
+        opt.textContent = cat.label;
+        categorySelect.appendChild(opt);
+      });
+    }
+
+    const btnPublish = document.getElementById("btnPublishComposed");
+    const btnCancel = document.getElementById("btnCancelCompose");
+    if (btnPublish) {
+      btnPublish.addEventListener("click", publishComposedCategoryPost);
+    }
+    if (btnCancel) {
+      btnCancel.addEventListener("click", function() {
+        document.getElementById("discoveryComposerBox").style.display = "none";
+      });
+    }
+  }
+
+  function openDiscoveryComposer(discoveryId) {
+    const discovery = pendingDiscoveriesCache.find(function(item) { return item.id === discoveryId; });
+    if (!discovery) return;
+
+    document.getElementById("discoveryComposerBox").style.display = "block";
+    document.getElementById("composeSourceDiscoveryId").value = discovery.id;
+    document.getElementById("composeTitle").value = discovery.title;
+    document.getElementById("composeCategory").value = discovery.category || "biomes";
+    document.getElementById("composeCustomCategory").value = "";
+    document.getElementById("composeTags").value = "discovery,community";
+    document.getElementById("composeBody").value = discovery.content || "";
+    document.getElementById("composeMsg").textContent = "Editing discovery: " + discovery.title;
+  }
+
+  async function publishComposedCategoryPost() {
+    const sourceId = document.getElementById("composeSourceDiscoveryId").value;
+    const title = document.getElementById("composeTitle").value.trim();
+    const category = document.getElementById("composeCategory").value;
+    const customCategory = document.getElementById("composeCustomCategory").value.trim();
+    const tags = document.getElementById("composeTags").value.trim();
+    const body = document.getElementById("composeBody").value.trim();
+    const msg = document.getElementById("composeMsg");
+
+    if (!sourceId || !title || !body) {
+      msg.textContent = "Title and body are required.";
+      msg.style.color = "#ff8b8b";
+      return;
+    }
+
+    const finalCategory = customCategory || category;
+    if (!finalCategory) {
+      msg.textContent = "Please choose or define a category.";
+      msg.style.color = "#ff8b8b";
+      return;
+    }
+
+    const cleanTags = tags
+      ? tags.split(",").map(function(t) { return t.trim(); }).filter(Boolean)
+      : [];
+
+    const composedContent =
+      '<div class="admin-curated-post">' +
+      '<p><strong>Curated from community discovery.</strong></p>' +
+      (cleanTags.length ? ('<p><strong>Tags:</strong> ' + escapeHtmlA(cleanTags.join(', ')) + '</p>') : '') +
+      body +
       '</div>';
 
-    list.appendChild(div);
-  });
-
-  list.querySelectorAll('[data-action="approve-discovery"]').forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
-      loadDiscoveries();
-      loadPending();
-      loadAllPosts();
-      loadOverview();
+    const { error: insertError } = await supabase.from("posts").insert({
+      author_id: currentAdminId,
+      title: title,
+      content: composedContent,
+      status: "published",
+      category: finalCategory,
+      post_type: "wiki",
+      guide_subcategory: null,
+      is_discovery: false,
     });
-  });
 
-  list.querySelectorAll('[data-action="reject-discovery"]').forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      if (!confirm("Reject and delete this discovery?")) return;
-      await supabase.from("posts").delete().eq("id", this.dataset.id);
-      loadDiscoveries();
-      loadPending();
-      loadAllPosts();
-      loadOverview();
-    });
-  });
+    if (insertError) {
+      msg.textContent = "Failed to publish category post: " + insertError.message;
+      msg.style.color = "#ff8b8b";
+      return;
+    }
 
-  list.querySelectorAll('[data-action="compose-from-discovery"]').forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      openDiscoveryComposer(this.dataset.id);
-      document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
-      document.querySelector('[data-tab="discoveries"]').classList.add('active');
-      document.querySelectorAll('.tab-panel').forEach(function(panel) { panel.style.display = 'none'; });
-      document.getElementById('tabDiscoveries').style.display = 'block';
-    });
-  });
-}
+    await supabase.from("posts").update({ status: "published" }).eq("id", sourceId);
 
-function initDiscoveryComposer() {
-  const categorySelect = document.getElementById("composeCategory");
-  if (categorySelect && typeof BOUNDLORE_CATEGORIES !== "undefined") {
-    categorySelect.innerHTML = "";
-    BOUNDLORE_CATEGORIES.forEach(function(cat) {
-      const opt = document.createElement("option");
-      opt.value = cat.slug;
-      opt.textContent = cat.label;
-      categorySelect.appendChild(opt);
+    msg.textContent = "Category post published and source discovery marked as published.";
+    msg.style.color = "#50c878";
+
+    loadDiscoveries();
+    loadPending();
+    loadAllPosts();
+    loadOverview();
+  }
+
+  function extractDiscoveryAttachmentLinks(content) {
+    if (!content) return [];
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = content;
+    const links = Array.from(wrapper.querySelectorAll("a[href]"));
+    return links.map(function(a) {
+      return {
+        href: a.getAttribute("href") || "",
+        label: (a.textContent || "attachment").trim(),
+      };
+    }).filter(function(link) {
+      return /^https?:\/\//i.test(link.href);
     });
   }
 
-  const btnPublish = document.getElementById("btnPublishComposed");
-  const btnCancel = document.getElementById("btnCancelCompose");
-  if (btnPublish) {
-    btnPublish.addEventListener("click", publishComposedCategoryPost);
-  }
-  if (btnCancel) {
-    btnCancel.addEventListener("click", function() {
-      document.getElementById("discoveryComposerBox").style.display = "none";
+  async function loadAllPosts() {
+    const tbody = document.getElementById("allPostsBody");
+    tbody.innerHTML = "";
+
+    const { data: posts, error } = await supabase
+      .from("posts")
+      .select("id, title, category, post_type, guide_subcategory, status, is_discovery, created_at, profiles:author_id(username)")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      tbody.innerHTML = '<tr><td colspan="6" style="color:#ff8b8b;">Failed to load posts: ' + escapeHtmlA(error.message) + '</td></tr>';
+      return;
+    }
+
+    if (!posts || posts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted);">No posts found.</td></tr>';
+      return;
+    }
+
+    posts.forEach(function(post) {
+      const authorName = post.profiles ? post.profiles.username : "Unknown";
+      const catLabel = getPostCategoryLabel(post);
+      const statusClass = post.status === "published" ? "badge-published" : "badge-pending";
+      const discoveryMark = post.is_discovery ? " \u2728" : "";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>" + escapeHtmlA(post.title) + discoveryMark + "</td>" +
+        "<td>" + catLabel + "</td>" +
+        "<td>" + escapeHtmlA(authorName) + "</td>" +
+        "<td><span class=\"badge " + statusClass + "\">" + post.status + "</span></td>" +
+        "<td>" + new Date(post.created_at).toLocaleDateString() + "</td>" +
+        "<td><button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"deleteany\" data-id=\"" + post.id + "\">Delete</button></td>";
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll("[data-action=\"deleteany\"]").forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        if (!confirm("Permanently delete this post?")) return;
+        await supabase.from("posts").delete().eq("id", this.dataset.id);
+        loadAllPosts();
+        loadPending();
+        loadDiscoveries();
+        loadOverview();
+      });
     });
   }
-}
 
-function openDiscoveryComposer(discoveryId) {
-  const discovery = pendingDiscoveriesCache.find(function(item) { return item.id === discoveryId; });
-  if (!discovery) return;
+  async function loadUsers() {
+    const tbody = document.getElementById("usersBody");
+    tbody.innerHTML = "";
 
-  document.getElementById("discoveryComposerBox").style.display = "block";
-  document.getElementById("composeSourceDiscoveryId").value = discovery.id;
-  document.getElementById("composeTitle").value = discovery.title;
-  document.getElementById("composeCategory").value = discovery.category || "biomes";
-  document.getElementById("composeCustomCategory").value = "";
-  document.getElementById("composeTags").value = "discovery,community";
-  document.getElementById("composeBody").value = discovery.content || "";
-  document.getElementById("composeMsg").textContent = "Editing discovery: " + discovery.title;
-}
+    const { data: users, error } = await supabase
+      .from("profiles")
+      .select("id, username, role, created_at, is_banned")
+      .order("created_at", { ascending: false });
 
-async function publishComposedCategoryPost() {
-  const sourceId = document.getElementById("composeSourceDiscoveryId").value;
-  const title = document.getElementById("composeTitle").value.trim();
-  const category = document.getElementById("composeCategory").value;
-  const customCategory = document.getElementById("composeCustomCategory").value.trim();
-  const tags = document.getElementById("composeTags").value.trim();
-  const body = document.getElementById("composeBody").value.trim();
-  const msg = document.getElementById("composeMsg");
+    if (error) {
+      tbody.innerHTML = '<tr><td colspan="4" style="color:#ff8b8b;">Failed to load users: ' + escapeHtmlA(error.message) + '</td></tr>';
+      return;
+    }
 
-  if (!sourceId || !title || !body) {
-    msg.textContent = "Title and body are required.";
-    msg.style.color = "#ff8b8b";
-    return;
+    if (!users || users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted);">No users found.</td></tr>';
+      return;
+    }
+
+    users.forEach(function(u) {
+      const roleClass = u.role === "admin" ? "badge-admin" : "badge-member";
+      const isSelf = u.id === currentAdminId;
+      const banBadge = u.is_banned ? '<span class="badge" style="background:#8b0000">Banned</span>' : '';
+      const tr = document.createElement("tr");
+      const avatarHtml = typeof renderAvatar === "function" ? renderAvatar(u, "bl-avatar-xs") : "";
+      tr.innerHTML =
+        "<td><span style=\"display:inline-flex;align-items:center;gap:8px;\">" + avatarHtml + "<span>" + escapeHtmlA(u.username) + (isSelf ? " (you)" : "") + " " + banBadge + "</span></span></td>" +
+        "<td><span class=\"badge " + roleClass + "\">" + u.role + "</span></td>" +
+        "<td>" + new Date(u.created_at).toLocaleDateString() + "</td>" +
+        "<td>" + (isSelf ? "-" :
+          "<button class=\"btn-small\" style=\"background:" + (u.role === "admin" ? "#e0a83a" : "#a05ce8") + ";\" data-action=\"togglerole\" data-id=\"" + u.id + "\" data-role=\"" + u.role + "\">" +
+          (u.role === "admin" ? "Revoke Admin" : "Make Admin") + "</button> " +
+          "<button class=\"btn-small\" style=\"background:" + (u.is_banned ? "#50c878" : "#e05555") + ";\" data-action=\"toggleban\" data-id=\"" + u.id + "\" data-banned=\"" + u.is_banned + "\">" +
+          (u.is_banned ? "Unban" : "Ban") + "</button>") + "</td>";
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll("[data-action=\"togglerole\"]").forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        const newRole = this.dataset.role === "admin" ? "member" : "admin";
+        if (!confirm("Change this user's role to " + newRole + "?")) return;
+        await supabase.from("profiles").update({ role: newRole }).eq("id", this.dataset.id);
+        loadUsers();
+      });
+    });
+
+    tbody.querySelectorAll("[data-action=\"toggleban\"]").forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        const willBan = this.dataset.banned !== "true";
+        if (!confirm(willBan ? "Diesen Nutzer wirklich bannen?" : "Bann wirklich aufheben?")) return;
+        await supabase.from("profiles").update({
+          is_banned: willBan,
+          banned_at: willBan ? new Date().toISOString() : null,
+        }).eq("id", this.dataset.id);
+        loadUsers();
+      });
+    });
   }
 
-  const finalCategory = customCategory || category;
-  if (!finalCategory) {
-    msg.textContent = "Please choose or define a category.";
-    msg.style.color = "#ff8b8b";
-    return;
-  }
+  async function loadReports() {
+    const { data: reports, error } = await supabase
+      .from("reports")
+      .select("id, reason, category, target_type, description, screenshot_url, created_at, post_id, reporter_id, posts:post_id(title), profiles:reporter_id(username)")
+      .order("created_at", { ascending: true });
 
-  const cleanTags = tags
-    ? tags.split(",").map(function(t) { return t.trim(); }).filter(Boolean)
-    : [];
+    const list = document.getElementById("reportsList");
+    const empty = document.getElementById("reportsEmpty");
+    list.innerHTML = "";
 
-  const composedContent =
-    '<div class="admin-curated-post">' +
-    '<p><strong>Curated from community discovery.</strong></p>' +
-    (cleanTags.length ? ('<p><strong>Tags:</strong> ' + escapeHtmlA(cleanTags.join(', ')) + '</p>') : '') +
-    body +
-    '</div>';
+    if (error || !reports || reports.length === 0) {
+      empty.style.display = "block";
+      document.getElementById("countReports").textContent = "0";
+      return;
+    }
 
-  const { error: insertError } = await supabase.from("posts").insert({
-    author_id: currentAdminId,
-    title,
-    content: composedContent,
-    status: "published",
-    category: finalCategory,
-    post_type: "wiki",
-    guide_subcategory: null,
-    is_discovery: false,
-  });
+    empty.style.display = "none";
+    document.getElementById("countReports").textContent = reports.length;
 
-  if (insertError) {
-    msg.textContent = "Failed to publish category post: " + insertError.message;
-    msg.style.color = "#ff8b8b";
-    return;
-  }
-
-  await supabase.from("posts").update({ status: "published" }).eq("id", sourceId);
-
-  msg.textContent = "Category post published and source discovery marked as published.";
-  msg.style.color = "#50c878";
-
-  loadDiscoveries();
-  loadPending();
-  loadAllPosts();
-  loadOverview();
-}
-
-function extractDiscoveryAttachmentLinks(content) {
-  if (!content) return [];
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = content;
-  const links = Array.from(wrapper.querySelectorAll("a[href]"));
-  return links.map(function(a) {
-    return {
-      href: a.getAttribute("href") || "",
-      label: (a.textContent || "attachment").trim(),
+    const categoryMeta = {
+      user: { label: "👤 User Report", color: "#e0a83a" },
+      post: { label: "📄 Post/Comment Report", color: "#5c9de0" },
+      bug: { label: "🐛 Bug Report", color: "#c85cd8" },
+      general: { label: "💬 General Question", color: "#888" },
     };
-  }).filter(function(link) {
-    return /^https?:\/\//i.test(link.href);
-  });
-}
-  const { data: allPosts } = await supabase.from("posts").select("category").eq("status", "published");
-  const breakdown = document.getElementById("categoryBreakdown");
-  breakdown.innerHTML = "";
-  if (allPosts && typeof BOUNDLORE_CATEGORIES !== "undefined") {
-    BOUNDLORE_CATEGORIES.forEach(function(cat) {
-      const count = allPosts.filter(function(p) { return p.category === cat.slug; }).length;
-      const row = document.createElement("div");
-      row.style.cssText = "display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);";
-      row.innerHTML = "<span>" + cat.icon + " " + cat.label + "</span><strong>" + count + "</strong>";
-      breakdown.appendChild(row);
+
+    reports.forEach(function(report) {
+      const meta = categoryMeta[report.category] || categoryMeta.general;
+      const reporterName = report.profiles ? report.profiles.username : "Unknown";
+      const postTitle = report.posts ? report.posts.title : null;
+
+      let actionsHtml = '<button class="btn-small" style="background:#666" data-action="dismiss" data-id="' + report.id + '">Dismiss</button>';
+      if (report.category === "post" && report.post_id) {
+        actionsHtml += ' <button class="btn-small" style="background:#e05555" data-action="deletepost" data-id="' + report.id + '" data-postid="' + report.post_id + '">Delete Post</button>';
+      }
+
+      const div = document.createElement("div");
+      div.className = "form-box";
+      div.style.marginBottom = "20px";
+      div.style.borderLeft = "4px solid " + meta.color;
+      div.innerHTML =
+        "<h3>" + meta.label + "</h3>" +
+        "<p style=\"color:var(--text-muted);font-size:0.85rem\">Reported by " + escapeHtmlA(reporterName) + " &middot; " + new Date(report.created_at).toLocaleString() + "</p>" +
+        (postTitle ? "<p style=\"margin:6px 0\"><strong>Related post:</strong> " + escapeHtmlA(postTitle) + "</p>" : "") +
+        "<p style=\"margin:10px 0\"><strong>Details:</strong> " + escapeHtmlA(report.reason || report.description || "") + "</p>" +
+        (report.screenshot_url ? "<p><a href=\"" + report.screenshot_url + "\" target=\"_blank\">View attached screenshot</a></p>" : "") +
+        "<div style=\"display:flex;gap:10px;align-items:center\">" + actionsHtml + "</div>";
+      list.appendChild(div);
+    });
+
+    list.querySelectorAll('[data-action="dismiss"]').forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        await supabase.from("reports").delete().eq("id", this.dataset.id);
+        loadReports();
+        loadOverview();
+      });
+    });
+
+    list.querySelectorAll('[data-action="deletepost"]').forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        if (!confirm("Delete this post and dismiss the report?")) return;
+        await supabase.from("posts").delete().eq("id", this.dataset.postid);
+        await supabase.from("reports").delete().eq("id", this.dataset.id);
+        loadReports();
+        loadAllPosts();
+        loadOverview();
+      });
     });
   }
-}
 
-async function loadPending() {
-  const { data: posts, error } = await supabase
-    .from("posts")
-    .select("id, title, category, content, is_discovery, created_at, author_id, profiles(username)")
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
-
-  const list = document.getElementById("pendingList");
-  const empty = document.getElementById("pendingEmpty");
-  list.innerHTML = "";
-
-  if (error || !posts || posts.length === 0) {
-    empty.style.display = "block";
-    document.getElementById("countPending").textContent = "0";
-    return;
-  }
-
-  empty.style.display = "none";
-  document.getElementById("countPending").textContent = posts.length;
-
-  posts.forEach(function(post) {
-    const authorName = post.profiles ? post.profiles.username : "Unknown";
-    const catLabel = getPostCategoryLabel(post);
-    const discoveryBadge = post.is_discovery ? "<span class=\"badge badge-discovery\">\u2728 Discovery</span>" : "";
-
+  function escapeHtmlA(str) {
     const div = document.createElement("div");
-    div.className = "form-box";
-    div.style.marginBottom = "20px";
-    div.innerHTML =
-      "<div style=\"display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;\">" +
-      "<h3 style=\"margin:0;\">" + escapeHtmlA(post.title) + "</h3>" +
-      "<span class=\"badge\" style=\"background:rgba(255,255,255,0.08);\">" + catLabel + "</span>" +
-      discoveryBadge +
-      "</div>" +
-      "<p style=\"color:var(--text-muted);font-size:0.85rem;margin-top:6px;\">By " + escapeHtmlA(authorName) + " &middot; " + new Date(post.created_at).toLocaleString() + "</p>" +
-      "<div style=\"background:#fff;color:#111;padding:16px;border-radius:6px;margin:14px 0;max-height:320px;overflow-y:auto;\">" + post.content + "</div>" +
-      "<div style=\"display:flex;gap:10px;\">" +
-      "<button class=\"btn-small\" style=\"background:#50c878;\" data-action=\"approve\" data-id=\"" + post.id + "\">Approve & Publish</button>" +
-      "<button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"reject\" data-id=\"" + post.id + "\">Reject & Delete</button>" +
-      "</div>";
-    list.appendChild(div);
-  });
+    div.textContent = str == null ? "" : str;
+    return div.innerHTML;
+  }
 
-  list.querySelectorAll("[data-action=\"approve\"]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
-      loadPending(); loadAllPosts(); loadOverview();
-    });
-  });
-  list.querySelectorAll("[data-action=\"reject\"]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      if (!confirm("Really reject and permanently delete this post?")) return;
-      await supabase.from("posts").delete().eq("id", this.dataset.id);
-      loadPending(); loadAllPosts(); loadOverview();
-    });
-  });
-}
-
-async function loadAllPosts() {
-  const { data: posts, error } = await supabase
-    .from("posts")
-    .select("id, title, category, status, is_discovery, created_at, profiles(username)")
-    .order("created_at", { ascending: false });
-
-  const tbody = document.getElementById("allPostsBody");
-  tbody.innerHTML = "";
-  if (error || !posts) return;
-
-  posts.forEach(function(post) {
-    const authorName = post.profiles ? post.profiles.username : "Unknown";
-    const catLabel = getPostCategoryLabel(post);
-    const statusClass = post.status === "published" ? "badge-published" : "badge-pending";
-    const discoveryMark = post.is_discovery ? " \u2728" : "";
-
-    const tr = document.createElement("tr");
-    tr.innerHTML =
-      "<td>" + escapeHtmlA(post.title) + discoveryMark + "</td>" +
-      "<td>" + catLabel + "</td>" +
-      "<td>" + escapeHtmlA(authorName) + "</td>" +
-      "<td><span class=\"badge " + statusClass + "\">" + post.status + "</span></td>" +
-      "<td>" + new Date(post.created_at).toLocaleDateString() + "</td>" +
-      "<td><button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"deleteany\" data-id=\"" + post.id + "\">Delete</button></td>";
-    tbody.appendChild(tr);
-  });
-
-  tbody.querySelectorAll("[data-action=\"deleteany\"]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      if (!confirm("Permanently delete this post?")) return;
-      await supabase.from("posts").delete().eq("id", this.dataset.id);
-      loadAllPosts(); loadPending(); loadOverview();
-    });
-  });
-}
-
-async function loadUsers() {
-  const { data: users, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  const tbody = document.getElementById("usersBody");
-  tbody.innerHTML = "";
-  if (error || !users) return;
-
-  users.forEach(function(u) {
-    const roleClass = u.role === "admin" ? "badge-admin" : "badge-member";
-    const isSelf = u.id === currentAdminId;
-    const banBadge = u.is_banned ? '<span class="badge" style="background:#8b0000">Banned</span>' : '';
-    const tr = document.createElement("tr");
-    const avatarHtml = typeof renderAvatar === "function" ? renderAvatar(u, "bl-avatar-xs") : "";
-    tr.innerHTML =
-      "<td><span style=\"display:inline-flex;align-items:center;gap:8px;\">" + avatarHtml + "<span>" + escapeHtmlA(u.username) + (isSelf ? " (you)" : "") + " " + banBadge + "</span></span></td>" +
-      "<td><span class=\"badge " + roleClass + "\">" + u.role + "</span></td>" +
-      "<td>" + new Date(u.created_at).toLocaleDateString() + "</td>" +
-      "<td>" + (isSelf ? "-" :
-        "<button class=\"btn-small\" style=\"background:" + (u.role === "admin" ? "#e0a83a" : "#a05ce8") + ";\" data-action=\"togglerole\" data-id=\"" + u.id + "\" data-role=\"" + u.role + "\">" +
-        (u.role === "admin" ? "Revoke Admin" : "Make Admin") + "</button> " +
-        "<button class=\"btn-small\" style=\"background:" + (u.is_banned ? "#50c878" : "#e05555") + ";\" data-action=\"toggleban\" data-id=\"" + u.id + "\" data-banned=\"" + u.is_banned + "\">" +
-        (u.is_banned ? "Unban" : "Ban") + "</button>") + "</td>";
-    tbody.appendChild(tr);
-  });
-
-  tbody.querySelectorAll("[data-action=\"togglerole\"]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      const newRole = this.dataset.role === "admin" ? "member" : "admin";
-      if (!confirm("Change this user's role to " + newRole + "?")) return;
-      await supabase.from("profiles").update({ role: newRole }).eq("id", this.dataset.id);
-      loadUsers();
+  document.querySelectorAll(".tab-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
+      this.classList.add("active");
+      document.querySelectorAll(".tab-panel").forEach(function(p) { p.style.display = "none"; });
+      const tabName = this.dataset.tab.charAt(0).toUpperCase() + this.dataset.tab.slice(1);
+      document.getElementById("tab" + tabName).style.display = "block";
     });
   });
 
-  tbody.querySelectorAll("[data-action=\"toggleban\"]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      const willBan = this.dataset.banned !== 'true';
-      if (!confirm(willBan ? 'Diesen Nutzer wirklich bannen?' : 'Bann wirklich aufheben?')) return;
-      await supabase.from('profiles').update({
-        is_banned: willBan,
-        banned_at: willBan ? new Date().toISOString() : null
-      }).eq('id', this.dataset.id);
-      loadUsers();
-    });
-  });
-}
-
-async function loadReports() {
-  const { data: reports, error } = await supabase
+  checkAdmin();
     .from('reports')
     .select('id, reason, category, target_type, description, screenshot_url, created_at, post_id, reporter_id, posts(title), profiles(username)')
     .order('created_at', { ascending: true });
