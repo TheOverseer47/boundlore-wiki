@@ -51,6 +51,7 @@ async function renderCategoryPosts(categorySlug) {
     const statBarHtml = renderRatingSummary(post);
     const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
     const dateLabel = new Date(post.created_at).toLocaleDateString();
+    const openLabel = getOpenLabelForPost(post, categorySlug);
 
     const card = document.createElement("div");
     card.className = "bl-guide-card";
@@ -69,7 +70,7 @@ async function renderCategoryPosts(categorySlug) {
       '<p class="bl-guide-card-summary">' + escapeHtmlRP(plainText) + (plainText.length >= 200 ? '...' : '') + '</p>' +
       '<div class="bl-guide-card-bottom">' +
       '<div class="post-rating-summary" data-post-id="' + post.id + '">' + statBarHtml + '</div>' +
-      '<span class="bl-guide-card-open">Open Guide &rarr;</span>' +
+      '<span class="bl-guide-card-open">' + escapeHtmlRP(openLabel) + ' &rarr;</span>' +
       '</div>' +
       '</a>';
 
@@ -163,6 +164,19 @@ function getReadableType(post) {
   if (post.post_type === "guide") return "Guide";
   if (post.post_type === "discovery") return "Discovery";
   return post.category || "Post";
+}
+
+function getOpenLabelForPost(post, categorySlug) {
+  if (categorySlug === "guilds" || post.category === "guilds") {
+    return "Open Guild";
+  }
+  if (post.post_type === "guide") {
+    return "Open Guide";
+  }
+  if (post.post_type === "discovery" || post.is_discovery) {
+    return "Open Discovery";
+  }
+  return "Open Post";
 }
 
 function escapeHtmlRP(str) {

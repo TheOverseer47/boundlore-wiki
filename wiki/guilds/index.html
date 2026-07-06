@@ -80,6 +80,10 @@
           <label for="guildDiscordInvite">Direct Discord Invite Link</label>
           <input id="guildDiscordInvite" class="form-input" type="url" placeholder="https://discord.gg/..." required />
         </div>
+        <div>
+          <label for="guildDiscordServerId">Discord Server ID (optional for live preview)</label>
+          <input id="guildDiscordServerId" class="form-input" type="text" placeholder="e.g. 123456789012345678" maxlength="30" />
+        </div>
         <div class="bl-guild-form-span">
           <label for="guildMotivation">Guild Motivation / Goal</label>
           <textarea id="guildMotivation" class="form-input" rows="4" required></textarea>
@@ -94,7 +98,7 @@
 
         <div class="bl-guild-form-span" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <button id="guildApplySubmit" type="submit" class="form-submit" style="max-width:320px;">Submit Guild Application</button>
-          <span style="color:var(--text-muted);font-size:0.85rem;">You must be logged in. Submission is reviewed by admins before publishing.</span>
+          <span style="color:var(--text-muted);font-size:0.85rem;">You must be logged in. Submission is reviewed by admins before publishing. Add server ID to show a Discord widget preview on your guild post.</span>
         </div>
       </form>
     </section>

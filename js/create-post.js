@@ -193,7 +193,7 @@ async function handleSubmit(e) {
     payload.category = cat;
     payload.guide_subcategory = null;
     payload.is_discovery = true;
-    payload.content = buildDiscoveryMediaContent(content, discoveryImageUrl, discoveryYoutubeUrl);
+    payload.content = buildDiscoveryMediaContent(title, content, discoveryImageUrl, discoveryYoutubeUrl);
 
     if (files.length > 0) {
       const uploadResult = await uploadDiscoveryFiles(userId, files);
@@ -302,8 +302,13 @@ function buildDiscoveryContentWithAttachments(baseHtml, files) {
     '<ul class="discovery-attachments">' + entries + '</ul>';
 }
 
-function buildDiscoveryMediaContent(baseHtml, imageUrl, youtubeUrl) {
-  let content = baseHtml;
+function buildDiscoveryMediaContent(title, baseHtml, imageUrl, youtubeUrl) {
+  let content =
+    '<section class="discovery-entry-head" style="padding:14px 16px;border:1px solid rgba(255,215,0,0.35);border-radius:10px;background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,255,255,0.04));margin-bottom:12px;">' +
+      '<p style="margin:0 0 6px;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#d8b65d;">Community Discovery</p>' +
+      '<h2 style="margin:0;font-size:1.2rem;line-height:1.35;">' + escapeHtmlCP(title || "Discovery") + '</h2>' +
+    '</section>' +
+    baseHtml;
   if (imageUrl) {
     const safeImage = escapeAttrCP(imageUrl);
     content += '<hr /><h3>Discovery Image</h3><p><a href="' + safeImage + '" target="_blank" rel="noopener">Open image</a></p><p><img src="' + safeImage + '" alt="Discovery image" style="max-width:360px;border-radius:8px;" /></p>';

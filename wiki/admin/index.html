@@ -7,6 +7,7 @@
 <title>Admin Dashboard - BoundLore</title>
 <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
 <link rel="stylesheet" href="/css/style.css" />
+<link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -35,6 +36,16 @@
 .kpi-box { border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; background:rgba(255,255,255,0.02); }
 .kpi-box h4 { margin:0 0 6px 0; font-size:0.86rem; color:var(--text-muted); text-transform:uppercase; }
 .kpi-box p { margin:0; font-size:0.93rem; }
+.discovery-asset-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:10px 0 14px; }
+.discovery-asset { border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px; background:rgba(255,255,255,0.02); }
+.discovery-asset img { width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin-bottom:8px; }
+.preview-modal { position:fixed; inset:0; z-index:2100; background:rgba(0,0,0,0.82); display:none; align-items:center; justify-content:center; padding:20px; }
+.preview-modal-content { width:min(1100px,100%); max-height:92vh; background:#0f1017; border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:14px; overflow:auto; }
+.preview-modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.preview-modal-frame { width:100%; min-height:70vh; border:1px solid rgba(255,255,255,0.12); border-radius:10px; background:#111; }
+.composer-toolbar-wrap .ql-toolbar,
+.composer-toolbar-wrap .ql-container { background:#fff; color:#111; }
+.composer-toolbar-wrap .ql-editor { min-height:230px; }
 </style>
 </head>
 <body>
@@ -137,8 +148,10 @@
       <label for="composeTags">Tags (comma-separated)</label>
       <input id="composeTags" class="form-input" type="text" placeholder="rare,item,desert" />
 
-      <label for="composeBody">Post Body (HTML allowed)</label>
-      <textarea id="composeBody" class="form-input" rows="10"></textarea>
+      <label for="composeBodyEditor">Post Body</label>
+      <div class="composer-toolbar-wrap">
+        <div id="composeBodyEditor"></div>
+      </div>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
         <button id="btnPublishComposed" class="btn-small" style="background:#50c878;" type="button">Publish Category Post</button>
@@ -192,6 +205,16 @@
   </div>
 </div>
 
+<div id="assetPreviewModal" class="preview-modal" aria-hidden="true">
+  <div class="preview-modal-content">
+    <div class="preview-modal-head">
+      <h3 id="assetPreviewTitle" style="margin:0;">Attachment Preview</h3>
+      <button id="assetPreviewClose" class="btn-small" type="button" style="background:#666;">Close</button>
+    </div>
+    <div id="assetPreviewBody"></div>
+  </div>
+</div>
+
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
@@ -199,6 +222,7 @@
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notifications.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script src="/js/main.js"></script>
 <script>
 let currentAdminId = null;
@@ -208,6 +232,7 @@ let usersCache = [];
 let canUseExtendedProfileFields = false;
 let canUseExtendedPostFields = false;
 let canUseAdminActions = false;
+let composeBodyEditor = null;
 
 async function checkAdmin() {
   setGateStatus("Checking permissions...");
@@ -457,12 +482,22 @@ async function loadDiscoveries() {
 
   discoveries.forEach(function(post) {
     const authorName = post.profiles ? post.profiles.username : "Unknown";
-    const attachmentLinks = extractDiscoveryAttachmentLinks(post.content);
-    const attachmentHtml = attachmentLinks.length
-      ? ('<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">Attachments</p><ul style="margin:0 0 12px 18px;">' +
-         attachmentLinks.map(function(link) {
-           return '<li><a href="' + escapeHtmlA(link.href) + '" target="_blank" rel="noopener" download>' + escapeHtmlA(link.label) + '</a></li>';
-         }).join("") + '</ul>')
+    const assets = extractDiscoveryAttachmentLinks(post.content);
+    const attachmentHtml = assets.length
+      ? ('<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">Attachments & Media</p><div class="discovery-asset-grid">' +
+         assets.map(function(asset, index) {
+           const imgPreview = asset.type === "image"
+             ? '<img src="' + escapeAttrA(asset.href) + '" alt="asset" />'
+             : '<div style="height:120px;border-radius:8px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.82rem;margin-bottom:8px;">' + escapeHtmlA(asset.type.toUpperCase()) + '</div>';
+           return '<div class="discovery-asset">' +
+              imgPreview +
+              '<p style="margin:0 0 8px;font-size:0.8rem;line-height:1.4;word-break:break-word;">' + escapeHtmlA(asset.label) + '</p>' +
+              '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+                '<button class="btn-small" style="background:#2a8bdc;" data-action="preview-asset" data-postid="' + post.id + '" data-asset-index="' + index + '">Preview</button>' +
+                '<button class="btn-small" style="background:#666;" data-action="download-asset" data-postid="' + post.id + '" data-asset-index="' + index + '">Download</button>' +
+              '</div>' +
+            '</div>';
+         }).join("") + '</div>')
       : '<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">No attachments</p>';
 
     const div = document.createElement("div");
@@ -476,7 +511,9 @@ async function loadDiscoveries() {
       '<p style="color:var(--text-muted);font-size:0.84rem;margin-top:6px;">By ' + escapeHtmlA(authorName) + ' &middot; ' + new Date(post.created_at).toLocaleString() + '</p>' +
       '<p style="color:var(--text-muted);font-size:0.82rem;margin:6px 0 10px;">Target category: <strong>' + escapeHtmlA(post.category || '-') + '</strong></p>' +
       attachmentHtml +
-      '<div style="background:#fff;color:#111;padding:12px;border-radius:6px;margin:8px 0;max-height:220px;overflow-y:auto;">' + post.content + '</div>' +
+      '<div style="background:#fff;color:#111;padding:12px;border-radius:6px;margin:8px 0;max-height:160px;overflow-y:auto;">' +
+        stripHeavyDiscoveryContent(post.content) +
+      '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
       '<button class="btn-small" style="background:#50c878;" data-action="approve-discovery" data-id="' + post.id + '">Approve Discovery</button>' +
       '<button class="btn-small" style="background:#2a8bdc;" data-action="compose-from-discovery" data-id="' + post.id + '">Build Category Post</button>' +
@@ -515,6 +552,28 @@ async function loadDiscoveries() {
       document.getElementById('tabDiscoveries').style.display = 'block';
     });
   });
+
+  list.querySelectorAll('[data-action="preview-asset"]').forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      const post = discoveries.find(function(item) { return item.id === btn.dataset.postid; });
+      if (!post) return;
+      const assets = extractDiscoveryAttachmentLinks(post.content);
+      const asset = assets[Number(btn.dataset.assetIndex)];
+      if (!asset) return;
+      openAssetPreview(asset);
+    });
+  });
+
+  list.querySelectorAll('[data-action="download-asset"]').forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      const post = discoveries.find(function(item) { return item.id === btn.dataset.postid; });
+      if (!post) return;
+      const assets = extractDiscoveryAttachmentLinks(post.content);
+      const asset = assets[Number(btn.dataset.assetIndex)];
+      if (!asset) return;
+      await forceDownloadAsset(asset);
+    });
+  });
 }
 
 function initDiscoveryComposer() {
@@ -531,6 +590,23 @@ function initDiscoveryComposer() {
       categorySelect.appendChild(opt);
     });
   }
+
+  if (window.Quill && !composeBodyEditor) {
+    composeBodyEditor = new Quill("#composeBodyEditor", {
+      theme: "snow",
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ["bold", "italic", "underline"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["link", "image", "blockquote"],
+          ["clean"],
+        ],
+      },
+    });
+  }
+
+  initAssetPreviewModal();
 
   const btnPublish = document.getElementById("btnPublishComposed");
   const btnCancel = document.getElementById("btnCancelCompose");
@@ -551,7 +627,9 @@ function openDiscoveryComposer(discoveryId) {
   document.getElementById("composeCategory").value = discovery.category || "biomes";
   document.getElementById("composeCustomCategory").value = "";
   document.getElementById("composeTags").value = "discovery,community";
-  document.getElementById("composeBody").value = discovery.content || "";
+  if (composeBodyEditor) {
+    composeBodyEditor.root.innerHTML = discovery.content || "";
+  }
   document.getElementById("composeMsg").textContent = "Editing discovery: " + discovery.title;
 }
 
@@ -561,7 +639,7 @@ async function publishComposedCategoryPost() {
   const category = document.getElementById("composeCategory").value;
   const customCategory = document.getElementById("composeCustomCategory").value.trim();
   const tags = document.getElementById("composeTags").value.trim();
-  const body = document.getElementById("composeBody").value.trim();
+  const body = composeBodyEditor ? (composeBodyEditor.root.innerHTML || "").trim() : "";
   const msg = document.getElementById("composeMsg");
 
   if (!sourceId || !title || !body) {
@@ -606,11 +684,130 @@ function extractDiscoveryAttachmentLinks(content) {
   if (!content) return [];
   const wrapper = document.createElement("div");
   wrapper.innerHTML = content;
-  return Array.from(wrapper.querySelectorAll("a[href]")).map(function(a) {
-    return { href: a.getAttribute("href") || "", label: (a.textContent || "attachment").trim() };
-  }).filter(function(link) {
-    return /^https?:\/\//i.test(link.href);
+  const assets = [];
+
+  Array.from(wrapper.querySelectorAll("img[src]"))
+    .map(function(img) {
+      return {
+        href: img.getAttribute("src") || "",
+        label: img.getAttribute("alt") || "image",
+        type: "image",
+      };
+    })
+    .filter(function(item) { return /^https?:\/\//i.test(item.href); })
+    .forEach(function(item) { assets.push(item); });
+
+  Array.from(wrapper.querySelectorAll("a[href]"))
+    .map(function(a) {
+      const href = a.getAttribute("href") || "";
+      const lower = href.toLowerCase();
+      const isImage = /(\.jpg|\.jpeg|\.png|\.webp|\.gif)(\?|$)/.test(lower);
+      const isPdf = /(\.pdf)(\?|$)/.test(lower);
+      const isVideo = lower.includes("youtube.com") || lower.includes("youtu.be");
+      return {
+        href: href,
+        label: (a.textContent || "attachment").trim() || "attachment",
+        type: isVideo ? "video" : (isPdf ? "pdf" : (isImage ? "image" : "file")),
+      };
+    })
+    .filter(function(link) { return /^https?:\/\//i.test(link.href); })
+    .forEach(function(link) {
+      if (!assets.some(function(existing) { return existing.href === link.href; })) {
+        assets.push(link);
+      }
+    });
+
+  return assets;
+}
+
+function stripHeavyDiscoveryContent(content) {
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = content || "";
+
+  Array.from(wrapper.querySelectorAll("img")).forEach(function(img) {
+    const replacement = document.createElement("p");
+    replacement.textContent = "[Image attachment hidden in preview]";
+    replacement.style.color = "#444";
+    replacement.style.fontStyle = "italic";
+    img.replaceWith(replacement);
   });
+
+  Array.from(wrapper.querySelectorAll("iframe")).forEach(function(frame) {
+    const replacement = document.createElement("p");
+    replacement.textContent = "[Embedded media hidden in preview]";
+    replacement.style.color = "#444";
+    replacement.style.fontStyle = "italic";
+    frame.replaceWith(replacement);
+  });
+
+  return wrapper.innerHTML;
+}
+
+function initAssetPreviewModal() {
+  const closeBtn = document.getElementById("assetPreviewClose");
+  const modal = document.getElementById("assetPreviewModal");
+  if (closeBtn) {
+    closeBtn.onclick = closeAssetPreview;
+  }
+  if (modal) {
+    modal.addEventListener("click", function(e) {
+      if (e.target === modal) closeAssetPreview();
+    });
+  }
+}
+
+function openAssetPreview(asset) {
+  const modal = document.getElementById("assetPreviewModal");
+  const title = document.getElementById("assetPreviewTitle");
+  const body = document.getElementById("assetPreviewBody");
+  if (!modal || !body || !asset) return;
+
+  title.textContent = asset.label || "Attachment Preview";
+  const safeUrl = escapeAttrA(asset.href || "");
+
+  if (asset.type === "image") {
+    body.innerHTML = '<img src="' + safeUrl + '" alt="preview" style="width:100%;max-height:78vh;object-fit:contain;border-radius:10px;background:#000;" />';
+  } else if (asset.type === "video") {
+    body.innerHTML = '<iframe class="preview-modal-frame" src="' + safeUrl + '" allowfullscreen></iframe>';
+  } else if (asset.type === "pdf") {
+    body.innerHTML = '<iframe class="preview-modal-frame" src="' + safeUrl + '"></iframe>';
+  } else {
+    body.innerHTML = '<div style="padding:12px;color:var(--text-muted);">No inline preview available for this file type. Use Download.</div>';
+  }
+
+  modal.style.display = "flex";
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeAssetPreview() {
+  const modal = document.getElementById("assetPreviewModal");
+  const body = document.getElementById("assetPreviewBody");
+  if (body) body.innerHTML = "";
+  if (modal) {
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
+}
+
+async function forceDownloadAsset(asset) {
+  try {
+    const res = await fetch(asset.href, { mode: "cors" });
+    const blob = await res.blob();
+    const tmpUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = tmpUrl;
+    a.download = (asset.label || "attachment").replace(/\s+/g, "_");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(tmpUrl);
+  } catch (err) {
+    window.open(asset.href, "_blank", "noopener");
+  }
+}
+
+function escapeAttrA(value) {
+  return String(value == null ? "" : value).replace(/"/g, "&quot;");
 }
 
 async function loadAllPosts() {
@@ -618,7 +815,7 @@ async function loadAllPosts() {
   tbody.innerHTML = "";
 
   const selectBase = canUseExtendedPostFields
-    ? "id, slug, title, category, post_type, guide_subcategory, status, is_discovery, created_at, author_id, admin_locked, deleted_at, profiles:author_id(username)"
+    ? "id, slug, title, category, post_type, guide_subcategory, status, is_discovery, created_at, author_id, admin_locked, deleted_at, deleted_by, profiles:author_id(username)"
     : "id, slug, title, category, post_type, guide_subcategory, status, is_discovery, created_at, author_id, profiles:author_id(username)";
 
   const { data: posts, error } = await supabase
@@ -639,6 +836,7 @@ async function loadAllPosts() {
   allPostsCache = posts.map(function(post) {
     if (typeof post.admin_locked === "undefined") post.admin_locked = false;
     if (typeof post.deleted_at === "undefined") post.deleted_at = null;
+    if (typeof post.deleted_by === "undefined") post.deleted_by = null;
     return post;
   });
   applyPostsFilter();
@@ -701,12 +899,19 @@ function applyPostsFilter() {
       if (!confirm("Permanently delete this post?")) return;
       const post = allPostsCache.find(function(p) { return p.id === btn.dataset.id; });
       if (canUseExtendedPostFields) {
-        await supabase.from("posts").update({ deleted_at: new Date().toISOString(), deleted_by: currentAdminId }).eq("id", this.dataset.id);
+        const shouldHardDelete = !!(post && (post.deleted_at || post.deleted_by));
+        if (shouldHardDelete) {
+          await supabase.from("posts").delete().eq("id", this.dataset.id);
+          await logAdminAction("delete_post_hard", "post", this.dataset.id, "Hard deleted after previous delete cycle");
+        } else {
+          await supabase.from("posts").update({ deleted_at: new Date().toISOString(), deleted_by: currentAdminId }).eq("id", this.dataset.id);
+          await logAdminAction("delete_post", "post", this.dataset.id, "Soft deleted");
+        }
       } else {
         await supabase.from("posts").delete().eq("id", this.dataset.id);
+        await logAdminAction("delete_post", "post", this.dataset.id, "Hard deleted (no soft delete fields)");
       }
       await notifyPostOwner(post, "post_status", "Your post was moderated", "An admin removed your post from public view.", "/wiki/account/");
-      await logAdminAction("delete_post", "post", this.dataset.id, canUseExtendedPostFields ? "Soft deleted" : "Hard deleted");
       loadAllPosts(); loadPending(); loadDiscoveries(); loadOverview();
     });
   });
@@ -724,7 +929,7 @@ function applyPostsFilter() {
 
   tbody.querySelectorAll("[data-action=\"restore\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      await supabase.from("posts").update({ deleted_at: null, deleted_by: null, status: "pending" }).eq("id", this.dataset.id);
+      await supabase.from("posts").update({ deleted_at: null, status: "pending" }).eq("id", this.dataset.id);
       const post = allPostsCache.find(function(p) { return p.id === btn.dataset.id; });
       await notifyPostOwner(post, "post_status", "Your post was restored", "An admin restored your post and set it to pending review.", "/wiki/account/");
       await logAdminAction("restore_post", "post", this.dataset.id, "Restored soft-deleted post");

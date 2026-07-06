@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     .community-shell { max-width: 1150px; margin: 0 auto 70px; padding: 0 20px; }
-    .community-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; margin-bottom: 26px; }
+    .community-top-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; margin-bottom: 26px; }
     .community-panel { background: linear-gradient(165deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
     .community-panel h2, .community-panel h3 { margin-top: 0; }
     .community-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -28,7 +28,7 @@
     .community-list a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,0.3); }
     .community-list a:hover { color: var(--accent); border-bottom-color: var(--accent); }
     @media (max-width: 900px) {
-      .community-grid, .community-columns { grid-template-columns: 1fr; }
+      .community-top-grid, .community-columns { grid-template-columns: 1fr; }
       .community-actions { grid-template-columns: 1fr; }
     }
   </style>
@@ -66,7 +66,7 @@
   </div>
 
   <div class="community-shell">
-    <div class="community-grid">
+    <div class="community-top-grid">
       <div class="community-panel">
         <h2>Current Community Status</h2>
         <p>The moderation and publishing workflow is live. Discoveries are submitted by players, reviewed by admins, and can be transformed into polished category posts.</p>
