@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -46,7 +46,7 @@
       <li><a href="/wiki/guides/">Guides</a></li>
       <li><a href="/wiki/guilds/">Guilds</a></li>
       <li><a href="/wiki/community/">Community</a></li>
-      <li><a href="/wiki/news/">News</a></li>
+      <li><a href="/wiki/news/">News</a></li><li><a href="/wiki/support">Support</a></li>
     </ul>
     <div class="nav-right">
       <span id="authArea"></span>
@@ -331,67 +331,74 @@ async function loadUsers() {
 
 async function loadReports() {
   const { data: reports, error } = await supabase
-    .from("reports")
-    .select("id, reason, created_at, post_id, reporter_id, posts(title), profiles(username)")
-    .order("created_at", { ascending: true });
+    .from('reports')
+    .select('id, reason, category, target_type, description, screenshot_url, created_at, post_id, reporter_id, posts(title), profiles(username)')
+    .order('created_at', { ascending: true });
 
-  const list = document.getElementById("reportsList");
-  const empty = document.getElementById("reportsEmpty");
-  list.innerHTML = "";
+  const list = document.getElementById('reportsList');
+  const empty = document.getElementById('reportsEmpty');
+  list.innerHTML = '';
 
   if (error || !reports || reports.length === 0) {
-    empty.style.display = "block";
-    document.getElementById("countReports").textContent = "0";
+    empty.style.display = 'block';
+    document.getElementById('countReports').textContent = '0';
     return;
   }
 
-  empty.style.display = "none";
-  document.getElementById("countReports").textContent = reports.length;
+  empty.style.display = 'none';
+  document.getElementById('countReports').textContent = reports.length;
 
-  reports.forEach(function(report) {
-    const postTitle = report.posts ? report.posts.title : "Deleted post";
-    const reporterName = report.profiles ? report.profiles.username : "Unknown";
-    const div = document.createElement("div");
-    div.className = "form-box";
-    div.style.marginBottom = "20px";
+  const categoryMeta = {
+    user: { label: '👤 User Report', color: '#e0a83a' },
+    post: { label: '📄 Post/Comment Report', color: '#5c9de0' },
+    bug: { label: '🐛 Bug Report', color: '#c85cd8' },
+    general: { label: '💬 General Question', color: '#888' }
+  };
+
+  reports.forEach(function (report) {
+    const meta = categoryMeta[report.category] || categoryMeta.general;
+    const reporterName = report.profiles ? report.profiles.username : 'Unknown';
+    const postTitle = report.posts ? report.posts.title : null;
+
+    let actionsHtml = '<button class="btn-small" style="background:#666" data-action="dismiss" data-id="' + report.id + '">Dismiss</button>';
+    if (report.category === 'post' && report.post_id) {
+      actionsHtml += ' <button class="btn-small" style="background:#e05555" data-action="deletepost" data-id="' + report.id + '" data-postid="' + report.post_id + '">Delete Post</button>';
+    }
+    if (report.category === 'user') {
+      actionsHtml += ' <span style="color:var(--text-muted);font-size:0.85em;margin-left:8px">Manage this user in the Users tab</span>';
+    }
+
+    const div = document.createElement('div');
+    div.className = 'form-box';
+    div.style.marginBottom = '20px';
+    div.style.borderLeft = '4px solid ' + meta.color;
     div.innerHTML =
-      "<h3>Report on: " + escapeHtmlA(postTitle) + "</h3>" +
-      "<p style=\"color:var(--text-muted);font-size:0.85rem;\">Reported by " + escapeHtmlA(reporterName) + " &middot; " + new Date(report.created_at).toLocaleString() + "</p>" +
-      "<p style=\"margin:10px 0;\"><strong>Reason:</strong> " + escapeHtmlA(report.reason) + "</p>" +
-      "<div style=\"display:flex;gap:10px;\">" +
-      "<button class=\"btn-small\" style=\"background:#666;\" data-action=\"dismiss\" data-id=\"" + report.id + "\">Dismiss Report</button>" +
-      "<button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"deletepost\" data-id=\"" + report.id + "\" data-postid=\"" + report.post_id + "\">Delete Post</button>" +
-      "</div>";
+      '<h3>' + meta.label + '</h3>' +
+      '<p style="color:var(--text-muted);font-size:0.85rem">Reported by ' + escapeHtmlA(reporterName) + ' &middot; ' + new Date(report.created_at).toLocaleString() + '</p>' +
+      (postTitle ? '<p style="margin:6px 0"><strong>Related post:</strong> ' + escapeHtmlA(postTitle) + '</p>' : '') +
+      '<p style="margin:10px 0"><strong>Details:</strong> ' + escapeHtmlA(report.reason || report.description || '') + '</p>' +
+      (report.screenshot_url ? '<p><a href="' + report.screenshot_url + '" target="_blank">View attached screenshot</a></p>' : '') +
+      '<div style="display:flex;gap:10px;align-items:center">' + actionsHtml + '</div>';
+
     list.appendChild(div);
   });
 
-  list.querySelectorAll("[data-action=\"dismiss\"]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      const { error } = await supabase.from("reports").delete().eq("id", this.dataset.id);
-      if (error) {
-        console.error("Failed to delete report:", error);
-        alert("Failed to delete report: " + error.message);
-        return;
-      }
-      loadReports(); loadOverview();
+  list.querySelectorAll('[data-action="dismiss"]').forEach(function (btn) {
+    btn.addEventListener('click', async function () {
+      await supabase.from('reports').delete().eq('id', this.dataset.id);
+      loadReports();
+      loadOverview();
     });
   });
-  list.querySelectorAll("[data-action=\"deletepost\"]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      if (!confirm("Delete this post and dismiss the report?")) return;
-      const { error: postDeleteError } = await supabase.from("posts").delete().eq("id", this.dataset.postid);
-      if (postDeleteError) {
-        console.error("Failed to delete post:", postDeleteError);
-        alert("Failed to delete post: " + postDeleteError.message);
-        return;
-      }
-      const { error: reportDeleteError } = await supabase.from("reports").delete().eq("id", this.dataset.id);
-      if (reportDeleteError) {
-        console.error("Failed to delete report:", reportDeleteError);
-        alert("Failed to delete report: " + reportDeleteError.message);
-        return;
-      }
-      loadReports(); loadAllPosts(); loadOverview();
+
+  list.querySelectorAll('[data-action="deletepost"]').forEach(function (btn) {
+    btn.addEventListener('click', async function () {
+      if (!confirm('Delete this post and dismiss the report?')) return;
+      await supabase.from('posts').delete().eq('id', this.dataset.postid);
+      await supabase.from('reports').delete().eq('id', this.dataset.id);
+      loadReports();
+      loadAllPosts();
+      loadOverview();
     });
   });
 }
@@ -416,3 +423,4 @@ checkAdmin();
 </script>
 </body>
 </html>
+

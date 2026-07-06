@@ -27,7 +27,7 @@
       <li><a href="../guilds/">Guilds</a></li>
       <li><a href="../community/">Community</a></li>
       <li><a href="../news/">News</a></li>
-    </ul>
+    <li><a href="/wiki/support">Support</a></li></ul>
     <div class="nav-right">
       <span id="authArea"></span>
       <a href="../create-post/" class="btn-contribute">+ New Post</a>
@@ -50,9 +50,9 @@
     </div>
 
     <div class="rating-widget">
-      <button id="btn-fire">🔥 <span id="fireCount">0</span></button>
-      <button id="btn-down">👎 <span id="downCount">0</span></button>
-      <button id="reportPostBtn">🚩 Report</button>
+      <button id="btn-fire">ðŸ”¥ <span id="fireCount">0</span></button>
+      <button id="btn-down">ðŸ‘Ž <span id="downCount">0</span></button>
+      <button id="reportPostBtn">ðŸš© Report</button>
     </div>
 
     <div class="comments-section">
@@ -103,7 +103,7 @@ async function loadPost() {
   document.getElementById('pageTitle').textContent = post.title + ' - BoundLore';
   document.getElementById('breadcrumbCategory').textContent = categoryLabel || 'Uncategorized';
   document.getElementById('postTitleHeading').textContent = post.title;
-  document.getElementById('postMeta').textContent = 'By ' + authorName + ' · ' + new Date(post.created_at).toLocaleDateString();
+  document.getElementById('postMeta').textContent = 'By ' + authorName + ' Â· ' + new Date(post.created_at).toLocaleDateString();
   document.getElementById('postContent').innerHTML = post.content;
 
   initPostInteractions(post.id);

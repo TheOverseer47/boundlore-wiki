@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Support, FAQ and report form for BoundLore.">
+<title>Support - BoundLore</title>
+<link rel="icon" type="image/jpeg" href="/public/images/icon.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo"><img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon"><span class="logo-text">Bound<span class="accent">Lore</span></span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="/wiki/creatures">Creatures</a></li>
+      <li><a href="/wiki/biomes">Biomes</a></li>
+      <li><a href="/wiki/items">Items</a></li>
+      <li><a href="/wiki/guides">Guides</a></li>
+      <li><a href="/wiki/guilds">Guilds</a></li>
+      <li><a href="/wiki/community">Community</a></li>
+      <li><a href="/wiki/news">News</a></li>
+      <li><a href="/wiki/support">Support</a></li>
+    </ul>
+    <div class="nav-right">
+      <input type="text" id="searchInput" placeholder="Search..." class="nav-search-input">
+      <div id="searchResults" class="search-results-dropdown"></div>
+      <span id="authArea"></span>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="wiki-hero">
+  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Support</p>
+  <h1>Support</h1>
+  <p>Find answers to common questions or report an issue directly to our team.</p>
+</div>
+
+<div style="max-width:800px;margin:0 auto;padding:0 20px 60px">
+
+  <div class="form-box" style="margin-bottom:30px">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item" id="faq-banned">
+      <h3 class="faq-question">Why was my account banned?</h3>
+      <p class="faq-answer">Accounts are banned for violating community guidelines (spam, harassment, or repeated rule violations). If you believe this is a mistake, use the report form below to contact an admin.</p>
+    </div>
+    <div class="faq-item" id="faq-post-missing">
+      <h3 class="faq-question">Why is my post not showing up?</h3>
+      <p class="faq-answer">New posts are reviewed by an admin before publishing. Check your Account page under "My Posts" to see the current status (Pending, Published, Rejected).</p>
+    </div>
+    <div class="faq-item" id="faq-password">
+      <h3 class="faq-question">How do I reset my password?</h3>
+      <p class="faq-answer">Go to the <a href="/wiki/login">login page</a> and click "Forgot password" to receive a reset link via email.</p>
+    </div>
+    <div class="faq-item" id="faq-report-user">
+      <h3 class="faq-question">How do I report a user or a post?</h3>
+      <p class="faq-answer">Use the form below. Select the correct category and provide as much detail as possible so our admins can act quickly.</p>
+    </div>
+  </div>
+
+  <div class="form-box" id="reportGateBox">
+    <p style="text-align:center">Loading...</p>
+  </div>
+
+  <div class="form-box" id="reportFormBox" style="display:none">
+    <h2>Submit a Report</h2>
+    <label class="form-label">Category</label>
+    <select id="reportCategory" class="form-input">
+      <option value="user">Report a User</option>
+      <option value="post">Report a Post/Comment</option>
+      <option value="bug">Report a Bug</option>
+      <option value="general">General Question</option>
+    </select>
+    <label class="form-label">Username or Post/Comment Link (required for User/Post reports)</label>
+    <input type="text" id="reportTarget" class="form-input" placeholder="e.g. FireFrog44 or https://boundlore.com/wiki/post/?slug=...">
+    <label class="form-label" style="margin-top:12px">Attach Screenshot (optional)</label>
+    <input type="file" id="reportScreenshot" accept="image/*" class="form-input">
+    <label class="form-label" style="margin-top:12px">Description</label>
+    <textarea id="reportDescription" class="form-input" rows="5" placeholder="Describe the issue in detail..."></textarea>
+    <button id="btnSubmitReport" class="btn-contribute" style="margin-top:14px">Submit Report</button>
+    <p id="reportSuccessMsg" style="display:none;color:#50c878;margin-top:10px">Report submitted. Our team will review it shortly.</p>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint">Imprint</a> &middot; <a href="/wiki/privacy">Privacy Policy</a></p>
+  </div>
+</footer>
+
+<script src="/js/supabase-config.js"></script>
+<script src="/js/auth-nav.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/support.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

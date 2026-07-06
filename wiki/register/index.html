@@ -27,7 +27,7 @@
       <li><a href="../guilds/">Guilds</a></li>
       <li><a href="../community/">Community</a></li>
       <li><a href="../news/">News</a></li>
-    </ul>
+    <li><a href="/wiki/support">Support</a></li></ul>
     <div class="nav-right">
       <span id="authArea"></span>
       <a href="../login/" class="btn-contribute">Login</a>
@@ -117,7 +117,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     msg.textContent = 'Error checking username. Please try again.';
     msg.style.color = '#e05555';
     btn.disabled = false;
-    btn.textContent = 'Register →';
+    btn.textContent = 'Register â†’';
     return;
   }
 
@@ -125,7 +125,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     msg.textContent = 'This username is already taken.';
     msg.style.color = '#e05555';
     btn.disabled = false;
-    btn.textContent = 'Register →';
+    btn.textContent = 'Register â†’';
     return;
   }
 
@@ -144,7 +144,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     msg.textContent = 'Error: ' + error.message;
     msg.style.color = '#e05555';
     btn.disabled = false;
-    btn.textContent = 'Register →';
+    btn.textContent = 'Register â†’';
     return;
   }
 

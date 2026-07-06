@@ -5,6 +5,13 @@
 // ============================================
 
 let searchDebounceTimer = null;
+const faqSearchIndex = [
+  { title: "Why was my account banned?", url: "/wiki/support/#faq-banned" },
+  { title: "Why is my post not showing up?", url: "/wiki/support/#faq-post-missing" },
+  { title: "How do I reset my password?", url: "/wiki/support/#faq-password" },
+  { title: "How do I report a user or a post?", url: "/wiki/support/#faq-report-user" },
+  { title: "Support", url: "/wiki/support" }
+];
 
 function initSearch() {
   const input = document.getElementById("searchInput");
@@ -43,12 +50,26 @@ async function runSearch(query, resultsBox) {
     if (error) throw error;
 
     if (!data || data.length === 0) {
+      const faqResults = faqSearchIndex.filter(item => item.title.toLowerCase().includes(query.toLowerCase()));
+      if (faqResults.length > 0) {
+        resultsBox.innerHTML = faqResults
+          .map(item => `<a href="${item.url}" class="search-result-item"><span class="search-result-title">${escapeHtml(item.title)}</span><span class="search-result-cat">Support</span></a>`)
+          .join("");
+        resultsBox.style.display = "block";
+        return;
+      }
+
       resultsBox.innerHTML = `<div class="search-empty">No results found for "${escapeHtml(query)}"</div>`;
       resultsBox.style.display = "block";
       return;
     }
 
-    resultsBox.innerHTML = data
+    const faqResults = faqSearchIndex.filter(item => item.title.toLowerCase().includes(query.toLowerCase()));
+    const faqHtml = faqResults
+      .map(item => `<a href="${item.url}" class="search-result-item"><span class="search-result-title">${escapeHtml(item.title)}</span><span class="search-result-cat">Support</span></a>`)
+      .join("");
+
+    resultsBox.innerHTML = faqHtml + data
       .map((post) => {
         const path = buildPostPath(post);
         return `<a href="${path}" class="search-result-item">
