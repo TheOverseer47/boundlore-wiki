@@ -257,8 +257,11 @@ async function handleEditSubmit(e) {
 
     updates.post_type = "discovery";
     updates.category = effectiveCategory;
-    updates.guide_subcategory = needsSubcategory ? effectiveSubcategory : null;
+    updates.guide_subcategory = null;
     updates.is_discovery = true;
+    if (needsSubcategory) {
+      meta.subcategory = effectiveSubcategory;
+    }
   }
 
   let updateQuery = supabase.from("posts").update(updates);
@@ -314,6 +317,7 @@ function normalizePostMetaEP(meta) {
   if (meta.update_phase) out.update_phase = String(meta.update_phase).slice(0, 32);
   if (meta.patch_tag) out.patch_tag = String(meta.patch_tag).slice(0, 40);
   if (meta.source_url) out.source_url = String(meta.source_url).slice(0, 500);
+  if (meta.subcategory) out.subcategory = String(meta.subcategory).slice(0, 60);
   return Object.keys(out).length ? out : null;
 }
 

@@ -137,7 +137,7 @@ function renderGroupedCategoryPosts(container, posts, categorySlug) {
   const groupedMap = {};
 
   posts.forEach(function(post) {
-    const key = post.guide_subcategory || 'general';
+    const key = getRenderableSubcategorySlug(post) || 'general';
     if (!groupedMap[key]) groupedMap[key] = [];
     groupedMap[key].push(post);
   });
@@ -219,11 +219,20 @@ function renderCategoryCard(post, categorySlug) {
 }
 
 function getPostSubcategoryLabel(post) {
-  if (!post || !post.guide_subcategory) return "";
+  if (!post) return "";
+  const subcategory = getRenderableSubcategorySlug(post);
+  if (!subcategory) return "";
   if (post.post_type === "guide") {
-    return getGuideSubcategoryLabel(post.guide_subcategory);
+    return getGuideSubcategoryLabel(subcategory);
   }
-  return getAnySubcategoryLabelRP(post.category, post.guide_subcategory);
+  return getAnySubcategoryLabelRP(post.category, subcategory);
+}
+
+function getRenderableSubcategorySlug(post) {
+  if (!post) return "";
+  if (post.guide_subcategory) return post.guide_subcategory;
+  const meta = parsePostMetaRP(post.content || "");
+  return meta && meta.subcategory ? meta.subcategory : "";
 }
 
 function getCategorySubcategoriesRP(categorySlug) {
@@ -245,6 +254,17 @@ function getAnySubcategoryLabelRP(categorySlug, subcategorySlug) {
     return getAnySubcategoryLabel(categorySlug, subcategorySlug);
   }
   return subcategorySlug || "";
+}
+
+function parsePostMetaRP(html) {
+  const match = String(html || "").match(/<!--BLMETA\s+([\s\S]*?)\s*-->/i);
+  if (!match) return {};
+  try {
+    const parsed = JSON.parse(match[1]);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    return {};
+  }
 }
 
 function extractDiscordInvite(html) {

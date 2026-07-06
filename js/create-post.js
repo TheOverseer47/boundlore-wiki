@@ -229,9 +229,12 @@ async function handleSubmit(e) {
     }
     payload.post_type = "discovery";
     payload.category = cat;
-    payload.guide_subcategory = needsSubcategory ? discoverySubcat : null;
+    payload.guide_subcategory = null;
     payload.is_discovery = true;
     payload.content = buildDiscoveryMediaContent(title, content, discoveryImageUrl, discoveryYoutubeUrl);
+    if (needsSubcategory) {
+      postMeta.subcategory = discoverySubcat;
+    }
   } else {
     if (!createIsAdmin) {
       errorEl.textContent = "Only admins can create wiki category posts.";
@@ -439,6 +442,7 @@ function normalizePostMetaCP(meta) {
   if (meta.update_phase) out.update_phase = String(meta.update_phase).slice(0, 32);
   if (meta.patch_tag) out.patch_tag = String(meta.patch_tag).slice(0, 40);
   if (meta.source_url) out.source_url = String(meta.source_url).slice(0, 500);
+  if (meta.subcategory) out.subcategory = String(meta.subcategory).slice(0, 60);
   return Object.keys(out).length ? out : null;
 }
 

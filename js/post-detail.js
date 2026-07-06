@@ -337,9 +337,11 @@ function computeRelatedScorePD(currentPost, currentMeta, candidate) {
 
   if (currentPost.post_type && candidate.post_type === currentPost.post_type) score += 4;
   if (currentPost.category && candidate.category === currentPost.category) score += 4;
-  if (currentPost.post_type === "guide" && currentPost.guide_subcategory && candidate.guide_subcategory === currentPost.guide_subcategory) score += 7;
   if (currentMeta && candidate.content) {
     const candidateMeta = parsePostMetaPD(candidate.content || "");
+    const currentSubcategory = currentMeta.subcategory || currentPost.guide_subcategory || "";
+    const candidateSubcategory = candidate.guide_subcategory || candidateMeta.subcategory || "";
+    if (currentSubcategory && candidateSubcategory && currentSubcategory === candidateSubcategory) score += 7;
     if (currentMeta.update_phase && candidateMeta.update_phase && currentMeta.update_phase === candidateMeta.update_phase) score += 2;
     if (currentMeta.patch_tag && candidateMeta.patch_tag && currentMeta.patch_tag === candidateMeta.patch_tag) score += 2;
   }
@@ -445,7 +447,11 @@ function renderRelatedItemPD(item) {
 }
 
 function isRelatedByTopicPD(post, candidate) {
-  if (post.post_type === "guide" && post.guide_subcategory && candidate.guide_subcategory === post.guide_subcategory) return true;
+  const currentMeta = parsePostMetaPD(post.content || "");
+  const currentSubcategory = post.guide_subcategory || currentMeta.subcategory || "";
+  const candidateMeta = parsePostMetaPD(candidate.content || "");
+  const candidateSubcategory = candidate.guide_subcategory || candidateMeta.subcategory || "";
+  if (currentSubcategory && candidateSubcategory && candidateSubcategory === currentSubcategory) return true;
   if (post.category && candidate.category === post.category) return true;
   return post.post_type && candidate.post_type === post.post_type;
 }
@@ -460,8 +466,10 @@ function isRelatedByMetaPD(postMeta, candidateContent) {
 }
 
 function getRelatedTopicLabelPD(post) {
-  if (post.post_type === "guide" && post.guide_subcategory) {
-    return "More in " + formatTopicLabelPD(post.guide_subcategory);
+  const postMeta = parsePostMetaPD(post.content || "");
+  const subcategory = post.guide_subcategory || postMeta.subcategory || "";
+  if (subcategory) {
+    return "More in " + formatTopicLabelPD(subcategory);
   }
   if (post.category) {
     return "More in " + getPostLabelSafe(post);

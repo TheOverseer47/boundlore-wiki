@@ -28,10 +28,12 @@ async function loadCommunityDiscoveries() {
     const label = typeof getPostCategoryLabel === "function"
       ? getPostCategoryLabel(post)
       : (post.category || "Discovery");
+    const meta = parsePostMetaCH(post.content || "");
+    const subcategory = post.guide_subcategory || (meta && meta.subcategory) || "";
     const text = stripHtmlCH(post.content).slice(0, 160);
 
     card.innerHTML =
-      '<span class="recent-tag">Discovery &middot; ' + escapeHtmlCH(label) + '</span>' +
+      '<span class="recent-tag">Discovery &middot; ' + escapeHtmlCH(label) + (subcategory ? ' <span style="opacity:0.8;">(' + escapeHtmlCH(subcategory) + ')</span>' : '') + '</span>' +
       '<h4>' + escapeHtmlCH(post.title) + '</h4>' +
       '<p>' + escapeHtmlCH(text) + (text.length >= 160 ? '...' : '') + '</p>';
 
@@ -60,7 +62,9 @@ async function loadCommunityGuides() {
   data.forEach(function(post) {
     const li = document.createElement("li");
     const href = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
-    const kind = post.guide_subcategory ? ('<span style="color:var(--text-muted);font-size:0.82rem;"> (' + escapeHtmlCH(post.guide_subcategory) + ')</span>') : '';
+    const meta = parsePostMetaCH(post.content || "");
+    const subcategory = post.guide_subcategory || (meta && meta.subcategory) || "";
+    const kind = subcategory ? ('<span style="color:var(--text-muted);font-size:0.82rem;"> (' + escapeHtmlCH(subcategory) + ')</span>') : '';
     li.innerHTML = '<a href="' + href + '">' + escapeHtmlCH(post.title) + '</a>' + kind;
     container.appendChild(li);
   });
@@ -181,6 +185,17 @@ function escapeHtmlCH(value) {
   const div = document.createElement("div");
   div.textContent = value == null ? "" : String(value);
   return div.innerHTML;
+}
+
+function parsePostMetaCH(html) {
+  const match = String(html || "").match(/<!--BLMETA\s+([\s\S]*?)\s*-->/i);
+  if (!match) return {};
+  try {
+    const parsed = JSON.parse(match[1]);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    return {};
+  }
 }
 
 document.addEventListener("DOMContentLoaded", loadCommunityHub);
