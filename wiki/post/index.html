@@ -39,12 +39,9 @@
 </nav>
 
 <div class="wiki-hero">
-  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; <span id="breadcrumbCategory">Post</span></p>
-  <h1 id="postTitle">Loading...</h1>
-  <p style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
-    <span id="postAuthorAvatar"></span>
-    <span id="postAuthor">&nbsp;</span> &middot; <span id="postDate">&nbsp;</span> <span id="postEditedTag" style="display:none;">(edited)</span>
-  </p>
+  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; <span id="breadcrumbCategory">Post</span> &rsaquo; <span id="breadcrumbTitle">Loading...</span></p>
+  <h1>BoundLore Post</h1>
+  <p>Curated knowledge, guides, and community reports.</p>
 </div>
 
 <div class="article-layout bl-post-layout">
@@ -64,15 +61,29 @@
         <a id="btnEditPost" class="btn-secondary" style="display:none;" href="#">Edit Post</a>
       </div>
 
-      <div class="bl-post-highlight-box">
-        <div class="bl-post-highlight-head">
-          <span class="bl-tag bl-tag-type" id="postTypeBadge">Post</span>
-          <span class="bl-post-readtime" id="postReadTime">- min read</span>
+      <header class="bl-post-header-card">
+        <h1 id="postTitle">Loading...</h1>
+        <div class="bl-post-meta-row">
+          <span id="postAuthorAvatar"></span>
+          <span><strong id="postAuthor">Unknown</strong></span>
+          <span>&middot;</span>
+          <span id="postDate">-</span>
+          <span id="postEditedTag" style="display:none;">(edited)</span>
         </div>
-        <p id="postSummary">Loading summary...</p>
+      </header>
+
+      <div class="bl-post-context-bar">
+        <span class="bl-post-context-chip">Type: <strong id="postTypeBadge">Post</strong></span>
+        <span class="bl-post-context-chip">Read Time: <strong id="postReadTime">- min</strong></span>
+        <span class="bl-post-context-chip">Category: <strong id="postCategoryChip">-</strong></span>
       </div>
 
       <div id="postBody" class="post-body"></div>
+
+      <section class="bl-related-section" id="relatedPostsSection" style="display:none;">
+        <h3 class="bl-related-title" id="relatedPostsTitle">Similar posts</h3>
+        <div class="bl-related-list" id="relatedPostsList"></div>
+      </section>
 
       <div class="rating-widget bl-post-rating-widget">
         <button id="btnUpvote" class="reaction-btn">👍 <span id="upvoteCount">0</span></button>

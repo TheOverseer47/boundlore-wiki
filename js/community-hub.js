@@ -1,5 +1,5 @@
 async function loadCommunityHub() {
-  await Promise.all([loadCommunityDiscoveries(), loadCommunityGuides()]);
+  await Promise.all([loadCommunityDiscoveries(), loadCommunityGuides(), initCommunityRedditForm()]);
 }
 
 async function loadCommunityDiscoveries() {
@@ -64,6 +64,111 @@ async function loadCommunityGuides() {
     li.innerHTML = '<a href="' + href + '">' + escapeHtmlCH(post.title) + '</a>' + kind;
     container.appendChild(li);
   });
+}
+
+async function initCommunityRedditForm() {
+  const gateBox = document.getElementById("redditGateBox");
+  const formBox = document.getElementById("redditFormBox");
+  const btn = document.getElementById("btnSubmitReddit");
+
+  if (!gateBox || !formBox || !btn) return;
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData || !sessionData.session) {
+    gateBox.innerHTML = 'Please <a href="/wiki/login/">log in</a> to submit a Reddit thread.';
+    return;
+  }
+
+  gateBox.style.display = "none";
+  formBox.style.display = "block";
+  btn.addEventListener("click", submitCommunityReddit);
+}
+
+async function submitCommunityReddit() {
+  const urlEl = document.getElementById("redditUrl");
+  const titleEl = document.getElementById("redditTitle");
+  const descEl = document.getElementById("redditDescription");
+  const btn = document.getElementById("btnSubmitReddit");
+
+  if (!urlEl || !descEl || !btn) return;
+
+  const url = (urlEl.value || "").trim();
+  const title = (titleEl && titleEl.value ? titleEl.value : "").trim();
+  const description = (descEl.value || "").trim();
+
+  setCommunityRedditStatus("", "");
+
+  if (!isValidRedditUrl(url)) {
+    setCommunityRedditStatus("Please enter a valid Reddit URL.", "error");
+    return;
+  }
+  if (!description) {
+    setCommunityRedditStatus("Please add context for your submission.", "error");
+    return;
+  }
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData || !sessionData.session) {
+    setCommunityRedditStatus("Please log in again and retry.", "error");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+
+  const reason = "Community Reddit submission" +
+    (title ? (" - " + title) : "") +
+    " - URL: " + url +
+    " - " + description;
+
+  const { error } = await supabase.from("reports").insert({
+    reporter_id: sessionData.session.user.id,
+    category: "general",
+    target_type: null,
+    description: "Community Reddit review request",
+    reason: reason,
+    screenshot_url: null,
+  });
+
+  btn.disabled = false;
+  btn.textContent = "Submit for Review";
+
+  if (error) {
+    setCommunityRedditStatus("Submission failed: " + error.message, "error");
+    return;
+  }
+
+  urlEl.value = "";
+  if (titleEl) titleEl.value = "";
+  descEl.value = "";
+  setCommunityRedditStatus("Submitted for review. Thanks for contributing.", "success");
+}
+
+function setCommunityRedditStatus(message, kind) {
+  const status = document.getElementById("redditStatus");
+  if (!status) return;
+  status.classList.remove("error", "success");
+
+  if (!message) {
+    status.style.display = "none";
+    status.textContent = "";
+    return;
+  }
+
+  status.textContent = message;
+  status.style.display = "block";
+  if (kind) status.classList.add(kind);
+}
+
+function isValidRedditUrl(url) {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    return (host === "reddit.com" || host === "www.reddit.com" || host.endsWith(".reddit.com")) && /^https?:$/.test(parsed.protocol);
+  } catch (err) {
+    return false;
+  }
 }
 
 function stripHtmlCH(html) {

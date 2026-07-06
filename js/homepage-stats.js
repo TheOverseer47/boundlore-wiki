@@ -20,16 +20,20 @@ async function loadHomepageStats() {
       .select("*")
       .single();
 
-    if (error || !data) {
-      throw error || new Error("homepage_stats returned no data");
-    }
-
-    updateCounters(el, {
+    const viewCounts = {
       creatures: data.creatures_count || 0,
       biomes: data.biomes_count || 0,
       items: data.items_count || 0,
       guides: data.guides_count || 0,
-    });
+    };
+
+    const fallbackCounts = await loadHomepageStatsFallback();
+    if (error || !data || shouldPreferFallback(viewCounts, fallbackCounts)) {
+      updateCounters(el, fallbackCounts);
+      return;
+    }
+
+    updateCounters(el, viewCounts);
   } catch (err) {
     console.warn("homepage_stats view failed, switching to direct count fallback:", err);
     const fallback = await loadHomepageStatsFallback();
@@ -39,10 +43,10 @@ async function loadHomepageStats() {
 
 async function loadHomepageStatsFallback() {
   const [creatures, biomes, items, guides] = await Promise.all([
-    countPostsByFilter({ category: "creatures", status: "published" }),
-    countPostsByFilter({ category: "biomes", status: "published" }),
-    countPostsByFilter({ category: "items", status: "published" }),
-    countPostsByFilter({ post_type: "guide", status: "published" }),
+    countPublishedByCategory("creatures"),
+    countPublishedByCategory("biomes"),
+    countPublishedByCategory("items"),
+    countGuidesPublished(),
   ]);
 
   return {
@@ -51,6 +55,57 @@ async function loadHomepageStatsFallback() {
     items,
     guides,
   };
+}
+
+async function countPublishedByCategory(category) {
+  const { count, error } = await supabase
+    .from("posts")
+    .select("id", { count: "exact", head: true })
+    .eq("category", category)
+    .in("status", ["published", "approved"]);
+
+  if (error) {
+    console.error("Homepage counter fallback failed for category", category, error);
+    return 0;
+  }
+  return count || 0;
+}
+
+async function countGuidesPublished() {
+  const [guideType, legacyGuideCategory] = await Promise.all([
+    supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .eq("post_type", "guide")
+      .in("status", ["published", "approved"]),
+    supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .eq("category", "guides")
+      .in("status", ["published", "approved"]),
+  ]);
+
+  const guideTypeCount = guideType.error ? 0 : (guideType.count || 0);
+  const legacyCount = legacyGuideCategory.error ? 0 : (legacyGuideCategory.count || 0);
+
+  if (guideType.error) {
+    console.error("Homepage counter guide count failed for post_type=guide", guideType.error);
+  }
+  if (legacyGuideCategory.error) {
+    console.error("Homepage counter guide count failed for category=guides", legacyGuideCategory.error);
+  }
+
+  return guideTypeCount + legacyCount;
+}
+
+function shouldPreferFallback(viewValues, fallbackValues) {
+  const viewTotal = sumCounters(viewValues);
+  const fallbackTotal = sumCounters(fallbackValues);
+  return fallbackTotal > 0 && (viewTotal === 0 || fallbackTotal > viewTotal);
+}
+
+function sumCounters(values) {
+  return (values.creatures || 0) + (values.biomes || 0) + (values.items || 0) + (values.guides || 0);
 }
 
 async function countPostsByFilter(filter) {

@@ -51,9 +51,14 @@ async function init() {
 function showNotFound() {
   document.getElementById("postLoading").style.display = "none";
   document.getElementById("postNotFound").style.display = "block";
-  document.getElementById("postTitle").textContent = "Post not found";
-  document.getElementById("postAuthor").textContent = "-";
-  document.getElementById("postDate").textContent = "-";
+  const postTitle = document.getElementById("postTitle");
+  const postAuthor = document.getElementById("postAuthor");
+  const postDate = document.getElementById("postDate");
+  const breadcrumbTitle = document.getElementById("breadcrumbTitle");
+  if (postTitle) postTitle.textContent = "Post not found";
+  if (postAuthor) postAuthor.textContent = "-";
+  if (postDate) postDate.textContent = "-";
+  if (breadcrumbTitle) breadcrumbTitle.textContent = "Not found";
 }
 
 function renderPost(post) {
@@ -87,19 +92,15 @@ function renderPost(post) {
     ? getPostCategoryLabel(post)
     : (post.category || "Post");
   document.getElementById("breadcrumbCategory").textContent = label;
+  const breadcrumbTitle = document.getElementById("breadcrumbTitle");
+  if (breadcrumbTitle) breadcrumbTitle.textContent = post.title;
   document.title = post.title + " - BoundLore";
 
   const postTypeLabel = post.post_type === "guide"
     ? "Guide"
     : (post.post_type === "discovery" ? "Discovery" : "Post");
 
-  const summaryText = summarizePostContent(post.content);
   const readTime = estimateReadTimeMinutes(post.content);
-
-  const postSummary = document.getElementById("postSummary");
-  if (postSummary) {
-    postSummary.textContent = summaryText;
-  }
 
   const postReadTime = document.getElementById("postReadTime");
   if (postReadTime) {
@@ -114,6 +115,11 @@ function renderPost(post) {
   const sideCategory = document.getElementById("sideCategory");
   if (sideCategory) {
     sideCategory.textContent = label;
+  }
+
+  const postCategoryChip = document.getElementById("postCategoryChip");
+  if (postCategoryChip) {
+    postCategoryChip.textContent = label;
   }
 
   const sideType = document.getElementById("sideType");
@@ -159,6 +165,60 @@ function renderPost(post) {
       ? `/wiki/edit-post/?slug=${encodeURIComponent(post.slug)}`
       : `/wiki/edit-post/?id=${post.id}`;
   }
+
+  loadRelatedPosts(post);
+}
+
+async function loadRelatedPosts(post) {
+  const wrap = document.getElementById("relatedPostsSection");
+  const list = document.getElementById("relatedPostsList");
+  const title = document.getElementById("relatedPostsTitle");
+  if (!wrap || !list || !title) return;
+
+  let query = supabase
+    .from("posts")
+    .select("id, slug, title, category, post_type, guide_subcategory, created_at")
+    .eq("status", "published")
+    .neq("id", post.id)
+    .limit(4)
+    .order("created_at", { ascending: false });
+
+  if (post.post_type === "guide" && post.guide_subcategory) {
+    title.textContent = "Similar Guides";
+    query = query.eq("post_type", "guide").eq("guide_subcategory", post.guide_subcategory);
+  } else if (post.category) {
+    title.textContent = "Similar in " + getPostLabelSafe(post);
+    query = query.eq("category", post.category);
+  } else {
+    title.textContent = "Related Posts";
+  }
+
+  const { data, error } = await query;
+  if (error || !data || data.length === 0) {
+    wrap.style.display = "none";
+    return;
+  }
+
+  wrap.style.display = "block";
+  list.innerHTML = "";
+
+  data.forEach(function(item) {
+    const link = document.createElement("a");
+    link.className = "bl-related-item";
+    link.href = item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id));
+    link.innerHTML =
+      escapeHtml(item.title || "Untitled") +
+      '<span>' + escapeHtml(getPostLabelSafe(item)) + ' • ' + new Date(item.created_at).toLocaleDateString() + '</span>';
+    list.appendChild(link);
+  });
+}
+
+function getPostLabelSafe(post) {
+  if (typeof getPostCategoryLabel === "function") {
+    return getPostCategoryLabel(post);
+  }
+  if (post.post_type === "guide") return "Guide";
+  return post.category || "Post";
 }
 
 async function loadReactions(postId) {
@@ -365,12 +425,6 @@ function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
-}
-
-function summarizePostContent(contentHtml) {
-  const plain = (contentHtml || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-  if (!plain) return "No summary available.";
-  return plain.length > 180 ? plain.slice(0, 180) + "..." : plain;
 }
 
 function estimateReadTimeMinutes(contentHtml) {
