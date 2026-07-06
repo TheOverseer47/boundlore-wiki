@@ -344,6 +344,18 @@ function wireCommentForm(postId) {
       return;
     }
 
+    if (window.BLNotify && currentPost && currentPost.author_id && currentPost.author_id !== currentUserId) {
+      await window.BLNotify.createNotification({
+        user_id: currentPost.author_id,
+        type: "comment",
+        title: "New comment on your post",
+        message: "Someone commented on \"" + currentPost.title + "\".",
+        target_url: currentPost.slug
+          ? ("/wiki/post/?slug=" + encodeURIComponent(currentPost.slug))
+          : ("/wiki/post/?id=" + encodeURIComponent(currentPost.id)),
+      });
+    }
+
     document.getElementById("newCommentText").value = "";
     loadComments(postId);
   };

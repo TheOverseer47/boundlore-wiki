@@ -49,6 +49,7 @@
   <div class="post-type-toggle">
     <button type="button" id="btnTypeGuide" class="type-btn active">Guide</button>
     <button type="button" id="btnTypeDiscovery" class="type-btn">Discovery</button>
+    <button type="button" id="btnTypeWiki" class="type-btn" style="display:none;">Wiki (Admin)</button>
   </div>
 
   <form id="createPostForm">
@@ -90,6 +91,26 @@
       </select>
       <p class="field-hint">Your discovery will appear in this category with a "Community Discovery" badge, pending admin review.</p>
       <p class="field-hint">Add screenshots/files below. Admins can review and download your attachments directly from the dashboard.</p>
+
+      <label for="discoveryImageUrl">Image URL (optional)</label>
+      <input type="url" id="discoveryImageUrl" class="form-input" placeholder="https://.../image.jpg" />
+
+      <label for="discoveryYoutubeUrl">YouTube URL (optional)</label>
+      <input type="url" id="discoveryYoutubeUrl" class="form-input" placeholder="https://www.youtube.com/watch?v=..." />
+      <p class="field-hint">You can provide one YouTube link for your discovery clip.</p>
+    </div>
+
+    <div id="wikiFields" style="display:none;">
+      <label for="wikiCategory">Wiki Category (admin only)</label>
+      <select id="wikiCategory" class="form-input">
+        <option value="">Select a wiki category...</option>
+      </select>
+      <p class="field-hint">Guides and Guilds are excluded here; these stay community-driven workflows.</p>
+
+      <label style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+        <input type="checkbox" id="wikiPublishNow" checked />
+        Publish immediately (otherwise submit as pending)
+      </label>
     </div>
 
     <label for="postContent" style="margin-top:16px;display:block;">Content</label>

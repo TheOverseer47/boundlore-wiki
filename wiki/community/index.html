@@ -3,11 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Community hub for discoveries, guides, guild onboarding, and support channels in BoundLore." />
   <title>Community – BoundLore</title>
   <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    .community-shell { max-width: 1150px; margin: 0 auto 70px; padding: 0 20px; }
+    .community-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; margin-bottom: 26px; }
+    .community-panel { background: linear-gradient(165deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
+    .community-panel h2, .community-panel h3 { margin-top: 0; }
+    .community-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .community-pill { padding: 6px 12px; border-radius: 999px; font-size: 0.78rem; letter-spacing: 0.03em; text-transform: uppercase; font-weight: 600; }
+    .pill-live { background: rgba(80, 200, 120, 0.2); color: #8ff0b2; border: 1px solid rgba(80, 200, 120, 0.45); }
+    .pill-warning { background: rgba(224, 168, 58, 0.18); color: #f4ce75; border: 1px solid rgba(224, 168, 58, 0.45); }
+    .community-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 24px; }
+    .community-action { text-decoration: none; color: inherit; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); padding: 16px; transition: transform 0.2s, border-color 0.2s, background 0.2s; }
+    .community-action:hover { transform: translateY(-2px); border-color: rgba(255,215,0,0.45); background: rgba(255,255,255,0.05); }
+    .community-action h4 { margin: 8px 0 6px; }
+    .community-columns { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
+    .community-list { margin: 0; padding-left: 18px; }
+    .community-list li { margin-bottom: 8px; }
+    .community-list a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,0.3); }
+    .community-list a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+    @media (max-width: 900px) {
+      .community-grid, .community-columns { grid-template-columns: 1fr; }
+      .community-actions { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar" id="navbar">
@@ -25,27 +49,95 @@
         <li><a href="../guilds/">Guilds</a></li>
         <li><a href="../community/" class="active">Community</a></li>
         <li><a href="../news/">News</a></li>
-      <li><a href="/wiki/support">Support</a></li></ul>
+        <li><a href="/wiki/support">Support</a></li>
+      </ul>
       <div class="nav-right">
-      <span id="authArea"></span>
+        <span id="authArea"></span>
         <div class="nav-search"><input type="text" placeholder="Search..." id="searchInput" /><div class="search-results" id="searchResults"></div></div>
         <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
 
-  <div class="construction-page">
-    <div class="construction-content">
-      <div class="construction-icon">🌐</div>
-      <div class="construction-badge">Under Construction</div>
-      <h1>Community</h1>
-      <p>The Community hub is being set up. Soon you'll find links to our Discord server, Reddit community, and other places where Light No Fire fans gather. Check back soon!</p>
-      <a href="/" class="btn-primary">← Back to Home</a>
+  <div class="wiki-hero">
+    <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Community</p>
+    <h1>Community Hub</h1>
+    <p>Discovery-first collaboration, guild onboarding, and curated guide growth.</p>
+  </div>
+
+  <div class="community-shell">
+    <div class="community-grid">
+      <div class="community-panel">
+        <h2>Current Community Status</h2>
+        <p>The moderation and publishing workflow is live. Discoveries are submitted by players, reviewed by admins, and can be transformed into polished category posts.</p>
+        <div class="community-pills">
+          <span class="community-pill pill-live">Discovery Upload: Live</span>
+          <span class="community-pill pill-live">Admin Review Queue: Live</span>
+          <span class="community-pill pill-live">Guild Applications: Live</span>
+          <span class="community-pill pill-warning">Official BoundLore Discord: Not launched yet</span>
+        </div>
+      </div>
+
+      <div class="community-panel">
+        <h3>How To Participate</h3>
+        <ol style="margin:0;padding-left:18px;line-height:1.7;">
+          <li>Submit discoveries with screenshots or documents.</li>
+          <li>Apply your guild with invite-link proof and profile details.</li>
+          <li>Read and improve guides through focused category content.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="community-actions">
+      <a class="community-action" href="/wiki/create-post/?type=discovery">
+        <div style="font-size:1.4rem;">&#128269;</div>
+        <h4>Report a Discovery</h4>
+        <p>Upload evidence and details. Admins can review and convert strong submissions into structured wiki posts.</p>
+      </a>
+      <a class="community-action" href="/wiki/guilds/">
+        <div style="font-size:1.4rem;">&#9868;&#65039;</div>
+        <h4>Apply Your Guild</h4>
+        <p>Submit a Discord invite and guild identity. Approved applications become visible for community recruitment.</p>
+      </a>
+      <a class="community-action" href="/wiki/guides/">
+        <div style="font-size:1.4rem;">&#128214;</div>
+        <h4>Improve Guides</h4>
+        <p>Use searchable, separated guide sections and contribute tested strategies for new players.</p>
+      </a>
+    </div>
+
+    <div class="community-columns">
+      <section class="recent-section" style="margin:0; padding:0;">
+        <div class="section-header">
+          <h2 class="section-title">Latest Community Discoveries</h2>
+          <a href="/wiki/create-post/?type=discovery" class="view-all">Submit Discovery &#8594;</a>
+        </div>
+        <div class="recent-grid" id="communityDiscoveryList">
+          <div class="recent-card placeholder">
+            <span class="recent-tag">Discovery</span>
+            <h4>Loading discoveries...</h4>
+            <p>Fetching the latest reviewed findings.</p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="community-panel">
+        <h3>Guide Pulse</h3>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Freshly published guides from the community.</p>
+        <ul class="community-list" id="communityGuideList">
+          <li style="color:var(--text-muted);">Loading guides...</li>
+        </ul>
+        <p style="margin-top:14px;"><a href="/wiki/guides/" class="view-all">Open all Guides &#8594;</a></p>
+      </aside>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase-config.js"></script>
+  <script src="/js/categories-config.js"></script>
   <script src="/js/search.js"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script src="/js/community-hub.js"></script>
   <script src="../../js/main.js"></script>
 </body>
 </html>
