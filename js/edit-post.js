@@ -108,18 +108,24 @@ async function initEditPost() {
 function fillCategorySelectors() {
   const guideSelect = document.getElementById("editGuideSubcategory");
   const discoverySelect = document.getElementById("editDiscoveryCategory");
+  const guideSubcategories = Array.isArray(window.BOUNDLORE_GUIDE_SUBCATEGORIES)
+    ? window.BOUNDLORE_GUIDE_SUBCATEGORIES
+    : (typeof BOUNDLORE_GUIDE_SUBCATEGORIES !== "undefined" ? BOUNDLORE_GUIDE_SUBCATEGORIES : []);
+  const categories = Array.isArray(window.BOUNDLORE_CATEGORIES)
+    ? window.BOUNDLORE_CATEGORIES
+    : (typeof BOUNDLORE_CATEGORIES !== "undefined" ? BOUNDLORE_CATEGORIES : []);
 
-  if (guideSelect && Array.isArray(window.BOUNDLORE_GUIDE_SUBCATEGORIES)) {
-    window.BOUNDLORE_GUIDE_SUBCATEGORIES.forEach(function (cat) {
+  if (guideSelect && Array.isArray(guideSubcategories)) {
+    guideSubcategories.forEach(function (cat) {
       const opt = document.createElement("option");
       opt.value = cat.slug;
-      opt.textContent = cat.icon + " " + cat.label;
+      opt.textContent = cat.label;
       guideSelect.appendChild(opt);
     });
   }
 
-  if (discoverySelect && Array.isArray(window.BOUNDLORE_CATEGORIES)) {
-    window.BOUNDLORE_CATEGORIES
+  if (discoverySelect && Array.isArray(categories)) {
+    categories
       .filter(function (cat) {
         return cat.slug !== "guides";
       })
@@ -146,15 +152,13 @@ function setEditPostType(type) {
   if (editCurrentType === "guide") {
     guideFields.style.display = "block";
     discoveryFields.style.display = "none";
-    guideSelect.setAttribute("required", "required");
+    guideSelect.removeAttribute("required");
     discoverySelect.removeAttribute("required");
-    discoverySelect.value = "";
   } else {
     guideFields.style.display = "none";
     discoveryFields.style.display = "block";
     guideSelect.removeAttribute("required");
-    discoverySelect.setAttribute("required", "required");
-    guideSelect.value = "";
+    discoverySelect.removeAttribute("required");
   }
 }
 
@@ -202,24 +206,34 @@ async function handleEditSubmit(e) {
 
   if (editCurrentType === "guide") {
     const subcat = document.getElementById("editGuideSubcategory").value;
-    if (!subcat) {
-      errEl.textContent = "Please choose a guide type.";
+
+    const wasGuide = editPost.post_type === "guide" || (!editPost.post_type && !editPost.is_discovery);
+    const effectiveSubcat = subcat || editPost.guide_subcategory || null;
+
+    if (!effectiveSubcat && !wasGuide) {
+      errEl.textContent = "Please choose a guide type when switching to Guide.";
       errEl.style.display = "block";
       return;
     }
+
     updates.post_type = "guide";
-    updates.category = null;
-    updates.guide_subcategory = subcat;
+    updates.category = wasGuide ? (editPost.category || null) : null;
+    updates.guide_subcategory = effectiveSubcat;
     updates.is_discovery = false;
   } else {
     const cat = document.getElementById("editDiscoveryCategory").value;
-    if (!cat) {
-      errEl.textContent = "Please choose a discovery category.";
+
+    const wasDiscovery = editPost.post_type === "discovery" || editPost.is_discovery;
+    const effectiveCategory = cat || editPost.category || null;
+
+    if (!effectiveCategory && !wasDiscovery) {
+      errEl.textContent = "Please choose a discovery category when switching to Discovery.";
       errEl.style.display = "block";
       return;
     }
+
     updates.post_type = "discovery";
-    updates.category = cat;
+    updates.category = effectiveCategory;
     updates.guide_subcategory = null;
     updates.is_discovery = true;
   }

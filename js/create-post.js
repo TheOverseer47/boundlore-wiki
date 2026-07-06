@@ -63,9 +63,12 @@ async function initCreatePermissions() {
 
 function fillWikiCategories() {
   const wikiSelect = document.getElementById("wikiCategory");
-  if (!wikiSelect || !Array.isArray(window.BOUNDLORE_CATEGORIES)) return;
+  const categories = Array.isArray(window.BOUNDLORE_CATEGORIES)
+    ? window.BOUNDLORE_CATEGORIES
+    : (typeof BOUNDLORE_CATEGORIES !== "undefined" ? BOUNDLORE_CATEGORIES : null);
+  if (!wikiSelect || !Array.isArray(categories)) return;
 
-  const allowed = window.BOUNDLORE_CATEGORIES.filter(function(cat) {
+  const allowed = categories.filter(function(cat) {
     return cat.slug !== "guides" && cat.slug !== "guilds" && cat.slug !== "community";
   });
 
@@ -164,8 +167,6 @@ async function handleSubmit(e) {
     status: "pending",
   };
 
-  if (submitBtn) submitBtn.disabled = true;
-
   if (currentPostType === "guide") {
     const subcat = document.getElementById("guideSubcategory").value;
     if (!subcat) {
@@ -201,17 +202,6 @@ async function handleSubmit(e) {
     payload.guide_subcategory = null;
     payload.is_discovery = true;
     payload.content = buildDiscoveryMediaContent(title, content, discoveryImageUrl, discoveryYoutubeUrl);
-
-    if (files.length > 0) {
-      const uploadResult = await uploadDiscoveryFiles(userId, files);
-      if (uploadResult.error) {
-        if (submitBtn) submitBtn.disabled = false;
-        errorEl.textContent = uploadResult.error;
-        errorEl.style.display = "block";
-        return;
-      }
-      payload.content = buildDiscoveryContentWithAttachments(payload.content, uploadResult.files);
-    }
   } else {
     if (!createIsAdmin) {
       errorEl.textContent = "Only admins can create wiki category posts.";
@@ -234,7 +224,19 @@ async function handleSubmit(e) {
     payload.status = publishNow ? "published" : "pending";
   }
 
+  if (files.length > 0) {
+    const uploadResult = await uploadDiscoveryFiles(userId, files);
+    if (uploadResult.error) {
+      errorEl.textContent = uploadResult.error;
+      errorEl.style.display = "block";
+      return;
+    }
+    payload.content = buildPostContentWithAttachments(payload.content, uploadResult.files, currentPostType === "discovery");
+  }
+
   payload.content = injectPostMetaCP(payload.content, postMeta);
+
+  if (submitBtn) submitBtn.disabled = true;
 
   const { data, error } = await supabase.from("posts").insert(payload).select().single();
 
@@ -292,7 +294,7 @@ async function uploadDiscoveryFiles(userId, files) {
   return { files: uploaded };
 }
 
-function buildDiscoveryContentWithAttachments(baseHtml, files) {
+function buildPostContentWithAttachments(baseHtml, files, isDiscovery) {
   if (!files || files.length === 0) return baseHtml;
 
   const entries = files.map(function(file) {
@@ -307,7 +309,7 @@ function buildDiscoveryContentWithAttachments(baseHtml, files) {
 
   return baseHtml +
     '<hr />' +
-    '<h3>Discovery Attachments</h3>' +
+    '<h3>' + (isDiscovery ? "Discovery Attachments" : "Attachments") + '</h3>' +
     '<ul class="discovery-attachments">' + entries + '</ul>';
 }
 
