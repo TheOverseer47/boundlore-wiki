@@ -69,6 +69,25 @@
     <p id="myPostsEmpty" style="text-align:center;color:var(--text-muted);display:none;padding:20px 0;">You haven't submitted any posts yet.</p>
   </div>
 
+  <div class="form-box" style="margin-bottom:24px;">
+    <h2>Security</h2>
+    <p style="color:var(--text-muted);margin-bottom:10px;">Manage your login security and account lifecycle.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+      <button id="sendResetMailBtn" type="button" class="btn-contribute">Send Password Reset Email</button>
+      <a href="/wiki/reset-password/" class="btn-contribute" style="background:rgba(255,255,255,0.06);color:var(--text);border-color:rgba(255,255,255,0.22);">Open Reset Page</a>
+    </div>
+    <p id="securityMsg" style="margin-top:8px;color:var(--text-muted);"></p>
+    <hr style="border:0;border-top:1px solid rgba(255,255,255,0.1);margin:20px 0;" />
+    <h3 style="margin:0 0 8px 0;color:#ffb3b3;">Danger Zone</h3>
+    <p style="color:var(--text-muted);margin-bottom:10px;">Deleting your account is permanent. You will receive a confirmation mail link before anything is removed.</p>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label for="deleteConfirmInput">Type DELETE to continue</label>
+      <input id="deleteConfirmInput" class="form-input" type="text" placeholder="DELETE" autocomplete="off" />
+    </div>
+    <button id="requestDeleteBtn" type="button" class="form-submit" style="max-width:320px;background:#b14242;color:#fff;">Request Account Deletion</button>
+    <p id="deleteMsg" style="margin-top:10px;color:var(--text-muted);"></p>
+  </div>
+
   <div class="form-box">
     <button id="logoutBtn2" class="form-submit" style="background:#e05555;">Log Out</button>
   </div>
@@ -89,6 +108,54 @@ async function loadAccount() {
   if (!sessionData.session) { window.location.href = "/wiki/login/"; return; }
 
   const user = sessionData.session.user;
+  const accountDeleteIntentKey = "bl_account_delete_intent";
+  const params = new URLSearchParams(window.location.search);
+
+  async function maybeFinalizeDelete() {
+    const hasConfirmDelete = params.get("confirm_delete") === "1";
+    const pendingRaw = localStorage.getItem(accountDeleteIntentKey);
+    if (!hasConfirmDelete || !pendingRaw) return;
+
+    let pending = null;
+    try {
+      pending = JSON.parse(pendingRaw);
+    } catch (_) {
+      localStorage.removeItem(accountDeleteIntentKey);
+      return;
+    }
+
+    const deleteMsg = document.getElementById("deleteMsg");
+    if (!pending || pending.userId !== user.id) {
+      deleteMsg.textContent = "Deletion confirmation did not match this account.";
+      deleteMsg.style.color = "#ff7b7b";
+      localStorage.removeItem(accountDeleteIntentKey);
+      return;
+    }
+
+    const isExpired = !pending.createdAt || (Date.now() - Number(pending.createdAt)) > (30 * 60 * 1000);
+    if (isExpired) {
+      deleteMsg.textContent = "Deletion confirmation expired. Please request a new deletion email.";
+      deleteMsg.style.color = "#ff7b7b";
+      localStorage.removeItem(accountDeleteIntentKey);
+      return;
+    }
+
+    deleteMsg.textContent = "Finalizing account deletion...";
+    deleteMsg.style.color = "#ffcc66";
+
+    const { error } = await supabase.rpc("delete_own_account");
+    localStorage.removeItem(accountDeleteIntentKey);
+    if (error) {
+      deleteMsg.textContent = "Deletion failed: " + error.message;
+      deleteMsg.style.color = "#ff7b7b";
+      return;
+    }
+
+    await supabase.auth.signOut();
+    deleteMsg.textContent = "Account deleted. Redirecting...";
+    deleteMsg.style.color = "#50c878";
+    setTimeout(function() { window.location.href = "/"; }, 900);
+  }
 
   const { data: profile } = await supabase
     .from("profiles").select("*").eq("id", user.id).single();
@@ -111,6 +178,10 @@ async function loadAccount() {
 
   const saveAvatarBtn = document.getElementById("saveAvatarBtn");
   const avatarSaveMsg = document.getElementById("avatarSaveMsg");
+  const securityMsg = document.getElementById("securityMsg");
+  const deleteMsg = document.getElementById("deleteMsg");
+  const resetBtn = document.getElementById("sendResetMailBtn");
+  const requestDeleteBtn = document.getElementById("requestDeleteBtn");
   saveAvatarBtn.addEventListener("click", async function() {
     const value = avatarInput.value.trim();
     const update = { avatar_url: value || null };
@@ -128,7 +199,63 @@ async function loadAccount() {
     }
   });
 
+  resetBtn.addEventListener("click", async function() {
+    securityMsg.textContent = "Sending reset mail...";
+    securityMsg.style.color = "#ffcc66";
+    resetBtn.disabled = true;
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: "https://boundlore.com/wiki/reset-password/"
+    });
+    resetBtn.disabled = false;
+    if (error) {
+      securityMsg.textContent = "Could not send reset mail: " + error.message;
+      securityMsg.style.color = "#ff7b7b";
+      return;
+    }
+    securityMsg.textContent = "Reset mail sent. Please check your inbox.";
+    securityMsg.style.color = "#50c878";
+  });
+
+  requestDeleteBtn.addEventListener("click", async function() {
+    const typed = (document.getElementById("deleteConfirmInput").value || "").trim();
+    if (typed !== "DELETE") {
+      deleteMsg.textContent = "Please type DELETE exactly to continue.";
+      deleteMsg.style.color = "#ff7b7b";
+      return;
+    }
+
+    deleteMsg.textContent = "Sending confirmation email...";
+    deleteMsg.style.color = "#ffcc66";
+    requestDeleteBtn.disabled = true;
+
+    localStorage.setItem(accountDeleteIntentKey, JSON.stringify({
+      userId: user.id,
+      createdAt: Date.now()
+    }));
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email: user.email,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: "https://boundlore.com/wiki/account/?confirm_delete=1"
+      }
+    });
+
+    requestDeleteBtn.disabled = false;
+    if (error) {
+      localStorage.removeItem(accountDeleteIntentKey);
+      deleteMsg.textContent = "Could not send deletion mail: " + error.message;
+      deleteMsg.style.color = "#ff7b7b";
+      return;
+    }
+
+    deleteMsg.textContent = "Confirmation mail sent. Open the link from your inbox to permanently delete this account.";
+    deleteMsg.style.color = "#50c878";
+  });
+
   renderMyPosts(user.id);
+
+  await maybeFinalizeDelete();
 
   document.getElementById("logoutBtn2").addEventListener("click", async function() {
     await supabase.auth.signOut();
