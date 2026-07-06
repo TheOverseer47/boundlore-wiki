@@ -190,7 +190,8 @@ function renderPost(post) {
   if (quickNav) {
     quickNav.innerHTML =
       '<li><a href="#postBody">Go to content</a></li>' +
-      '<li><a href="#commentsList">Jump to comments</a></li>';
+      '<li><a href="#commentsList">Jump to comments</a></li>' +
+      '<li><a href="#relatedPostsSection">See also</a></li>';
 
     const headings = extractHeadings(cleanContent).slice(0, 5);
     headings.forEach(function(heading, index) {
@@ -214,10 +215,10 @@ function renderPost(post) {
       : `/wiki/edit-post/?id=${post.id}`;
   }
 
-  loadRelatedPosts(post);
+  loadRelatedPosts(post, postMeta);
 }
 
-async function loadRelatedPosts(post) {
+async function loadRelatedPosts(post, postMeta) {
   const wrap = document.getElementById("relatedPostsSection");
   const list = document.getElementById("relatedPostsList");
   const title = document.getElementById("relatedPostsTitle");
@@ -225,38 +226,62 @@ async function loadRelatedPosts(post) {
 
   let query = supabase
     .from("posts")
-    .select("id, slug, title, category, post_type, guide_subcategory, created_at")
+    .select("id, slug, title, category, post_type, guide_subcategory, content, created_at")
     .eq("status", "published")
     .neq("id", post.id)
-    .limit(4)
     .order("created_at", { ascending: false });
 
-  if (post.post_type === "guide" && post.guide_subcategory) {
-    title.textContent = "Similar Guides";
-    query = query.eq("post_type", "guide").eq("guide_subcategory", post.guide_subcategory);
-  } else if (post.category) {
-    title.textContent = "Similar in " + getPostLabelSafe(post);
-    query = query.eq("category", post.category);
-  } else {
-    title.textContent = "Related Posts";
-  }
+  title.textContent = "See also";
+  query = query.limit(12);
 
   const { data, error } = await query;
   if (error || !data || data.length === 0) {
-    wrap.style.display = "none";
+    renderRelatedFallbackPD(wrap, list, title, post);
+    return;
+  }
+
+  const scored = data.map(function(item) {
+    return Object.assign({}, item, {
+      relatedScore: computeRelatedScorePD(post, postMeta, item),
+    });
+  }).filter(function(item) {
+    return item.relatedScore > 0;
+  }).sort(function(a, b) {
+    if (b.relatedScore !== a.relatedScore) return b.relatedScore - a.relatedScore;
+    return new Date(b.created_at) - new Date(a.created_at);
+  }).slice(0, 6);
+
+  if (scored.length === 0) {
+    const fallback = data.slice(0, 3);
+    if (fallback.length === 0) {
+      renderRelatedFallbackPD(wrap, list, title, post);
+      return;
+    }
+    title.textContent = "Latest posts";
+    wrap.style.display = "block";
+    list.innerHTML = "";
+    fallback.forEach(function(item) {
+      const link = document.createElement("a");
+      link.className = "bl-related-item";
+      link.href = item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id));
+      link.innerHTML =
+        escapeHtml(item.title || "Untitled") +
+        '<span>' + escapeHtml(getSeeAlsoLabelPD(item)) + ' • ' + new Date(item.created_at).toLocaleDateString() + '</span>';
+      list.appendChild(link);
+    });
     return;
   }
 
   wrap.style.display = "block";
   list.innerHTML = "";
 
-  data.forEach(function(item) {
+  scored.forEach(function(item) {
     const link = document.createElement("a");
     link.className = "bl-related-item";
     link.href = item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id));
     link.innerHTML =
       escapeHtml(item.title || "Untitled") +
-      '<span>' + escapeHtml(getPostLabelSafe(item)) + ' • ' + new Date(item.created_at).toLocaleDateString() + '</span>';
+      '<span>' + escapeHtml(getSeeAlsoLabelPD(item)) + ' • ' + new Date(item.created_at).toLocaleDateString() + '</span>';
     list.appendChild(link);
   });
 }
@@ -267,6 +292,78 @@ function getPostLabelSafe(post) {
   }
   if (post.post_type === "guide") return "Guide";
   return post.category || "Post";
+}
+
+function getSeeAlsoLabelPD(post) {
+  const typeLabel = post.post_type === "guide"
+    ? "Guide"
+    : (post.post_type === "discovery" ? "Discovery" : "Post");
+  const categoryLabel = getPostLabelSafe(post);
+  return typeLabel + " · " + categoryLabel;
+}
+
+function computeRelatedScorePD(currentPost, currentMeta, candidate) {
+  let score = 0;
+
+  if (currentPost.post_type && candidate.post_type === currentPost.post_type) score += 4;
+  if (currentPost.category && candidate.category === currentPost.category) score += 4;
+  if (currentPost.post_type === "guide" && currentPost.guide_subcategory && candidate.guide_subcategory === currentPost.guide_subcategory) score += 7;
+  if (currentMeta && candidate.content) {
+    const candidateMeta = parsePostMetaPD(candidate.content || "");
+    if (currentMeta.update_phase && candidateMeta.update_phase && currentMeta.update_phase === candidateMeta.update_phase) score += 2;
+    if (currentMeta.patch_tag && candidateMeta.patch_tag && currentMeta.patch_tag === candidateMeta.patch_tag) score += 2;
+  }
+
+  const currentLabel = getPostLabelSafe(currentPost).toLowerCase();
+  const candidateLabel = getPostLabelSafe(candidate).toLowerCase();
+  if (currentLabel && candidateLabel && currentLabel === candidateLabel) score += 1;
+
+  const currentTitleWords = tokenizeRelatedTermsPD(currentPost.title);
+  const candidateTitleWords = tokenizeRelatedTermsPD(candidate.title);
+  const sharedWords = currentTitleWords.filter(function(word) {
+    return candidateTitleWords.includes(word);
+  }).length;
+  score += Math.min(sharedWords, 2);
+
+  return score;
+}
+
+function tokenizeRelatedTermsPD(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .split(/\s+/)
+    .map(function(word) { return word.trim(); })
+    .filter(function(word) {
+      return word.length >= 4 && !["with", "from", "this", "that", "your", "about", "there", "what"].includes(word);
+    });
+}
+
+function renderRelatedFallbackPD(wrap, list, title, post) {
+  const sectionTitle = post && post.post_type === "guide"
+    ? "See also"
+    : "Explore more";
+
+  title.textContent = sectionTitle;
+  wrap.style.display = "block";
+  list.innerHTML = "";
+
+  const links = [
+    { label: "Browse guides", href: "/wiki/guides/", meta: "Guides hub" },
+    { label: "Browse creatures", href: "/wiki/creatures/", meta: "Creatures hub" },
+    { label: "Browse biomes", href: "/wiki/biomes/", meta: "Biomes hub" },
+    { label: "Browse items", href: "/wiki/items/", meta: "Items hub" },
+    { label: "Community posts", href: "/wiki/community/", meta: "Discussion and updates" },
+    { label: "Submit a post", href: "/wiki/create-post/", meta: "Add something new" },
+  ];
+
+  links.forEach(function(item) {
+    const link = document.createElement("a");
+    link.className = "bl-related-item";
+    link.href = item.href;
+    link.innerHTML = escapeHtml(item.label) + '<span>' + escapeHtml(item.meta) + '</span>';
+    list.appendChild(link);
+  });
 }
 
 async function loadReactions(postId) {
