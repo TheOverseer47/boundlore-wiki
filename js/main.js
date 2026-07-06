@@ -1,6 +1,48 @@
-// Navbar scroll
+// Lightweight performance mode for Chrome/low-powered setups
+const ua = navigator.userAgent || '';
+const isChromium = /Chrome|CriOS/.test(ua) && !/Edg|OPR|Brave|Vivaldi/.test(ua);
+const lowPowerHint =
+  (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 6) ||
+  (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 8) ||
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (isChromium || lowPowerHint) {
+  const applyPerfMode = () => {
+    document.documentElement.classList.add('perf-mode');
+    if (document.body) {
+      document.body.classList.add('perf-mode');
+    }
+  };
+
+  applyPerfMode();
+  document.addEventListener('DOMContentLoaded', applyPerfMode, { once: true });
+  window.addEventListener('load', applyPerfMode, { once: true });
+}
+
+// Navbar scroll (rAF throttled + passive listener)
 const navbar = document.getElementById('navbar');
-if (navbar) window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 20));
+if (navbar) {
+  let lastScrolled = false;
+  let ticking = false;
+
+  const updateNavbarState = () => {
+    const shouldBeScrolled = window.scrollY > 20;
+    if (shouldBeScrolled !== lastScrolled) {
+      navbar.classList.toggle('scrolled', shouldBeScrolled);
+      lastScrolled = shouldBeScrolled;
+    }
+    ticking = false;
+  };
+
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(updateNavbarState);
+  };
+
+  updateNavbarState();
+  window.addEventListener('scroll', onScroll, { passive: true });
+}
 
 // Hamburger
 const hamburger = document.getElementById('hamburger');
@@ -41,13 +83,17 @@ function animateCounter(el, target, duration = 1500) {
 const stats = { statCreatures: 0, statBiomes: 0, statItems: 0, statGuides: 0 };
 const statsBar = document.querySelector('.stats-bar');
 if (statsBar) {
-  new IntersectionObserver((entries) => {
+  const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        Object.entries(stats).forEach(([id, val]) => { const el = document.getElementById(id); if (el) animateCounter(el, val); });
-      }
+      if (!entry.isIntersecting) return;
+      Object.entries(stats).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) animateCounter(el, val);
+      });
+      observer.disconnect();
     });
-  }, { threshold: 0.5 }).observe(statsBar);
+  }, { threshold: 0.5 });
+  observer.observe(statsBar);
 }
 
 // Dynamic hero background – add more image URLs to the array for slideshow
