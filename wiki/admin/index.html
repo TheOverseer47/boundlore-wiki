@@ -1028,7 +1028,7 @@ function applyUsersFilter() {
         return;
       }
 
-      const newRole = this.dataset.role === "admin" ? "member" : "admin";
+      const newRole = this.dataset.role === "admin" ? "user" : "admin";
       if (existing.id === ULTIMATE_ADMIN_ID && newRole !== "admin") {
         alert("The ultimate admin account (" + ULTIMATE_ADMIN_USERNAME + ") cannot lose admin rights.");
         return;
