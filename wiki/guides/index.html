@@ -41,14 +41,34 @@
   <p>Community-written tips, tutorials and survival strategies for Light No Fire</p>
 </div>
 
-<div style="max-width:1000px;margin:0 auto;padding:40px 20px;">
+<div class="bl-guides-shell">
+  <section class="bl-guides-overview form-box">
+    <div>
+      <h2>Knowledge Index</h2>
+      <p>Top-voted guides are boosted using Wilson scoring so high-quality posts stay visible, even with different vote counts.</p>
+    </div>
+    <div class="bl-guides-overview-stats">
+      <div class="bl-guides-stat"><span id="guideStatCount">-</span><small>Published Guides</small></div>
+      <div class="bl-guides-stat"><span id="guideStatFeatured">-</span><small>Featured</small></div>
+      <div class="bl-guides-stat"><span id="guideStatTopRatio">-</span><small>Top Approval</small></div>
+    </div>
+  </section>
+
+  <section class="bl-guides-legend form-box">
+    <h3>Ranking Rules</h3>
+    <ul>
+      <li>Featured requires at least 10 votes and at least 85% positive votes.</li>
+      <li>Guides are sorted by featured state, then Wilson confidence score, then recency.</li>
+      <li>New unrated guides remain visible and can climb as votes arrive.</li>
+    </ul>
+  </section>
 
   <div id="categoryPostsList"></div>
   <p id="categoryPostsEmpty" style="text-align:center;color:var(--text-muted);display:none;padding:40px 0;">
     No guides published yet. Be the first to contribute!
   </p>
 
-  <div class="form-box" style="text-align:center;margin-top:40px;background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,140,0,0.05));">
+  <div class="form-box bl-guides-cta">
     <h2>Write a Guide</h2>
     <p style="color:var(--text-muted);margin-bottom:20px;">Discovered something useful? Submit it and it will be reviewed and published here.</p>
     <a href="/wiki/create-post/" class="btn-contribute" style="display:inline-block;">Submit a Guide</a>
@@ -61,11 +81,27 @@
 <script src="/js/supabase-config.js"></script>
 <script src="/js/search.js"></script>
 <script src="/js/categories-config.js"></script>
+<script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/render-posts.js"></script>
 <script src="/js/main.js"></script>
 <script>
-renderCategoryPosts("guides");
+renderCategoryPosts("guides").then(function(result) {
+  if (!result || !result.posts) return;
+  const posts = result.posts;
+  const total = posts.length;
+  const featured = posts.filter(function(p) { return p.is_featured_guide; }).length;
+  const best = posts.reduce(function(acc, p) {
+    if (!acc || (p.reaction_approval_rate || 0) > (acc.reaction_approval_rate || 0)) return p;
+    return acc;
+  }, null);
+
+  document.getElementById("guideStatCount").textContent = String(total);
+  document.getElementById("guideStatFeatured").textContent = String(featured);
+  document.getElementById("guideStatTopRatio").textContent = best && best.reaction_total > 0
+    ? Math.round((best.reaction_approval_rate || 0) * 100) + "%"
+    : "-";
+});
 </script>
 </body>
 </html>

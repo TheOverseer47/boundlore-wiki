@@ -39,6 +39,8 @@ async function renderMyPosts(userId) {
       const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
       actions.push("<a href=\"" + postUrl + "\" style=\"color:var(--accent);font-size:0.85rem;\">View &rarr;</a>");
     }
+      const editUrl = post.slug ? `/wiki/edit-post/?slug=${encodeURIComponent(post.slug)}` : `/wiki/edit-post/?id=${post.id}`;
+      actions.push(`<a href="${editUrl}" class="link-btn">Edit</a>`);
 
     const row = document.createElement("div");
     row.style.cssText = "display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);";

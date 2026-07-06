@@ -43,11 +43,13 @@ function setPostType(type) {
     discoveryFields.style.display = "none";
     guideSelect.setAttribute("required", "required");
     discoverySelect.removeAttribute("required");
+    discoverySelect.value = "";
   } else {
     guideFields.style.display = "none";
     discoveryFields.style.display = "block";
     guideSelect.removeAttribute("required");
     discoverySelect.setAttribute("required", "required");
+    guideSelect.value = "";
   }
 }
 
@@ -118,5 +120,15 @@ async function handleSubmit(e) {
     return;
   }
 
-  window.location.href = `/wiki/post/?slug=${data.slug}`;
+  if (data && data.slug) {
+    window.location.href = `/wiki/post/?slug=${data.slug}`;
+    return;
+  }
+
+  if (data && data.id) {
+    window.location.href = `/wiki/post/?id=${data.id}`;
+    return;
+  }
+
+  window.location.href = "/wiki/account/";
 }

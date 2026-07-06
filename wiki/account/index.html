@@ -49,10 +49,15 @@
 
   <div class="form-box" style="margin-bottom:24px;">
     <h2>Profile</h2>
+    <div id="accountAvatarBox" style="margin-bottom:12px;"></div>
     <p><strong>Username:</strong> <span id="profUsername"></span></p>
     <p><strong>Email:</strong> <span id="profEmail"></span></p>
     <p><strong>Role:</strong> <span id="profRole"></span></p>
     <p><strong>Member since:</strong> <span id="profJoined"></span></p>
+    <label for="avatarUrlInput" style="display:block;margin-top:12px;">Avatar URL</label>
+    <input id="avatarUrlInput" class="form-input" type="url" placeholder="https://..." />
+    <button id="saveAvatarBtn" type="button" class="btn-contribute" style="margin-top:10px;">Save Avatar</button>
+    <p id="avatarSaveMsg" style="margin-top:8px;color:var(--text-muted);"></p>
   </div>
 
   <div class="form-box" style="margin-bottom:24px;">
@@ -74,6 +79,7 @@
 
 <script src="/js/supabase-config.js"></script>
 <script src="/js/categories-config.js"></script>
+<script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/my-posts.js"></script>
 <script src="/js/main.js"></script>
@@ -85,7 +91,7 @@ async function loadAccount() {
   const user = sessionData.session.user;
 
   const { data: profile } = await supabase
-    .from("profiles").select("username, role, created_at").eq("id", user.id).single();
+    .from("profiles").select("*").eq("id", user.id).single();
 
   document.getElementById("gateBox").style.display = "none";
   document.getElementById("accountContent").style.display = "block";
@@ -94,6 +100,33 @@ async function loadAccount() {
   document.getElementById("profEmail").textContent = user.email;
   document.getElementById("profRole").textContent = profile && profile.role === "admin" ? "Admin" : "Member";
   document.getElementById("profJoined").textContent = profile ? new Date(profile.created_at).toLocaleDateString() : "N/A";
+
+  const avatarBox = document.getElementById("accountAvatarBox");
+  if (avatarBox && typeof renderAvatar === "function") {
+    avatarBox.innerHTML = renderAvatar(profile, "bl-avatar-lg");
+  }
+
+  const avatarInput = document.getElementById("avatarUrlInput");
+  avatarInput.value = profile && (profile.avatar_url || profile.avatarurl) ? (profile.avatar_url || profile.avatarurl) : "";
+
+  const saveAvatarBtn = document.getElementById("saveAvatarBtn");
+  const avatarSaveMsg = document.getElementById("avatarSaveMsg");
+  saveAvatarBtn.addEventListener("click", async function() {
+    const value = avatarInput.value.trim();
+    const update = { avatar_url: value || null };
+    const { error } = await supabase.from("profiles").update(update).eq("id", user.id);
+    if (error) {
+      avatarSaveMsg.textContent = "Could not save avatar: " + error.message;
+      avatarSaveMsg.style.color = "#ff7b7b";
+      return;
+    }
+    avatarSaveMsg.textContent = "Avatar saved.";
+    avatarSaveMsg.style.color = "#50c878";
+    if (typeof renderAvatar === "function") {
+      const merged = Object.assign({}, profile || {}, update, { username: profile ? profile.username : "User" });
+      avatarBox.innerHTML = renderAvatar(merged, "bl-avatar-lg");
+    }
+  });
 
   renderMyPosts(user.id);
 

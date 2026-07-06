@@ -10,7 +10,7 @@ async function renderCategoryPosts(categorySlug) {
   // Build query with special handling for the 'guides' pseudo-category
   let query = supabase
     .from("posts")
-    .select("id, slug, title, category, content, is_discovery, post_type, created_at, profiles(username)")
+    .select("id, slug, title, category, content, is_discovery, post_type, created_at, profiles:author_id(*)")
     .eq("status", "published");
 
   if (categorySlug === "guides") {
@@ -26,35 +26,143 @@ async function renderCategoryPosts(categorySlug) {
 
   if (error || !posts || posts.length === 0) {
     if (emptyMsg) emptyMsg.style.display = "block";
-    return;
+    return { posts: [] };
   }
 
   if (emptyMsg) emptyMsg.style.display = "none";
 
-  posts.forEach(function(post) {
+  const postsWithScores = await attachReactionStats(posts);
+  const sortedPosts = sortPostsByCategoryLogic(postsWithScores, categorySlug);
+
+  sortedPosts.forEach(function(post) {
     const authorName = post.profiles ? post.profiles.username : "Unknown";
-    const plainText = post.content.replace(/<[^>]*>/g, "").slice(0, 140);
+    const plainText = post.content.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 200);
     const discoveryBadge = post.is_discovery
-      ? "<span style=\"background:linear-gradient(135deg,#ffd700,#ff8c00);color:#111;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;margin-left:6px;\">\u2728 Discovery</span>"
+      ? '<span class="bl-tag bl-tag-discovery">\u2728 Discovery</span>'
       : "";
+    const featuredBadge = post.is_featured_guide
+      ? '<span class="bl-tag bl-tag-featured">Featured</span>'
+      : "";
+    const typeLabel = getReadableType(post);
+    const typeBadge = '<span class="bl-tag bl-tag-type">' + escapeHtmlRP(typeLabel) + '</span>';
+    const avatarHtml = typeof renderAvatar === "function"
+      ? renderAvatar(post.profiles, "bl-avatar-sm")
+      : "";
+    const statBarHtml = renderRatingSummary(post);
+    const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+    const dateLabel = new Date(post.created_at).toLocaleDateString();
 
     const card = document.createElement("div");
-    card.className = "guide-card";
-    card.style.cssText = "background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:20px;margin-bottom:16px;cursor:pointer;transition:border-color 0.2s;";
+    card.className = "bl-guide-card";
     card.innerHTML =
-      "<h3 style=\"margin:0 0 6px;\">" + escapeHtmlRP(post.title) + discoveryBadge + "</h3>" +
-      "<p style=\"color:var(--text-muted);font-size:0.8rem;margin-bottom:8px;\">By " + escapeHtmlRP(authorName) + " &middot; " + new Date(post.created_at).toLocaleDateString() + "</p>" +
-      "<p style=\"color:var(--text-secondary);\">" + escapeHtmlRP(plainText) + "...</p>";
-
-    card.innerHTML +=
-      "<div class=\"post-rating-summary\" data-post-id=\"" + post.id + "\"></div>";
-    card.addEventListener("click", function() {
-      const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
-      window.location.href = postUrl;
-    });
+      '<a class="bl-guide-card-link" href="' + postUrl + '">' +
+      '<div class="bl-guide-card-top">' +
+      '<div class="bl-guide-card-title-wrap">' +
+      '<h3 class="bl-guide-card-title">' + escapeHtmlRP(post.title) + '</h3>' +
+      '<div class="bl-guide-card-tags">' + typeBadge + featuredBadge + discoveryBadge + '</div>' +
+      '</div>' +
+      '<div class="bl-guide-card-meta">' +
+      avatarHtml +
+      '<span>By ' + escapeHtmlRP(authorName) + ' &middot; ' + dateLabel + '</span>' +
+      '</div>' +
+      '</div>' +
+      '<p class="bl-guide-card-summary">' + escapeHtmlRP(plainText) + (plainText.length >= 200 ? '...' : '') + '</p>' +
+      '<div class="bl-guide-card-bottom">' +
+      '<div class="post-rating-summary" data-post-id="' + post.id + '">' + statBarHtml + '</div>' +
+      '<span class="bl-guide-card-open">Open Guide &rarr;</span>' +
+      '</div>' +
+      '</a>';
 
     container.appendChild(card);
   });
+
+  return { posts: sortedPosts };
+}
+
+async function attachReactionStats(posts) {
+  if (!posts || posts.length === 0) return [];
+
+  const ids = posts.map(function(post) { return post.id; });
+  const { data: reactions } = await supabase
+    .from("post_reactions")
+    .select("post_id, reaction")
+    .in("post_id", ids);
+
+  const map = {};
+  (reactions || []).forEach(function(r) {
+    if (!map[r.post_id]) {
+      map[r.post_id] = { up: 0, down: 0 };
+    }
+    if (r.reaction === "up") map[r.post_id].up += 1;
+    if (r.reaction === "down") map[r.post_id].down += 1;
+  });
+
+  return posts.map(function(post) {
+    const stats = map[post.id] || { up: 0, down: 0 };
+    const totalVotes = stats.up + stats.down;
+    const approvalRate = totalVotes > 0 ? stats.up / totalVotes : 0;
+    const wilsonScore = computeWilsonLowerBound(stats.up, totalVotes);
+    const isFeaturedGuide = post.post_type === "guide" && totalVotes >= 10 && approvalRate >= 0.85;
+
+    return Object.assign({}, post, {
+      reaction_upvotes: stats.up,
+      reaction_downvotes: stats.down,
+      reaction_total: totalVotes,
+      reaction_approval_rate: approvalRate,
+      wilson_score: wilsonScore,
+      is_featured_guide: isFeaturedGuide,
+    });
+  });
+}
+
+function sortPostsByCategoryLogic(posts, categorySlug) {
+  const copy = posts.slice();
+  if (categorySlug !== "guides") {
+    return copy.sort(function(a, b) {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  }
+
+  return copy.sort(function(a, b) {
+    if (a.is_featured_guide !== b.is_featured_guide) {
+      return a.is_featured_guide ? -1 : 1;
+    }
+    if (a.wilson_score !== b.wilson_score) {
+      return b.wilson_score - a.wilson_score;
+    }
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+}
+
+function computeWilsonLowerBound(positiveVotes, totalVotes) {
+  if (!totalVotes) return 0;
+  const z = 1.96;
+  const phat = positiveVotes / totalVotes;
+  const z2 = z * z;
+  const numerator = phat + z2 / (2 * totalVotes) - z * Math.sqrt((phat * (1 - phat) + z2 / (4 * totalVotes)) / totalVotes);
+  const denominator = 1 + z2 / totalVotes;
+  return numerator / denominator;
+}
+
+function renderRatingSummary(post) {
+  const up = post.reaction_upvotes || 0;
+  const down = post.reaction_downvotes || 0;
+  const total = post.reaction_total || 0;
+  if (total === 0) {
+    return '<span class="bl-rating-empty">No ratings yet</span>';
+  }
+
+  const positivePercent = Math.round((up / total) * 100);
+  return '<span class="bl-rating-line">👍 ' + up + ' &middot; 👎 ' + down + ' &middot; ' + positivePercent + '% positive</span>';
+}
+
+function getReadableType(post) {
+  if (typeof getPostCategoryLabel === "function") {
+    return getPostCategoryLabel(post);
+  }
+  if (post.post_type === "guide") return "Guide";
+  if (post.post_type === "discovery") return "Discovery";
+  return post.category || "Post";
 }
 
 function escapeHtmlRP(str) {

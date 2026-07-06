@@ -127,6 +127,7 @@
 
 <script src="/js/supabase-config.js"></script>
 <script src="/js/categories-config.js"></script>
+<script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/main.js"></script>
 <script>
@@ -281,7 +282,7 @@ async function loadAllPosts() {
 async function loadUsers() {
   const { data: users, error } = await supabase
     .from("profiles")
-    .select("id, username, role, created_at, is_banned")
+    .select("*")
     .order("created_at", { ascending: false });
 
   const tbody = document.getElementById("usersBody");
@@ -293,8 +294,9 @@ async function loadUsers() {
     const isSelf = u.id === currentAdminId;
     const banBadge = u.is_banned ? '<span class="badge" style="background:#8b0000">Banned</span>' : '';
     const tr = document.createElement("tr");
+    const avatarHtml = typeof renderAvatar === "function" ? renderAvatar(u, "bl-avatar-xs") : "";
     tr.innerHTML =
-      "<td>" + escapeHtmlA(u.username) + (isSelf ? " (you)" : "") + " " + banBadge + "</td>" +
+      "<td><span style=\"display:inline-flex;align-items:center;gap:8px;\">" + avatarHtml + "<span>" + escapeHtmlA(u.username) + (isSelf ? " (you)" : "") + " " + banBadge + "</span></span></td>" +
       "<td><span class=\"badge " + roleClass + "\">" + u.role + "</span></td>" +
       "<td>" + new Date(u.created_at).toLocaleDateString() + "</td>" +
       "<td>" + (isSelf ? "-" :

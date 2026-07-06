@@ -41,11 +41,14 @@
 <div class="wiki-hero">
   <p class="breadcrumb"><a href="/">Home</a> &rsaquo; <span id="breadcrumbCategory">Post</span></p>
   <h1 id="postTitle">Loading...</h1>
-  <p><span id="postAuthor">&nbsp;</span> &middot; <span id="postDate">&nbsp;</span> <span id="postEditedTag" style="display:none;">(edited)</span></p>
+  <p style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
+    <span id="postAuthorAvatar"></span>
+    <span id="postAuthor">&nbsp;</span> &middot; <span id="postDate">&nbsp;</span> <span id="postEditedTag" style="display:none;">(edited)</span>
+  </p>
 </div>
 
-<div class="article-layout" style="grid-template-columns:1fr;max-width:800px;margin:0 auto;padding-bottom:60px;">
-  <article class="article-content">
+<div class="article-layout bl-post-layout">
+  <article class="article-content bl-post-main">
 
     <div id="postLoading">
       <p>Loading post...</p>
@@ -57,18 +60,26 @@
     </div>
 
     <div id="postContent" style="display:none;">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+      <div class="bl-post-toolbar">
         <a id="btnEditPost" class="btn-secondary" style="display:none;" href="#">Edit Post</a>
+      </div>
+
+      <div class="bl-post-highlight-box">
+        <div class="bl-post-highlight-head">
+          <span class="bl-tag bl-tag-type" id="postTypeBadge">Post</span>
+          <span class="bl-post-readtime" id="postReadTime">- min read</span>
+        </div>
+        <p id="postSummary">Loading summary...</p>
       </div>
 
       <div id="postBody" class="post-body"></div>
 
-      <div class="rating-widget" style="display:flex;gap:10px;margin:24px 0;">
+      <div class="rating-widget bl-post-rating-widget">
         <button id="btnUpvote" class="reaction-btn">👍 <span id="upvoteCount">0</span></button>
         <button id="btnDownvote" class="reaction-btn">👎 <span id="downvoteCount">0</span></button>
       </div>
 
-      <div class="comments-section">
+      <div class="comments-section bl-comments-section">
         <h3>Comments (<span id="commentCount">0</span>)</h3>
         <div id="commentsList"></div>
 
@@ -84,12 +95,43 @@
     </div>
 
   </article>
+
+  <aside class="article-sidebar bl-post-sidebar">
+    <div class="sidebar-box bl-side-box">
+      <h3>Post Details</h3>
+      <table class="info-table">
+        <tr><td>Category</td><td id="sideCategory">-</td></tr>
+        <tr><td>Type</td><td id="sideType">-</td></tr>
+        <tr><td>Published</td><td id="sidePublished">-</td></tr>
+        <tr><td>Updated</td><td id="sideUpdated">-</td></tr>
+        <tr><td>Score</td><td id="sideScore">-</td></tr>
+      </table>
+    </div>
+
+    <div class="sidebar-box bl-side-box">
+      <h3>Quick Navigation</h3>
+      <ul class="source-list" id="postQuickNav">
+        <li><a href="#postBody">Go to content</a></li>
+        <li><a href="#commentsList">Jump to comments</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-box bl-side-box">
+      <h3>Community Tips</h3>
+      <ul class="source-list">
+        <li><a href="/wiki/guides/">Read more guides</a></li>
+        <li><a href="/wiki/create-post/">Submit your own post</a></li>
+        <li><a href="/wiki/support/">Report an issue</a></li>
+      </ul>
+    </div>
+  </aside>
 </div>
 
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
 <script src="/js/categories-config.js"></script>
+<script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/search.js"></script>
 <script src="/js/main.js"></script>
