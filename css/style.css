@@ -231,7 +231,7 @@ a:hover { color: var(--gold-light); }
   font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.85rem;
   letter-spacing: 0.08em; text-transform: uppercase;
   border: 1px solid rgba(198,212,223,0.2);
-  transition: all var(--transition); }
+  transition: all var(--transition); justify-content: center; }
 .btn-steam:hover { background: var(--steam-light); color: #fff;
   transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,40,56,0.6); }
 
@@ -1142,6 +1142,11 @@ a:hover { color: var(--gold-light); }
   }
 }
 
+@keyframes heroTickerScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 /* RESPONSIVE */
 @media (max-width: 1024px) {
   .nav-links { gap: 0; }
@@ -1166,11 +1171,6 @@ a:hover { color: var(--gold-light); }
     grid-template-columns: 1fr;
   }
   .nav-links.open { display: flex; }
-
-@keyframes heroTickerScroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
   .hamburger { display: flex; }
   .nav-search input { width: 120px; }
   .nav-search input:focus { width: 150px; }
