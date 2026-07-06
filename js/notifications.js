@@ -55,6 +55,20 @@
       .eq("is_read", false);
   }
 
+  async function deleteOld(userId) {
+    if (!userId) return { ok: false };
+    if (!(await detectNotificationsTable())) return { ok: false, skipped: true };
+
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("user_id", userId)
+      .eq("is_read", true);
+
+    if (error) return { ok: false, error };
+    return { ok: true };
+  }
+
   async function createNotification(payload) {
     if (!payload || !payload.user_id || !payload.title) return { ok: false, skipped: true };
     if (!(await detectNotificationsTable())) return { ok: false, skipped: true };
@@ -78,6 +92,7 @@
     fetchUnreadCount,
     fetchLatest,
     markAllRead,
+    deleteOld,
     createNotification,
   };
 })();

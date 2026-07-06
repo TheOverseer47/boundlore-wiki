@@ -22,8 +22,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     .community-shell { max-width: 1150px; margin: 0 auto 70px; padding: 0 20px; }
-    .community-shell, .community-shell h2, .community-shell h3, .community-shell h4, .community-shell p, .community-shell li { color: #f2f4fb; }
-    .community-shell p, .community-shell li { color: #dde1ef; }
+    .community-shell, .community-shell h2, .community-shell h3, .community-shell h4, .community-shell p, .community-shell li { color: #f2f4fb !important; }
+    .community-shell p, .community-shell li { color: #dde1ef !important; }
     .community-top-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; margin-bottom: 26px; }
     .community-panel { background: linear-gradient(165deg, rgba(255,255,255,0.14), rgba(56,58,78,0.86)); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; }
     .community-panel h2, .community-panel h3 { margin-top: 0; }
@@ -32,10 +32,10 @@
     .pill-live { background: rgba(80, 200, 120, 0.2); color: #8ff0b2; border: 1px solid rgba(80, 200, 120, 0.45); }
     .pill-warning { background: rgba(224, 168, 58, 0.18); color: #f4ce75; border: 1px solid rgba(224, 168, 58, 0.45); }
     .community-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 24px; }
-    .community-action { text-decoration: none; color: #f4f6ff; border-radius: 12px; border: 1px solid rgba(255,255,255,0.22); background: linear-gradient(165deg, rgba(255,255,255,0.14), rgba(42,44,62,0.92)); padding: 16px; transition: transform 0.2s, border-color 0.2s, background 0.2s; }
+    .community-action { text-decoration: none; color: #f4f6ff !important; border-radius: 12px; border: 1px solid rgba(255,255,255,0.22); background: linear-gradient(165deg, rgba(255,255,255,0.14), rgba(42,44,62,0.92)); padding: 16px; transition: transform 0.2s, border-color 0.2s, background 0.2s; }
     .community-action:hover { transform: translateY(-2px); border-color: rgba(255,215,0,0.55); background: linear-gradient(165deg, rgba(255,255,255,0.2), rgba(54,56,77,0.95)); }
     .community-action h4 { margin: 8px 0 6px; }
-    .community-action p { color: #e1e5f2; }
+    .community-action p { color: #e1e5f2 !important; }
     .community-action > div { color: #ffd782; text-shadow: 0 0 16px rgba(255,215,122,0.25); }
     .community-columns { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
     .community-list { margin: 0; padding-left: 18px; }
@@ -45,8 +45,8 @@
     .community-feed-panel { background: linear-gradient(165deg, rgba(255,255,255,0.12), rgba(28,30,44,0.92)); border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; padding: 16px; }
     .community-feed-panel .section-header { margin-bottom: 14px; text-align: left; }
     .community-feed-panel .recent-card { background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(48,50,72,0.92)); border-color: rgba(255,255,255,0.24); opacity: 1; }
-    .community-feed-panel .recent-card h4 { color: #f3f4f9; }
-    .community-feed-panel .recent-card p { color: #e0e3ef; }
+    .community-feed-panel .recent-card h4 { color: #f3f4f9 !important; }
+    .community-feed-panel .recent-card p { color: #e0e3ef !important; }
     .community-reddit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
     .community-reddit-card { border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; padding: 16px; background: linear-gradient(145deg, rgba(255,123,46,0.24), rgba(44,46,68,0.9)); }
     .community-reddit-card p { color: #eceef7; line-height: 1.58; }
@@ -151,9 +151,9 @@
 
       <aside class="community-panel">
         <h3>Guide Pulse</h3>
-        <p style="color:var(--text-muted);font-size:0.9rem;">Freshly published guides from the community.</p>
+        <p style="color:#e0e3ef;font-size:0.9rem;">Freshly published guides from the community.</p>
         <ul class="community-list" id="communityGuideList">
-          <li style="color:var(--text-muted);">Loading guides...</li>
+          <li style="color:#d9deec;">Loading guides...</li>
         </ul>
         <p style="margin-top:14px;"><a href="/wiki/guides/" class="view-all">Open all Guides &#8594;</a></p>
       </aside>
@@ -169,7 +169,7 @@
       <section class="community-panel community-reddit-form">
         <h3 style="margin-top:0;">Submit Your Reddit Thread</h3>
         <p style="margin-bottom:12px;color:#c9cad8;">Share a high-quality Reddit post. After admin review, we can feature it in community updates.</p>
-        <div id="redditGateBox"><p style="color:var(--text-muted);">Loading...</p></div>
+        <div id="redditGateBox"><p style="color:#dbe0ef;">Loading...</p></div>
         <div id="redditFormBox" style="display:none;">
           <label class="form-label" for="redditUrl">Reddit URL</label>
           <input id="redditUrl" class="form-input" type="url" placeholder="https://www.reddit.com/r/..." />
