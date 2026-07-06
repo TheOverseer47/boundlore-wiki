@@ -226,6 +226,8 @@
 <script src="/js/main.js"></script>
 <script>
 let currentAdminId = null;
+const ULTIMATE_ADMIN_ID = "58d9cffb-6e21-438b-92fa-4b0f650f267b";
+const ULTIMATE_ADMIN_USERNAME = "TheOverseer47";
 let pendingDiscoveriesCache = [];
 let allPostsCache = [];
 let usersCache = [];
@@ -990,21 +992,24 @@ function applyUsersFilter() {
   filtered.forEach(function(u) {
     const roleClass = u.role === "admin" ? "badge-admin" : "badge-member";
     const isSelf = u.id === currentAdminId;
+    const isUltimateAdmin = u.id === ULTIMATE_ADMIN_ID;
     const banBadge = u.is_banned ? '<span class="badge" style="background:#8b0000">Banned</span>' : '';
     const timeoutActive = !!u.timeout_until && new Date(u.timeout_until).getTime() > Date.now();
     const timeoutBadge = timeoutActive ? '<span class="badge" style="background:#9b4d00;color:#fff;">Timeout</span>' : '';
     const deletedBadge = u.deleted_at ? '<span class="badge" style="background:#555;color:#fff;">Deleted</span>' : '';
+    const protectedBadge = isUltimateAdmin ? '<span class="badge" style="background:#2a8bdc;color:#fff;">Ultimate Admin</span>' : '';
+    const actionsLocked = isSelf || isUltimateAdmin;
     const tr = document.createElement("tr");
     const avatarHtml = typeof renderAvatar === "function" ? renderAvatar(u, "bl-avatar-xs") : "";
     const securityText = canUseExtendedProfileFields
       ? ("IP: " + escapeHtmlA(u.last_known_ip || "n/a") + "<br>Timeout: " + escapeHtmlA(u.timeout_until ? new Date(u.timeout_until).toLocaleString() : "none"))
       : "Apply SQL migration to enable timeout/IP fields.";
     tr.innerHTML =
-      "<td><span style=\"display:inline-flex;align-items:center;gap:8px;\">" + avatarHtml + "<span>" + escapeHtmlA(u.username) + (isSelf ? " (you)" : "") + " " + banBadge + "</span></span></td>" +
+      "<td><span style=\"display:inline-flex;align-items:center;gap:8px;\">" + avatarHtml + "<span>" + escapeHtmlA(u.username) + (isSelf ? " (you)" : "") + " " + banBadge + " " + protectedBadge + "</span></span></td>" +
       "<td><span class=\"badge " + roleClass + "\">" + u.role + "</span></td>" +
       "<td style=\"font-size:0.82rem;color:var(--text-muted);\">" + securityText + "<div style=\"margin-top:6px;\">" + timeoutBadge + " " + deletedBadge + "</div></td>" +
       "<td>" + new Date(u.created_at).toLocaleDateString() + "</td>" +
-      "<td>" + (isSelf ? "-" :
+      "<td>" + (actionsLocked ? "-" :
         "<button class=\"btn-small\" style=\"background:" + (u.role === "admin" ? "#e0a83a" : "#a05ce8") + ";\" data-action=\"togglerole\" data-id=\"" + u.id + "\" data-role=\"" + u.role + "\">" + (u.role === "admin" ? "Revoke Admin" : "Make Admin") + "</button> " +
         "<button class=\"btn-small\" style=\"background:" + (u.is_banned ? "#50c878" : "#e05555") + ";\" data-action=\"toggleban\" data-id=\"" + u.id + "\" data-banned=\"" + u.is_banned + "\">" + (u.is_banned ? "Unban" : "Ban") + "</button> " +
         "<button class=\"btn-small\" style=\"background:#9b4d00;\" data-action=\"timeout\" data-id=\"" + u.id + "\">Set Timeout</button> " +
@@ -1016,16 +1021,48 @@ function applyUsersFilter() {
 
   tbody.querySelectorAll("[data-action=\"togglerole\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
+      const userId = this.dataset.id;
+      const existing = usersCache.find(function(entry) { return entry.id === userId; });
+      if (!existing) {
+        alert("User not found in cache. Please refresh and retry.");
+        return;
+      }
+
       const newRole = this.dataset.role === "admin" ? "member" : "admin";
+      if (existing.id === ULTIMATE_ADMIN_ID && newRole !== "admin") {
+        alert("The ultimate admin account (" + ULTIMATE_ADMIN_USERNAME + ") cannot lose admin rights.");
+        return;
+      }
+
       if (!confirm("Change this user's role to " + newRole + "?")) return;
-      await supabase.from("profiles").update({ role: newRole }).eq("id", this.dataset.id);
-      await logAdminAction("change_role", "user", this.dataset.id, "Changed role to " + newRole);
+
+      const { data: updated, error } = await supabase
+        .from("profiles")
+        .update({ role: newRole })
+        .eq("id", userId)
+        .select("id, role")
+        .maybeSingle();
+
+      if (error) {
+        alert("Role update failed: " + error.message);
+        return;
+      }
+      if (!updated) {
+        alert("Role update was blocked (no row updated). Check RLS permissions.");
+        return;
+      }
+
+      await logAdminAction("change_role", "user", userId, "Changed role to " + newRole);
       loadUsers();
     });
   });
 
   tbody.querySelectorAll("[data-action=\"toggleban\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
+      if (this.dataset.id === ULTIMATE_ADMIN_ID) {
+        alert("The ultimate admin account cannot be banned or unbanned from this panel.");
+        return;
+      }
       const willBan = this.dataset.banned !== "true";
       if (!confirm(willBan ? "Diesen Nutzer wirklich bannen?" : "Bann wirklich aufheben?")) return;
       await supabase.from("profiles").update({
@@ -1048,6 +1085,10 @@ function applyUsersFilter() {
 
   tbody.querySelectorAll("[data-action=\"timeout\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
+      if (this.dataset.id === ULTIMATE_ADMIN_ID) {
+        alert("The ultimate admin account cannot receive a timeout.");
+        return;
+      }
       if (!canUseExtendedProfileFields) {
         alert("Timeout fields are missing. Apply the SQL migration first.");
         return;
@@ -1074,6 +1115,10 @@ function applyUsersFilter() {
 
   tbody.querySelectorAll("[data-action=\"clear-timeout\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
+      if (this.dataset.id === ULTIMATE_ADMIN_ID) {
+        alert("The ultimate admin account timeout cannot be changed here.");
+        return;
+      }
       if (!canUseExtendedProfileFields) {
         alert("Timeout fields are missing. Apply the SQL migration first.");
         return;
@@ -1095,6 +1140,10 @@ function applyUsersFilter() {
 
   tbody.querySelectorAll("[data-action=\"delete-user\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
+      if (this.dataset.id === ULTIMATE_ADMIN_ID) {
+        alert("The ultimate admin account cannot be deleted.");
+        return;
+      }
       if (!confirm("Mark this user as deleted and revoke activity access?")) return;
       if (!canUseExtendedProfileFields) {
         alert("Soft-delete user fields are missing. Apply the SQL migration first.");
