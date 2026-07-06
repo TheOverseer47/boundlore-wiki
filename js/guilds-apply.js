@@ -13,6 +13,7 @@ async function initGuildsApplyPage() {
 
 async function handleGuildApplicationSubmit(event) {
   event.preventDefault();
+  const form = event.currentTarget;
 
   const err = document.getElementById("guildApplyError");
   const ok = document.getElementById("guildApplySuccess");
@@ -90,7 +91,9 @@ async function handleGuildApplicationSubmit(event) {
     return;
   }
 
-  form.reset();
+  if (form && typeof form.reset === "function") {
+    form.reset();
+  }
   ok.textContent = "Guild application submitted. After admin approval, it will automatically appear in the guild listings.";
   ok.style.display = "block";
 }
