@@ -7,6 +7,7 @@
 let currentPost = null;
 let currentUserId = null;
 let isAdmin = false;
+let postImageViewer = null;
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -90,6 +91,7 @@ function renderPost(post) {
   }
 
   document.getElementById("postBody").innerHTML = cleanContent;
+  enhancePostImagesPD();
 
   const label = typeof getPostCategoryLabel === "function"
     ? getPostCategoryLabel(post)
@@ -510,4 +512,59 @@ function formatUpdatePhasePD(value) {
   if (value === "post-update") return "Post-Update";
   if (value === "evergreen") return "Evergreen";
   return value;
+}
+
+function ensureImageViewerPD() {
+  if (postImageViewer) return postImageViewer;
+
+  const overlay = document.createElement("div");
+  overlay.className = "bl-image-lightbox";
+  overlay.innerHTML =
+    '<button type="button" class="bl-image-lightbox-close" aria-label="Close image preview">Close</button>' +
+    '<img alt="Post image preview" />';
+
+  const closeBtn = overlay.querySelector(".bl-image-lightbox-close");
+  const img = overlay.querySelector("img");
+
+  function closeViewer() {
+    overlay.classList.remove("open");
+    img.classList.remove("zoomed");
+    img.removeAttribute("src");
+  }
+
+  closeBtn.addEventListener("click", closeViewer);
+  overlay.addEventListener("click", function(e) {
+    if (e.target === overlay) closeViewer();
+  });
+  img.addEventListener("click", function() {
+    img.classList.toggle("zoomed");
+  });
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape" && overlay.classList.contains("open")) {
+      closeViewer();
+    }
+  });
+
+  document.body.appendChild(overlay);
+  postImageViewer = { overlay: overlay, img: img, close: closeViewer };
+  return postImageViewer;
+}
+
+function enhancePostImagesPD() {
+  const body = document.getElementById("postBody");
+  if (!body) return;
+
+  const viewer = ensureImageViewerPD();
+  const imgs = body.querySelectorAll("img[src]");
+  imgs.forEach(function(node) {
+    node.classList.add("bl-post-clickable-image");
+    if (node.dataset.enhancedImageViewer === "1") return;
+    node.dataset.enhancedImageViewer = "1";
+    node.addEventListener("click", function() {
+      viewer.img.setAttribute("src", node.getAttribute("src") || "");
+      viewer.img.setAttribute("alt", node.getAttribute("alt") || "Post image");
+      viewer.img.classList.remove("zoomed");
+      viewer.overlay.classList.add("open");
+    });
+  });
 }

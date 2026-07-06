@@ -187,13 +187,14 @@
   <section class="recent-section">
     <div class="section-header">
       <h2 class="section-title">Recently Added</h2>
-      <a href="wiki/" class="view-all">View all &#8594;</a>
+      <a href="wiki/guides/" class="view-all">Open Guides &#8594;</a>
     </div>
-    <div class="recent-grid" id="recentArticles">
-      <div class="recent-card placeholder">
-        <span class="recent-tag">Creatures</span>
-        <h4>First articles coming soon...</h4>
-        <p>Be the first to contribute to BoundLore!</p>
+    <div id="recentArticles" class="recent-ticker-wrap" aria-live="polite">
+      <div class="recent-ticker-track" id="recentTickerTrack">
+        <a class="recent-ticker-item" href="/wiki/create-post/">
+          <span class="recent-tag">Live Feed</span>
+          <strong>Loading latest approved posts...</strong>
+        </a>
       </div>
     </div>
   </section>
@@ -228,6 +229,7 @@
   <script src="/js/supabase-config.js"></script>
   <script src="/js/categories-config.js"></script>
   <script src="/js/discovery-home.js"></script>
+  <script src="/js/recent-ticker.js"></script>
   <script src="/js/search.js"></script>
   <script src="/js/auth-nav.js"></script>
   <script src="js/main.js"></script>

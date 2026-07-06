@@ -339,6 +339,101 @@ a:hover { color: var(--gold-light); }
 .recent-card p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
 .recent-card.placeholder { opacity: 0.5; }
 
+.recent-ticker-wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  border: 1px solid rgba(201,168,76,0.22);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(10,10,15,0.5);
+}
+
+.recent-ticker-track {
+  display: inline-flex;
+  gap: 12px;
+  padding: 12px;
+  min-width: max-content;
+  animation: recentTickerScroll 42s linear infinite;
+}
+
+.recent-ticker-item {
+  min-width: 320px;
+  max-width: 320px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  padding: 10px 12px;
+  color: var(--text);
+  display: grid;
+  gap: 4px;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.recent-ticker-item:hover {
+  border-color: rgba(201,168,76,0.5);
+  background: rgba(201,168,76,0.08);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.recent-ticker-item strong {
+  font-size: 0.92rem;
+  line-height: 1.35;
+  font-family: 'Cinzel', serif;
+}
+
+.recent-ticker-date {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.bl-post-clickable-image {
+  cursor: zoom-in;
+}
+
+.bl-image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 3100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.86);
+  padding: 20px;
+}
+
+.bl-image-lightbox.open {
+  display: flex;
+}
+
+.bl-image-lightbox img {
+  max-width: min(95vw, 1300px);
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease;
+  cursor: zoom-in;
+}
+
+.bl-image-lightbox img.zoomed {
+  transform: scale(1.75);
+  cursor: zoom-out;
+}
+
+.bl-image-lightbox-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
 /* FOOTER */
 .footer { background: rgba(10,10,15,0.95); backdrop-filter: none;
   padding: 60px 24px 0; border-top: 1px solid var(--border); }
@@ -1143,6 +1238,11 @@ a:hover { color: var(--gold-light); }
 }
 
 @keyframes heroTickerScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes recentTickerScroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
