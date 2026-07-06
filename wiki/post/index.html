@@ -71,7 +71,9 @@
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="../imprint/">Imprint</a> &middot; <a href="../privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
-<script src="/js/auth-nav.js"></script><script src="../../js/main.js"></script>
+<script src="/js/auth-nav.js"></script>
+<script src="../../js/categories-config.js"></script>
+<script src="../../js/main.js"></script>
 <script src="../../js/post-interactions.js"></script>
 <script>
 async function loadPost() {
@@ -97,7 +99,7 @@ async function loadPost() {
   }
 
   const authorName = post.profiles ? post.profiles.username : 'Unknown';
-  const categoryLabel = post.post_type === 'guide' ? post.guide_subcategory : post.category;
+  const categoryLabel = getPostCategoryLabel(post);
 
   document.title = post.title + ' - BoundLore';
   document.getElementById('pageTitle').textContent = post.title + ' - BoundLore';

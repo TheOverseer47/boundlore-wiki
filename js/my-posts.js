@@ -23,12 +23,7 @@ async function renderMyPosts(userId) {
   if (emptyMsg) emptyMsg.style.display = "none";
 
   posts.forEach(function(post) {
-    const isGuide = post.post_type === "guide";
-    const categoryKey = isGuide ? post.guide_subcategory : post.category;
-    const cat = typeof getCategoryBySlug === "function" ? getCategoryBySlug(categoryKey) : null;
-    const catLabel = isGuide
-      ? (post.guide_subcategory || "Guide")
-      : (cat ? (cat.icon + " " + cat.label) : (post.category || "General"));
+    const catLabel = getPostCategoryLabel(post);
 
     let statusBadge = "";
     if (post.status === "pending") {

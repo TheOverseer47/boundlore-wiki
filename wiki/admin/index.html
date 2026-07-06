@@ -206,8 +206,7 @@ async function loadPending() {
 
   posts.forEach(function(post) {
     const authorName = post.profiles ? post.profiles.username : "Unknown";
-    const cat = getCategoryBySlug(post.category);
-    const catLabel = cat ? (cat.icon + " " + cat.label) : post.category;
+    const catLabel = getPostCategoryLabel(post);
     const discoveryBadge = post.is_discovery ? "<span class=\"badge badge-discovery\">\u2728 Discovery</span>" : "";
 
     const div = document.createElement("div");
@@ -255,8 +254,7 @@ async function loadAllPosts() {
 
   posts.forEach(function(post) {
     const authorName = post.profiles ? post.profiles.username : "Unknown";
-    const cat = getCategoryBySlug(post.category);
-    const catLabel = cat ? (cat.icon + " " + cat.label) : post.category;
+    const catLabel = getPostCategoryLabel(post);
     const statusClass = post.status === "published" ? "badge-published" : "badge-pending";
     const discoveryMark = post.is_discovery ? " \u2728" : "";
 

@@ -19,6 +19,33 @@ const DISCOVERY_TAG = {
   description: 'Newly found, unverified, or rare finds shared by the community.'
 };
 
+const BOUNDLORE_GUIDE_SUBCATEGORIES = [
+  { slug: 'survival', label: 'Survival' },
+  { slug: 'exploration', label: 'Exploration' },
+  { slug: 'combat', label: 'Combat' },
+  { slug: 'building', label: 'Building' },
+  { slug: 'taming', label: 'Taming' },
+  { slug: 'farming', label: 'Farming' },
+  { slug: 'crafting-guide', label: 'Crafting' },
+  { slug: 'lore-story', label: 'Lore & Story' },
+  { slug: 'multiplayer-guilds', label: 'Multiplayer & Guilds' },
+  { slug: 'beginner', label: 'Beginner Tips' },
+  { slug: 'advanced', label: 'Advanced Strategies' }
+];
+
+function getGuideSubcategoryLabel(slug) {
+  const found = BOUNDLORE_GUIDE_SUBCATEGORIES.find(function(c) { return c.slug === slug; });
+  return found ? found.label : (slug || 'Guide');
+}
+
+function getPostCategoryLabel(post) {
+  if (post.post_type === 'guide') {
+    return getGuideSubcategoryLabel(post.guide_subcategory);
+  }
+  const cat = getCategoryBySlug(post.category);
+  return cat ? cat.label : (post.category || 'Uncategorized');
+}
+
 function getCategoryBySlug(slug) {
   return BOUNDLORE_CATEGORIES.find(function(c) { return c.slug === slug; }) || null;
 }

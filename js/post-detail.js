@@ -66,7 +66,7 @@ function renderPost(post) {
 
   const label = post.post_type === "guide"
     ? "Guides"
-    : (post.category ? post.category.charAt(0).toUpperCase() + post.category.slice(1) : "Post");
+    : getPostCategoryLabel(post);
   document.getElementById("breadcrumbCategory").textContent = label;
 
   if (currentUserId && post.author_id === currentUserId) {
