@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="Community post on BoundLore." />
-<title id="pageTitle">Post - BoundLore</title>
+<title>Post - BoundLore</title>
 <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
 <link rel="stylesheet" href="../../css/style.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,17 +20,19 @@
     </a>
     <ul class="nav-links" id="navLinks">
       <li><a href="/">Home</a></li>
-      <li><a href="../creatures/">Creatures</a></li>
-      <li><a href="../biomes/">Biomes</a></li>
-      <li><a href="../items/">Items</a></li>
-      <li><a href="../guides/">Guides</a></li>
-      <li><a href="../guilds/">Guilds</a></li>
-      <li><a href="../community/">Community</a></li>
-      <li><a href="../news/">News</a></li>
+      <li><a href="/wiki/creatures/">Creatures</a></li>
+      <li><a href="/wiki/biomes/">Biomes</a></li>
+      <li><a href="/wiki/items/">Items</a></li>
+      <li><a href="/wiki/guides/">Guides</a></li>
+      <li><a href="/wiki/guilds/">Guilds</a></li>
+      <li><a href="/wiki/community/">Community</a></li>
+      <li><a href="/wiki/news/">News</a></li>
     <li><a href="/wiki/support">Support</a></li></ul>
     <div class="nav-right">
+      <input type="text" id="searchInput" placeholder="Search..." class="nav-search-input" />
+      <div id="searchResults" class="search-results-dropdown"></div>
       <span id="authArea"></span>
-      <a href="../create-post/" class="btn-contribute">+ New Post</a>
+      <a href="/wiki/create-post/" class="btn-contribute">+ New Post</a>
       <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -38,81 +40,60 @@
 
 <div class="wiki-hero">
   <p class="breadcrumb"><a href="/">Home</a> &rsaquo; <span id="breadcrumbCategory">Post</span></p>
-  <h1 id="postTitleHeading">Loading...</h1>
-  <p id="postMeta">&nbsp;</p>
+  <h1 id="postTitle">Loading...</h1>
+  <p><span id="postAuthor">&nbsp;</span> &middot; <span id="postDate">&nbsp;</span> <span id="postEditedTag" style="display:none;">(edited)</span></p>
 </div>
 
 <div class="article-layout" style="grid-template-columns:1fr;max-width:800px;margin:0 auto;padding-bottom:60px;">
   <article class="article-content">
 
-    <div id="postContent" class="post-content">
+    <div id="postLoading">
       <p>Loading post...</p>
     </div>
 
-    <div class="rating-widget">
-      <button id="btn-fire">&#128293; <span id="fireCount">0</span></button>
-      <button id="btn-down">&#128078; <span id="downCount">0</span></button>
-      <button id="reportPostBtn">&#128681; Report</button>
+    <div id="postNotFound" style="display:none;">
+      <h2>Post not found</h2>
+      <p>This post does not exist or has been removed.</p>
     </div>
 
-    <div class="comments-section">
-      <h3>Comments (<span id="commentCount">0</span>)</h3>
-      <div id="commentsList"></div>
+    <div id="postContent" style="display:none;">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+        <a id="btnEditPost" class="btn-secondary" style="display:none;" href="#">Edit Post</a>
+      </div>
 
-      <form id="commentForm" style="margin-top:20px;">
-        <textarea id="commentInput" required placeholder="Share your thoughts..."></textarea>
-        <button id="commentSubmitBtn" type="submit">Post Comment</button>
-      </form>
+      <div id="postBody" class="post-body"></div>
+
+      <div class="rating-widget" style="display:flex;gap:10px;margin:24px 0;">
+        <button id="btnUpvote" class="reaction-btn">👍 <span id="upvoteCount">0</span></button>
+        <button id="btnDownvote" class="reaction-btn">👎 <span id="downvoteCount">0</span></button>
+      </div>
+
+      <div class="comments-section">
+        <h3>Comments (<span id="commentCount">0</span>)</h3>
+        <div id="commentsList"></div>
+
+        <div id="commentLoginPrompt" style="display:none;margin-top:16px;">
+          <p>Please <a href="/wiki/login/">log in</a> to comment.</p>
+        </div>
+
+        <div id="commentFormBox" style="margin-top:16px;">
+          <textarea id="newCommentText" class="form-input" rows="3" placeholder="Share your thoughts..."></textarea>
+          <button id="btnSubmitComment" type="button" class="btn-contribute">Post Comment</button>
+        </div>
+      </div>
     </div>
 
   </article>
 </div>
 
-<footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="../imprint/">Imprint</a> &middot; <a href="../privacy/">Privacy Policy</a></p></div></footer>
+<footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
+<script src="/js/categories-config.js"></script>
 <script src="/js/auth-nav.js"></script>
-<script src="../../js/categories-config.js"></script>
-<script src="../../js/main.js"></script>
-<script src="../../js/post-interactions.js"></script>
-<script>
-async function loadPost() {
-  const params = new URLSearchParams(window.location.search);
-  const postId = params.get('id');
-
-  if (!postId) {
-    document.getElementById('postTitleHeading').textContent = 'Post not found';
-    document.getElementById('postContent').innerHTML = '<p>No post ID was provided.</p>';
-    return;
-  }
-
-  const { data: post, error } = await supabase
-    .from('posts')
-    .select('id, title, post_type, guide_subcategory, category, content, created_at, status, profiles(username)')
-    .eq('id', postId)
-    .single();
-
-  if (error || !post) {
-    document.getElementById('postTitleHeading').textContent = 'Post not found';
-    document.getElementById('postContent').innerHTML = '<p>This post does not exist or has been removed.</p>';
-    return;
-  }
-
-  const authorName = post.profiles ? post.profiles.username : 'Unknown';
-  const categoryLabel = getPostCategoryLabel(post);
-
-  document.title = post.title + ' - BoundLore';
-  document.getElementById('pageTitle').textContent = post.title + ' - BoundLore';
-  document.getElementById('breadcrumbCategory').textContent = categoryLabel || 'Uncategorized';
-  document.getElementById('postTitleHeading').textContent = post.title;
-  document.getElementById('postMeta').textContent = 'By ' + authorName + ' &middot; ' + new Date(post.created_at).toLocaleDateString();
-  document.getElementById('postContent').innerHTML = post.content;
-
-  initPostInteractions(post.id);
-}
-
-loadPost();
-</script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/post-detail.js"></script>
 </body>
 </html>
 

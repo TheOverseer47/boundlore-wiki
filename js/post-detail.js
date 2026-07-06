@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", init);
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
-  if (!slug) return showNotFound();
+  const postId = params.get("id");
+  if (!slug && !postId) return showNotFound();
 
   const { data: sessionData } = await supabase.auth.getSession();
   if (sessionData && sessionData.session) {
@@ -26,11 +27,17 @@ async function init() {
     isAdmin = profile && profile.role === "admin";
   }
 
-  const { data: post, error } = await supabase
+  let postQuery = supabase
     .from("posts")
-    .select("*, profiles:author_id(username)")
-    .eq("slug", slug)
-    .single();
+    .select("*, profiles:author_id(username)");
+
+  if (slug) {
+    postQuery = postQuery.eq("slug", slug);
+  } else {
+    postQuery = postQuery.eq("id", postId);
+  }
+
+  const { data: post, error } = await postQuery.single();
 
   if (error || !post) return showNotFound();
 
@@ -44,6 +51,9 @@ async function init() {
 function showNotFound() {
   document.getElementById("postLoading").style.display = "none";
   document.getElementById("postNotFound").style.display = "block";
+  document.getElementById("postTitle").textContent = "Post not found";
+  document.getElementById("postAuthor").textContent = "-";
+  document.getElementById("postDate").textContent = "-";
 }
 
 function renderPost(post) {
@@ -64,10 +74,11 @@ function renderPost(post) {
 
   document.getElementById("postBody").innerHTML = post.content;
 
-  const label = post.post_type === "guide"
-    ? "Guides"
-    : getPostCategoryLabel(post);
+  const label = typeof getPostCategoryLabel === "function"
+    ? getPostCategoryLabel(post)
+    : (post.category || "Post");
   document.getElementById("breadcrumbCategory").textContent = label;
+  document.title = post.title + " - BoundLore";
 
   if (currentUserId && post.author_id === currentUserId) {
     const editBtn = document.getElementById("btnEditPost");

@@ -10,7 +10,7 @@ async function renderCategoryPosts(categorySlug) {
   // Build query with special handling for the 'guides' pseudo-category
   let query = supabase
     .from("posts")
-    .select("id, title, category, content, is_discovery, post_type, created_at, profiles(username)")
+    .select("id, slug, title, category, content, is_discovery, post_type, created_at, profiles(username)")
     .eq("status", "published");
 
   if (categorySlug === "guides") {
@@ -49,7 +49,8 @@ async function renderCategoryPosts(categorySlug) {
     card.innerHTML +=
       "<div class=\"post-rating-summary\" data-post-id=\"" + post.id + "\"></div>";
     card.addEventListener("click", function() {
-      window.location.href = "/wiki/post/?id=" + post.id;
+      const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+      window.location.href = postUrl;
     });
 
     container.appendChild(card);

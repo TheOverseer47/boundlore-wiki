@@ -36,7 +36,8 @@ async function renderMyPosts(userId) {
 
     const actions = [];
     if (post.status === "published") {
-      actions.push("<a href=\"/wiki/post/?id=" + post.id + "\" style=\"color:var(--accent);font-size:0.85rem;\">View &rarr;</a>");
+      const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+      actions.push("<a href=\"" + postUrl + "\" style=\"color:var(--accent);font-size:0.85rem;\">View &rarr;</a>");
     }
 
     const row = document.createElement("div");

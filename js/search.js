@@ -43,7 +43,7 @@ async function runSearch(query, resultsBox) {
     const { data, error } = await supabase
       .from("posts")
       .select("id, title, category, post_type, slug, excerpt")
-      .eq("status", "approved")
+      .eq("status", "published")
       .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%`)
       .limit(8);
 
@@ -72,9 +72,12 @@ async function runSearch(query, resultsBox) {
     resultsBox.innerHTML = faqHtml + data
       .map((post) => {
         const path = buildPostPath(post);
+        const categoryLabel = typeof getPostCategoryLabel === "function"
+          ? getPostCategoryLabel(post)
+          : (post.post_type === "guide" ? "Guide" : (post.category || "Post"));
         return `<a href="${path}" class="search-result-item">
           <span class="search-result-title">${escapeHtml(post.title)}</span>
-          <span class="search-result-cat">${escapeHtml(post.post_type === "guide" ? "Guide" : post.category)}</span>
+          <span class="search-result-cat">${escapeHtml(categoryLabel)}</span>
         </a>`;
       })
       .join("");
