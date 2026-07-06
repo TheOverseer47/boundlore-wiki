@@ -934,9 +934,54 @@ a:hover { color: var(--gold-light); }
   gap: 12px;
 }
 
+.bl-category-filters {
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+}
+
+.bl-category-filters-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.bl-category-filter-item {
+  min-width: 180px;
+  flex: 1;
+}
+
+.bl-category-filter-item label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.bl-category-filter-summary {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
 @media (max-width: 760px) {
   .bl-category-group-grid {
     grid-template-columns: 1fr;
+  }
+
+  .bl-category-filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bl-category-filter-item {
+    width: 100%;
+    min-width: 0;
   }
 }
 

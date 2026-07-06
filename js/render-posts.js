@@ -25,16 +25,30 @@ async function renderCategoryPosts(categorySlug) {
   container.innerHTML = "";
 
   if (error || !posts || posts.length === 0) {
+    renderGroupedCategoryFilterControls(container, categorySlug, {
+      activeSubcategory: "",
+      sortMode: "newest",
+      visibleCount: 0,
+      totalCount: 0,
+    });
     if (emptyMsg) emptyMsg.style.display = "block";
     return { posts: [] };
   }
 
   const activeSubcategory = getSubcategoryFilterFromUrlRP();
+  const sortMode = getSortFilterFromUrlRP();
   const filteredPosts = activeSubcategory
     ? posts.filter(function(post) {
         return getRenderableSubcategorySlug(post) === activeSubcategory;
       })
     : posts;
+
+  renderGroupedCategoryFilterControls(container, categorySlug, {
+    activeSubcategory: activeSubcategory,
+    sortMode: sortMode,
+    visibleCount: filteredPosts.length,
+    totalCount: posts.length,
+  });
 
   if (!filteredPosts.length) {
     if (emptyMsg) emptyMsg.style.display = "block";
@@ -44,7 +58,9 @@ async function renderCategoryPosts(categorySlug) {
   if (emptyMsg) emptyMsg.style.display = "none";
 
   const postsWithScores = await attachReactionStats(filteredPosts);
-  const sortedPosts = sortPostsByCategoryLogic(postsWithScores, categorySlug);
+  const sortedPosts = shouldGroupBySubcategory(categorySlug)
+    ? sortGroupedCategoryPosts(postsWithScores, sortMode)
+    : sortPostsByCategoryLogic(postsWithScores, categorySlug);
 
   if (categorySlug === "guilds") {
     sortedPosts.forEach(function(post) {
@@ -255,6 +271,133 @@ function getSubcategoryFilterFromUrlRP() {
   } catch (err) {
     return "";
   }
+}
+
+function getSortFilterFromUrlRP() {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    const sort = (params.get("sort") || "newest").toLowerCase().trim();
+    if (["newest", "oldest", "top"].includes(sort)) return sort;
+    return "newest";
+  } catch (err) {
+    return "newest";
+  }
+}
+
+function sortGroupedCategoryPosts(posts, sortMode) {
+  const copy = posts.slice();
+  if (sortMode === "oldest") {
+    return copy.sort(function(a, b) {
+      return new Date(a.created_at) - new Date(b.created_at);
+    });
+  }
+  if (sortMode === "top") {
+    return copy.sort(function(a, b) {
+      if ((b.reaction_upvotes || 0) !== (a.reaction_upvotes || 0)) {
+        return (b.reaction_upvotes || 0) - (a.reaction_upvotes || 0);
+      }
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  }
+  return copy.sort(function(a, b) {
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+}
+
+function renderGroupedCategoryFilterControls(container, categorySlug, state) {
+  const host = container.parentElement;
+  if (!host) return;
+
+  const controlsId = "categoryFilterControls";
+  let controls = host.querySelector("#" + controlsId);
+  if (!shouldGroupBySubcategory(categorySlug)) {
+    if (controls) controls.remove();
+    return;
+  }
+
+  if (!controls) {
+    controls = document.createElement("div");
+    controls.id = controlsId;
+    controls.className = "bl-category-filters";
+    controls.innerHTML =
+      '<div class="bl-category-filters-row">' +
+        '<div class="bl-category-filter-item">' +
+          '<label for="blCategorySubFilter">Subcategory</label>' +
+          '<select id="blCategorySubFilter" class="form-input"></select>' +
+        '</div>' +
+        '<div class="bl-category-filter-item">' +
+          '<label for="blCategorySortFilter">Sort</label>' +
+          '<select id="blCategorySortFilter" class="form-input">' +
+            '<option value="newest">Newest</option>' +
+            '<option value="oldest">Oldest</option>' +
+            '<option value="top">Top Rated</option>' +
+          '</select>' +
+        '</div>' +
+        '<button type="button" id="blCategoryFilterReset" class="btn-small" style="background:#666;align-self:flex-end;">Reset</button>' +
+      '</div>' +
+      '<p id="blCategoryFilterSummary" class="bl-category-filter-summary"></p>';
+    host.insertBefore(controls, container);
+  }
+
+  const subFilter = controls.querySelector("#blCategorySubFilter");
+  const sortFilter = controls.querySelector("#blCategorySortFilter");
+  const resetBtn = controls.querySelector("#blCategoryFilterReset");
+  const summary = controls.querySelector("#blCategoryFilterSummary");
+
+  if (!subFilter || !sortFilter || !resetBtn || !summary) return;
+
+  const subcategories = getCategorySubcategoriesRP(categorySlug);
+  subFilter.innerHTML = '<option value="">All Subcategories</option>';
+  subcategories.forEach(function(item) {
+    const opt = document.createElement("option");
+    opt.value = item.slug;
+    opt.textContent = item.label;
+    subFilter.appendChild(opt);
+  });
+  subFilter.value = state.activeSubcategory || "";
+  sortFilter.value = state.sortMode || "newest";
+
+  const activeSubLabel = state.activeSubcategory
+    ? getCategorySubcategoryLabelRP(categorySlug, state.activeSubcategory)
+    : "All subcategories";
+  summary.textContent = "Showing " + state.visibleCount + " of " + state.totalCount + " entries - " + activeSubLabel;
+
+  if (!subFilter.dataset.bound) {
+    subFilter.addEventListener("change", function() {
+      setCategoryFilterUrlParam("subcategory", subFilter.value);
+      renderCategoryPosts(categorySlug);
+    });
+    subFilter.dataset.bound = "1";
+  }
+
+  if (!sortFilter.dataset.bound) {
+    sortFilter.addEventListener("change", function() {
+      setCategoryFilterUrlParam("sort", sortFilter.value === "newest" ? "" : sortFilter.value);
+      renderCategoryPosts(categorySlug);
+    });
+    sortFilter.dataset.bound = "1";
+  }
+
+  if (!resetBtn.dataset.bound) {
+    resetBtn.addEventListener("click", function() {
+      setCategoryFilterUrlParam("subcategory", "");
+      setCategoryFilterUrlParam("sort", "");
+      renderCategoryPosts(categorySlug);
+    });
+    resetBtn.dataset.bound = "1";
+  }
+}
+
+function setCategoryFilterUrlParam(key, value) {
+  const url = new URL(window.location.href);
+  if (!value) {
+    url.searchParams.delete(key);
+    if (key === "subcategory") url.searchParams.delete("subcat");
+  } else {
+    url.searchParams.set(key, value);
+    if (key === "subcategory") url.searchParams.delete("subcat");
+  }
+  window.history.replaceState({}, "", url.toString());
 }
 
 function getRenderableSubcategorySlug(post) {
