@@ -65,6 +65,9 @@ function renderPost(post) {
   document.getElementById("postLoading").style.display = "none";
   document.getElementById("postContent").style.display = "block";
 
+  const postMeta = parsePostMetaPD(post.content || "");
+  const cleanContent = stripPostMetaPD(post.content || "");
+
   document.getElementById("postTitle").textContent = post.title;
   document.getElementById("postAuthor").textContent = post.profiles?.username || "Unknown";
 
@@ -86,7 +89,7 @@ function renderPost(post) {
     document.getElementById("postEditedTag").style.display = "inline";
   }
 
-  document.getElementById("postBody").innerHTML = post.content;
+  document.getElementById("postBody").innerHTML = cleanContent;
 
   const label = typeof getPostCategoryLabel === "function"
     ? getPostCategoryLabel(post)
@@ -100,7 +103,7 @@ function renderPost(post) {
     ? "Guide"
     : (post.post_type === "discovery" ? "Discovery" : "Post");
 
-  const readTime = estimateReadTimeMinutes(post.content);
+  const readTime = estimateReadTimeMinutes(cleanContent);
 
   const postReadTime = document.getElementById("postReadTime");
   if (postReadTime) {
@@ -127,6 +130,49 @@ function renderPost(post) {
     sideType.textContent = postTypeLabel;
   }
 
+  const updatePhaseLabel = formatUpdatePhasePD(postMeta.update_phase);
+  const sideUpdatePhase = document.getElementById("sideUpdatePhase");
+  if (sideUpdatePhase) {
+    sideUpdatePhase.textContent = updatePhaseLabel || "-";
+  }
+
+  const sidePatchTag = document.getElementById("sidePatchTag");
+  if (sidePatchTag) {
+    sidePatchTag.textContent = postMeta.patch_tag || "-";
+  }
+
+  const sideSource = document.getElementById("sideSource");
+  if (sideSource) {
+    if (postMeta.source_url) {
+      const safeUrl = escapeHtml(postMeta.source_url);
+      sideSource.innerHTML = '<a href="' + safeUrl + '" target="_blank" rel="noopener">Source Link</a>';
+    } else {
+      sideSource.textContent = "-";
+    }
+  }
+
+  const updatePhaseChip = document.getElementById("postUpdatePhaseChip");
+  const updatePhaseValue = document.getElementById("postUpdatePhaseValue");
+  if (updatePhaseChip && updatePhaseValue) {
+    if (updatePhaseLabel) {
+      updatePhaseChip.style.display = "inline-flex";
+      updatePhaseValue.textContent = updatePhaseLabel;
+    } else {
+      updatePhaseChip.style.display = "none";
+    }
+  }
+
+  const patchTagChip = document.getElementById("postPatchTagChip");
+  const patchTagValue = document.getElementById("postPatchTagValue");
+  if (patchTagChip && patchTagValue) {
+    if (postMeta.patch_tag) {
+      patchTagChip.style.display = "inline-flex";
+      patchTagValue.textContent = postMeta.patch_tag;
+    } else {
+      patchTagChip.style.display = "none";
+    }
+  }
+
   const sidePublished = document.getElementById("sidePublished");
   if (sidePublished) {
     sidePublished.textContent = created.toLocaleDateString();
@@ -144,7 +190,7 @@ function renderPost(post) {
       '<li><a href="#postBody">Go to content</a></li>' +
       '<li><a href="#commentsList">Jump to comments</a></li>';
 
-    const headings = extractHeadings(post.content).slice(0, 5);
+    const headings = extractHeadings(cleanContent).slice(0, 5);
     headings.forEach(function(heading, index) {
       const headingId = "post-heading-" + index;
       const match = document.querySelector("#postBody h1, #postBody h2, #postBody h3");
@@ -441,4 +487,27 @@ function extractHeadings(contentHtml) {
   return Array.from(nodes).map(function(node) {
     return (node.textContent || "Section").trim();
   }).filter(Boolean);
+}
+
+function stripPostMetaPD(html) {
+  return String(html || "").replace(/<!--BLMETA\s+[\s\S]*?-->/gi, "").trim();
+}
+
+function parsePostMetaPD(html) {
+  const match = String(html || "").match(/<!--BLMETA\s+([\s\S]*?)\s*-->/i);
+  if (!match) return {};
+  try {
+    const parsed = JSON.parse(match[1]);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    return {};
+  }
+}
+
+function formatUpdatePhasePD(value) {
+  if (!value) return "";
+  if (value === "pre-update") return "Pre-Update";
+  if (value === "post-update") return "Post-Update";
+  if (value === "evergreen") return "Evergreen";
+  return value;
 }

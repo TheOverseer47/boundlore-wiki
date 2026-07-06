@@ -77,6 +77,11 @@ async function initEditPost() {
 
   editPost = post;
 
+  const existingMeta = parsePostMetaEP(post.content || "");
+  document.getElementById("editPostUpdatePhase").value = existingMeta.update_phase || "";
+  document.getElementById("editPostPatchTag").value = existingMeta.patch_tag || "";
+  document.getElementById("editPostSourceUrl").value = existingMeta.source_url || "";
+
   const canEdit = editIsAdmin || post.author_id === editUserId;
   if (!canEdit) {
     loading.style.display = "none";
@@ -85,7 +90,7 @@ async function initEditPost() {
   }
 
   document.getElementById("editPostTitle").value = post.title || "";
-  editQuill.root.innerHTML = post.content || "";
+  editQuill.root.innerHTML = stripPostMetaEP(post.content || "") || "";
 
   const postType = post.post_type === "discovery" || post.is_discovery ? "discovery" : "guide";
   setEditPostType(postType);
@@ -169,6 +174,7 @@ async function handleEditSubmit(e) {
 
   const title = document.getElementById("editPostTitle").value.trim();
   const content = (editQuill.root.innerHTML || "").trim();
+  const meta = collectPostMetaEP();
 
   if (!title) {
     errEl.textContent = "Please enter a title.";
@@ -182,9 +188,15 @@ async function handleEditSubmit(e) {
     return;
   }
 
+  if (meta && meta._error) {
+    errEl.textContent = meta._error;
+    errEl.style.display = "block";
+    return;
+  }
+
   const updates = {
     title: title,
-    content: content,
+    content: injectPostMetaEP(content, meta),
     status: "pending",
   };
 
@@ -241,4 +253,61 @@ async function handleEditSubmit(e) {
   setTimeout(function () {
     window.location.href = "/wiki/post/?id=" + encodeURIComponent(editPost.id);
   }, 900);
+}
+
+function collectPostMetaEP() {
+  const phase = (document.getElementById("editPostUpdatePhase")?.value || "").trim();
+  const patchTag = (document.getElementById("editPostPatchTag")?.value || "").trim();
+  const sourceUrl = (document.getElementById("editPostSourceUrl")?.value || "").trim();
+
+  if (sourceUrl && !isValidHttpUrlEP(sourceUrl)) {
+    return { _error: "Please provide a valid source URL (http/https)." };
+  }
+
+  return {
+    update_phase: phase || null,
+    patch_tag: patchTag || null,
+    source_url: sourceUrl || null,
+  };
+}
+
+function normalizePostMetaEP(meta) {
+  if (!meta || typeof meta !== "object") return null;
+  const out = {};
+  if (meta.update_phase) out.update_phase = String(meta.update_phase).slice(0, 32);
+  if (meta.patch_tag) out.patch_tag = String(meta.patch_tag).slice(0, 40);
+  if (meta.source_url) out.source_url = String(meta.source_url).slice(0, 500);
+  return Object.keys(out).length ? out : null;
+}
+
+function stripPostMetaEP(html) {
+  return String(html || "").replace(/<!--BLMETA\s+[\s\S]*?-->/gi, "").trim();
+}
+
+function parsePostMetaEP(html) {
+  const match = String(html || "").match(/<!--BLMETA\s+([\s\S]*?)\s*-->/i);
+  if (!match) return {};
+  try {
+    const parsed = JSON.parse(match[1]);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    return {};
+  }
+}
+
+function injectPostMetaEP(html, meta) {
+  const cleaned = stripPostMetaEP(html);
+  const normalized = normalizePostMetaEP(meta);
+  if (!normalized) return cleaned;
+  const json = JSON.stringify(normalized).replace(/-->/g, "--\\>");
+  return cleaned + "\n<!--BLMETA " + json + " -->";
+}
+
+function isValidHttpUrlEP(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (err) {
+    return false;
+  }
 }

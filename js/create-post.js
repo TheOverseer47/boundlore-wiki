@@ -136,6 +136,7 @@ async function handleSubmit(e) {
 
   const title = document.getElementById("postTitle").value.trim();
   const content = quillEditor.root.innerHTML.trim();
+  const postMeta = collectPostMetaCP();
   const mediaInput = document.getElementById("postMedia");
   const files = mediaInput && mediaInput.files ? Array.from(mediaInput.files) : [];
 
@@ -146,6 +147,12 @@ async function handleSubmit(e) {
   }
   if (!content || content === "<p><br></p>") {
     errorEl.textContent = "Please write some content.";
+    errorEl.style.display = "block";
+    return;
+  }
+
+  if (postMeta && postMeta._error) {
+    errorEl.textContent = postMeta._error;
     errorEl.style.display = "block";
     return;
   }
@@ -226,6 +233,8 @@ async function handleSubmit(e) {
     payload.is_discovery = false;
     payload.status = publishNow ? "published" : "pending";
   }
+
+  payload.content = injectPostMetaCP(payload.content, postMeta);
 
   const { data, error } = await supabase.from("posts").insert(payload).select().single();
 
@@ -348,4 +357,41 @@ function escapeHtmlCP(value) {
 
 function escapeAttrCP(value) {
   return String(value == null ? "" : value).replace(/"/g, "&quot;");
+}
+
+function collectPostMetaCP() {
+  const phase = (document.getElementById("postUpdatePhase")?.value || "").trim();
+  const patchTag = (document.getElementById("postPatchTag")?.value || "").trim();
+  const sourceUrl = (document.getElementById("postSourceUrl")?.value || "").trim();
+
+  if (sourceUrl && !isValidHttpUrl(sourceUrl)) {
+    return { _error: "Please provide a valid source URL (http/https)." };
+  }
+
+  return {
+    update_phase: phase || null,
+    patch_tag: patchTag || null,
+    source_url: sourceUrl || null,
+  };
+}
+
+function normalizePostMetaCP(meta) {
+  if (!meta || typeof meta !== "object") return null;
+  const out = {};
+  if (meta.update_phase) out.update_phase = String(meta.update_phase).slice(0, 32);
+  if (meta.patch_tag) out.patch_tag = String(meta.patch_tag).slice(0, 40);
+  if (meta.source_url) out.source_url = String(meta.source_url).slice(0, 500);
+  return Object.keys(out).length ? out : null;
+}
+
+function stripPostMetaCP(html) {
+  return String(html || "").replace(/<!--BLMETA\s+[\s\S]*?-->/gi, "").trim();
+}
+
+function injectPostMetaCP(html, meta) {
+  const cleaned = stripPostMetaCP(html);
+  const normalized = normalizePostMetaCP(meta);
+  if (!normalized) return cleaned;
+  const json = JSON.stringify(normalized).replace(/-->/g, "--\\>");
+  return cleaned + "\n<!--BLMETA " + json + " -->";
 }

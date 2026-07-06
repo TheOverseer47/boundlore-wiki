@@ -57,6 +57,27 @@
     <label for="postTitle">Title</label>
     <input type="text" id="postTitle" class="form-input" required maxlength="120" />
 
+    <div class="form-group" style="margin-top:8px;">
+      <label for="postUpdatePhase">Update Phase</label>
+      <select id="postUpdatePhase" class="form-input">
+        <option value="">Not specified</option>
+        <option value="pre-update">Pre-Update</option>
+        <option value="post-update">Post-Update</option>
+        <option value="evergreen">Evergreen</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="postPatchTag">Patch / Version Tag (optional)</label>
+      <input type="text" id="postPatchTag" class="form-input" maxlength="40" placeholder="e.g. Foundation-1.2" />
+    </div>
+
+    <div class="form-group">
+      <label for="postSourceUrl">Primary Source URL (optional)</label>
+      <input type="url" id="postSourceUrl" class="form-input" placeholder="https://..." />
+      <p class="field-hint">Use official patch notes, trusted clips, or reproducible evidence links.</p>
+    </div>
+
     <div id="guideFields">
       <label for="guideSubcategory">Guide Category</label>
       <select id="guideSubcategory" class="form-input">
