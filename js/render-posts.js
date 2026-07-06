@@ -10,7 +10,7 @@ async function renderCategoryPosts(categorySlug) {
   // Build query with special handling for the 'guides' pseudo-category
   let query = supabase
     .from("posts")
-    .select("id, slug, title, category, content, is_discovery, post_type, created_at, profiles:author_id(*)")
+    .select("id, slug, title, category, guide_subcategory, content, is_discovery, post_type, created_at, profiles:author_id(*)")
     .eq("status", "published");
 
   if (categorySlug === "guides") {

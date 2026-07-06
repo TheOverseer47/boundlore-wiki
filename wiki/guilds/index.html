@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <nav class="navbar" id="navbar">
@@ -40,58 +41,76 @@
     <p>Find factions, recruit allies, and join voice channels for expeditions.</p>
   </div>
 
-  <div style="max-width:1100px;margin:0 auto;padding:0 20px 60px;">
-    <section class="form-box" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(88,101,242,0.18),rgba(255,255,255,0.02));border:1px solid rgba(88,101,242,0.45);">
-      <h2 style="margin-top:0;">BoundLore Discord Hub</h2>
-      <p style="color:var(--text-muted);">Join the community Discord for raid planning, event pings, and guild recruitment threads.</p>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;">
-        <a class="btn-contribute" href="https://discord.com/invite/boundlore" target="_blank" rel="noopener">Join Discord</a>
-        <a class="btn-secondary" href="/wiki/community/">Community Hub</a>
-      </div>
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-top:10px;">If the invite expires, contact an admin via Support.</p>
+  <div class="bl-guides-shell" style="max-width:1100px;">
+    <section class="bl-guides-section form-box" style="background:linear-gradient(135deg,rgba(255,140,0,0.16),rgba(255,255,255,0.02));border:1px solid rgba(255,140,0,0.45);">
+      <h2 style="margin-top:0;">Discord Status</h2>
+      <p style="color:var(--text-muted);margin-bottom:10px;">BoundLore has currently no official own Discord server. A first-party server is planned and will be announced publicly once moderation and onboarding are ready.</p>
+      <p style="color:var(--text-muted);font-size:0.9rem;">Until then, only approved guild listings are shown here, including their own Discord invite links.</p>
     </section>
 
-    <section>
-      <h2 style="margin:0 0 14px;">Featured Guilds</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
-        <article class="form-box" style="margin:0;">
-          <h3 style="margin-top:0;">Dawnwardens</h3>
-          <p style="color:var(--text-muted);">Exploration-first guild focused on map discovery and cooperative route planning.</p>
-          <a href="https://discord.com/invite/boundlore" target="_blank" rel="noopener" class="link-btn">Join Channel</a>
-        </article>
-        <article class="form-box" style="margin:0;">
-          <h3 style="margin-top:0;">Ashen Cartographers</h3>
-          <p style="color:var(--text-muted);">Biomes and landmarks cataloging team building shared field reports.</p>
-          <a href="https://discord.com/invite/boundlore" target="_blank" rel="noopener" class="link-btn">Join Channel</a>
-        </article>
-        <article class="form-box" style="margin:0;">
-          <h3 style="margin-top:0;">Ember Traders</h3>
-          <p style="color:var(--text-muted);">Crafting and trade specialists sharing item value sheets and caravan schedules.</p>
-          <a href="https://discord.com/invite/boundlore" target="_blank" rel="noopener" class="link-btn">Join Channel</a>
-        </article>
-      </div>
+    <section class="bl-guides-section bl-guides-listing">
+      <h3 class="bl-guides-listing-title">Approved Guild Listings</h3>
+      <p class="bl-guides-results-info">Guild posts become visible here automatically once approved by an admin.</p>
+      <div id="categoryPostsList"></div>
+      <p id="categoryPostsEmpty" style="text-align:center;color:var(--text-muted);display:none;padding:30px 0;">No guild listings available yet.</p>
     </section>
 
-    <section class="form-box" style="margin-top:20px;">
-      <h2 style="margin-top:0;">Apply For Listing</h2>
-      <p style="color:var(--text-muted);">To list your guild here, publish a discovery post in the Guilds category and include your rules, timezone, and recruitment goal.</p>
-      <a href="/wiki/create-post/" class="btn-contribute">Publish Guild Discovery</a>
-    </section>
-  </div>
+    <section class="bl-guides-section form-box">
+      <h2 style="margin-top:0;">Guild Application</h2>
+      <p style="color:var(--text-muted);margin-bottom:16px;">Complete this form to submit your guild. After admin approval, your data is automatically published as an optimized guild post.</p>
 
-  <div class="construction-page" style="display:none;">
-    <div class="construction-content">
-      <div class="construction-icon">&#9884;&#65039;</div>
-      <div class="construction-badge">Under Construction</div>
-      <h1>Guilds</h1>
-      <p>Guilds section placeholder.</p>
-      <a href="/" class="btn-primary">&larr; Back to Home</a>
-    </div>
+      <form id="guildApplyForm" class="bl-guild-form-grid">
+        <div>
+          <label for="guildName">Guild Name</label>
+          <input id="guildName" class="form-input" type="text" required maxlength="80" />
+        </div>
+        <div>
+          <label for="guildFounder">Founder Name</label>
+          <input id="guildFounder" class="form-input" type="text" required maxlength="80" />
+        </div>
+        <div>
+          <label for="guildMemberCount">Member Count (minimum 20)</label>
+          <input id="guildMemberCount" class="form-input" type="number" min="20" required />
+        </div>
+        <div>
+          <label for="guildWebsite">Website (optional)</label>
+          <input id="guildWebsite" class="form-input" type="url" placeholder="https://..." />
+        </div>
+        <div>
+          <label for="guildDiscordServer">Discord Server Link</label>
+          <input id="guildDiscordServer" class="form-input" type="url" placeholder="https://discord.gg/..." required />
+        </div>
+        <div>
+          <label for="guildDiscordInvite">Direct Discord Invite Link</label>
+          <input id="guildDiscordInvite" class="form-input" type="url" placeholder="https://discord.gg/..." required />
+        </div>
+        <div class="bl-guild-form-span">
+          <label for="guildMotivation">Guild Motivation / Goal</label>
+          <textarea id="guildMotivation" class="form-input" rows="4" required></textarea>
+        </div>
+        <div class="bl-guild-form-span">
+          <label for="guildDescription">Guild Description</label>
+          <textarea id="guildDescription" class="form-input" rows="5" required></textarea>
+        </div>
+
+        <div id="guildApplyError" class="form-error" style="display:none;color:#ff8b8b;"></div>
+        <div id="guildApplySuccess" style="display:none;color:#50c878;"></div>
+
+        <div class="bl-guild-form-span" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button id="guildApplySubmit" type="submit" class="form-submit" style="max-width:320px;">Submit Guild Application</button>
+          <span style="color:var(--text-muted);font-size:0.85rem;">You must be logged in. Submission is reviewed by admins before publishing.</span>
+        </div>
+      </form>
+    </section>
   </div>
 
   <script src="/js/supabase-config.js"></script>
+  <script src="/js/categories-config.js"></script>
+  <script src="/js/avatar-utils.js"></script>
   <script src="/js/search.js"></script>
   <script src="/js/auth-nav.js"></script>
+  <script src="/js/render-posts.js"></script>
+  <script src="/js/guilds-apply.js"></script>
   <script src="../../js/main.js"></script>
 </body>
 </html>

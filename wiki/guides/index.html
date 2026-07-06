@@ -42,7 +42,7 @@
 </div>
 
 <div class="bl-guides-shell">
-  <section class="bl-guides-overview form-box">
+  <section class="bl-guides-section bl-guides-overview form-box">
     <div>
       <h2>Knowledge Index</h2>
       <p>Top-voted guides are boosted using Wilson scoring so high-quality posts stay visible, even with different vote counts.</p>
@@ -54,7 +54,7 @@
     </div>
   </section>
 
-  <section class="bl-guides-legend form-box">
+  <section class="bl-guides-section bl-guides-legend form-box">
     <h3>Ranking Rules</h3>
     <ul>
       <li>Featured requires at least 10 votes and at least 85% positive votes.</li>
@@ -63,12 +63,39 @@
     </ul>
   </section>
 
+  <section class="bl-guides-section form-box bl-guides-tools">
+    <h3>Find Your Guide</h3>
+    <div class="bl-guides-tools-grid">
+      <div>
+        <label for="guideSearchInput">Guide Search</label>
+        <input id="guideSearchInput" class="form-input" type="text" placeholder="Search by title, author, or content..." />
+      </div>
+      <div>
+        <label for="guideCategoryFilter">Guide Category</label>
+        <select id="guideCategoryFilter" class="form-input">
+          <option value="">All Guide Categories</option>
+        </select>
+      </div>
+      <div class="bl-guides-tools-actions">
+        <label class="form-check" style="margin:0;">
+          <input id="guideFeaturedOnly" type="checkbox" />
+          <span>Featured only</span>
+        </label>
+        <button id="guideResetFilters" type="button" class="btn-secondary">Reset Filters</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="bl-guides-section bl-guides-listing">
+    <h3 class="bl-guides-listing-title">Published Guides</h3>
+    <p id="guideResultsInfo" class="bl-guides-results-info">Loading guides...</p>
   <div id="categoryPostsList"></div>
+  </section>
   <p id="categoryPostsEmpty" style="text-align:center;color:var(--text-muted);display:none;padding:40px 0;">
     No guides published yet. Be the first to contribute!
   </p>
 
-  <div class="form-box bl-guides-cta">
+  <div class="bl-guides-section form-box bl-guides-cta">
     <h2>Write a Guide</h2>
     <p style="color:var(--text-muted);margin-bottom:20px;">Discovered something useful? Submit it and it will be reviewed and published here.</p>
     <a href="/wiki/create-post/" class="btn-contribute" style="display:inline-block;">Submit a Guide</a>
@@ -89,18 +116,88 @@
 renderCategoryPosts("guides").then(function(result) {
   if (!result || !result.posts) return;
   const posts = result.posts;
-  const total = posts.length;
-  const featured = posts.filter(function(p) { return p.is_featured_guide; }).length;
-  const best = posts.reduce(function(acc, p) {
-    if (!acc || (p.reaction_approval_rate || 0) > (acc.reaction_approval_rate || 0)) return p;
-    return acc;
-  }, null);
+  const cards = Array.from(document.querySelectorAll("#categoryPostsList .bl-guide-card"));
+  const emptyEl = document.getElementById("categoryPostsEmpty");
+  const resultInfo = document.getElementById("guideResultsInfo");
+  const searchInput = document.getElementById("guideSearchInput");
+  const categoryFilter = document.getElementById("guideCategoryFilter");
+  const featuredOnly = document.getElementById("guideFeaturedOnly");
+  const resetBtn = document.getElementById("guideResetFilters");
 
-  document.getElementById("guideStatCount").textContent = String(total);
-  document.getElementById("guideStatFeatured").textContent = String(featured);
-  document.getElementById("guideStatTopRatio").textContent = best && best.reaction_total > 0
-    ? Math.round((best.reaction_approval_rate || 0) * 100) + "%"
-    : "-";
+  if (typeof BOUNDLORE_GUIDE_SUBCATEGORIES !== "undefined") {
+    BOUNDLORE_GUIDE_SUBCATEGORIES.forEach(function(cat) {
+      const opt = document.createElement("option");
+      opt.value = cat.slug;
+      opt.textContent = cat.label;
+      categoryFilter.appendChild(opt);
+    });
+  }
+
+  function updateStats(filteredPosts) {
+    const total = posts.length;
+    const featured = posts.filter(function(p) { return p.is_featured_guide; }).length;
+    const best = posts.reduce(function(acc, p) {
+      if (!acc || (p.reaction_approval_rate || 0) > (acc.reaction_approval_rate || 0)) return p;
+      return acc;
+    }, null);
+
+    document.getElementById("guideStatCount").textContent = String(total);
+    document.getElementById("guideStatFeatured").textContent = String(featured);
+    document.getElementById("guideStatTopRatio").textContent = best && best.reaction_total > 0
+      ? Math.round((best.reaction_approval_rate || 0) * 100) + "%"
+      : "-";
+
+    resultInfo.textContent = "Showing " + filteredPosts.length + " of " + total + " guides.";
+  }
+
+  function applyGuideFilters() {
+    const query = (searchInput.value || "").trim().toLowerCase();
+    const category = categoryFilter.value;
+    const featured = featuredOnly.checked;
+
+    const filtered = [];
+
+    posts.forEach(function(post, index) {
+      const card = cards[index];
+      if (!card) return;
+
+      const haystack = [
+        post.title || "",
+        post.content ? post.content.replace(/<[^>]*>/g, " ") : "",
+        post.profiles && post.profiles.username ? post.profiles.username : "",
+        post.guide_subcategory || ""
+      ].join(" ").toLowerCase();
+
+      const matchQuery = !query || haystack.indexOf(query) !== -1;
+      const matchCategory = !category || post.guide_subcategory === category;
+      const matchFeatured = !featured || !!post.is_featured_guide;
+      const visible = matchQuery && matchCategory && matchFeatured;
+
+      card.style.display = visible ? "block" : "none";
+      if (visible) filtered.push(post);
+    });
+
+    emptyEl.style.display = filtered.length === 0 ? "block" : "none";
+    if (filtered.length === 0) {
+      emptyEl.textContent = "No guides match your current filters.";
+    } else {
+      emptyEl.textContent = "No guides published yet. Be the first to contribute!";
+    }
+
+    updateStats(filtered);
+  }
+
+  searchInput.addEventListener("input", applyGuideFilters);
+  categoryFilter.addEventListener("change", applyGuideFilters);
+  featuredOnly.addEventListener("change", applyGuideFilters);
+  resetBtn.addEventListener("click", function() {
+    searchInput.value = "";
+    categoryFilter.value = "";
+    featuredOnly.checked = false;
+    applyGuideFilters();
+  });
+
+  applyGuideFilters();
 });
 </script>
 </body>

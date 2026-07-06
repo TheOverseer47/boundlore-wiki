@@ -378,6 +378,20 @@ a:hover { color: var(--gold-light); }
   gap: 18px;
 }
 
+.bl-guides-section {
+  position: relative;
+}
+
+.bl-guides-section::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent);
+}
+
 .bl-guides-overview {
   display: flex;
   justify-content: space-between;
@@ -437,6 +451,66 @@ a:hover { color: var(--gold-light); }
   line-height: 1.75;
 }
 
+.bl-guides-tools h3,
+.bl-guides-listing-title {
+  margin: 0 0 12px;
+}
+
+.bl-guides-tools-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 0.9fr;
+  gap: 14px;
+  align-items: end;
+}
+
+.bl-guides-tools-grid label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bl-guides-tools-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.bl-guides-listing {
+  background: rgba(10,10,15,0.42);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.bl-guides-results-info {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
+.bl-guild-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+
+.bl-guild-form-grid label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bl-guild-form-span {
+  grid-column: 1 / -1;
+}
+
 .bl-guides-cta {
   text-align: center;
   margin-top: 12px;
@@ -449,8 +523,8 @@ a:hover { color: var(--gold-light); }
 
 .bl-guide-card-link {
   display: block;
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(17,17,24,0.84));
-  border: 1px solid rgba(255,255,255,0.09);
+  background: linear-gradient(180deg, rgba(201,168,76,0.06), rgba(17,17,24,0.93));
+  border: 1px solid rgba(201,168,76,0.24);
   border-radius: 14px;
   padding: 18px;
   color: var(--text);
@@ -514,6 +588,10 @@ a:hover { color: var(--gold-light); }
   gap: 8px;
   font-size: 0.81rem;
   color: var(--text-muted);
+}
+
+.bl-guide-card-meta .bl-avatar {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
 }
 
 .bl-guide-card-summary {
@@ -781,8 +859,19 @@ a:hover { color: var(--gold-light); }
     min-width: 100%;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+  .bl-guides-tools-grid {
+    grid-template-columns: 1fr;
+  }
+  .bl-guides-tools-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
   .bl-guide-card-link { padding: 14px; }
   .bl-post-layout { padding: 22px 14px 50px; }
+  .bl-guild-form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ===== Auth & Account Forms (Phase 1) ===== */
