@@ -19,7 +19,7 @@ const BOUNDLORE_CATEGORIES = [
     description: 'Professions, builds, quests, and talent paths.',
     nav: 'primary',
     subcategories: [
-      { slug: 'berufe', label: 'Berufe' },
+      { slug: 'berufe', label: 'Professions' },
       { slug: 'building', label: 'Building' },
       { slug: 'quests', label: 'Quests' },
       { slug: 'talents', label: 'Talents' },
@@ -84,7 +84,7 @@ const BOUNDLORE_GUIDE_SUBCATEGORIES = [
   { slug: 'multiplayer-guilds', label: 'Multiplayer & Guilds' },
   { slug: 'beginner', label: 'Beginner Tips' },
   { slug: 'advanced', label: 'Advanced Strategies' },
-  { slug: 'berufe', label: 'Berufe' },
+  { slug: 'berufe', label: 'Professions' },
   { slug: 'quests', label: 'Quests' },
   { slug: 'talents', label: 'Talents' }
 ];

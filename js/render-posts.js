@@ -29,9 +29,21 @@ async function renderCategoryPosts(categorySlug) {
     return { posts: [] };
   }
 
+  const activeSubcategory = getSubcategoryFilterFromUrlRP();
+  const filteredPosts = activeSubcategory
+    ? posts.filter(function(post) {
+        return getRenderableSubcategorySlug(post) === activeSubcategory;
+      })
+    : posts;
+
+  if (!filteredPosts.length) {
+    if (emptyMsg) emptyMsg.style.display = "block";
+    return { posts: [] };
+  }
+
   if (emptyMsg) emptyMsg.style.display = "none";
 
-  const postsWithScores = await attachReactionStats(posts);
+  const postsWithScores = await attachReactionStats(filteredPosts);
   const sortedPosts = sortPostsByCategoryLogic(postsWithScores, categorySlug);
 
   if (categorySlug === "guilds") {
@@ -58,7 +70,8 @@ async function renderCategoryPosts(categorySlug) {
     const typeLabel = getReadableType(post);
     const typeBadge = '<span class="bl-tag bl-tag-type">' + escapeHtmlRP(typeLabel) + '</span>';
     const subcategoryLabel = getPostSubcategoryLabel(post);
-    const subcategoryBadge = subcategoryLabel
+    const showSubcategoryBadge = shouldShowSubcategoryBadge(post, subcategoryLabel);
+    const subcategoryBadge = showSubcategoryBadge
       ? '<span class="bl-tag bl-tag-subcategory">' + escapeHtmlRP(subcategoryLabel) + '</span>'
       : '';
     const avatarHtml = typeof renderAvatar === "function"
@@ -184,7 +197,8 @@ function renderCategoryCard(post, categorySlug) {
   const typeLabel = getReadableType(post);
   const typeBadge = '<span class="bl-tag bl-tag-type">' + escapeHtmlRP(typeLabel) + '</span>';
   const subcategoryLabel = getPostSubcategoryLabel(post);
-  const subcategoryBadge = subcategoryLabel
+  const showSubcategoryBadge = shouldShowSubcategoryBadge(post, subcategoryLabel);
+  const subcategoryBadge = showSubcategoryBadge
     ? '<span class="bl-tag bl-tag-subcategory">' + escapeHtmlRP(subcategoryLabel) + '</span>'
     : "";
   const avatarHtml = typeof renderAvatar === "function"
@@ -226,6 +240,21 @@ function getPostSubcategoryLabel(post) {
     return getGuideSubcategoryLabel(subcategory);
   }
   return getAnySubcategoryLabelRP(post.category, subcategory);
+}
+
+function shouldShowSubcategoryBadge(post, subcategoryLabel) {
+  if (!subcategoryLabel) return false;
+  // Guide cards already use their guide subcategory as the primary type badge.
+  return post.post_type !== "guide";
+}
+
+function getSubcategoryFilterFromUrlRP() {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    return (params.get("subcategory") || params.get("subcat") || "").toLowerCase().trim();
+  } catch (err) {
+    return "";
+  }
 }
 
 function getRenderableSubcategorySlug(post) {

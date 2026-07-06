@@ -12,6 +12,7 @@ const DISCOVERY_STORAGE_BUCKET = "discovery-uploads";
 let createCurrentUserId = null;
 let createIsAdmin = false;
 let currentDiscoveryCategory = "";
+let currentWikiCategory = "";
 
 document.addEventListener("DOMContentLoaded", async () => {
   quillEditor = new Quill("#postEditor", {
@@ -30,10 +31,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnTypeDiscovery").addEventListener("click", () => setPostType("discovery"));
   document.getElementById("btnTypeWiki").addEventListener("click", () => setPostType("wiki"));
   const discoveryCategorySelect = document.getElementById("discoveryCategory");
+  const wikiCategorySelect = document.getElementById("wikiCategory");
   if (discoveryCategorySelect) {
     discoveryCategorySelect.addEventListener("change", function() {
       currentDiscoveryCategory = this.value;
       refreshDiscoverySubcategoryOptions();
+    });
+  }
+  if (wikiCategorySelect) {
+    wikiCategorySelect.addEventListener("change", function() {
+      currentWikiCategory = this.value;
+      refreshWikiSubcategoryOptions();
     });
   }
 
@@ -108,6 +116,8 @@ function setPostType(type) {
   const guideSelect = document.getElementById("guideSubcategory");
   const discoverySelect = document.getElementById("discoveryCategory");
   const discoverySubWrap = document.getElementById("discoverySubcategoryWrap");
+  const wikiSubWrap = document.getElementById("wikiSubcategoryWrap");
+  const wikiSubcategory = document.getElementById("wikiSubcategory");
   const wikiCategory = document.getElementById("wikiCategory");
 
   if (type === "guide") {
@@ -119,8 +129,11 @@ function setPostType(type) {
     wikiCategory.removeAttribute("required");
     discoverySelect.value = "";
     wikiCategory.value = "";
+    if (wikiSubcategory) wikiSubcategory.value = "";
     currentDiscoveryCategory = "";
+    currentWikiCategory = "";
     if (discoverySubWrap) discoverySubWrap.style.display = "none";
+    if (wikiSubWrap) wikiSubWrap.style.display = "none";
   } else if (type === "discovery") {
     guideFields.style.display = "none";
     discoveryFields.style.display = "block";
@@ -130,8 +143,11 @@ function setPostType(type) {
     wikiCategory.removeAttribute("required");
     guideSelect.value = "";
     wikiCategory.value = "";
+    if (wikiSubcategory) wikiSubcategory.value = "";
     currentDiscoveryCategory = discoverySelect.value || currentDiscoveryCategory || "";
+    currentWikiCategory = "";
     refreshDiscoverySubcategoryOptions();
+    if (wikiSubWrap) wikiSubWrap.style.display = "none";
   } else {
     guideFields.style.display = "none";
     discoveryFields.style.display = "none";
@@ -141,6 +157,9 @@ function setPostType(type) {
     wikiCategory.setAttribute("required", "required");
     guideSelect.value = "";
     discoverySelect.value = "";
+    currentWikiCategory = wikiCategory.value || currentWikiCategory || "";
+    if (discoverySubWrap) discoverySubWrap.style.display = "none";
+    refreshWikiSubcategoryOptions();
   }
 }
 
@@ -243,9 +262,18 @@ async function handleSubmit(e) {
     }
 
     const wikiCategory = document.getElementById("wikiCategory").value;
+    const wikiSubcategory = document.getElementById("wikiSubcategory")?.value || "";
     const publishNow = document.getElementById("wikiPublishNow").checked;
+    const needsSubcategory = typeof requiresSubcategoryForCategory === "function"
+      ? requiresSubcategoryForCategory(wikiCategory)
+      : false;
     if (!wikiCategory) {
       errorEl.textContent = "Please choose a wiki category.";
+      errorEl.style.display = "block";
+      return;
+    }
+    if (needsSubcategory && !wikiSubcategory) {
+      errorEl.textContent = "Please choose a wiki subcategory for this category.";
       errorEl.style.display = "block";
       return;
     }
@@ -255,6 +283,9 @@ async function handleSubmit(e) {
     payload.guide_subcategory = null;
     payload.is_discovery = false;
     payload.status = publishNow ? "published" : "pending";
+    if (needsSubcategory) {
+      postMeta.subcategory = wikiSubcategory;
+    }
   }
 
   if (files.length > 0) {
@@ -299,6 +330,32 @@ function refreshDiscoverySubcategoryOptions(presetValue) {
   const wrap = document.getElementById("discoverySubcategoryWrap");
   const select = document.getElementById("discoverySubcategory");
   const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+  if (!wrap || !select) return;
+
+  const options = typeof getCategorySubcategories === "function" ? getCategorySubcategories(category) : [];
+  if (!options.length) {
+    wrap.style.display = "none";
+    select.innerHTML = '<option value="">Select a subcategory...</option>';
+    select.removeAttribute("required");
+    return;
+  }
+
+  wrap.style.display = "block";
+  select.innerHTML = '<option value="">Select a subcategory...</option>';
+  options.forEach(function(optData) {
+    const opt = document.createElement("option");
+    opt.value = optData.slug;
+    opt.textContent = optData.label;
+    select.appendChild(opt);
+  });
+  select.setAttribute("required", "required");
+  if (presetValue) select.value = presetValue;
+}
+
+function refreshWikiSubcategoryOptions(presetValue) {
+  const wrap = document.getElementById("wikiSubcategoryWrap");
+  const select = document.getElementById("wikiSubcategory");
+  const category = document.getElementById("wikiCategory")?.value || currentWikiCategory || "";
   if (!wrap || !select) return;
 
   const options = typeof getCategorySubcategories === "function" ? getCategorySubcategories(category) : [];

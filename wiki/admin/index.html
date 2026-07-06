@@ -142,6 +142,13 @@
       <label for="composeCategory">Main Category</label>
       <select id="composeCategory" class="form-input"></select>
 
+      <div id="composeSubcategoryWrap" style="display:none;">
+        <label for="composeSubcategory">Subcategory</label>
+        <select id="composeSubcategory" class="form-input">
+          <option value="">Select a subcategory...</option>
+        </select>
+      </div>
+
       <label for="composeCustomCategory">Custom Category (optional)</label>
       <input id="composeCustomCategory" class="form-input" type="text" placeholder="e.g. ancient-ruins" />
 
@@ -592,6 +599,9 @@ function initDiscoveryComposer() {
       opt.textContent = cat.label;
       categorySelect.appendChild(opt);
     });
+    categorySelect.addEventListener("change", function() {
+      refreshComposeSubcategoryOptions();
+    });
   }
 
   if (window.Quill && !composeBodyEditor) {
@@ -624,10 +634,12 @@ function initDiscoveryComposer() {
 function openDiscoveryComposer(discoveryId) {
   const discovery = pendingDiscoveriesCache.find(function(item) { return item.id === discoveryId; });
   if (!discovery) return;
+  const sourceMeta = parsePostMetaA(discovery.content || "");
   document.getElementById("discoveryComposerBox").style.display = "block";
   document.getElementById("composeSourceDiscoveryId").value = discovery.id;
   document.getElementById("composeTitle").value = discovery.title;
   document.getElementById("composeCategory").value = discovery.category || "biomes";
+  refreshComposeSubcategoryOptions(sourceMeta.subcategory || "");
   document.getElementById("composeCustomCategory").value = "";
   document.getElementById("composeTags").value = "discovery,community";
   if (composeBodyEditor) {
@@ -642,6 +654,7 @@ async function publishComposedCategoryPost() {
   const sourceId = document.getElementById("composeSourceDiscoveryId").value;
   const title = document.getElementById("composeTitle").value.trim();
   const category = document.getElementById("composeCategory").value;
+  const subcategory = document.getElementById("composeSubcategory")?.value || "";
   const customCategory = document.getElementById("composeCustomCategory").value.trim();
   const tags = document.getElementById("composeTags").value.trim();
   const body = composeBodyEditor ? (composeBodyEditor.root.innerHTML || "").trim() : "";
@@ -658,10 +671,31 @@ async function publishComposedCategoryPost() {
   }
 
   const finalCategory = customCategory || category;
+  const needsSubcategory = typeof requiresSubcategoryForCategory === "function"
+    ? requiresSubcategoryForCategory(finalCategory)
+    : false;
+  if (needsSubcategory && !subcategory) {
+    msg.textContent = "This category requires a subcategory.";
+    msg.style.color = "#ff8b8b";
+    composePublishInFlight = false;
+    if (btnPublish) btnPublish.disabled = false;
+    return;
+  }
+
+  const sourceDiscovery = pendingDiscoveriesCache.find(function(item) { return item.id === sourceId; });
+  const sourceAssets = sourceDiscovery ? extractDiscoveryAttachmentLinks(sourceDiscovery.content || "") : [];
   const cleanTags = tags ? tags.split(",").map(function(t) { return t.trim(); }).filter(Boolean) : [];
-  const composedContent = '<div class="admin-curated-post"><p><strong>Curated from community discovery.</strong></p>' +
+  let composedContent = '<div class="admin-curated-post"><p><strong>Curated from community discovery.</strong></p>' +
     (cleanTags.length ? ('<p><strong>Tags:</strong> ' + escapeHtmlA(cleanTags.join(', ')) + '</p>') : '') +
     body + '</div>';
+
+  if (sourceAssets.length && !/discovery-attachments/.test(composedContent)) {
+    composedContent += buildCuratedAttachmentHtmlA(sourceAssets);
+  }
+
+  const composedMeta = {};
+  if (needsSubcategory) composedMeta.subcategory = subcategory;
+  composedContent = injectPostMetaA(composedContent, composedMeta);
 
   const baseInsert = {
     author_id: currentAdminId,
@@ -702,7 +736,6 @@ async function publishComposedCategoryPost() {
   }
 
   await supabase.from("posts").update({ status: "approved" }).eq("id", sourceId);
-  const sourceDiscovery = pendingDiscoveriesCache.find(function(item) { return item.id === sourceId; });
   await notifyPostOwner(sourceDiscovery, "discovery", "Discovery converted into wiki post", "An admin used your discovery to create a curated wiki post.", "/wiki/account/");
   await logAdminAction("compose_from_discovery", "post", sourceId, "Composed curated wiki post");
   msg.textContent = "Category post published. Source discovery was marked as approved (not publicly published).";
@@ -773,6 +806,75 @@ function stripHeavyDiscoveryContent(content) {
   });
 
   return wrapper.innerHTML;
+}
+
+function refreshComposeSubcategoryOptions(presetValue) {
+  const wrap = document.getElementById("composeSubcategoryWrap");
+  const select = document.getElementById("composeSubcategory");
+  const category = document.getElementById("composeCategory")?.value || "";
+  if (!wrap || !select) return;
+
+  const options = typeof getCategorySubcategories === "function" ? getCategorySubcategories(category) : [];
+  if (!options.length) {
+    wrap.style.display = "none";
+    select.innerHTML = '<option value="">Select a subcategory...</option>';
+    select.removeAttribute("required");
+    return;
+  }
+
+  wrap.style.display = "block";
+  select.innerHTML = '<option value="">Select a subcategory...</option>';
+  options.forEach(function(optData) {
+    const opt = document.createElement("option");
+    opt.value = optData.slug;
+    opt.textContent = optData.label;
+    select.appendChild(opt);
+  });
+  select.setAttribute("required", "required");
+  if (presetValue) select.value = presetValue;
+}
+
+function stripPostMetaA(html) {
+  return String(html || "").replace(/<!--BLMETA\s+[\s\S]*?-->/gi, "").trim();
+}
+
+function parsePostMetaA(html) {
+  const match = String(html || "").match(/<!--BLMETA\s+([\s\S]*?)\s*-->/i);
+  if (!match) return {};
+  try {
+    const parsed = JSON.parse(match[1]);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    return {};
+  }
+}
+
+function normalizePostMetaA(meta) {
+  if (!meta || typeof meta !== "object") return null;
+  const out = {};
+  if (meta.subcategory) out.subcategory = String(meta.subcategory).slice(0, 60);
+  return Object.keys(out).length ? out : null;
+}
+
+function injectPostMetaA(html, meta) {
+  const cleaned = stripPostMetaA(html);
+  const normalized = normalizePostMetaA(meta);
+  if (!normalized) return cleaned;
+  const json = JSON.stringify(normalized).replace(/-->/g, "--\\>");
+  return cleaned + "\n<!--BLMETA " + json + " -->";
+}
+
+function buildCuratedAttachmentHtmlA(assets) {
+  if (!assets || !assets.length) return "";
+  const items = assets.map(function(asset) {
+    const href = escapeAttrA(asset.href);
+    const label = escapeHtmlA(asset.label || "attachment");
+    if (asset.type === "image") {
+      return '<li><a href="' + href + '" target="_blank" rel="noopener">' + label + '</a><br><img src="' + href + '" alt="' + label + '" style="max-width:320px;border-radius:8px;margin-top:6px;" /></li>';
+    }
+    return '<li><a href="' + href + '" target="_blank" rel="noopener">' + label + '</a></li>';
+  }).join("");
+  return '<hr /><h3>Discovery Attachments</h3><ul class="discovery-attachments">' + items + '</ul>';
 }
 
 function initAssetPreviewModal() {

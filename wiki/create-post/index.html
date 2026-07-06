@@ -94,7 +94,7 @@
         <option value="multiplayer-guilds">Multiplayer &amp; Guilds</option>
         <option value="beginner">Beginner Tips</option>
         <option value="advanced">Advanced Strategies</option>
-        <option value="berufe">Berufe</option>
+        <option value="berufe">Professions</option>
         <option value="quests">Quests</option>
         <option value="talents">Talents</option>
       </select>
@@ -138,6 +138,13 @@
       <select id="wikiCategory" class="form-input">
         <option value="">Select a wiki category...</option>
       </select>
+      <div id="wikiSubcategoryWrap" class="form-group" style="display:none;margin-top:12px;">
+        <label for="wikiSubcategory">Wiki Subcategory</label>
+        <select id="wikiSubcategory" class="form-input">
+          <option value="">Select a subcategory...</option>
+        </select>
+        <p class="field-hint">Required for categories with dedicated subcategory groups.</p>
+      </div>
       <p class="field-hint">Guides and Guilds are excluded here; these stay community-driven workflows.</p>
 
       <label style="display:flex;align-items:center;gap:8px;margin-top:10px;">
@@ -167,10 +174,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js?v=2"></script>
+<script src="/js/categories-config.js?v=3"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/search.js"></script>
-<script src="/js/main.js?v=2"></script>
-<script src="/js/create-post.js?v=2"></script>
+<script src="/js/main.js?v=3"></script>
+<script src="/js/create-post.js?v=3"></script>
 </body>
 </html>

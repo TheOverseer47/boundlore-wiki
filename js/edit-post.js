@@ -4,6 +4,7 @@ let editCurrentType = "guide";
 let editUserId = null;
 let editIsAdmin = false;
 let currentEditDiscoveryCategory = "";
+let currentEditWikiCategory = "";
 
 document.addEventListener("DOMContentLoaded", initEditPost);
 
@@ -32,11 +33,21 @@ async function initEditPost() {
   document.getElementById("btnEditTypeDiscovery").addEventListener("click", function () {
     setEditPostType("discovery");
   });
+  document.getElementById("btnEditTypeWiki").addEventListener("click", function () {
+    setEditPostType("wiki");
+  });
   const editDiscoveryCategorySelect = document.getElementById("editDiscoveryCategory");
+  const editWikiCategorySelect = document.getElementById("editWikiCategory");
   if (editDiscoveryCategorySelect) {
     editDiscoveryCategorySelect.addEventListener("change", function() {
       currentEditDiscoveryCategory = this.value;
       refreshEditDiscoverySubcategoryOptions();
+    });
+  }
+  if (editWikiCategorySelect) {
+    editWikiCategorySelect.addEventListener("change", function() {
+      currentEditWikiCategory = this.value;
+      refreshEditWikiSubcategoryOptions();
     });
   }
   form.addEventListener("submit", handleEditSubmit);
@@ -67,6 +78,10 @@ async function initEditPost() {
     .single();
 
   editIsAdmin = !!(myProfile && myProfile.role === "admin");
+  const wikiBtn = document.getElementById("btnEditTypeWiki");
+  if (wikiBtn) {
+    wikiBtn.style.display = editIsAdmin ? "inline-flex" : "none";
+  }
 
   let query = supabase.from("posts").select("*");
   if (slug) {
@@ -100,15 +115,21 @@ async function initEditPost() {
   document.getElementById("editPostTitle").value = post.title || "";
   editQuill.root.innerHTML = stripPostMetaEP(post.content || "") || "";
 
-  const postType = post.post_type === "discovery" || post.is_discovery ? "discovery" : "guide";
+  const postType = post.post_type === "wiki"
+    ? "wiki"
+    : (post.post_type === "discovery" || post.is_discovery ? "discovery" : "guide");
   setEditPostType(postType);
 
   if (postType === "guide") {
     document.getElementById("editGuideSubcategory").value = post.guide_subcategory || "";
-  } else {
+  } else if (postType === "discovery") {
     document.getElementById("editDiscoveryCategory").value = post.category || "";
     currentEditDiscoveryCategory = post.category || "";
-    refreshEditDiscoverySubcategoryOptions(post.guide_subcategory || "");
+    refreshEditDiscoverySubcategoryOptions(existingMeta.subcategory || post.guide_subcategory || "");
+  } else {
+    document.getElementById("editWikiCategory").value = post.category || "";
+    currentEditWikiCategory = post.category || "";
+    refreshEditWikiSubcategoryOptions(existingMeta.subcategory || "");
   }
 
   loading.style.display = "none";
@@ -118,6 +139,7 @@ async function initEditPost() {
 function fillCategorySelectors() {
   const guideSelect = document.getElementById("editGuideSubcategory");
   const discoverySelect = document.getElementById("editDiscoveryCategory");
+  const wikiSelect = document.getElementById("editWikiCategory");
   const guideSubcategories = Array.isArray(window.BOUNDLORE_GUIDE_SUBCATEGORIES)
     ? window.BOUNDLORE_GUIDE_SUBCATEGORIES
     : (typeof BOUNDLORE_GUIDE_SUBCATEGORIES !== "undefined" ? BOUNDLORE_GUIDE_SUBCATEGORIES : []);
@@ -146,32 +168,64 @@ function fillCategorySelectors() {
         discoverySelect.appendChild(opt);
       });
   }
+
+  if (wikiSelect && Array.isArray(categories)) {
+    categories
+      .filter(function (cat) {
+        return cat.slug !== "guides" && cat.slug !== "guilds" && cat.slug !== "community";
+      })
+      .forEach(function (cat) {
+        const opt = document.createElement("option");
+        opt.value = cat.slug;
+        opt.textContent = cat.icon + " " + cat.label;
+        wikiSelect.appendChild(opt);
+      });
+  }
 }
 
 function setEditPostType(type) {
-  editCurrentType = type === "discovery" ? "discovery" : "guide";
+  editCurrentType = type === "discovery" ? "discovery" : (type === "wiki" ? "wiki" : "guide");
 
   document.getElementById("btnEditTypeGuide").classList.toggle("active", editCurrentType === "guide");
   document.getElementById("btnEditTypeDiscovery").classList.toggle("active", editCurrentType === "discovery");
+  document.getElementById("btnEditTypeWiki").classList.toggle("active", editCurrentType === "wiki");
 
   const guideFields = document.getElementById("editGuideFields");
   const discoveryFields = document.getElementById("editDiscoveryFields");
+  const wikiFields = document.getElementById("editWikiFields");
   const guideSelect = document.getElementById("editGuideSubcategory");
   const discoverySelect = document.getElementById("editDiscoveryCategory");
+  const wikiSelect = document.getElementById("editWikiCategory");
   const discoverySubWrap = document.getElementById("editDiscoverySubcategoryWrap");
+  const wikiSubWrap = document.getElementById("editWikiSubcategoryWrap");
 
   if (editCurrentType === "guide") {
     guideFields.style.display = "block";
     discoveryFields.style.display = "none";
+    wikiFields.style.display = "none";
     guideSelect.removeAttribute("required");
     discoverySelect.removeAttribute("required");
+    wikiSelect.removeAttribute("required");
     if (discoverySubWrap) discoverySubWrap.style.display = "none";
-  } else {
+    if (wikiSubWrap) wikiSubWrap.style.display = "none";
+  } else if (editCurrentType === "discovery") {
     guideFields.style.display = "none";
     discoveryFields.style.display = "block";
+    wikiFields.style.display = "none";
     guideSelect.removeAttribute("required");
     discoverySelect.removeAttribute("required");
+    wikiSelect.removeAttribute("required");
     refreshEditDiscoverySubcategoryOptions();
+    if (wikiSubWrap) wikiSubWrap.style.display = "none";
+  } else {
+    guideFields.style.display = "none";
+    discoveryFields.style.display = "none";
+    wikiFields.style.display = "block";
+    guideSelect.removeAttribute("required");
+    discoverySelect.removeAttribute("required");
+    wikiSelect.setAttribute("required", "required");
+    if (discoverySubWrap) discoverySubWrap.style.display = "none";
+    refreshEditWikiSubcategoryOptions();
   }
 }
 
@@ -213,7 +267,6 @@ async function handleEditSubmit(e) {
 
   const updates = {
     title: title,
-    content: injectPostMetaEP(content, meta),
     status: "pending",
   };
 
@@ -233,13 +286,14 @@ async function handleEditSubmit(e) {
     updates.category = wasGuide ? (editPost.category || null) : null;
     updates.guide_subcategory = effectiveSubcat;
     updates.is_discovery = false;
-  } else {
+  } else if (editCurrentType === "discovery") {
     const cat = document.getElementById("editDiscoveryCategory").value;
     const subcat = document.getElementById("editDiscoverySubcategory")?.value || "";
 
     const wasDiscovery = editPost.post_type === "discovery" || editPost.is_discovery;
     const effectiveCategory = cat || editPost.category || null;
-    const effectiveSubcategory = subcat || editPost.guide_subcategory || null;
+    const existingMeta = parsePostMetaEP(editPost.content || "");
+    const effectiveSubcategory = subcat || existingMeta.subcategory || editPost.guide_subcategory || null;
     const needsSubcategory = typeof requiresSubcategoryForCategory === "function"
       ? requiresSubcategoryForCategory(effectiveCategory)
       : false;
@@ -261,8 +315,48 @@ async function handleEditSubmit(e) {
     updates.is_discovery = true;
     if (needsSubcategory) {
       meta.subcategory = effectiveSubcategory;
+    } else {
+      delete meta.subcategory;
+    }
+  } else {
+    if (!editIsAdmin) {
+      errEl.textContent = "Only admins can save wiki posts.";
+      errEl.style.display = "block";
+      return;
+    }
+
+    const wikiCategory = document.getElementById("editWikiCategory").value;
+    const wikiSubcategory = document.getElementById("editWikiSubcategory")?.value || "";
+    const existingMeta = parsePostMetaEP(editPost.content || "");
+    const effectiveCategory = wikiCategory || editPost.category || null;
+    const effectiveSubcategory = wikiSubcategory || existingMeta.subcategory || null;
+    const needsSubcategory = typeof requiresSubcategoryForCategory === "function"
+      ? requiresSubcategoryForCategory(effectiveCategory)
+      : false;
+
+    if (!effectiveCategory) {
+      errEl.textContent = "Please choose a wiki category.";
+      errEl.style.display = "block";
+      return;
+    }
+    if (needsSubcategory && !effectiveSubcategory) {
+      errEl.textContent = "Please choose a wiki subcategory for this category.";
+      errEl.style.display = "block";
+      return;
+    }
+
+    updates.post_type = "wiki";
+    updates.category = effectiveCategory;
+    updates.guide_subcategory = null;
+    updates.is_discovery = false;
+    if (needsSubcategory) {
+      meta.subcategory = effectiveSubcategory;
+    } else {
+      delete meta.subcategory;
     }
   }
+
+  updates.content = injectPostMetaEP(content, meta);
 
   let updateQuery = supabase.from("posts").update(updates);
   if (editIsAdmin) {
@@ -357,6 +451,32 @@ function refreshEditDiscoverySubcategoryOptions(presetValue) {
   const wrap = document.getElementById("editDiscoverySubcategoryWrap");
   const select = document.getElementById("editDiscoverySubcategory");
   const category = document.getElementById("editDiscoveryCategory")?.value || currentEditDiscoveryCategory || "";
+  if (!wrap || !select) return;
+
+  const options = typeof getCategorySubcategories === "function" ? getCategorySubcategories(category) : [];
+  if (!options.length) {
+    wrap.style.display = "none";
+    select.innerHTML = '<option value="">Choose a subcategory...</option>';
+    select.removeAttribute("required");
+    return;
+  }
+
+  wrap.style.display = "block";
+  select.innerHTML = '<option value="">Choose a subcategory...</option>';
+  options.forEach(function(optData) {
+    const opt = document.createElement("option");
+    opt.value = optData.slug;
+    opt.textContent = optData.label;
+    select.appendChild(opt);
+  });
+  select.setAttribute("required", "required");
+  if (presetValue) select.value = presetValue;
+}
+
+function refreshEditWikiSubcategoryOptions(presetValue) {
+  const wrap = document.getElementById("editWikiSubcategoryWrap");
+  const select = document.getElementById("editWikiSubcategory");
+  const category = document.getElementById("editWikiCategory")?.value || currentEditWikiCategory || "";
   if (!wrap || !select) return;
 
   const options = typeof getCategorySubcategories === "function" ? getCategorySubcategories(category) : [];

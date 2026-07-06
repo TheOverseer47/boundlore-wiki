@@ -83,6 +83,7 @@
     <div class="post-type-toggle" style="margin-top:18px;margin-bottom:18px;">
       <button type="button" class="toggle-btn" id="btnEditTypeGuide" data-type="guide">Guide</button>
       <button type="button" class="toggle-btn" id="btnEditTypeDiscovery" data-type="discovery">Discovery</button>
+      <button type="button" class="toggle-btn" id="btnEditTypeWiki" data-type="wiki" style="display:none;">Wiki (Admin)</button>
     </div>
 
     <div id="editGuideFields" style="display:none;">
@@ -100,7 +101,7 @@
         <option value="multiplayer-guilds">Multiplayer &amp; Guilds</option>
         <option value="beginner">Beginner Tips</option>
         <option value="advanced">Advanced Strategies</option>
-        <option value="berufe">Berufe</option>
+        <option value="berufe">Professions</option>
         <option value="quests">Quests</option>
         <option value="talents">Talents</option>
       </select>
@@ -130,6 +131,20 @@
       </div>
     </div>
 
+    <div id="editWikiFields" style="display:none;">
+      <label for="editWikiCategory">Wiki Category</label>
+      <select id="editWikiCategory" class="form-input">
+        <option value="">Choose wiki category...</option>
+      </select>
+      <div id="editWikiSubcategoryWrap" class="form-group" style="display:none;margin-top:12px;">
+        <label for="editWikiSubcategory">Wiki Subcategory</label>
+        <select id="editWikiSubcategory" class="form-input">
+          <option value="">Choose a subcategory...</option>
+        </select>
+        <p class="field-hint">Required for categories like Creatures, Classes, and Items.</p>
+      </div>
+    </div>
+
     <label style="margin-top:18px;display:block;" for="editPostEditor">Content</label>
     <div id="editPostEditor" style="height:280px;background:#fff;"></div>
 
@@ -146,9 +161,9 @@
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js?v=2"></script>
+<script src="/js/categories-config.js?v=3"></script>
 <script src="/js/auth-nav.js"></script>
-<script src="/js/edit-post.js?v=2"></script>
-<script src="/js/main.js?v=2"></script>
+<script src="/js/edit-post.js?v=3"></script>
+<script src="/js/main.js?v=3"></script>
 </body>
 </html>
