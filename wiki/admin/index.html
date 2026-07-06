@@ -149,9 +149,6 @@
         </select>
       </div>
 
-      <label for="composeCustomCategory">Custom Category (optional)</label>
-      <input id="composeCustomCategory" class="form-input" type="text" placeholder="e.g. ancient-ruins" />
-
       <label for="composeTags">Tags (comma-separated)</label>
       <input id="composeTags" class="form-input" type="text" placeholder="rare,item,desert" />
 
@@ -640,7 +637,6 @@ function openDiscoveryComposer(discoveryId) {
   document.getElementById("composeTitle").value = discovery.title;
   document.getElementById("composeCategory").value = discovery.category || "biomes";
   refreshComposeSubcategoryOptions(sourceMeta.subcategory || "");
-  document.getElementById("composeCustomCategory").value = "";
   document.getElementById("composeTags").value = "discovery,community";
   if (composeBodyEditor) {
     composeBodyEditor.root.innerHTML = discovery.content || "";
@@ -655,7 +651,6 @@ async function publishComposedCategoryPost() {
   const title = document.getElementById("composeTitle").value.trim();
   const category = document.getElementById("composeCategory").value;
   const subcategory = document.getElementById("composeSubcategory")?.value || "";
-  const customCategory = document.getElementById("composeCustomCategory").value.trim();
   const tags = document.getElementById("composeTags").value.trim();
   const body = composeBodyEditor ? (composeBodyEditor.root.innerHTML || "").trim() : "";
   const msg = document.getElementById("composeMsg");
@@ -670,7 +665,19 @@ async function publishComposedCategoryPost() {
     return;
   }
 
-  const finalCategory = customCategory || category;
+  const finalCategory = category;
+  const allowedCategorySlugs = (Array.isArray(window.BOUNDLORE_CATEGORIES) ? window.BOUNDLORE_CATEGORIES : [])
+    .map(function(cat) { return cat.slug; })
+    .filter(function(slug) {
+      return slug !== "guides" && slug !== "guilds" && slug !== "community";
+    });
+  if (!finalCategory || !allowedCategorySlugs.includes(finalCategory)) {
+    msg.textContent = "Please choose a valid main category.";
+    msg.style.color = "#ff8b8b";
+    composePublishInFlight = false;
+    if (btnPublish) btnPublish.disabled = false;
+    return;
+  }
   const needsSubcategory = typeof requiresSubcategoryForCategory === "function"
     ? requiresSubcategoryForCategory(finalCategory)
     : false;
