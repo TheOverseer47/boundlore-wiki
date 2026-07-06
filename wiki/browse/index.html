@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Browse the broader BoundLore category network beyond the main header categories." />
+  <title>Browse - BoundLore</title>
+  <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo"><img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" /><span class="logo-text">Bound<span class="accent">Lore</span></span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="../creatures/">Creatures</a></li>
+        <li><a href="../classes/">Classes</a></li>
+        <li><a href="../items/">Items</a></li>
+        <li><a href="../guides/">Guides</a></li>
+        <li><a href="../guilds/">Guilds</a></li>
+        <li><a href="../community/">Community</a></li>
+        <li><a href="../news/">News</a></li>
+        <li><a href="../browse/" class="active">More</a></li>
+        <li><a href="/wiki/support">Support</a></li>
+      </ul>
+      <div class="nav-right">
+        <span id="authArea"></span>
+        <div class="nav-search"><input type="text" placeholder="Search..." id="searchInput" /><div class="search-results" id="searchResults"></div></div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="wiki-hero">
+    <p class="breadcrumb"><a href="/">Home</a> › More</p>
+    <h1>Browse More Categories</h1>
+    <p>Secondary category hubs that stay accessible without crowding the main header.</p>
+  </div>
+  <div class="bl-guides-shell" style="max-width:1100px;">
+    <section class="bl-guides-section form-box">
+      <h2 style="margin-top:0;">Secondary Worlds of Knowledge</h2>
+      <p style="color:var(--text-muted);">These categories remain part of the wiki but live outside the main header for a cleaner navigation path.</p>
+    </section>
+
+    <section class="bl-guides-section bl-guides-listing">
+      <h3 class="bl-guides-listing-title">More Categories</h3>
+      <div class="category-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        <a href="/wiki/biomes/" class="category-card"><div class="card-icon">🌍</div><h3>Biomes</h3><p>Landscapes, climates, and regions.</p><span class="card-arrow">→</span></a>
+        <a href="/wiki/dungeons/" class="category-card"><div class="card-icon">🏰</div><h3>Dungeons</h3><p>Ruins, instances, and dangerous encounters.</p><span class="card-arrow">→</span></a>
+        <a href="/wiki/locations/" class="category-card"><div class="card-icon">🗺️</div><h3>Locations</h3><p>Notable landmarks and points of interest.</p><span class="card-arrow">→</span></a>
+        <a href="/wiki/lore/" class="category-card"><div class="card-icon">📜</div><h3>Lore</h3><p>Mythology, history, and background material.</p><span class="card-arrow">→</span></a>
+        <a href="/wiki/crafting/" class="category-card"><div class="card-icon">🔨</div><h3>Crafting</h3><p>Recipes, materials, and item creation.</p><span class="card-arrow">→</span></a>
+      </div>
+    </section>
+  </div>
+  <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community · <a href="/wiki/imprint/">Imprint</a> · <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
+  <script src="/js/supabase-config.js"></script>
+  <script src="/js/categories-config.js?v=2"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script src="/js/search.js"></script>
+  <script src="../../js/main.js?v=2"></script>
+</body>
+</html>

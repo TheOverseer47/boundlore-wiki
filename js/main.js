@@ -49,6 +49,39 @@ const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 if (hamburger && navLinks) hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
 
+const MAIN_NAV_LINKS = [
+  { label: 'Home', href: '/' },
+  { label: 'Creatures', href: '/wiki/creatures/' },
+  { label: 'Classes', href: '/wiki/classes/' },
+  { label: 'Items', href: '/wiki/items/' },
+  { label: 'Guides', href: '/wiki/guides/' },
+  { label: 'Guilds', href: '/wiki/guilds/' },
+  { label: 'Community', href: '/wiki/community/' },
+  { label: 'News', href: '/wiki/news/' },
+  { label: 'More', href: '/wiki/browse/' },
+  { label: 'Support', href: '/wiki/support/' },
+];
+
+function renderMainNavLinks() {
+  if (!navLinks) return;
+  const currentPath = normalizeNavPath(window.location.pathname);
+  navLinks.innerHTML = MAIN_NAV_LINKS.map(function(item) {
+    const itemPath = normalizeNavPath(item.href);
+    const active = currentPath === itemPath || (itemPath !== '/' && currentPath.startsWith(itemPath));
+    return '<li><a href="' + item.href + '"' + (active ? ' class="active"' : '') + '>' + item.label + '</a></li>';
+  }).join('');
+}
+
+function normalizeNavPath(path) {
+  return String(path || '/')
+    .replace(/\/+/g, '/')
+    .replace(/index\.html$/i, '')
+    .replace(/\/+$/, '/')
+    .replace(/^$/, '/');
+}
+
+renderMainNavLinks();
+
 // Wiki search data – add entries as articles are created
 const wikiData = [
   // { title: 'Dragon', category: 'Creatures', url: 'wiki/creatures/dragon.html', description: 'A fearsome dragon.' }

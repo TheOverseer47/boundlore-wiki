@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Classes hub for professions, building, quests, and talents in BoundLore." />
+  <title>Classes - BoundLore</title>
+  <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo"><img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" /><span class="logo-text">Bound<span class="accent">Lore</span></span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="../creatures/">Creatures</a></li>
+        <li><a href="../classes/" class="active">Classes</a></li>
+        <li><a href="../items/">Items</a></li>
+        <li><a href="../guides/">Guides</a></li>
+        <li><a href="../guilds/">Guilds</a></li>
+        <li><a href="../community/">Community</a></li>
+        <li><a href="../news/">News</a></li>
+        <li><a href="../browse/">More</a></li>
+        <li><a href="/wiki/support">Support</a></li>
+      </ul>
+      <div class="nav-right">
+        <span id="authArea"></span>
+        <div class="nav-search"><input type="text" placeholder="Search..." id="searchInput" /><div class="search-results" id="searchResults"></div></div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="wiki-hero">
+    <p class="breadcrumb"><a href="/">Home</a> › Classes</p>
+    <h1>⚒️ Classes</h1>
+    <p>Professions, building, quests, and talent paths that shape how the world is played</p>
+  </div>
+  <div class="bl-guides-shell" style="max-width:1100px;">
+    <section class="bl-guides-section form-box">
+      <h2 style="margin-top:0;">Class Atlas</h2>
+      <p style="color:var(--text-muted);">Use this hub for profession-oriented knowledge, build paths, quest structures, and talent planning. These are also available as subcategories when you submit a guide or discovery.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+        <a href="/wiki/create-post/?type=guide" class="btn-contribute" style="display:inline-block;">Write a Guide</a>
+        <a href="/wiki/create-post/?type=discovery&category=classes" class="btn-secondary" style="display:inline-flex;align-items:center;text-decoration:none;">Report a Class Discovery</a>
+      </div>
+    </section>
+
+    <section class="bl-guides-section bl-guides-listing">
+      <h3 class="bl-guides-listing-title">Class Subcategories</h3>
+      <div class="bl-category-group-grid" style="margin-bottom:16px;">
+        <a class="bl-guide-card-link" href="/wiki/guides/?subcategory=berufe"><div class="bl-guide-card" style="min-height:140px;"><h3 class="bl-guide-card-title">Berufe</h3><p class="bl-guide-card-summary">Profession and role-based setups.</p></div></a>
+        <a class="bl-guide-card-link" href="/wiki/guides/?subcategory=building"><div class="bl-guide-card" style="min-height:140px;"><h3 class="bl-guide-card-title">Building</h3><p class="bl-guide-card-summary">Bases, structures, and construction planning.</p></div></a>
+        <a class="bl-guide-card-link" href="/wiki/guides/?subcategory=quests"><div class="bl-guide-card" style="min-height:140px;"><h3 class="bl-guide-card-title">Quests</h3><p class="bl-guide-card-summary">Quest chains, requirements, and route planning.</p></div></a>
+        <a class="bl-guide-card-link" href="/wiki/guides/?subcategory=talents"><div class="bl-guide-card" style="min-height:140px;"><h3 class="bl-guide-card-title">Talents</h3><p class="bl-guide-card-summary">Talent builds and progression choices.</p></div></a>
+      </div>
+      <div id="categoryPostsList"></div>
+    </section>
+
+    <div class="empty-state" id="categoryPostsEmpty" style="display:none;">
+      <h3>No class-related posts documented yet</h3>
+      <p>Be the first to submit a guide or discovery for this area.</p>
+    </div>
+  </div>
+  <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community · <a href="/wiki/imprint/">Imprint</a> · <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
+  <script src="/js/supabase-config.js"></script>
+  <script src="/js/categories-config.js?v=2"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script src="/js/search.js"></script>
+  <script src="../../js/main.js?v=2"></script>
+  <script src="/js/render-posts.js?v=2"></script>
+  <script>renderCategoryPosts("classes");</script>
+</body>
+</html>

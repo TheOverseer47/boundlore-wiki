@@ -107,11 +107,11 @@
 
 <script src="/js/supabase-config.js"></script>
 <script src="/js/search.js"></script>
-<script src="/js/categories-config.js"></script>
+<script src="/js/categories-config.js?v=2"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
-<script src="/js/render-posts.js"></script>
-<script src="/js/main.js"></script>
+<script src="/js/render-posts.js?v=2"></script>
+<script src="/js/main.js?v=2"></script>
 <script>
 renderCategoryPosts("guides").then(function(result) {
   if (!result || !result.posts) return;
@@ -123,6 +123,8 @@ renderCategoryPosts("guides").then(function(result) {
   const categoryFilter = document.getElementById("guideCategoryFilter");
   const featuredOnly = document.getElementById("guideFeaturedOnly");
   const resetBtn = document.getElementById("guideResetFilters");
+  const queryParams = new URLSearchParams(window.location.search);
+  const presetSubcategory = (queryParams.get("subcategory") || queryParams.get("subcat") || "").toLowerCase();
 
   if (typeof BOUNDLORE_GUIDE_SUBCATEGORIES !== "undefined") {
     BOUNDLORE_GUIDE_SUBCATEGORIES.forEach(function(cat) {
@@ -131,6 +133,10 @@ renderCategoryPosts("guides").then(function(result) {
       opt.textContent = cat.label;
       categoryFilter.appendChild(opt);
     });
+  }
+
+  if (presetSubcategory) {
+    categoryFilter.value = presetSubcategory;
   }
 
   function updateStats(filteredPosts) {

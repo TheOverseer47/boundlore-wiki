@@ -10,9 +10,10 @@ async function loadHomepageStats() {
     biomes: document.getElementById("statBiomes"),
     items: document.getElementById("statItems"),
     guides: document.getElementById("statGuides"),
+    classes: document.getElementById("statClasses"),
   };
 
-  if (!el.creatures && !el.biomes && !el.items && !el.guides) return;
+  if (!el.creatures && !el.biomes && !el.items && !el.guides && !el.classes) return;
 
   try {
     const { data, error } = await supabase
@@ -25,6 +26,7 @@ async function loadHomepageStats() {
       biomes: data.biomes_count || 0,
       items: data.items_count || 0,
       guides: data.guides_count || 0,
+      classes: data.classes_count || 0,
     };
 
     const fallbackCounts = await loadHomepageStatsFallback();
@@ -42,11 +44,12 @@ async function loadHomepageStats() {
 }
 
 async function loadHomepageStatsFallback() {
-  const [creatures, biomes, items, guides] = await Promise.all([
+  const [creatures, biomes, items, guides, classes] = await Promise.all([
     countPublishedByCategory("creatures"),
     countPublishedByCategory("biomes"),
     countPublishedByCategory("items"),
     countGuidesPublished(),
+    countPublishedByCategory("classes"),
   ]);
 
   return {
@@ -54,6 +57,7 @@ async function loadHomepageStatsFallback() {
     biomes,
     items,
     guides,
+    classes,
   };
 }
 
@@ -105,7 +109,7 @@ function shouldPreferFallback(viewValues, fallbackValues) {
 }
 
 function sumCounters(values) {
-  return (values.creatures || 0) + (values.biomes || 0) + (values.items || 0) + (values.guides || 0);
+  return (values.creatures || 0) + (values.biomes || 0) + (values.items || 0) + (values.guides || 0) + (values.classes || 0);
 }
 
 async function countPostsByFilter(filter) {
@@ -126,6 +130,7 @@ function updateCounters(elements, values) {
   animateCount(elements.biomes, values.biomes || 0);
   animateCount(elements.items, values.items || 0);
   animateCount(elements.guides, values.guides || 0);
+  animateCount(elements.classes, values.classes || 0);
 }
 
 function animateCount(element, target) {

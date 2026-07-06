@@ -96,6 +96,7 @@ function renderPost(post) {
   const label = typeof getPostCategoryLabel === "function"
     ? getPostCategoryLabel(post)
     : (post.category || "Post");
+    const subcategoryLabel = getPostSubcategoryLabelPD(post, postMeta);
   document.getElementById("breadcrumbCategory").textContent = label;
   const breadcrumbTitle = document.getElementById("breadcrumbTitle");
   if (breadcrumbTitle) breadcrumbTitle.textContent = post.title;
@@ -126,6 +127,17 @@ function renderPost(post) {
   if (postCategoryChip) {
     postCategoryChip.textContent = label;
   }
+
+    const subcategoryChip = document.getElementById("postSubcategoryChip");
+    const subcategoryValue = document.getElementById("postSubcategoryValue");
+    if (subcategoryChip && subcategoryValue) {
+      if (subcategoryLabel) {
+        subcategoryChip.style.display = "inline-flex";
+        subcategoryValue.textContent = subcategoryLabel;
+      } else {
+        subcategoryChip.style.display = "none";
+      }
+    }
 
   const sideType = document.getElementById("sideType");
   if (sideType) {
@@ -301,6 +313,18 @@ function getPostLabelSafe(post) {
 }
 
 function getSeeAlsoLabelPD(post) {
+
+  function getPostSubcategoryLabelPD(post, postMeta) {
+    const subcategory = (postMeta && postMeta.subcategory) || post.guide_subcategory || "";
+    if (!subcategory) return "";
+    if (typeof getAnySubcategoryLabel === "function") {
+      return getAnySubcategoryLabel(post.category, subcategory) || subcategory;
+    }
+    if (typeof getGuideSubcategoryLabel === "function") {
+      return getGuideSubcategoryLabel(subcategory);
+    }
+    return subcategory;
+  }
   const typeLabel = post.post_type === "guide"
     ? "Guide"
     : (post.post_type === "discovery" ? "Discovery" : "Post");

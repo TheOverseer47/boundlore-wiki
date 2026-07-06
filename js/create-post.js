@@ -11,6 +11,7 @@ let currentPostType = "guide";
 const DISCOVERY_STORAGE_BUCKET = "discovery-uploads";
 let createCurrentUserId = null;
 let createIsAdmin = false;
+let currentDiscoveryCategory = "";
 
 document.addEventListener("DOMContentLoaded", async () => {
   quillEditor = new Quill("#postEditor", {
@@ -28,6 +29,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnTypeGuide").addEventListener("click", () => setPostType("guide"));
   document.getElementById("btnTypeDiscovery").addEventListener("click", () => setPostType("discovery"));
   document.getElementById("btnTypeWiki").addEventListener("click", () => setPostType("wiki"));
+  const discoveryCategorySelect = document.getElementById("discoveryCategory");
+  if (discoveryCategorySelect) {
+    discoveryCategorySelect.addEventListener("change", function() {
+      currentDiscoveryCategory = this.value;
+      refreshDiscoverySubcategoryOptions();
+    });
+  }
 
   document.getElementById("createPostForm").addEventListener("submit", handleSubmit);
 
@@ -40,6 +48,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     setPostType("discovery");
   } else if (typeParam === "wiki" && createIsAdmin) {
     setPostType("wiki");
+  }
+
+  const presetCategory = (params.get("category") || params.get("cat") || "").toLowerCase();
+  const presetSubcategory = (params.get("subcategory") || params.get("subcat") || "").toLowerCase();
+  if (presetCategory && discoveryCategorySelect) {
+    discoveryCategorySelect.value = presetCategory;
+    currentDiscoveryCategory = presetCategory;
+    refreshDiscoverySubcategoryOptions(presetSubcategory);
   }
 });
 
@@ -91,6 +107,7 @@ function setPostType(type) {
   const wikiFields = document.getElementById("wikiFields");
   const guideSelect = document.getElementById("guideSubcategory");
   const discoverySelect = document.getElementById("discoveryCategory");
+  const discoverySubWrap = document.getElementById("discoverySubcategoryWrap");
   const wikiCategory = document.getElementById("wikiCategory");
 
   if (type === "guide") {
@@ -102,6 +119,8 @@ function setPostType(type) {
     wikiCategory.removeAttribute("required");
     discoverySelect.value = "";
     wikiCategory.value = "";
+    currentDiscoveryCategory = "";
+    if (discoverySubWrap) discoverySubWrap.style.display = "none";
   } else if (type === "discovery") {
     guideFields.style.display = "none";
     discoveryFields.style.display = "block";
@@ -111,6 +130,8 @@ function setPostType(type) {
     wikiCategory.removeAttribute("required");
     guideSelect.value = "";
     wikiCategory.value = "";
+    currentDiscoveryCategory = discoverySelect.value || currentDiscoveryCategory || "";
+    refreshDiscoverySubcategoryOptions();
   } else {
     guideFields.style.display = "none";
     discoveryFields.style.display = "none";
@@ -180,10 +201,19 @@ async function handleSubmit(e) {
     payload.is_discovery = false;
   } else if (currentPostType === "discovery") {
     const cat = document.getElementById("discoveryCategory").value;
+    const discoverySubcat = document.getElementById("discoverySubcategory")?.value || "";
     const discoveryImageUrl = (document.getElementById("discoveryImageUrl").value || "").trim();
     const discoveryYoutubeUrl = (document.getElementById("discoveryYoutubeUrl").value || "").trim();
+    const needsSubcategory = typeof requiresSubcategoryForCategory === "function"
+      ? requiresSubcategoryForCategory(cat)
+      : false;
     if (!cat) {
       errorEl.textContent = "Please select a category for your discovery.";
+      errorEl.style.display = "block";
+      return;
+    }
+    if (needsSubcategory && !discoverySubcat) {
+      errorEl.textContent = "Please select a subcategory for this category.";
       errorEl.style.display = "block";
       return;
     }
@@ -199,7 +229,7 @@ async function handleSubmit(e) {
     }
     payload.post_type = "discovery";
     payload.category = cat;
-    payload.guide_subcategory = null;
+    payload.guide_subcategory = needsSubcategory ? discoverySubcat : null;
     payload.is_discovery = true;
     payload.content = buildDiscoveryMediaContent(title, content, discoveryImageUrl, discoveryYoutubeUrl);
   } else {
@@ -259,7 +289,33 @@ async function handleSubmit(e) {
     return;
   }
 
-  window.location.href = "/wiki/account/";
+}
+
+
+function refreshDiscoverySubcategoryOptions(presetValue) {
+  const wrap = document.getElementById("discoverySubcategoryWrap");
+  const select = document.getElementById("discoverySubcategory");
+  const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+  if (!wrap || !select) return;
+
+  const options = typeof getCategorySubcategories === "function" ? getCategorySubcategories(category) : [];
+  if (!options.length) {
+    wrap.style.display = "none";
+    select.innerHTML = '<option value="">Select a subcategory...</option>';
+    select.removeAttribute("required");
+    return;
+  }
+
+  wrap.style.display = "block";
+  select.innerHTML = '<option value="">Select a subcategory...</option>';
+  options.forEach(function(optData) {
+    const opt = document.createElement("option");
+    opt.value = optData.slug;
+    opt.textContent = optData.label;
+    select.appendChild(opt);
+  });
+  select.setAttribute("required", "required");
+  if (presetValue) select.value = presetValue;
 }
 
 async function uploadDiscoveryFiles(userId, files) {

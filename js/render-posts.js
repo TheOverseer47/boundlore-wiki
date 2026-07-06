@@ -41,6 +41,11 @@ async function renderCategoryPosts(categorySlug) {
     return { posts: sortedPosts };
   }
 
+  if (shouldGroupBySubcategory(categorySlug)) {
+    renderGroupedCategoryPosts(container, sortedPosts, categorySlug);
+    return { posts: sortedPosts };
+  }
+
   sortedPosts.forEach(function(post) {
     const authorName = post.profiles ? post.profiles.username : "Unknown";
     const plainText = post.content.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 200);
@@ -52,6 +57,10 @@ async function renderCategoryPosts(categorySlug) {
       : "";
     const typeLabel = getReadableType(post);
     const typeBadge = '<span class="bl-tag bl-tag-type">' + escapeHtmlRP(typeLabel) + '</span>';
+    const subcategoryLabel = getPostSubcategoryLabel(post);
+    const subcategoryBadge = subcategoryLabel
+      ? '<span class="bl-tag bl-tag-subcategory">' + escapeHtmlRP(subcategoryLabel) + '</span>'
+      : '';
     const avatarHtml = typeof renderAvatar === "function"
       ? renderAvatar(post.profiles, "bl-avatar-sm")
       : "";
@@ -67,7 +76,7 @@ async function renderCategoryPosts(categorySlug) {
       '<div class="bl-guide-card-top">' +
       '<div class="bl-guide-card-title-wrap">' +
       '<h3 class="bl-guide-card-title">' + escapeHtmlRP(post.title) + '</h3>' +
-      '<div class="bl-guide-card-tags">' + typeBadge + featuredBadge + discoveryBadge + '</div>' +
+      '<div class="bl-guide-card-tags">' + typeBadge + subcategoryBadge + featuredBadge + discoveryBadge + '</div>' +
       '</div>' +
       '<div class="bl-guide-card-meta">' +
       avatarHtml +
@@ -117,6 +126,125 @@ function renderGuildCard(post) {
     '<p class="bl-guild-meta">By ' + escapeHtmlRP(authorName) + ' · ' + dateLabel + '</p>';
 
   return card;
+}
+
+function shouldGroupBySubcategory(categorySlug) {
+  return ['creatures', 'items', 'classes'].includes(categorySlug);
+}
+
+function renderGroupedCategoryPosts(container, posts, categorySlug) {
+  const groups = getCategorySubcategoriesRP(categorySlug);
+  const groupedMap = {};
+
+  posts.forEach(function(post) {
+    const key = post.guide_subcategory || 'general';
+    if (!groupedMap[key]) groupedMap[key] = [];
+    groupedMap[key].push(post);
+  });
+
+  const orderedKeys = groups.map(function(group) { return group.slug; });
+  if (groupedMap.general) orderedKeys.unshift('general');
+
+  orderedKeys.forEach(function(key) {
+    const items = groupedMap[key];
+    if (!items || items.length === 0) return;
+
+    const groupWrap = document.createElement('section');
+    groupWrap.className = 'bl-category-group';
+
+    const groupTitle = document.createElement('h3');
+    groupTitle.className = 'bl-category-group-title';
+    groupTitle.textContent = key === 'general'
+      ? 'General'
+      : getCategorySubcategoryLabelRP(categorySlug, key);
+
+    const groupGrid = document.createElement('div');
+    groupGrid.className = 'bl-category-group-grid';
+
+    items.forEach(function(post) {
+      const card = renderCategoryCard(post, categorySlug);
+      groupGrid.appendChild(card);
+    });
+
+    groupWrap.appendChild(groupTitle);
+    groupWrap.appendChild(groupGrid);
+    container.appendChild(groupWrap);
+  });
+}
+
+function renderCategoryCard(post, categorySlug) {
+  const authorName = post.profiles ? post.profiles.username : "Unknown";
+  const plainText = post.content.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 200);
+  const discoveryBadge = post.is_discovery
+    ? '<span class="bl-tag bl-tag-discovery">\u2728 Discovery</span>'
+    : "";
+  const featuredBadge = post.is_featured_guide
+    ? '<span class="bl-tag bl-tag-featured">Featured</span>'
+    : "";
+  const typeLabel = getReadableType(post);
+  const typeBadge = '<span class="bl-tag bl-tag-type">' + escapeHtmlRP(typeLabel) + '</span>';
+  const subcategoryLabel = getPostSubcategoryLabel(post);
+  const subcategoryBadge = subcategoryLabel
+    ? '<span class="bl-tag bl-tag-subcategory">' + escapeHtmlRP(subcategoryLabel) + '</span>'
+    : "";
+  const avatarHtml = typeof renderAvatar === "function"
+    ? renderAvatar(post.profiles, "bl-avatar-sm")
+    : "";
+  const statBarHtml = renderRatingSummary(post);
+  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const dateLabel = new Date(post.created_at).toLocaleDateString();
+  const openLabel = getOpenLabelForPost(post, categorySlug);
+
+  const card = document.createElement("div");
+  card.className = "bl-guide-card";
+  card.innerHTML =
+    '<a class="bl-guide-card-link" href="' + postUrl + '">' +
+    '<div class="bl-guide-card-top">' +
+    '<div class="bl-guide-card-title-wrap">' +
+    '<h3 class="bl-guide-card-title">' + escapeHtmlRP(post.title) + '</h3>' +
+    '<div class="bl-guide-card-tags">' + typeBadge + subcategoryBadge + featuredBadge + discoveryBadge + '</div>' +
+    '</div>' +
+    '<div class="bl-guide-card-meta">' +
+    avatarHtml +
+    '<span>By ' + escapeHtmlRP(authorName) + ' &middot; ' + dateLabel + '</span>' +
+    '</div>' +
+    '</div>' +
+    '<p class="bl-guide-card-summary">' + escapeHtmlRP(plainText) + (plainText.length >= 200 ? '...' : '') + '</p>' +
+    '<div class="bl-guide-card-bottom">' +
+    '<div class="post-rating-summary" data-post-id="' + post.id + '">' + statBarHtml + '</div>' +
+    '<span class="bl-guide-card-open">' + escapeHtmlRP(openLabel) + ' &rarr;</span>' +
+    '</div>' +
+    '</a>';
+  return card;
+}
+
+function getPostSubcategoryLabel(post) {
+  if (!post || !post.guide_subcategory) return "";
+  if (post.post_type === "guide") {
+    return getGuideSubcategoryLabel(post.guide_subcategory);
+  }
+  return getAnySubcategoryLabelRP(post.category, post.guide_subcategory);
+}
+
+function getCategorySubcategoriesRP(categorySlug) {
+  if (typeof getCategorySubcategories === "function") {
+    return getCategorySubcategories(categorySlug);
+  }
+  return [];
+}
+
+function getCategorySubcategoryLabelRP(categorySlug, subcategorySlug) {
+  if (typeof getCategorySubcategoryLabel === "function") {
+    return getCategorySubcategoryLabel(categorySlug, subcategorySlug);
+  }
+  return subcategorySlug || "";
+}
+
+function getAnySubcategoryLabelRP(categorySlug, subcategorySlug) {
+  if (typeof getAnySubcategoryLabel === "function") {
+    return getAnySubcategoryLabel(categorySlug, subcategorySlug);
+  }
+  return subcategorySlug || "";
 }
 
 function extractDiscordInvite(html) {

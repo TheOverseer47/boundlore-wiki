@@ -89,6 +89,20 @@
       <label for="editGuideSubcategory">Guide Type</label>
       <select id="editGuideSubcategory" class="form-input">
         <option value="">Choose guide type...</option>
+        <option value="survival">Survival</option>
+        <option value="exploration">Exploration</option>
+        <option value="combat">Combat</option>
+        <option value="building">Building</option>
+        <option value="taming">Taming</option>
+        <option value="farming">Farming</option>
+        <option value="crafting-guide">Crafting</option>
+        <option value="lore-story">Lore &amp; Story</option>
+        <option value="multiplayer-guilds">Multiplayer &amp; Guilds</option>
+        <option value="beginner">Beginner Tips</option>
+        <option value="advanced">Advanced Strategies</option>
+        <option value="berufe">Berufe</option>
+        <option value="quests">Quests</option>
+        <option value="talents">Talents</option>
       </select>
     </div>
 
@@ -96,7 +110,24 @@
       <label for="editDiscoveryCategory">Discovery Category</label>
       <select id="editDiscoveryCategory" class="form-input">
         <option value="">Choose category...</option>
+        <option value="creatures">Creatures</option>
+        <option value="classes">Classes</option>
+        <option value="biomes">Biomes</option>
+        <option value="items">Items</option>
+        <option value="guilds">Guilds</option>
+        <option value="building">Building</option>
+        <option value="dungeons">Dungeons</option>
+        <option value="locations">Locations</option>
+        <option value="lore">Lore</option>
+        <option value="crafting">Crafting</option>
       </select>
+      <div id="editDiscoverySubcategoryWrap" class="form-group" style="display:none;margin-top:12px;">
+        <label for="editDiscoverySubcategory">Subcategory</label>
+        <select id="editDiscoverySubcategory" class="form-input">
+          <option value="">Choose a subcategory...</option>
+        </select>
+        <p class="field-hint">Required for categories like Creatures, Classes, and Items so entries stay easy to scan.</p>
+      </div>
     </div>
 
     <label style="margin-top:18px;display:block;" for="editPostEditor">Content</label>
@@ -115,9 +146,9 @@
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js"></script>
+<script src="/js/categories-config.js?v=2"></script>
 <script src="/js/auth-nav.js"></script>
-<script src="/js/edit-post.js"></script>
-<script src="/js/main.js"></script>
+<script src="/js/edit-post.js?v=2"></script>
+<script src="/js/main.js?v=2"></script>
 </body>
 </html>

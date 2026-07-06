@@ -3,6 +3,7 @@ let editPost = null;
 let editCurrentType = "guide";
 let editUserId = null;
 let editIsAdmin = false;
+let currentEditDiscoveryCategory = "";
 
 document.addEventListener("DOMContentLoaded", initEditPost);
 
@@ -31,6 +32,13 @@ async function initEditPost() {
   document.getElementById("btnEditTypeDiscovery").addEventListener("click", function () {
     setEditPostType("discovery");
   });
+  const editDiscoveryCategorySelect = document.getElementById("editDiscoveryCategory");
+  if (editDiscoveryCategorySelect) {
+    editDiscoveryCategorySelect.addEventListener("change", function() {
+      currentEditDiscoveryCategory = this.value;
+      refreshEditDiscoverySubcategoryOptions();
+    });
+  }
   form.addEventListener("submit", handleEditSubmit);
 
   const params = new URLSearchParams(window.location.search);
@@ -99,6 +107,8 @@ async function initEditPost() {
     document.getElementById("editGuideSubcategory").value = post.guide_subcategory || "";
   } else {
     document.getElementById("editDiscoveryCategory").value = post.category || "";
+    currentEditDiscoveryCategory = post.category || "";
+    refreshEditDiscoverySubcategoryOptions(post.guide_subcategory || "");
   }
 
   loading.style.display = "none";
@@ -148,17 +158,20 @@ function setEditPostType(type) {
   const discoveryFields = document.getElementById("editDiscoveryFields");
   const guideSelect = document.getElementById("editGuideSubcategory");
   const discoverySelect = document.getElementById("editDiscoveryCategory");
+  const discoverySubWrap = document.getElementById("editDiscoverySubcategoryWrap");
 
   if (editCurrentType === "guide") {
     guideFields.style.display = "block";
     discoveryFields.style.display = "none";
     guideSelect.removeAttribute("required");
     discoverySelect.removeAttribute("required");
+    if (discoverySubWrap) discoverySubWrap.style.display = "none";
   } else {
     guideFields.style.display = "none";
     discoveryFields.style.display = "block";
     guideSelect.removeAttribute("required");
     discoverySelect.removeAttribute("required");
+    refreshEditDiscoverySubcategoryOptions();
   }
 }
 
@@ -222,19 +235,29 @@ async function handleEditSubmit(e) {
     updates.is_discovery = false;
   } else {
     const cat = document.getElementById("editDiscoveryCategory").value;
+    const subcat = document.getElementById("editDiscoverySubcategory")?.value || "";
 
     const wasDiscovery = editPost.post_type === "discovery" || editPost.is_discovery;
     const effectiveCategory = cat || editPost.category || null;
+    const effectiveSubcategory = subcat || editPost.guide_subcategory || null;
+    const needsSubcategory = typeof requiresSubcategoryForCategory === "function"
+      ? requiresSubcategoryForCategory(effectiveCategory)
+      : false;
 
     if (!effectiveCategory && !wasDiscovery) {
       errEl.textContent = "Please choose a discovery category when switching to Discovery.";
       errEl.style.display = "block";
       return;
     }
+    if (needsSubcategory && !effectiveSubcategory) {
+      errEl.textContent = "Please choose a subcategory for this category.";
+      errEl.style.display = "block";
+      return;
+    }
 
     updates.post_type = "discovery";
     updates.category = effectiveCategory;
-    updates.guide_subcategory = null;
+    updates.guide_subcategory = needsSubcategory ? effectiveSubcategory : null;
     updates.is_discovery = true;
   }
 
@@ -324,4 +347,30 @@ function isValidHttpUrlEP(value) {
   } catch (err) {
     return false;
   }
+}
+
+function refreshEditDiscoverySubcategoryOptions(presetValue) {
+  const wrap = document.getElementById("editDiscoverySubcategoryWrap");
+  const select = document.getElementById("editDiscoverySubcategory");
+  const category = document.getElementById("editDiscoveryCategory")?.value || currentEditDiscoveryCategory || "";
+  if (!wrap || !select) return;
+
+  const options = typeof getCategorySubcategories === "function" ? getCategorySubcategories(category) : [];
+  if (!options.length) {
+    wrap.style.display = "none";
+    select.innerHTML = '<option value="">Choose a subcategory...</option>';
+    select.removeAttribute("required");
+    return;
+  }
+
+  wrap.style.display = "block";
+  select.innerHTML = '<option value="">Choose a subcategory...</option>';
+  options.forEach(function(optData) {
+    const opt = document.createElement("option");
+    opt.value = optData.slug;
+    opt.textContent = optData.label;
+    select.appendChild(opt);
+  });
+  select.setAttribute("required", "required");
+  if (presetValue) select.value = presetValue;
 }

@@ -94,6 +94,9 @@
         <option value="multiplayer-guilds">Multiplayer &amp; Guilds</option>
         <option value="beginner">Beginner Tips</option>
         <option value="advanced">Advanced Strategies</option>
+        <option value="berufe">Berufe</option>
+        <option value="quests">Quests</option>
+        <option value="talents">Talents</option>
       </select>
     </div>
 
@@ -102,6 +105,7 @@
       <select id="discoveryCategory" class="form-input">
         <option value="">Select a category...</option>
         <option value="creatures">Creatures</option>
+        <option value="classes">Classes</option>
         <option value="biomes">Biomes</option>
         <option value="items">Items</option>
         <option value="guilds">Guilds</option>
@@ -111,6 +115,13 @@
         <option value="lore">Lore</option>
         <option value="crafting">Crafting</option>
       </select>
+      <div id="discoverySubcategoryWrap" class="form-group" style="display:none;margin-top:12px;">
+        <label for="discoverySubcategory">Subcategory</label>
+        <select id="discoverySubcategory" class="form-input">
+          <option value="">Select a subcategory...</option>
+        </select>
+        <p class="field-hint">Required for categories like Creatures, Classes, and Items so entries stay easy to scan.</p>
+      </div>
       <p class="field-hint">Your discovery will appear in this category with a "Community Discovery" badge, pending admin review.</p>
       <p class="field-hint">Add screenshots/files below. Admins can review and download your attachments directly from the dashboard.</p>
 
@@ -156,9 +167,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script src="/js/supabase-config.js"></script>
+<script src="/js/categories-config.js?v=2"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/search.js"></script>
-<script src="/js/main.js"></script>
-<script src="/js/create-post.js"></script>
+<script src="/js/main.js?v=2"></script>
+<script src="/js/create-post.js?v=2"></script>
 </body>
 </html>

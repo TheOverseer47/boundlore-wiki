@@ -847,6 +847,12 @@ a:hover { color: var(--gold-light); }
   margin-top: 8px;
 }
 
+.bl-tag-subcategory {
+  border-color: rgba(201,168,76,0.28);
+  color: #f3d88f;
+  background: rgba(201,168,76,0.08);
+}
+
 .bl-tag {
   border-radius: 999px;
   font-size: 0.68rem;
@@ -904,6 +910,29 @@ a:hover { color: var(--gold-light); }
   color: var(--gold-light);
   font-size: 0.82rem;
   font-weight: 700;
+}
+
+.bl-category-group {
+  margin-bottom: 22px;
+}
+
+.bl-category-group-title {
+  margin: 0 0 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 1.04rem;
+  color: var(--gold-light);
+}
+
+.bl-category-group-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .bl-category-group-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .bl-rating-line,
