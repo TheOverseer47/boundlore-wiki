@@ -22,33 +22,34 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     .community-shell { max-width: 1150px; margin: 0 auto 70px; padding: 0 20px; }
-    .community-shell, .community-shell h2, .community-shell h3, .community-shell h4, .community-shell p, .community-shell li { color: var(--text); }
-    .community-shell p, .community-shell li { color: #c9cad8; }
+    .community-shell, .community-shell h2, .community-shell h3, .community-shell h4, .community-shell p, .community-shell li { color: #f2f4fb; }
+    .community-shell p, .community-shell li { color: #dde1ef; }
     .community-top-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; margin-bottom: 26px; }
-    .community-panel { background: linear-gradient(165deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
+    .community-panel { background: linear-gradient(165deg, rgba(255,255,255,0.14), rgba(56,58,78,0.86)); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; }
     .community-panel h2, .community-panel h3 { margin-top: 0; }
     .community-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .community-pill { padding: 6px 12px; border-radius: 999px; font-size: 0.78rem; letter-spacing: 0.03em; text-transform: uppercase; font-weight: 600; }
     .pill-live { background: rgba(80, 200, 120, 0.2); color: #8ff0b2; border: 1px solid rgba(80, 200, 120, 0.45); }
     .pill-warning { background: rgba(224, 168, 58, 0.18); color: #f4ce75; border: 1px solid rgba(224, 168, 58, 0.45); }
     .community-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 24px; }
-    .community-action { text-decoration: none; color: #eef0f8; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: linear-gradient(165deg, rgba(255,255,255,0.08), rgba(20,20,32,0.8)); padding: 16px; transition: transform 0.2s, border-color 0.2s, background 0.2s; }
-    .community-action:hover { transform: translateY(-2px); border-color: rgba(255,215,0,0.45); background: rgba(255,255,255,0.05); }
+    .community-action { text-decoration: none; color: #f4f6ff; border-radius: 12px; border: 1px solid rgba(255,255,255,0.22); background: linear-gradient(165deg, rgba(255,255,255,0.14), rgba(42,44,62,0.92)); padding: 16px; transition: transform 0.2s, border-color 0.2s, background 0.2s; }
+    .community-action:hover { transform: translateY(-2px); border-color: rgba(255,215,0,0.55); background: linear-gradient(165deg, rgba(255,255,255,0.2), rgba(54,56,77,0.95)); }
     .community-action h4 { margin: 8px 0 6px; }
-    .community-action p { color: #d3d6e4; }
+    .community-action p { color: #e1e5f2; }
+    .community-action > div { color: #ffd782; text-shadow: 0 0 16px rgba(255,215,122,0.25); }
     .community-columns { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
     .community-list { margin: 0; padding-left: 18px; }
     .community-list li { margin-bottom: 8px; }
-    .community-list a { color: var(--text); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,0.3); }
+    .community-list a { color: #f0f3ff; text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,0.45); }
     .community-list a:hover { color: var(--gold); border-bottom-color: var(--gold); }
-    .community-feed-panel { background: rgba(17,17,24,0.75); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; }
+    .community-feed-panel { background: linear-gradient(165deg, rgba(255,255,255,0.12), rgba(28,30,44,0.92)); border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; padding: 16px; }
     .community-feed-panel .section-header { margin-bottom: 14px; text-align: left; }
-    .community-feed-panel .recent-card { background: rgba(34,35,48,0.88); border-color: rgba(255,255,255,0.15); }
+    .community-feed-panel .recent-card { background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(48,50,72,0.92)); border-color: rgba(255,255,255,0.24); opacity: 1; }
     .community-feed-panel .recent-card h4 { color: #f3f4f9; }
-    .community-feed-panel .recent-card p { color: #d4d7e4; }
+    .community-feed-panel .recent-card p { color: #e0e3ef; }
     .community-reddit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
-    .community-reddit-card { border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; background: linear-gradient(145deg, rgba(255,96,0,0.14), rgba(17,17,24,0.9)); }
-    .community-reddit-card p { color: #d6d7e2; line-height: 1.58; }
+    .community-reddit-card { border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; padding: 16px; background: linear-gradient(145deg, rgba(255,123,46,0.24), rgba(44,46,68,0.9)); }
+    .community-reddit-card p { color: #eceef7; line-height: 1.58; }
     .community-reddit-form .form-label { display: block; margin-bottom: 6px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #d5d6e0; }
     .community-reddit-status { margin-top: 10px; font-size: 0.9rem; display: none; }
     .community-reddit-status.error { color: #ff8b8b; }
