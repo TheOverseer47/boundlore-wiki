@@ -48,10 +48,10 @@ async function loadCommunityGuides() {
   const { data, error } = await supabase
     .from("posts")
     .select("id, slug, title, category, post_type, guide_subcategory, content, created_at")
-    .eq("status", "published")
-    .eq("category", "guides")
+    .in("status", ["published", "approved"])
+    .eq("post_type", "guide")
     .order("created_at", { ascending: false })
-    .limit(4);
+    .limit(6);
 
   if (error || !data || data.length === 0) {
     container.innerHTML = '<li style="color:var(--text-muted);">No guides published yet.</li>';
@@ -64,7 +64,10 @@ async function loadCommunityGuides() {
     const href = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
     const meta = parsePostMetaCH(post.content || "");
     const subcategory = post.guide_subcategory || (meta && meta.subcategory) || "";
-    const kind = subcategory ? ('<span style="color:var(--text-muted);font-size:0.82rem;"> (' + escapeHtmlCH(subcategory) + ')</span>') : '';
+    const label = subcategory && typeof getGuideSubcategoryLabel === "function"
+      ? getGuideSubcategoryLabel(subcategory)
+      : subcategory;
+    const kind = label ? ('<span style="color:var(--text-muted);font-size:0.82rem;"> (' + escapeHtmlCH(label) + ')</span>') : '';
     li.innerHTML = '<a href="' + href + '">' + escapeHtmlCH(post.title) + '</a>' + kind;
     container.appendChild(li);
   });

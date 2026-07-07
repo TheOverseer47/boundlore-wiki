@@ -7,13 +7,14 @@ async function loadRecentTicker() {
     .select("id, slug, title, category, post_type, guide_subcategory, created_at, status")
     .in("status", ["published", "approved"])
     .order("created_at", { ascending: false })
-    .limit(10);
+    .limit(6);
 
   if (error || !data || data.length === 0) {
     track.innerHTML =
-      '<a class="recent-ticker-item" href="/wiki/create-post/">' +
-      '<span class="recent-tag">Live Feed</span>' +
-      '<strong>No recent approved posts yet. Be the first to contribute.</strong>' +
+      '<a class="recent-card placeholder" href="/wiki/create-post/">' +
+      '<span class="recent-tag">Recently Added</span>' +
+      '<h4>No recent approved posts yet</h4>' +
+      '<p>Be the first to contribute a post to populate this section.</p>' +
       "</a>";
     return;
   }
@@ -22,20 +23,18 @@ async function loadRecentTicker() {
     const label = typeof getPostCategoryLabel === "function"
       ? getPostCategoryLabel(post)
       : (post.category || "Post");
-    const statusLabel = post.status === "approved" ? "Approved" : "Published";
     const href = post.slug
       ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug))
       : ("/wiki/post/?id=" + encodeURIComponent(post.id));
 
-    return '<a class="recent-ticker-item" href="' + href + '">' +
-      '<span class="recent-tag">' + escapeHtmlRT(label) + ' · ' + statusLabel + '</span>' +
-      '<strong>' + escapeHtmlRT(post.title || "Untitled") + '</strong>' +
-      '<span class="recent-ticker-date">' + new Date(post.created_at).toLocaleDateString() + '</span>' +
+    return '<a class="recent-card" href="' + href + '">' +
+      '<span class="recent-tag">' + escapeHtmlRT(label) + '</span>' +
+      '<h4>' + escapeHtmlRT(post.title || "Untitled") + '</h4>' +
+      '<div class="recent-meta"><span>' + escapeHtmlRT(post.status === "approved" ? "Approved" : "Published") + '</span><span>' + new Date(post.created_at).toLocaleDateString() + '</span></div>' +
       "</a>";
   }).join("");
 
-  // Duplicate once for seamless marquee loop.
-  track.innerHTML = itemsHtml + itemsHtml;
+  track.innerHTML = itemsHtml;
 }
 
 function escapeHtmlRT(value) {

@@ -633,6 +633,15 @@ a:hover { color: var(--gold-light); }
   line-height: 1.55;
 }
 
+.bl-guides-overview-centered {
+  justify-content: center;
+  text-align: center;
+}
+
+.bl-guides-overview-centered p {
+  margin: 0 auto;
+}
+
 .bl-guides-overview-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(100px, 1fr));
@@ -671,6 +680,31 @@ a:hover { color: var(--gold-light); }
   padding-left: 18px;
   color: var(--text-muted);
   line-height: 1.75;
+}
+
+.bl-guides-legend-centered {
+  text-align: center;
+}
+
+.bl-guides-legend-centered ul {
+  display: inline-block;
+  text-align: left;
+  max-width: 720px;
+}
+
+.recent-static-grid {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.recent-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-top: 10px;
 }
 
 .bl-guides-tools h3,

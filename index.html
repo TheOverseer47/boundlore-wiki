@@ -190,11 +190,12 @@
       <h2 class="section-title">Recently Added</h2>
       <a href="wiki/guides/" class="view-all">Open Guides &#8594;</a>
     </div>
-    <div id="recentArticles" class="recent-ticker-wrap" aria-live="polite">
-      <div class="recent-ticker-track" id="recentTickerTrack">
-        <a class="recent-ticker-item" href="/wiki/create-post/">
-          <span class="recent-tag">Live Feed</span>
-          <strong>Loading latest approved posts...</strong>
+    <div id="recentArticles" class="recent-static-grid" aria-live="polite">
+      <div id="recentTickerTrack" class="recent-grid">
+        <a class="recent-card placeholder" href="/wiki/create-post/">
+          <span class="recent-tag">Recently Added</span>
+          <h4>Loading latest approved posts...</h4>
+          <p>Building a fresh snapshot of recently added content.</p>
         </a>
       </div>
     </div>
@@ -231,7 +232,7 @@
   <script src="/js/supabase-config.js"></script>
   <script src="/js/categories-config.js?v=3"></script>
   <script src="/js/discovery-home.js"></script>
-  <script src="/js/recent-ticker.js"></script>
+  <script src="/js/recent-ticker.js?v=2"></script>
   <script src="/js/search.js"></script>
   <script src="/js/auth-nav.js"></script>
   <script src="js/main.js?v=3"></script>
