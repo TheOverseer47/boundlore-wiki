@@ -1,0 +1,23 @@
+Expected local trailer knowledge pack posts:
+- Biomes: Aquatic Biome - Trailer Reference
+- Biomes: Palm Desert Biome - Trailer Reference
+- Biomes: Temperate Woodland Biome - Trailer Reference
+- Biomes: Frozen Biome - Trailer Reference
+- Biomes: Grasslands Biome - Trailer Reference
+- Biomes: Rocky and Mountainous Biome - Trailer Reference
+- Creatures: Human Adventurer
+- Creatures: Elf Humanoid
+- Creatures: Giant or Ogre Humanoid
+- Creatures: Skeleton Humanoid
+- Creatures: Unknown Horned Humanoid
+- Creatures: Badger Humanoid
+- Creatures: Bear Humanoid
+- Creatures: Fox Humanoid
+- Creatures: Frog Humanoid
+- Creatures: Otter Humanoid
+- Creatures: Pig Humanoid
+- Creatures: Rabbit or Hare Humanoid
+- Items: Bow and Arrow - Trailer Weapon Reference
+- Items: Staff
+- Items: Fire Sword
+- Items: Sword and Shield - Trailer Weapon Reference

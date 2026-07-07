@@ -7,9 +7,10 @@ const BOUNDLORE_CATEGORIES = [
     description: 'Beasts, monsters, mounts, and wildlife of the world.',
     nav: 'primary',
     subcategories: [
-      { slug: 'mounts', label: 'Mounts' },
-      { slug: 'monsters', label: 'Monsters' },
-      { slug: 'npcs', label: 'NPCs' },
+      { slug: 'mounts', label: 'Mounts', icon: '\u{1F40E}' },
+      { slug: 'monsters', label: 'Monsters', icon: '\u{1F479}' },
+      { slug: 'races', label: 'Races', icon: '\u{1F9DD}' },
+      { slug: 'npcs', label: 'NPCs', icon: '\u{1F91D}' },
     ],
   },
   {
@@ -19,10 +20,10 @@ const BOUNDLORE_CATEGORIES = [
     description: 'Professions, builds, quests, and talent paths.',
     nav: 'primary',
     subcategories: [
-      { slug: 'berufe', label: 'Professions' },
-      { slug: 'building', label: 'Building' },
-      { slug: 'quests', label: 'Quests' },
-      { slug: 'talents', label: 'Talents' },
+      { slug: 'berufe', label: 'Professions', icon: '\u{1F6E0}\u{FE0F}' },
+      { slug: 'building', label: 'Building', icon: '\u{1F3D7}\u{FE0F}' },
+      { slug: 'quests', label: 'Quests', icon: '\u{1F5FA}\u{FE0F}' },
+      { slug: 'talents', label: 'Talents', icon: '\u{2728}' },
     ],
   },
   {
@@ -32,16 +33,30 @@ const BOUNDLORE_CATEGORIES = [
     description: 'Weapons, armor, tools, and artifacts.',
     nav: 'primary',
     subcategories: [
-      { slug: 'weapons', label: 'Weapons' },
-      { slug: 'armor', label: 'Armor' },
-      { slug: 'items', label: 'Items' },
+      { slug: 'weapons', label: 'Weapons', icon: '\u{2694}\u{FE0F}' },
+      { slug: 'armor', label: 'Armor', icon: '\u{1F6E1}\u{FE0F}' },
+      { slug: 'items', label: 'Items', icon: '\u{1F9F0}' },
     ],
   },
   { slug: 'guides', label: 'Guides', icon: '\u{1F4D6}', description: 'Tips, tutorials, and survival strategies.', nav: 'primary' },
   { slug: 'guilds', label: 'Guilds', icon: '\u{1F3F0}', description: 'Player factions and communities.', nav: 'primary' },
   { slug: 'community', label: 'Community', icon: '\u{1F310}', description: 'Social hubs, links, and community resources.', nav: 'primary' },
   { slug: 'news', label: 'News', icon: '\u{1F4F0}', description: 'Latest updates and announcements.', nav: 'primary' },
-  { slug: 'biomes', label: 'Biomes', icon: '\u{1F30D}', description: 'Landscapes, climates, and regions.', nav: 'more' },
+  {
+    slug: 'biomes',
+    label: 'Biomes',
+    icon: '\u{1F30D}',
+    description: 'Landscapes, climates, and regions.',
+    nav: 'more',
+    subcategories: [
+      { slug: 'aquatic', label: 'Aquatic', icon: '\u{1F30A}' },
+      { slug: 'deserts', label: 'Deserts', icon: '\u{1F3DC}\u{FE0F}' },
+      { slug: 'forests', label: 'Forests', icon: '\u{1F332}' },
+      { slug: 'frozen', label: 'Frozen', icon: '\u{2744}\u{FE0F}' },
+      { slug: 'grasslands', label: 'Grasslands', icon: '\u{1F33F}' },
+      { slug: 'rocky-mountainous', label: 'Rocky & Mountainous', icon: '\u{26F0}\u{FE0F}' },
+    ],
+  },
   { slug: 'dungeons', label: 'Dungeons', icon: '\u{1F3F0}', description: 'Instances, ruins, and dangerous encounters.', nav: 'more' },
   { slug: 'locations', label: 'Locations', icon: '\u{1F5FA}\u{FE0F}', description: 'Notable landmarks and points of interest.', nav: 'more' },
   { slug: 'lore', label: 'Lore', icon: '\u{1F4DC}', description: 'Mythology, history, and world background.', nav: 'more' },
@@ -106,6 +121,12 @@ function getCategorySubcategoryLabel(categorySlug, subcategorySlug) {
   return subcategorySlug || '';
 }
 
+function getCategorySubcategoryIcon(categorySlug, subcategorySlug) {
+  const subcategories = getCategorySubcategories(categorySlug);
+  const found = subcategories.find(function(c) { return c.slug === subcategorySlug; });
+  return found && found.icon ? found.icon : '';
+}
+
 function getAnySubcategoryLabel(categorySlug, subcategorySlug) {
   const categoryLabel = getCategorySubcategoryLabel(categorySlug, subcategorySlug);
   if (categoryLabel) return categoryLabel;
@@ -113,7 +134,7 @@ function getAnySubcategoryLabel(categorySlug, subcategorySlug) {
 }
 
 function requiresSubcategoryForCategory(categorySlug) {
-  return ['creatures', 'classes', 'items'].includes(categorySlug);
+  return getCategorySubcategories(categorySlug).length > 0;
 }
 
 function getCategoryDisplayLabel(categorySlug) {

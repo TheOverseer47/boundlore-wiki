@@ -277,14 +277,16 @@ async function loadRelatedPosts(post, postMeta) {
   list.innerHTML = "";
 
   const usedIds = new Set();
-  const bestMatches = scored.slice(0, 4);
+  const bestMatches = scored.filter(function(item) {
+    return item.relatedScore >= 8;
+  }).slice(0, 4);
   const topicalMatches = scored.filter(function(item) {
     return isRelatedByTopicPD(post, item);
   }).filter(function(item) {
     return !bestMatches.some(function(best) { return best.id === item.id; });
   }).slice(0, 4);
   const metaMatches = scored.filter(function(item) {
-    return isRelatedByMetaPD(postMeta, item.content || "");
+    return isRelatedByMetaPD(post, postMeta, item);
   }).filter(function(item) {
     return !bestMatches.some(function(best) { return best.id === item.id; }) &&
       !topicalMatches.some(function(topic) { return topic.id === item.id; });
@@ -322,7 +324,11 @@ function getSeeAlsoLabelPD(post) {
     ? "Guide"
     : (post.post_type === "discovery" ? "Discovery" : "Post");
   const categoryLabel = getPostLabelSafe(post);
-  return typeLabel + " · " + categoryLabel;
+  const postMeta = parsePostMetaPD(post.content || "");
+  const subcategoryLabel = getPostSubcategoryLabelPD(post, postMeta);
+  return subcategoryLabel
+    ? (typeLabel + " · " + categoryLabel + " · " + subcategoryLabel)
+    : (typeLabel + " · " + categoryLabel);
 }
 
 function getPostSubcategoryLabelPD(post, postMeta) {
@@ -338,15 +344,27 @@ function getPostSubcategoryLabelPD(post, postMeta) {
 }
 
 function computeRelatedScorePD(currentPost, currentMeta, candidate) {
+  const candidateMeta = parsePostMetaPD(candidate.content || "");
+  const currentSubcategory = (currentMeta && currentMeta.subcategory) || currentPost.guide_subcategory || "";
+  const candidateSubcategory = candidate.guide_subcategory || candidateMeta.subcategory || "";
+  const sameType = Boolean(currentPost.post_type && candidate.post_type === currentPost.post_type);
+  const sameCategory = Boolean(currentPost.category && candidate.category === currentPost.category);
+  const sameSubcategory = Boolean(currentSubcategory && candidateSubcategory && currentSubcategory === candidateSubcategory);
+  const sameSource = Boolean(currentMeta && currentMeta.source_url && candidateMeta.source_url && currentMeta.source_url === candidateMeta.source_url);
+
+  if (currentPost.post_type === "guide") {
+    if (!sameType) return 0;
+  } else if (!sameCategory) {
+    return 0;
+  }
+
   let score = 0;
 
-  if (currentPost.post_type && candidate.post_type === currentPost.post_type) score += 4;
-  if (currentPost.category && candidate.category === currentPost.category) score += 4;
+  if (sameType) score += 3;
+  if (sameCategory) score += 6;
+  if (sameSubcategory) score += 10;
+  if (sameSource) score += 4;
   if (currentMeta && candidate.content) {
-    const candidateMeta = parsePostMetaPD(candidate.content || "");
-    const currentSubcategory = currentMeta.subcategory || currentPost.guide_subcategory || "";
-    const candidateSubcategory = candidate.guide_subcategory || candidateMeta.subcategory || "";
-    if (currentSubcategory && candidateSubcategory && currentSubcategory === candidateSubcategory) score += 7;
     if (currentMeta.update_phase && candidateMeta.update_phase && currentMeta.update_phase === candidateMeta.update_phase) score += 2;
     if (currentMeta.patch_tag && candidateMeta.patch_tag && currentMeta.patch_tag === candidateMeta.patch_tag) score += 2;
   }
@@ -357,15 +375,21 @@ function computeRelatedScorePD(currentPost, currentMeta, candidate) {
 
   const currentLabelTokens = tokenizeRelatedTermsPD(currentLabel);
   const candidateLabelTokens = tokenizeRelatedTermsPD(candidateLabel);
-  score += Math.min(countSharedTermsPD(currentLabelTokens, candidateLabelTokens), 2);
+  if (sameCategory || sameSubcategory || sameType) {
+    score += Math.min(countSharedTermsPD(currentLabelTokens, candidateLabelTokens), 1);
+  }
 
   const currentSlugTokens = tokenizeRelatedTermsPD(currentPost.slug || currentPost.title || "");
   const candidateSlugTokens = tokenizeRelatedTermsPD(candidate.slug || candidate.title || "");
-  score += Math.min(countSharedTermsPD(currentSlugTokens, candidateSlugTokens), 2);
+  if (sameSubcategory || sameSource) {
+    score += Math.min(countSharedTermsPD(currentSlugTokens, candidateSlugTokens), 1);
+  }
 
   const currentTitleWords = tokenizeRelatedTermsPD(currentPost.title);
   const candidateTitleWords = tokenizeRelatedTermsPD(candidate.title);
-  score += Math.min(countSharedTermsPD(currentTitleWords, candidateTitleWords), 3);
+  if (sameSubcategory || sameSource) {
+    score += Math.min(countSharedTermsPD(currentTitleWords, candidateTitleWords), 2);
+  }
 
   return score;
 }
@@ -457,14 +481,20 @@ function isRelatedByTopicPD(post, candidate) {
   const candidateMeta = parsePostMetaPD(candidate.content || "");
   const candidateSubcategory = candidate.guide_subcategory || candidateMeta.subcategory || "";
   if (currentSubcategory && candidateSubcategory && candidateSubcategory === currentSubcategory) return true;
-  if (post.category && candidate.category === post.category) return true;
-  return post.post_type && candidate.post_type === post.post_type;
+  if (post.post_type === "guide") return post.post_type && candidate.post_type === post.post_type;
+  return post.category && candidate.category === post.category;
 }
 
-function isRelatedByMetaPD(postMeta, candidateContent) {
-  if (!postMeta || !candidateContent) return false;
-  const candidateMeta = parsePostMetaPD(candidateContent || "");
+function isRelatedByMetaPD(post, postMeta, candidate) {
+  if (!postMeta || !candidate) return false;
+  const currentSubcategory = post.guide_subcategory || postMeta.subcategory || "";
+  const candidateMeta = parsePostMetaPD(candidate.content || "");
+  const candidateSubcategory = candidate.guide_subcategory || candidateMeta.subcategory || "";
+  if (currentSubcategory && candidateSubcategory && currentSubcategory !== candidateSubcategory) {
+    return false;
+  }
   return Boolean(
+    (postMeta.source_url && candidateMeta.source_url && postMeta.source_url === candidateMeta.source_url) ||
     (postMeta.update_phase && candidateMeta.update_phase && postMeta.update_phase === candidateMeta.update_phase) ||
     (postMeta.patch_tag && candidateMeta.patch_tag && postMeta.patch_tag === candidateMeta.patch_tag)
   );

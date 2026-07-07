@@ -960,6 +960,9 @@ a:hover { color: var(--gold-light); }
   text-transform: uppercase;
   letter-spacing: 0.11em;
   color: #9ea5bd;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .bl-category-group-grid {
@@ -988,6 +991,11 @@ a:hover { color: var(--gold-light); }
   flex: 1;
 }
 
+.bl-category-filter-search {
+  min-width: 240px;
+  flex: 1.35;
+}
+
 .bl-category-filter-item label {
   display: block;
   font-size: 0.78rem;
@@ -1013,6 +1021,7 @@ a:hover { color: var(--gold-light); }
 .bl-subcategory-pill {
   display: inline-flex;
   align-items: center;
+  gap: 7px;
   padding: 5px 10px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.14);
@@ -1021,6 +1030,14 @@ a:hover { color: var(--gold-light); }
   font-size: 0.76rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.bl-subcategory-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 @media (max-width: 760px) {
@@ -1158,14 +1175,11 @@ a:hover { color: var(--gold-light); }
 .bl-related-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 14px;
+  align-items: start;
 }
 
 .bl-related-group {
-  margin-top: 14px;
-}
-
-.bl-related-group:first-child {
   margin-top: 0;
 }
 
@@ -1176,6 +1190,9 @@ a:hover { color: var(--gold-light); }
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  min-height: 1.1rem;
+  display: flex;
+  align-items: center;
 }
 
 .bl-related-group-grid {
@@ -1205,6 +1222,13 @@ a:hover { color: var(--gold-light); }
   color: var(--text-muted);
   font-size: 0.78rem;
   margin-top: 5px;
+}
+
+@media (max-width: 860px) {
+  .bl-related-list,
+  .bl-related-group-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .bl-post-rating-widget {

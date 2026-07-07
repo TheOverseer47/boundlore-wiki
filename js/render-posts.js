@@ -7,6 +7,8 @@ async function renderCategoryPosts(categorySlug) {
   const emptyMsg = document.getElementById("categoryPostsEmpty");
   if (!container) return;
 
+  enhanceSubcategoryOverview(container, categorySlug);
+
   // Build query with special handling for the 'guides' pseudo-category
   let query = supabase
     .from("posts")
@@ -37,15 +39,21 @@ async function renderCategoryPosts(categorySlug) {
 
   const activeSubcategory = getSubcategoryFilterFromUrlRP();
   const sortMode = getSortFilterFromUrlRP();
-  const filteredPosts = activeSubcategory
-    ? posts.filter(function(post) {
-        return getRenderableSubcategorySlug(post) === activeSubcategory;
-      })
-    : posts;
+  const searchQuery = getCategorySearchFromUrlRP();
+  const filteredPosts = posts.filter(function(post) {
+    if (activeSubcategory && getRenderableSubcategorySlug(post) !== activeSubcategory) {
+      return false;
+    }
+    if (searchQuery && !matchesCategorySearchRP(post, categorySlug, searchQuery)) {
+      return false;
+    }
+    return true;
+  });
 
   renderGroupedCategoryFilterControls(container, categorySlug, {
     activeSubcategory: activeSubcategory,
     sortMode: sortMode,
+    searchQuery: searchQuery,
     visibleCount: filteredPosts.length,
     totalCount: posts.length,
   });
@@ -158,7 +166,8 @@ function renderGuildCard(post) {
 }
 
 function shouldGroupBySubcategory(categorySlug) {
-  return ['creatures', 'items', 'classes'].includes(categorySlug);
+  if (categorySlug === "guides") return false;
+  return getCategorySubcategoriesRP(categorySlug).length > 0;
 }
 
 function renderGroupedCategoryPosts(container, posts, categorySlug) {
@@ -183,9 +192,11 @@ function renderGroupedCategoryPosts(container, posts, categorySlug) {
 
     const groupTitle = document.createElement('h3');
     groupTitle.className = 'bl-category-group-title';
-    groupTitle.textContent = key === 'general'
+    const label = key === 'general'
       ? 'General'
       : getCategorySubcategoryLabelRP(categorySlug, key);
+    const icon = key === 'general' ? '' : getCategorySubcategoryIconRP(categorySlug, key);
+    groupTitle.innerHTML = (icon ? '<span class="bl-subcategory-icon" aria-hidden="true">' + escapeHtmlRP(icon) + '</span>' : '') + '<span>' + escapeHtmlRP(label) + '</span>';
 
     const groupGrid = document.createElement('div');
     groupGrid.className = 'bl-category-group-grid';
@@ -215,7 +226,7 @@ function renderCategoryCard(post, categorySlug) {
   const subcategoryLabel = getPostSubcategoryLabel(post);
   const showSubcategoryBadge = shouldShowSubcategoryBadge(post, subcategoryLabel);
   const subcategoryBadge = showSubcategoryBadge
-    ? '<span class="bl-tag bl-tag-subcategory">' + escapeHtmlRP(subcategoryLabel) + '</span>'
+    ? '<span class="bl-tag bl-tag-subcategory">' + buildSubcategoryDisplayRP(post.category, getRenderableSubcategorySlug(post), subcategoryLabel) + '</span>'
     : "";
   const avatarHtml = typeof renderAvatar === "function"
     ? renderAvatar(post.profiles, "bl-avatar-sm")
@@ -273,6 +284,15 @@ function getSubcategoryFilterFromUrlRP() {
   }
 }
 
+function getCategorySearchFromUrlRP() {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    return (params.get("q") || "").trim().toLowerCase();
+  } catch (err) {
+    return "";
+  }
+}
+
 function getSortFilterFromUrlRP() {
   try {
     const params = new URLSearchParams(window.location.search || "");
@@ -321,6 +341,10 @@ function renderGroupedCategoryFilterControls(container, categorySlug, state) {
     controls.className = "bl-category-filters";
     controls.innerHTML =
       '<div class="bl-category-filters-row">' +
+        '<div class="bl-category-filter-item bl-category-filter-search">' +
+          '<label for="blCategorySearchFilter">Search</label>' +
+          '<input id="blCategorySearchFilter" class="form-input" type="search" placeholder="Search this category..." />' +
+        '</div>' +
         '<div class="bl-category-filter-item">' +
           '<label for="blCategorySubFilter">Subcategory</label>' +
           '<select id="blCategorySubFilter" class="form-input"></select>' +
@@ -341,26 +365,29 @@ function renderGroupedCategoryFilterControls(container, categorySlug, state) {
 
   const subFilter = controls.querySelector("#blCategorySubFilter");
   const sortFilter = controls.querySelector("#blCategorySortFilter");
+  const searchFilter = controls.querySelector("#blCategorySearchFilter");
   const resetBtn = controls.querySelector("#blCategoryFilterReset");
   const summary = controls.querySelector("#blCategoryFilterSummary");
 
-  if (!subFilter || !sortFilter || !resetBtn || !summary) return;
+  if (!subFilter || !sortFilter || !searchFilter || !resetBtn || !summary) return;
 
   const subcategories = getCategorySubcategoriesRP(categorySlug);
   subFilter.innerHTML = '<option value="">All Subcategories</option>';
   subcategories.forEach(function(item) {
     const opt = document.createElement("option");
     opt.value = item.slug;
-    opt.textContent = item.label;
+    opt.textContent = (item.icon ? (item.icon + " ") : "") + item.label;
     subFilter.appendChild(opt);
   });
   subFilter.value = state.activeSubcategory || "";
   sortFilter.value = state.sortMode || "newest";
+  searchFilter.value = state.searchQuery || "";
 
   const activeSubLabel = state.activeSubcategory
     ? getCategorySubcategoryLabelRP(categorySlug, state.activeSubcategory)
     : "All subcategories";
-  summary.textContent = "Showing " + state.visibleCount + " of " + state.totalCount + " entries - " + activeSubLabel;
+  const searchLabel = state.searchQuery ? (' - Search: "' + state.searchQuery + '"') : "";
+  summary.textContent = "Showing " + state.visibleCount + " of " + state.totalCount + " entries - " + activeSubLabel + searchLabel;
 
   if (!subFilter.dataset.bound) {
     subFilter.addEventListener("change", function() {
@@ -378,10 +405,23 @@ function renderGroupedCategoryFilterControls(container, categorySlug, state) {
     sortFilter.dataset.bound = "1";
   }
 
+  if (!searchFilter.dataset.bound) {
+    let searchTimer = null;
+    searchFilter.addEventListener("input", function() {
+      window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(function() {
+        setCategoryFilterUrlParam("q", searchFilter.value.trim());
+        renderCategoryPosts(categorySlug);
+      }, 180);
+    });
+    searchFilter.dataset.bound = "1";
+  }
+
   if (!resetBtn.dataset.bound) {
     resetBtn.addEventListener("click", function() {
       setCategoryFilterUrlParam("subcategory", "");
       setCategoryFilterUrlParam("sort", "");
+      setCategoryFilterUrlParam("q", "");
       renderCategoryPosts(categorySlug);
     });
     resetBtn.dataset.bound = "1";
@@ -419,6 +459,54 @@ function getCategorySubcategoryLabelRP(categorySlug, subcategorySlug) {
     return getCategorySubcategoryLabel(categorySlug, subcategorySlug);
   }
   return subcategorySlug || "";
+}
+
+function getCategorySubcategoryIconRP(categorySlug, subcategorySlug) {
+  if (typeof getCategorySubcategoryIcon === "function") {
+    return getCategorySubcategoryIcon(categorySlug, subcategorySlug);
+  }
+  return "";
+}
+
+function buildSubcategoryDisplayRP(categorySlug, subcategorySlug, fallbackLabel) {
+  const label = fallbackLabel || getCategorySubcategoryLabelRP(categorySlug, subcategorySlug);
+  const icon = getCategorySubcategoryIconRP(categorySlug, subcategorySlug);
+  if (!icon) return escapeHtmlRP(label);
+  return '<span class="bl-subcategory-icon" aria-hidden="true">' + escapeHtmlRP(icon) + '</span>' + escapeHtmlRP(label);
+}
+
+function enhanceSubcategoryOverview(container, categorySlug) {
+  const shell = container && typeof container.closest === 'function'
+    ? container.closest('.bl-guides-shell, .contribute-layout, main, body')
+    : null;
+  if (!shell) return;
+  const overview = shell.querySelector('.bl-subcategory-overview');
+  if (!overview) return;
+  const subcategories = getCategorySubcategoriesRP(categorySlug);
+  if (!subcategories.length) return;
+
+  overview.innerHTML = '';
+  subcategories.forEach(function(item) {
+    const pill = document.createElement('span');
+    pill.className = 'bl-subcategory-pill';
+    pill.innerHTML = buildSubcategoryDisplayRP(categorySlug, item.slug, item.label);
+    overview.appendChild(pill);
+  });
+}
+
+function matchesCategorySearchRP(post, categorySlug, query) {
+  const haystack = [
+    post.title || '',
+    post.category || '',
+    post.post_type || '',
+    getPostSubcategoryLabel(post) || '',
+    getCategorySubcategoryLabelRP(categorySlug, getRenderableSubcategorySlug(post)) || '',
+    String(post.content || '').replace(/<[^>]*>/g, ' '),
+  ].join(' ').toLowerCase();
+
+  return query.split(/\s+/).filter(Boolean).every(function(term) {
+    return haystack.includes(term);
+  });
 }
 
 function getAnySubcategoryLabelRP(categorySlug, subcategorySlug) {
