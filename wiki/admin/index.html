@@ -223,7 +223,7 @@
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js?v=8"></script>
+<script src="/js/categories-config.js?v=10"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notifications.js"></script>
@@ -244,7 +244,8 @@ let canUseCategoryExtensions = false;
 let canUseDiscoveryEvidenceTable = false;
 let composeBodyEditor = null;
 let composePublishInFlight = false;
-const ADMIN_DISCOVERY_PLACEHOLDER_VALUES = ["asdf", "qwerty", "test", "todo", "none", "n/a", "na", "unknown", "idk", "???", "12345"];
+const ADMIN_DISCOVERY_PLACEHOLDER_VALUES = ["asdf", "qwerty", "test", "todo", "none", "n/a", "na", "idk", "???", "12345"];
+const ADMIN_DISCOVERY_SKIP_VALUES = ["unclear", "no", "not observed", "unknown", "not sure"];
 
 async function checkAdmin() {
   setGateStatus("Checking permissions...");
@@ -962,6 +963,7 @@ function evaluateDiscoveryForApprovalA(post) {
   const meta = parsePostMetaA(post.content || "");
   const payload = meta && typeof meta.discovery_payload === "object" ? meta.discovery_payload : null;
   const relations = Array.isArray(meta && meta.discovery_relations) ? meta.discovery_relations : [];
+  const relationsSkipped = !!(meta && meta.discovery_relations_skipped === true);
   const evidence = Array.isArray(meta && meta.discovery_evidence) ? meta.discovery_evidence : [];
   const schema = typeof getDiscoverySchemaForCategory === "function"
     ? getDiscoverySchemaForCategory(post.category || "")
@@ -991,11 +993,11 @@ function evaluateDiscoveryForApprovalA(post) {
     }
   });
 
-  if (payload && payload.how_to_reproduce && String(payload.how_to_reproduce).trim().split(/\s+/).filter(Boolean).length < 4) {
+  if (payload && payload.how_to_reproduce && !ADMIN_DISCOVERY_SKIP_VALUES.includes(String(payload.how_to_reproduce).trim().toLowerCase()) && String(payload.how_to_reproduce).trim().split(/\s+/).filter(Boolean).length < 4) {
     issues.push("Reproduction steps are too short.");
   }
 
-  if (!relations.length) {
+  if (!relations.length && !relationsSkipped) {
     issues.push("No linked dependencies or references selected.");
   }
 
@@ -1011,6 +1013,7 @@ function validateDiscoveryTextForAdminA(field, value) {
   const clean = String(value || "").trim();
   const lower = clean.toLowerCase();
   if (!clean) return field.label + ": empty value.";
+  if (ADMIN_DISCOVERY_SKIP_VALUES.includes(lower)) return "";
   if (ADMIN_DISCOVERY_PLACEHOLDER_VALUES.includes(lower)) {
     return field.label + ": placeholder content detected.";
   }
@@ -1131,8 +1134,10 @@ async function syncDiscoveryBackboneA(post) {
   if (!canUseEntityBackbone || !post || !post.id) return;
 
   const meta = parsePostMetaA(post.content || "");
+  const payload = meta && typeof meta.discovery_payload === "object" ? meta.discovery_payload : {};
+  const canonicalName = String(payload.entity_name || "").trim() || post.title;
   const entityType = deriveEntityTypeA(post, meta);
-  const entitySlug = slugifyEntityA(post.title || "");
+  const entitySlug = slugifyEntityA(canonicalName || "");
   if (!entityType || !entitySlug) return;
 
   const entityMetadata = {
@@ -1146,7 +1151,7 @@ async function syncDiscoveryBackboneA(post) {
     .from("wiki_entities")
     .upsert({
       entity_type: entityType,
-      canonical_name: post.title,
+      canonical_name: canonicalName,
       slug: entitySlug,
       category_slug: post.category || null,
       subcategory_slug: meta.subcategory || null,
@@ -1174,7 +1179,12 @@ async function syncDiscoveryBackboneA(post) {
 
 async function syncDiscoveryAliasesA(sourceEntityId, post) {
   if (!sourceEntityId || !post) return;
-  const aliases = [post.title].filter(Boolean).map(function(value) {
+  const meta = parsePostMetaA(post.content || "");
+  const payload = meta && typeof meta.discovery_payload === "object" ? meta.discovery_payload : {};
+  const baseAliases = [post.title, payload.entity_name]
+    .concat(String(payload.alt_names || "").split(",").map(function(v) { return String(v || "").trim(); }))
+    .filter(Boolean);
+  const aliases = baseAliases.map(function(value) {
     return {
       entity_id: sourceEntityId,
       alias_name: value,

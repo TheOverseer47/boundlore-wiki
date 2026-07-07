@@ -29,8 +29,9 @@ let editDiscoverySuggestionState = {
 };
 const editRelationInputTimers = {};
 const EDIT_DISCOVERY_PLACEHOLDER_VALUES = [
-  "asdf", "qwerty", "test", "todo", "none", "n/a", "na", "unknown", "idk", "???", "12345"
+  "asdf", "qwerty", "test", "todo", "none", "n/a", "na", "idk", "???", "12345"
 ];
+const EDIT_DISCOVERY_SKIP_VALUES = ["unclear", "no", "not observed", "unknown", "not sure"];
 
 document.addEventListener("DOMContentLoaded", initEditPost);
 
@@ -445,11 +446,6 @@ async function handleEditSubmit(e) {
         errEl.style.display = "block";
         return;
       }
-      if (!structuredResult.relations || structuredResult.relations.length === 0) {
-        errEl.textContent = "Please link at least one related entry, dependency, item, location, creature, or guide.";
-        errEl.style.display = "block";
-        return;
-      }
       const duplicateError = await detectDiscoveryDuplicateEP({
         excludeId: editPost.id,
         title: title,
@@ -470,6 +466,7 @@ async function handleEditSubmit(e) {
       }
       meta.discovery_payload = structuredResult.payload;
       meta.discovery_relations = structuredResult.relations;
+      meta.discovery_relations_skipped = !structuredResult.relations || structuredResult.relations.length === 0;
       meta.discovery_evidence = evidenceInput.items;
       updates.content = buildEditStructuredDiscoveryContent(title, effectiveCategory, structuredResult.payload, structuredResult.relations);
     } else {
@@ -492,6 +489,7 @@ async function handleEditSubmit(e) {
       }
       delete meta.discovery_payload;
       delete meta.discovery_relations;
+      delete meta.discovery_relations_skipped;
       delete meta.discovery_evidence;
       updates.content = content;
     }
@@ -629,6 +627,9 @@ function normalizePostMetaEP(meta) {
     }).filter(function(rel) {
       return !!rel.title;
     });
+  }
+  if (typeof meta.discovery_relations_skipped === "boolean") {
+    out.discovery_relations_skipped = meta.discovery_relations_skipped;
   }
   if (Array.isArray(meta.discovery_evidence)) {
     out.discovery_evidence = meta.discovery_evidence.slice(0, 20).map(function(item) {
@@ -1272,7 +1273,8 @@ function collectEditStructuredDiscoveryInput() {
     }
   }
 
-  if (String(payload.how_to_reproduce || "").length < 20) {
+  const reproValue = String(payload.how_to_reproduce || "").trim().toLowerCase();
+  if (reproValue && !EDIT_DISCOVERY_SKIP_VALUES.includes(reproValue) && String(payload.how_to_reproduce || "").length < 20) {
     return { error: "Please provide clearer reproduction steps (at least 20 characters)." };
   }
 
@@ -1300,6 +1302,10 @@ function collectEditStructuredDiscoveryInput() {
 function validateEditDiscoveryTextQuality(field, value) {
   const clean = String(value || "").trim();
   const lower = clean.toLowerCase();
+
+  if (EDIT_DISCOVERY_SKIP_VALUES.includes(lower)) {
+    return "";
+  }
 
   if (EDIT_DISCOVERY_PLACEHOLDER_VALUES.includes(lower)) {
     return field.label + ": please provide real discovery details, not placeholders.";

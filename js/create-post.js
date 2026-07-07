@@ -37,6 +37,7 @@ let discoverySuggestionState = {
   guides: [],
 };
 let discoveryWizardStep = 1;
+let discoveryDataFieldIndex = 0;
 let discoveryRelationsSkipped = false;
 const relationInputTimers = {};
 const DISCOVERY_PLACEHOLDER_VALUES = [
@@ -65,6 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (discoveryCategorySelect) {
     discoveryCategorySelect.addEventListener("change", function() {
       currentDiscoveryCategory = this.value;
+      discoveryDataFieldIndex = 0;
       refreshDiscoverySubcategoryOptions();
       renderDiscoveryStructuredFields();
       renderDiscoveryRelationFields();
@@ -248,6 +250,24 @@ function renderDiscoveryWizard() {
     next.className = "btn-contribute";
     next.textContent = "Continue";
     next.addEventListener("click", function() {
+      if (discoveryWizardStep === 1) {
+        const cat = document.getElementById("discoveryCategory")?.value || "";
+        const subcat = document.getElementById("discoverySubcategory")?.value || "";
+        const needSub = typeof requiresSubcategoryForCategory === "function" ? requiresSubcategoryForCategory(cat) : false;
+        if (!cat) {
+          showDiscoveryWizardError("Please choose a discovery category before continuing.");
+          return;
+        }
+        if (needSub && !subcat) {
+          showDiscoveryWizardError("Please choose a required subcategory before continuing.");
+          return;
+        }
+      }
+      if (discoveryWizardStep === 2 && !hasRequiredDiscoveryFieldsFilledCP()) {
+        showDiscoveryWizardError("Please complete required discovery data fields (or use skip options) before continuing.");
+        return;
+      }
+      showDiscoveryWizardError("");
       discoveryWizardStep += 1;
       renderDiscoveryWizard();
     });
@@ -260,6 +280,23 @@ function renderDiscoveryWizard() {
   }
 
   nav.appendChild(controls);
+}
+
+function showDiscoveryWizardError(message) {
+  const err = document.getElementById("formError");
+  if (!err) return;
+  err.textContent = message || "";
+  err.style.display = message ? "block" : "none";
+}
+
+function hasRequiredDiscoveryFieldsFilledCP() {
+  const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+  const config = getDiscoveryConfig(category);
+  const fields = Array.isArray(config.fields) ? config.fields : [];
+  return fields.filter(function(field) { return !!field.required; }).every(function(field) {
+    const value = String(discoveryFieldState[field.key] == null ? "" : discoveryFieldState[field.key]).trim();
+    return value.length > 0;
+  });
 }
 
 function setPostType(type) {
@@ -336,6 +373,7 @@ function setPostType(type) {
     }
     if (titleLabel) titleLabel.textContent = "Report Title (optional)";
     discoveryWizardStep = 1;
+    discoveryDataFieldIndex = 0;
     renderDiscoveryWizard();
   } else {
     guideFields.style.display = "none";
@@ -505,6 +543,9 @@ async function handleSubmit(e) {
       postMeta.discovery_payload = structuredResult.payload;
       postMeta.discovery_relations = structuredResult.relations;
       postMeta.discovery_relations_skipped = discoveryRelationsSkipped === true;
+      postMeta.discovery_record_id = postMeta.discovery_record_id || generateDiscoveryRecordIdCP();
+      postMeta.discovery_record_status = "unverified";
+      postMeta.discovery_submitted_at = new Date().toISOString();
       const evidenceInput = collectDiscoveryEvidenceInputCP({
         hasExternalEvidence: !!discoveryImageUrl || !!discoveryYoutubeUrl || files.length > 0,
       });
@@ -912,100 +953,152 @@ function renderDiscoveryStructuredFields() {
     return;
   }
 
-  wrap.innerHTML = "<h3 style='margin:0 0 8px;'>Discovery Data</h3><p class='field-hint'>Answer one question at a time. Use quick-skip when data is unknown.</p>";
+  if (discoveryDataFieldIndex < 0) discoveryDataFieldIndex = 0;
+  if (discoveryDataFieldIndex > fields.length - 1) discoveryDataFieldIndex = fields.length - 1;
 
-  fields.forEach(function(field) {
-    const group = document.createElement("div");
-    group.className = "form-group";
-    group.style.marginTop = "10px";
+  const field = fields[discoveryDataFieldIndex];
 
-    const label = document.createElement("label");
-    label.setAttribute("for", "discField_" + field.key);
-    label.textContent = field.label + (field.required ? " *" : "");
-    group.appendChild(label);
+  wrap.innerHTML = "<h3 style='margin:0 0 8px;'>Discovery Data</h3><p class='field-hint'>Question " + (discoveryDataFieldIndex + 1) + " of " + fields.length + ".</p>";
 
-    let input;
-    const current = discoveryFieldState[field.key] != null ? discoveryFieldState[field.key] : "";
-    if (field.type === "textarea") {
-      input = document.createElement("textarea");
-      input.rows = 4;
-      input.maxLength = field.max || 1200;
-      input.className = "form-input";
-      input.placeholder = field.placeholder || "Add concrete details.";
-      input.value = current;
-    } else if (field.type === "select") {
-      input = document.createElement("select");
-      input.className = "form-input";
-      const empty = document.createElement("option");
-      empty.value = "";
-      empty.textContent = "Select...";
-      input.appendChild(empty);
-      (field.options || []).forEach(function(opt) {
-        const option = document.createElement("option");
-        option.value = opt;
-        option.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
-        input.appendChild(option);
-      });
-      input.value = current;
-    } else {
-      input = document.createElement("input");
-      input.type = field.type === "number" ? "number" : "text";
-      input.className = "form-input";
-      input.maxLength = field.max || 240;
-      if (field.type === "number" && typeof field.min === "number") input.min = String(field.min);
-      if (field.type !== "number") {
-        input.placeholder = field.placeholder || "Add your finding...";
-      }
-      input.value = current;
+  const group = document.createElement("div");
+  group.className = "form-group";
+  group.style.marginTop = "10px";
+
+  const label = document.createElement("label");
+  label.setAttribute("for", "discField_" + field.key);
+  label.textContent = field.label + (field.required ? " *" : "");
+  group.appendChild(label);
+
+  let input;
+  const current = discoveryFieldState[field.key] != null ? discoveryFieldState[field.key] : "";
+  if (field.type === "textarea") {
+    input = document.createElement("textarea");
+    input.rows = 4;
+    input.maxLength = field.max || 1200;
+    input.className = "form-input";
+    input.placeholder = field.placeholder || "Add concrete details.";
+    input.value = current;
+  } else if (field.type === "select") {
+    input = document.createElement("select");
+    input.className = "form-input";
+    const empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = "Select...";
+    input.appendChild(empty);
+    (field.options || []).forEach(function(opt) {
+      const option = document.createElement("option");
+      option.value = opt;
+      option.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
+      input.appendChild(option);
+    });
+    input.value = current;
+  } else {
+    input = document.createElement("input");
+    input.type = field.type === "number" ? "number" : "text";
+    input.className = "form-input";
+    input.maxLength = field.max || 240;
+    if (field.type === "number" && typeof field.min === "number") input.min = String(field.min);
+    if (field.type !== "number") {
+      input.placeholder = field.placeholder || "Add your finding...";
     }
+    input.value = current;
+  }
 
-    input.id = "discField_" + field.key;
-    input.dataset.discoveryField = field.key;
-    if (field.required) input.setAttribute("data-required", "1");
+  input.id = "discField_" + field.key;
+  input.dataset.discoveryField = field.key;
+  if (field.required) input.setAttribute("data-required", "1");
 
-    input.addEventListener("input", function() {
-      discoveryFieldState[field.key] = input.value;
-      toggleFieldSuggestionHint(hint, input);
-    });
-
-    input.addEventListener("focus", function() {
-      toggleFieldSuggestionHint(hint, input);
-    });
-
-    input.addEventListener("blur", function() {
-      toggleFieldSuggestionHint(hint, input);
-    });
-
-    group.appendChild(input);
-
-    const hint = document.createElement("p");
-    hint.className = "field-hint";
-    hint.textContent = field.placeholder || "Tip: keep this factual and reproducible.";
-    group.appendChild(hint);
+  input.addEventListener("input", function() {
+    discoveryFieldState[field.key] = input.value;
     toggleFieldSuggestionHint(hint, input);
-
-    if (field.required && field.type !== "number") {
-      const quickRow = document.createElement("div");
-      quickRow.style.display = "flex";
-      quickRow.style.flexWrap = "wrap";
-      quickRow.style.gap = "6px";
-      ["Unclear", "No", "Not observed"].forEach(function(labelText) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "btn-secondary";
-        btn.textContent = labelText;
-        btn.addEventListener("click", function() {
-          input.value = labelText.toLowerCase();
-          discoveryFieldState[field.key] = input.value;
-          toggleFieldSuggestionHint(hint, input);
-        });
-        quickRow.appendChild(btn);
-      });
-      group.appendChild(quickRow);
-    }
-
-    wrap.appendChild(group);
+    message.style.display = "none";
   });
+
+  input.addEventListener("focus", function() {
+    toggleFieldSuggestionHint(hint, input);
+  });
+
+  input.addEventListener("blur", function() {
+    toggleFieldSuggestionHint(hint, input);
+  });
+
+  group.appendChild(input);
+
+  const hint = document.createElement("p");
+  hint.className = "field-hint";
+  hint.textContent = field.placeholder || "Tip: keep this factual and reproducible.";
+  group.appendChild(hint);
+  toggleFieldSuggestionHint(hint, input);
+
+  const message = document.createElement("p");
+  message.className = "field-hint";
+  message.style.color = "#ffb4b4";
+  message.style.display = "none";
+  group.appendChild(message);
+
+  if (field.required && (field.type === "text" || field.type === "textarea")) {
+    const quickRow = document.createElement("div");
+    quickRow.style.display = "flex";
+    quickRow.style.flexWrap = "wrap";
+    quickRow.style.gap = "6px";
+    ["Unclear", "No", "Not observed"].forEach(function(labelText) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-secondary";
+      btn.textContent = labelText;
+      btn.addEventListener("click", function() {
+        input.value = labelText.toLowerCase();
+        discoveryFieldState[field.key] = input.value;
+        toggleFieldSuggestionHint(hint, input);
+        message.style.display = "none";
+      });
+      quickRow.appendChild(btn);
+    });
+    group.appendChild(quickRow);
+  }
+
+  const nav = document.createElement("div");
+  nav.style.display = "flex";
+  nav.style.gap = "8px";
+  nav.style.marginTop = "8px";
+
+  if (discoveryDataFieldIndex > 0) {
+    const prev = document.createElement("button");
+    prev.type = "button";
+    prev.className = "btn-secondary";
+    prev.textContent = "Previous question";
+    prev.addEventListener("click", function() {
+      discoveryDataFieldIndex -= 1;
+      renderDiscoveryStructuredFields();
+    });
+    nav.appendChild(prev);
+  }
+
+  if (discoveryDataFieldIndex < fields.length - 1) {
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "btn-contribute";
+    next.textContent = "Next question";
+    next.addEventListener("click", function() {
+      const value = String(input.value || "").trim();
+      if (field.required && !value) {
+        message.textContent = "Please answer this required question or use a quick-skip option.";
+        message.style.display = "block";
+        return;
+      }
+      discoveryDataFieldIndex += 1;
+      renderDiscoveryStructuredFields();
+    });
+    nav.appendChild(next);
+  } else {
+    const done = document.createElement("span");
+    done.className = "field-hint";
+    done.textContent = "All structured questions reviewed. Continue to relations/evidence.";
+    nav.appendChild(done);
+  }
+
+  group.appendChild(nav);
+  wrap.appendChild(group);
 }
 
 function toggleFieldSuggestionHint(hintEl, inputEl) {
@@ -1587,7 +1680,8 @@ function collectStructuredDiscoveryInput() {
     }
   }
 
-  if (String(payload.how_to_reproduce || "").length < 20) {
+  const reproValue = String(payload.how_to_reproduce || "").trim().toLowerCase();
+  if (reproValue && !DISCOVERY_SKIP_VALUES.includes(reproValue) && String(payload.how_to_reproduce || "").length < 20) {
     return { error: "Please provide clearer reproduction steps (at least 20 characters)." };
   }
 
@@ -1769,6 +1863,11 @@ function buildDiscoveryAutoTitle(payload, category) {
   return categoryLabel + " Report " + new Date().toISOString().slice(0, 10);
 }
 
+function generateDiscoveryRecordIdCP() {
+  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return "DISC-" + Date.now() + "-" + rand;
+}
+
 function isValidHttpUrl(value) {
   try {
     const url = new URL(value);
@@ -1868,6 +1967,9 @@ function normalizePostMetaCP(meta) {
   if (typeof meta.discovery_relations_skipped === "boolean") {
     out.discovery_relations_skipped = meta.discovery_relations_skipped;
   }
+  if (meta.discovery_record_id) out.discovery_record_id = String(meta.discovery_record_id).slice(0, 64);
+  if (meta.discovery_record_status) out.discovery_record_status = String(meta.discovery_record_status).slice(0, 40);
+  if (meta.discovery_submitted_at) out.discovery_submitted_at = String(meta.discovery_submitted_at).slice(0, 40);
   if (Array.isArray(meta.discovery_evidence)) {
     out.discovery_evidence = meta.discovery_evidence.slice(0, 20).map(function(item) {
       return {

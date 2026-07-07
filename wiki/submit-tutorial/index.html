@@ -150,9 +150,10 @@
     <h2>Before You Start (Read This First)</h2>
     <ol style="padding-left:18px;line-height:1.6;">
       <li>Open <strong>Create Post</strong> and decide first: <strong>Guide</strong> or <strong>Discovery</strong>. Never mix both in one post.</li>
-      <li>Use a clear title. Bad example: "Help pls". Good example: "Early Mount Spawn Near Stone Plateau (Dawn)".</li>
+      <li>For Discovery, the title is optional. If empty, BoundLore generates one from your structured fields (entity + location).</li>
       <li>Write for strangers. A person who does not know you must still understand your post.</li>
       <li>Never submit placeholders like "test", "asdf", random letters, or copy-paste spam.</li>
+      <li>Use the step-by-step wizard. Complete one section, then continue. Use skip buttons (Unclear / No / Not observed) only when data is truly unknown.</li>
       <li>If you add evidence (image/video/file), you must map what exact facts it proves.</li>
       <li>After submit, your post enters review. Admin approves, rejects, or requests fixes.</li>
     </ol>
@@ -161,27 +162,32 @@
   <div class="tutorial-grid">
     <section class="tutorial-card">
       <h2>Discovery (Structured Facts)</h2>
-      <p>Use Discovery for reproducible, verifiable in-game facts. Think like a bug report + field report.</p>
+      <p>Use Discovery for reproducible, verifiable in-game facts. Think like a data record, not a blog post.</p>
 
       <h3>Step by Step</h3>
       <ol>
         <li>Click <strong>Discovery</strong> on Create Post.</li>
-        <li>Fill <strong>Title</strong>, then choose <strong>Category</strong> and (if shown) <strong>Subcategory</strong>.</li>
-        <li>Fill every required field marked with <strong>*</strong>. Write concrete details, not guesses.</li>
-        <li>In <strong>Auto Relations</strong>, link at least one related entry.
-        Example: related creature, related item, related location, or guide.</li>
+        <li><strong>Step 1 (Basics):</strong> choose Category and required Subcategory.</li>
+        <li><strong>Step 2 (Discovery Data):</strong> answer one question at a time (Identity, conditions, reproduction, expected vs observed, confidence).</li>
+        <li>Use quick-skip only when needed: <strong>Unclear</strong>, <strong>No</strong>, <strong>Not observed</strong>.</li>
+        <li><strong>Step 3 (Auto Relations):</strong> link related entries or explicitly skip relations if not available.</li>
+        <li><strong>Step 4 (Evidence):</strong> map screenshots/videos/files to the fields they prove.</li>
         <li>If you add image/video/upload evidence, tick exactly which fields that evidence supports, then add a useful note.</li>
         <li>Add Update Phase, Patch Tag, and Source URL when possible for future verification.</li>
         <li>Click <strong>Submit for Review</strong>.</li>
       </ol>
 
       <h3>Field By Field (What To Enter + Why)</h3>
-      <div class="tutorial-field"><strong>Title:</strong> one clear sentence about what was found. This helps search and duplicate checks.</div>
+      <div class="tutorial-field"><strong>Entity name:</strong> required. The actual name of the item/NPC/location/mechanic discovered.</div>
+      <div class="tutorial-field"><strong>Discovery type:</strong> required taxonomy for indexing and automation (creature, item, bug, exploit, secret, etc.).</div>
       <div class="tutorial-field"><strong>Category/Subcategory:</strong> where this belongs. This controls filters and relation suggestions.</div>
-      <div class="tutorial-field"><strong>Where found:</strong> exact location/biome/conditions. Others must be able to go there.</div>
-      <div class="tutorial-field"><strong>Spawn conditions:</strong> time/weather/state requirements. Needed for reproducibility.</div>
+      <div class="tutorial-field"><strong>World / Region / Where found / Coordinates:</strong> location identity for search and map-level filtering.</div>
+      <div class="tutorial-field"><strong>Trigger conditions + Requirements:</strong> time/weather/event/quest/class/level dependencies.</div>
+      <div class="tutorial-field"><strong>How to reproduce:</strong> exact steps another user can repeat.</div>
       <div class="tutorial-field"><strong>Observed result:</strong> what happened exactly after your steps.</div>
-      <div class="tutorial-field"><strong>Auto Relations:</strong> connect to existing entries so data is discoverable and linked.</div>
+      <div class="tutorial-field"><strong>Expected result:</strong> what should happen instead (critical for validation and troubleshooting).</div>
+      <div class="tutorial-field"><strong>Confidence + Impact + Tags:</strong> verification quality and analytics-ready metadata.</div>
+      <div class="tutorial-field"><strong>Auto Relations:</strong> optional links to item/creature/location/guide/dependency graph.</div>
       <div class="tutorial-field"><strong>Evidence mapping:</strong> tell the system which facts each evidence item proves.</div>
 
       <div class="tutorial-note">
@@ -191,9 +197,9 @@
       <h3>Do Not Do This</h3>
       <ol>
         <li>Do not write long roleplay text in Discovery.</li>
-        <li>Do not skip relation linking.</li>
+        <li>Do not skip required identity fields (entity name/type/location).</li>
         <li>Do not upload evidence without mapping it to fields.</li>
-        <li>Do not write "unknown" in every field just to pass the form.</li>
+        <li>Do not use skip values everywhere to force-pass the form.</li>
         <li>Do not post theories as facts.</li>
       </ol>
     </section>
