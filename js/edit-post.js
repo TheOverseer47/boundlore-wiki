@@ -113,7 +113,11 @@ async function initEditPost() {
   }
 
   document.getElementById("editPostTitle").value = post.title || "";
-  editQuill.root.innerHTML = stripPostMetaEP(post.content || "") || "";
+  const cleanHtml = stripPostMetaEP(post.content || "") || "";
+  editQuill.setText("");
+  if (cleanHtml && cleanHtml !== "<p><br></p>") {
+    editQuill.clipboard.dangerouslyPasteHTML(cleanHtml);
+  }
 
   const postType = post.post_type === "wiki"
     ? "wiki"
@@ -146,6 +150,16 @@ function fillCategorySelectors() {
   const categories = Array.isArray(window.BOUNDLORE_CATEGORIES)
     ? window.BOUNDLORE_CATEGORIES
     : (typeof BOUNDLORE_CATEGORIES !== "undefined" ? BOUNDLORE_CATEGORIES : []);
+
+  if (guideSelect) {
+    guideSelect.innerHTML = '<option value="">Choose guide type...</option>';
+  }
+  if (discoverySelect) {
+    discoverySelect.innerHTML = '<option value="">Choose category...</option>';
+  }
+  if (wikiSelect) {
+    wikiSelect.innerHTML = '<option value="">Choose wiki category...</option>';
+  }
 
   if (guideSelect && Array.isArray(guideSubcategories)) {
     guideSubcategories.forEach(function (cat) {

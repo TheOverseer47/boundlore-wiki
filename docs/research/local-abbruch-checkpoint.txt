@@ -1,0 +1,5 @@
+Lokal Projekt Abbruch checkpoint: 9264330
+
+Rollback commands:
+git -C "c:\Users\Julius\Documents\GitHub\boundlore-wiki" reset --hard 9264330
+git -C "c:\Users\Julius\Documents\GitHub\boundlore-wiki" clean -fd
