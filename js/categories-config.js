@@ -237,12 +237,15 @@ function isStructuredDiscoveryEnabled() {
       return true;
     }
     try {
-      return window.localStorage.getItem(BOUNDLORE_DISCOVERY_FLAG_STORAGE) === '1';
+      const stored = window.localStorage.getItem(BOUNDLORE_DISCOVERY_FLAG_STORAGE);
+      if (stored === '1') return true;
+      // Launch default: structured discovery is on unless explicitly disabled via ?enableStructuredDiscovery=0.
+      return true;
     } catch (err) {
-      return false;
+      return true;
     }
   } catch (err) {
-    return false;
+    return true;
   }
 }
 
