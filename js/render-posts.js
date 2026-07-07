@@ -7,6 +7,10 @@ async function renderCategoryPosts(categorySlug) {
   const emptyMsg = document.getElementById("categoryPostsEmpty");
   if (!container) return;
 
+  if (typeof ensureCategoryExtensionsLoaded === "function") {
+    await ensureCategoryExtensionsLoaded();
+  }
+
   enhanceSubcategoryOverview(container, categorySlug);
 
   // Build query with special handling for the 'guides' pseudo-category

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Simple step-by-step tutorial for submitting Discoveries and Guides on BoundLore." />
+<title>Submission Tutorial - BoundLore</title>
+<link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+<style>
+.tutorial-shell {
+  max-width: 1080px;
+  margin: 34px auto 70px;
+  padding: 0 20px;
+}
+.tutorial-intro {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+.tutorial-intro h2 {
+  margin: 0 0 8px;
+  font-family: 'Cinzel', serif;
+  color: var(--gold-light);
+}
+.tutorial-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tutorial-card {
+  background: rgba(17, 17, 24, 0.92);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: 12px;
+  padding: 16px;
+}
+.tutorial-card h2 {
+  margin: 0 0 8px;
+  font-family: 'Cinzel', serif;
+  color: var(--gold-light);
+}
+.tutorial-card h3 {
+  margin: 14px 0 8px;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.tutorial-card ol {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.55;
+}
+.tutorial-card li {
+  margin-bottom: 7px;
+}
+.tutorial-card p {
+  line-height: 1.55;
+  color: var(--text);
+}
+.tutorial-card ul {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.55;
+}
+.tutorial-card ul li {
+  margin-bottom: 7px;
+}
+.tutorial-note {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px dashed rgba(201, 168, 76, 0.45);
+  background: rgba(201, 168, 76, 0.08);
+}
+.tutorial-field {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  background: rgba(0, 0, 0, 0.24);
+}
+.tutorial-field strong {
+  color: var(--gold-light);
+}
+.tutorial-gate {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  background: rgba(201, 168, 76, 0.1);
+}
+.tutorial-gate p {
+  margin-bottom: 10px;
+}
+.tutorial-gate .status {
+  margin-top: 8px;
+  color: var(--text-muted);
+}
+.tutorial-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 900px) {
+  .tutorial-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" />
+      <span class="logo-text">Bound<span class="accent">Lore</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="/wiki/creatures/">Creatures</a></li>
+      <li><a href="/wiki/biomes/">Biomes</a></li>
+      <li><a href="/wiki/items/">Items</a></li>
+      <li><a href="/wiki/guides/">Guides</a></li>
+      <li><a href="/wiki/guilds/">Guilds</a></li>
+      <li><a href="/wiki/community/">Community</a></li>
+      <li><a href="/wiki/news/">News</a></li>
+      <li><a href="/wiki/support">Support</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="/wiki/create-post/" class="btn-contribute">Back to Submit</a>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="wiki-hero">
+  <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Submission Tutorial</p>
+  <h1>How To Submit (Guide + Discovery)</h1>
+  <p>Simple instructions with zero guesswork. Follow each checklist exactly.</p>
+</div>
+
+<div class="tutorial-shell">
+  <section class="tutorial-intro">
+    <h2>Before You Start (Read This First)</h2>
+    <ol style="padding-left:18px;line-height:1.6;">
+      <li>Open <strong>Create Post</strong> and decide first: <strong>Guide</strong> or <strong>Discovery</strong>. Never mix both in one post.</li>
+      <li>Use a clear title. Bad example: "Help pls". Good example: "Early Mount Spawn Near Stone Plateau (Dawn)".</li>
+      <li>Write for strangers. A person who does not know you must still understand your post.</li>
+      <li>Never submit placeholders like "test", "asdf", random letters, or copy-paste spam.</li>
+      <li>If you add evidence (image/video/file), you must map what exact facts it proves.</li>
+      <li>After submit, your post enters review. Admin approves, rejects, or requests fixes.</li>
+    </ol>
+  </section>
+
+  <div class="tutorial-grid">
+    <section class="tutorial-card">
+      <h2>Discovery (Structured Facts)</h2>
+      <p>Use Discovery for reproducible, verifiable in-game facts. Think like a bug report + field report.</p>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li>Click <strong>Discovery</strong> on Create Post.</li>
+        <li>Fill <strong>Title</strong>, then choose <strong>Category</strong> and (if shown) <strong>Subcategory</strong>.</li>
+        <li>Fill every required field marked with <strong>*</strong>. Write concrete details, not guesses.</li>
+        <li>In <strong>Auto Relations</strong>, link at least one related entry.
+        Example: related creature, related item, related location, or guide.</li>
+        <li>If you add image/video/upload evidence, tick exactly which fields that evidence supports, then add a useful note.</li>
+        <li>Add Update Phase, Patch Tag, and Source URL when possible for future verification.</li>
+        <li>Click <strong>Submit for Review</strong>.</li>
+      </ol>
+
+      <h3>Field By Field (What To Enter + Why)</h3>
+      <div class="tutorial-field"><strong>Title:</strong> one clear sentence about what was found. This helps search and duplicate checks.</div>
+      <div class="tutorial-field"><strong>Category/Subcategory:</strong> where this belongs. This controls filters and relation suggestions.</div>
+      <div class="tutorial-field"><strong>Where found:</strong> exact location/biome/conditions. Others must be able to go there.</div>
+      <div class="tutorial-field"><strong>Spawn conditions:</strong> time/weather/state requirements. Needed for reproducibility.</div>
+      <div class="tutorial-field"><strong>Observed result:</strong> what happened exactly after your steps.</div>
+      <div class="tutorial-field"><strong>Auto Relations:</strong> connect to existing entries so data is discoverable and linked.</div>
+      <div class="tutorial-field"><strong>Evidence mapping:</strong> tell the system which facts each evidence item proves.</div>
+
+      <div class="tutorial-note">
+        <strong>Discovery Quality Rule:</strong> someone else should be able to repeat your steps and reach a similar result.
+      </div>
+
+      <h3>Do Not Do This</h3>
+      <ol>
+        <li>Do not write long roleplay text in Discovery.</li>
+        <li>Do not skip relation linking.</li>
+        <li>Do not upload evidence without mapping it to fields.</li>
+        <li>Do not write "unknown" in every field just to pass the form.</li>
+        <li>Do not post theories as facts.</li>
+      </ol>
+    </section>
+
+    <section class="tutorial-card">
+      <h2>Guide (Practical Explanation)</h2>
+      <p>Use Guide for teaching: strategy, flow, recommendations, and practical steps for players.</p>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li>Click <strong>Guide</strong> on Create Post.</li>
+        <li>Set a clear <strong>Title</strong> and pick a <strong>Guide Category</strong>.</li>
+        <li>Write your content in order: goal, preparation, steps, troubleshooting.</li>
+        <li>Use <strong>Guide References</strong> to link related creatures/items/locations/guides.</li>
+        <li>Add Source URL and update info when available.</li>
+        <li>Click <strong>Submit for Review</strong>.</li>
+      </ol>
+
+      <h3>Field By Field (What To Enter + Why)</h3>
+      <div class="tutorial-field"><strong>Title:</strong> describe outcome, not clickbait. Better trust, better search ranking.</div>
+      <div class="tutorial-field"><strong>Guide category:</strong> puts guide in the correct hub and helps users find it.</div>
+      <div class="tutorial-field"><strong>Content:</strong> write clear steps with context and expected result.</div>
+      <div class="tutorial-field"><strong>Guide references:</strong> link entries discussed by the guide to build a data network.</div>
+      <div class="tutorial-field"><strong>Source / patch:</strong> tells readers how current and trustworthy the guide is.</div>
+
+      <div class="tutorial-note">
+        <strong>Guide Quality Rule:</strong> a new player should understand the process after reading once.
+      </div>
+
+      <h3>Simple Guide Structure</h3>
+      <ol>
+        <li>Goal: What this guide helps with.</li>
+        <li>Preparation: What the player needs first.</li>
+        <li>Steps: Ordered actions (1, 2, 3, ...).</li>
+        <li>Troubleshooting: common errors and fixes.</li>
+        <li>Verification: how the reader knows the method worked.</li>
+      </ol>
+
+      <h3>Guide Mistakes To Avoid</h3>
+      <ul>
+        <li>No huge text wall without steps.</li>
+        <li>No missing references for key entities.</li>
+        <li>No outdated patch claims without version note.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="tutorial-gate" id="tutorialGateConfirm">
+    <h2 style="margin:0 0 8px;font-family:'Cinzel',serif;color:var(--gold-light);">Mandatory One-Time Confirmation</h2>
+    <p>You must confirm you read this tutorial before your account can submit posts.</p>
+    <label style="display:flex;align-items:flex-start;gap:8px;">
+      <input type="checkbox" id="tutorialConfirmCheckbox" />
+      <span>I read this tutorial and I understand how to submit valid Guides and Discoveries with useful, reproducible data.</span>
+    </label>
+    <div class="tutorial-actions">
+      <button type="button" id="tutorialConfirmBtn" class="btn-contribute" disabled>Confirm Tutorial Read</button>
+      <a href="/wiki/create-post/" class="btn-contribute">Back to Submit</a>
+    </div>
+    <p id="tutorialConfirmStatus" class="status">Status: not confirmed yet.</p>
+  </section>
+
+  <div class="tutorial-actions">
+    <a href="/wiki/create-post/?type=discovery" class="btn-contribute">Start a Discovery</a>
+    <a href="/wiki/create-post/?type=guide" class="btn-contribute">Start a Guide</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-config.js"></script>
+<script src="/js/auth-nav.js"></script>
+<script src="/js/main.js?v=3"></script>
+<script src="/js/submit-tutorial.js?v=1"></script>
+</body>
+</html>

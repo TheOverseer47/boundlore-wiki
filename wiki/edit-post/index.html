@@ -163,9 +163,11 @@
         <option value="quests">Quests</option>
         <option value="talents">Talents</option>
       </select>
+      <div id="editGuideReferenceFields" class="form-group bl-discovery-panel" style="margin-top:14px;"></div>
     </div>
 
     <div id="editDiscoveryFields" style="display:none;">
+      <p id="editDiscoveryModeHint" class="field-hint" style="display:none;"></p>
       <label for="editDiscoveryCategory">Discovery Category</label>
       <select id="editDiscoveryCategory" class="form-input">
         <option value="">Choose category...</option>
@@ -187,6 +189,10 @@
         </select>
         <p class="field-hint">Required for categories like Creatures, Classes, and Items so entries stay easy to scan.</p>
       </div>
+
+      <div id="editDiscoveryStructuredFields" class="form-group" style="margin-top:14px;"></div>
+      <div id="editDiscoveryRelationFields" class="form-group" style="margin-top:10px;"></div>
+      <div id="editDiscoveryEvidenceFields" class="form-group" style="margin-top:10px;"></div>
     </div>
 
     <div id="editWikiFields" style="display:none;">
@@ -203,11 +209,13 @@
       </div>
     </div>
 
-    <label style="margin-top:18px;display:block;" for="editPostEditor">Content</label>
-    <div class="edit-editor-shell">
-      <div id="editPostEditor"></div>
+    <div id="editContentEditorWrap">
+      <label style="margin-top:18px;display:block;" for="editPostEditor">Content</label>
+      <div class="edit-editor-shell">
+        <div id="editPostEditor"></div>
+      </div>
+      <p class="edit-editor-hint">Use headings and lists for structure. Keep source links and patch/update tags above up to date.</p>
     </div>
-    <p class="edit-editor-hint">Use headings and lists for structure. Keep source links and patch/update tags above up to date.</p>
 
     <div id="editFormError" style="display:none;color:#ff7b7b;margin-top:14px;"></div>
     <div id="editFormOk" style="display:none;color:#50c878;margin-top:14px;"></div>
@@ -223,9 +231,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js?v=5"></script>
+<script src="/js/categories-config.js?v=8"></script>
 <script src="/js/auth-nav.js"></script>
-<script src="/js/edit-post.js?v=5"></script>
+<script src="/js/edit-post.js?v=6"></script>
 <script src="/js/main.js?v=3"></script>
 </body>
 </html>

@@ -233,6 +233,88 @@ function renderPost(post) {
   }
 
   loadRelatedPosts(post, postMeta);
+  renderStructuredDiscoveryPD(post, postMeta);
+  renderGuideReferencesPD(post, postMeta);
+}
+
+function renderStructuredDiscoveryPD(post, postMeta) {
+  const section = document.getElementById("postDiscoveryData");
+  if (!section) return;
+  section.style.display = "none";
+  section.innerHTML = "";
+
+  if (!post || post.post_type !== "discovery") return;
+  const payload = postMeta && typeof postMeta.discovery_payload === "object" ? postMeta.discovery_payload : null;
+  const relations = Array.isArray(postMeta && postMeta.discovery_relations) ? postMeta.discovery_relations : [];
+  const evidence = Array.isArray(postMeta && postMeta.discovery_evidence) ? postMeta.discovery_evidence : [];
+  if (!payload && relations.length === 0 && evidence.length === 0) return;
+
+  section.style.display = "block";
+  let html = '<h3 class="bl-related-title">Discovery Data Network</h3>';
+
+  if (payload && Object.keys(payload).length) {
+    html += '<div class="bl-related-group"><h4 class="bl-related-group-title">Structured Facts</h4><ul class="source-list">';
+    Object.keys(payload).forEach(function(key) {
+      const value = payload[key];
+      if (value == null || value === "") return;
+      const label = String(key).replace(/_/g, " ").replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+      html += '<li><strong>' + escapeHtml(label) + ':</strong> ' + escapeHtml(String(value)) + '</li>';
+    });
+    html += '</ul></div>';
+  }
+
+  if (relations.length) {
+    html += '<div class="bl-related-group"><h4 class="bl-related-group-title">Auto-Linked Dependencies</h4><ul class="source-list">';
+    relations.forEach(function(rel) {
+      const relLabel = escapeHtml(String(rel.relation_type || rel.group || "related_to").replace(/_/g, " "));
+      const title = escapeHtml(rel.title || "Entry");
+      if (rel.slug) {
+        html += '<li><strong>' + relLabel + ':</strong> <a href="/wiki/post/?slug=' + encodeURIComponent(rel.slug) + '">' + title + '</a></li>';
+      } else {
+        html += '<li><strong>' + relLabel + ':</strong> ' + title + '</li>';
+      }
+    });
+    html += '</ul></div>';
+  }
+
+  if (evidence.length) {
+    html += '<div class="bl-related-group"><h4 class="bl-related-group-title">Evidence Mapping</h4><ul class="source-list">';
+    evidence.forEach(function(item) {
+      const supports = Array.isArray(item.supports) && item.supports.length
+        ? item.supports.map(function(key) { return escapeHtml(String(key).replace(/_/g, " ")); }).join(', ')
+        : 'general evidence';
+      const label = escapeHtml(item.label || 'Evidence');
+      const note = item.note ? ('<div style="color:var(--text-muted);font-size:0.84rem;">' + escapeHtml(item.note) + '</div>') : '';
+      if (item.url) {
+        html += '<li><strong>Supports:</strong> ' + supports + '<br><a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' + label + '</a>' + note + '</li>';
+      } else {
+        html += '<li><strong>Supports:</strong> ' + supports + '<br>' + label + note + '</li>';
+      }
+    });
+    html += '</ul></div>';
+  }
+
+  section.innerHTML = html;
+}
+
+function renderGuideReferencesPD(post, postMeta) {
+  const section = document.getElementById("postDiscoveryData");
+  if (!section || !post || post.post_type !== "guide") return;
+  const refs = Array.isArray(postMeta && postMeta.guide_references) ? postMeta.guide_references : [];
+  if (!refs.length) return;
+
+  section.style.display = "block";
+  section.innerHTML = '<h3 class="bl-related-title">Guide Reference Network</h3>' +
+    '<div class="bl-related-group"><h4 class="bl-related-group-title">Referenced Entries</h4><ul class="source-list">' +
+    refs.map(function(ref) {
+      const label = escapeHtml(ref.title || "Entry");
+      const type = escapeHtml(ref.post_type === "guide" ? "Guide" : (ref.category || "Entry"));
+      if (ref.slug) {
+        return '<li><a href="/wiki/post/?slug=' + encodeURIComponent(ref.slug) + '">' + label + '</a> <span style="color:var(--text-muted);">(' + type + ')</span></li>';
+      }
+      return '<li>' + label + ' <span style="color:var(--text-muted);">(' + type + ')</span></li>';
+    }).join('') +
+    '</ul></div>';
 }
 
 async function loadRelatedPosts(post, postMeta) {

@@ -13,6 +13,33 @@ let createCurrentUserId = null;
 let createIsAdmin = false;
 let currentDiscoveryCategory = "";
 let currentWikiCategory = "";
+let structuredDiscoveryEnabled = false;
+let discoveryFieldState = {};
+let discoveryEvidenceState = {
+  supports: [],
+  note: "",
+};
+let guideReferenceState = [];
+let guideReferenceSuggestions = [];
+let guideReferenceCategory = "";
+let guideReferenceTimer = null;
+let createTutorialConfirmed = false;
+let discoveryRelationState = {
+  items: [],
+  creatures: [],
+  locations: [],
+  guides: [],
+};
+let discoverySuggestionState = {
+  items: [],
+  creatures: [],
+  locations: [],
+  guides: [],
+};
+const relationInputTimers = {};
+const DISCOVERY_PLACEHOLDER_VALUES = [
+  "asdf", "qwerty", "test", "todo", "none", "n/a", "na", "unknown", "idk", "???", "12345"
+];
 
 document.addEventListener("DOMContentLoaded", async () => {
   quillEditor = new Quill("#postEditor", {
@@ -36,6 +63,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     discoveryCategorySelect.addEventListener("change", function() {
       currentDiscoveryCategory = this.value;
       refreshDiscoverySubcategoryOptions();
+      renderDiscoveryStructuredFields();
+      renderDiscoveryRelationFields();
+      renderDiscoveryEvidenceFields();
     });
   }
   if (wikiCategorySelect) {
@@ -48,7 +78,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("createPostForm").addEventListener("submit", handleSubmit);
 
   await initCreatePermissions();
+  await initTutorialGateCP();
+  structuredDiscoveryEnabled = typeof isStructuredDiscoveryEnabled === "function"
+    ? isStructuredDiscoveryEnabled()
+    : false;
+  if (typeof ensureCategoryExtensionsLoaded === "function") {
+    await ensureCategoryExtensionsLoaded();
+  }
+  fillDiscoveryCategories();
   fillWikiCategories();
+  syncDiscoveryModeHint();
+  renderGuideReferenceFields();
 
   const params = new URLSearchParams(window.location.search);
   const typeParam = (params.get("type") || "").toLowerCase();
@@ -64,6 +104,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     discoveryCategorySelect.value = presetCategory;
     currentDiscoveryCategory = presetCategory;
     refreshDiscoverySubcategoryOptions(presetSubcategory);
+    renderDiscoveryStructuredFields();
+    renderDiscoveryRelationFields();
+    renderDiscoveryEvidenceFields();
   }
 });
 
@@ -85,6 +128,50 @@ async function initCreatePermissions() {
   }
 }
 
+async function initTutorialGateCP() {
+  const gateBox = document.getElementById("tutorialGateBox");
+  const gateLink = document.getElementById("tutorialGateLink");
+  const submitBtn = document.querySelector("#createPostForm button[type='submit']");
+  if (!gateBox || !gateLink) return;
+
+  await supabase.auth.refreshSession();
+  const { data: sessionData } = await supabase.auth.getSession();
+  const user = sessionData && sessionData.session ? sessionData.session.user : null;
+  if (!user) {
+    createTutorialConfirmed = false;
+    gateBox.style.display = "none";
+    return;
+  }
+
+  createTutorialConfirmed = !!(user.user_metadata && user.user_metadata.submission_tutorial_v1_accepted === true);
+  gateLink.href = "/wiki/submit-tutorial/?returnTo=" + encodeURIComponent(window.location.pathname + window.location.search);
+
+  gateBox.style.display = createTutorialConfirmed ? "none" : "block";
+  if (submitBtn) {
+    submitBtn.disabled = !createTutorialConfirmed;
+    submitBtn.title = createTutorialConfirmed
+      ? ""
+      : "Please read and confirm the tutorial once before submitting.";
+  }
+}
+
+function fillDiscoveryCategories() {
+  const discoverySelect = document.getElementById("discoveryCategory");
+  if (!discoverySelect) return;
+  discoverySelect.innerHTML = '<option value="">Select a category...</option>';
+
+  const categories = typeof getDiscoveryCategoryOptions === "function"
+    ? getDiscoveryCategoryOptions()
+    : [];
+
+  categories.forEach(function(cat) {
+    const opt = document.createElement("option");
+    opt.value = cat.slug;
+    opt.textContent = cat.label;
+    discoverySelect.appendChild(opt);
+  });
+}
+
 function fillWikiCategories() {
   const wikiSelect = document.getElementById("wikiCategory");
   const categories = Array.isArray(window.BOUNDLORE_CATEGORIES)
@@ -104,6 +191,15 @@ function fillWikiCategories() {
   });
 }
 
+function syncDiscoveryModeHint() {
+  const hint = document.getElementById("discoveryModeHint");
+  if (!hint) return;
+  hint.style.display = "block";
+  hint.textContent = structuredDiscoveryEnabled
+    ? "Structured discovery mode is active for this local session."
+    : "Structured discovery mode is currently disabled. Add ?enableStructuredDiscovery=1 to test the new structured flow locally.";
+}
+
 function setPostType(type) {
   currentPostType = type === "wiki" ? "wiki" : (type === "discovery" ? "discovery" : "guide");
   document.getElementById("btnTypeGuide").classList.toggle("active", type === "guide");
@@ -119,6 +215,11 @@ function setPostType(type) {
   const wikiSubWrap = document.getElementById("wikiSubcategoryWrap");
   const wikiSubcategory = document.getElementById("wikiSubcategory");
   const wikiCategory = document.getElementById("wikiCategory");
+  const contentWrap = document.getElementById("contentEditorWrap");
+  const contentLabel = document.getElementById("postContentLabel");
+  const structuredWrap = document.getElementById("discoveryStructuredFields");
+  const relationWrap = document.getElementById("discoveryRelationFields");
+  const guideReferenceWrap = document.getElementById("guideReferenceFields");
 
   if (type === "guide") {
     guideFields.style.display = "block";
@@ -134,6 +235,10 @@ function setPostType(type) {
     currentWikiCategory = "";
     if (discoverySubWrap) discoverySubWrap.style.display = "none";
     if (wikiSubWrap) wikiSubWrap.style.display = "none";
+    if (contentWrap) contentWrap.style.display = "block";
+    if (contentLabel) contentLabel.textContent = "Content";
+    if (guideReferenceWrap) guideReferenceWrap.style.display = "block";
+    renderGuideReferenceFields();
   } else if (type === "discovery") {
     guideFields.style.display = "none";
     discoveryFields.style.display = "block";
@@ -147,7 +252,15 @@ function setPostType(type) {
     currentDiscoveryCategory = discoverySelect.value || currentDiscoveryCategory || "";
     currentWikiCategory = "";
     refreshDiscoverySubcategoryOptions();
+    renderDiscoveryStructuredFields();
+    renderDiscoveryRelationFields();
+    renderDiscoveryEvidenceFields();
     if (wikiSubWrap) wikiSubWrap.style.display = "none";
+    if (structuredWrap) structuredWrap.style.display = structuredDiscoveryEnabled ? "block" : "none";
+    if (relationWrap) relationWrap.style.display = structuredDiscoveryEnabled ? "block" : "none";
+    if (contentWrap) contentWrap.style.display = structuredDiscoveryEnabled ? "none" : "block";
+    if (contentLabel) contentLabel.textContent = structuredDiscoveryEnabled ? "Content" : "Discovery Notes";
+    if (guideReferenceWrap) guideReferenceWrap.style.display = "none";
   } else {
     guideFields.style.display = "none";
     discoveryFields.style.display = "none";
@@ -160,6 +273,11 @@ function setPostType(type) {
     currentWikiCategory = wikiCategory.value || currentWikiCategory || "";
     if (discoverySubWrap) discoverySubWrap.style.display = "none";
     refreshWikiSubcategoryOptions();
+    if (contentWrap) contentWrap.style.display = "block";
+    if (contentLabel) contentLabel.textContent = "Content";
+    if (structuredWrap) structuredWrap.style.display = "none";
+    if (relationWrap) relationWrap.style.display = "none";
+    if (guideReferenceWrap) guideReferenceWrap.style.display = "none";
   }
 }
 
@@ -172,6 +290,17 @@ async function handleSubmit(e) {
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData.session) {
     errorEl.textContent = "You must be logged in to submit a post.";
+    errorEl.style.display = "block";
+    return;
+  }
+
+  await supabase.auth.refreshSession();
+  const { data: refreshedSession } = await supabase.auth.getSession();
+  const refreshedUser = refreshedSession && refreshedSession.session ? refreshedSession.session.user : null;
+  createTutorialConfirmed = !!(refreshedUser && refreshedUser.user_metadata && refreshedUser.user_metadata.submission_tutorial_v1_accepted === true);
+
+  if (!createTutorialConfirmed) {
+    errorEl.textContent = "Please read and confirm the submission tutorial once before submitting posts.";
     errorEl.style.display = "block";
     return;
   }
@@ -188,7 +317,7 @@ async function handleSubmit(e) {
     errorEl.style.display = "block";
     return;
   }
-  if (!content || content === "<p><br></p>") {
+  if (currentPostType !== "discovery" && (!content || content === "<p><br></p>")) {
     errorEl.textContent = "Please write some content.";
     errorEl.style.display = "block";
     return;
@@ -214,10 +343,27 @@ async function handleSubmit(e) {
       errorEl.style.display = "block";
       return;
     }
+    const guideReferenceError = validateGuideReferencesCP();
+    if (guideReferenceError) {
+      errorEl.textContent = guideReferenceError;
+      errorEl.style.display = "block";
+      return;
+    }
     payload.post_type = "guide";
     payload.category = null;
     payload.guide_subcategory = subcat;
     payload.is_discovery = false;
+    if (guideReferenceState.length) {
+      postMeta.guide_references = guideReferenceState.map(function(item) {
+        return {
+          id: item.id || null,
+          slug: item.slug || null,
+          title: item.title || "",
+          category: item.category || null,
+          post_type: item.post_type || null,
+        };
+      });
+    }
   } else if (currentPostType === "discovery") {
     const cat = document.getElementById("discoveryCategory").value;
     const discoverySubcat = document.getElementById("discoverySubcategory")?.value || "";
@@ -246,11 +392,77 @@ async function handleSubmit(e) {
       errorEl.style.display = "block";
       return;
     }
+
     payload.post_type = "discovery";
     payload.category = cat;
     payload.guide_subcategory = null;
     payload.is_discovery = true;
-    payload.content = buildDiscoveryMediaContent(title, content, discoveryImageUrl, discoveryYoutubeUrl);
+    if (structuredDiscoveryEnabled) {
+      const structuredResult = collectStructuredDiscoveryInput();
+      if (structuredResult.error) {
+        errorEl.textContent = structuredResult.error;
+        errorEl.style.display = "block";
+        return;
+      }
+
+      if (!structuredResult.relations || structuredResult.relations.length === 0) {
+        errorEl.textContent = "Please link at least one related entry, dependency, item, location, creature, or guide.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      const duplicateError = await detectDiscoveryDuplicateCP({
+        title: title,
+        category: cat,
+        subcategory: needsSubcategory ? discoverySubcat : "",
+        payload: structuredResult.payload,
+      });
+      if (duplicateError) {
+        errorEl.textContent = duplicateError;
+        errorEl.style.display = "block";
+        return;
+      }
+
+      postMeta.discovery_payload = structuredResult.payload;
+      postMeta.discovery_relations = structuredResult.relations;
+      const evidenceInput = collectDiscoveryEvidenceInputCP({
+        hasExternalEvidence: !!discoveryImageUrl || !!discoveryYoutubeUrl || files.length > 0,
+      });
+      if (evidenceInput.error) {
+        errorEl.textContent = evidenceInput.error;
+        errorEl.style.display = "block";
+        return;
+      }
+      postMeta.discovery_evidence = buildDiscoveryEvidenceMetaCP(evidenceInput, [], discoveryImageUrl, discoveryYoutubeUrl);
+      payload.content = buildStructuredDiscoveryContent(
+        title,
+        cat,
+        structuredResult.payload,
+        structuredResult.relations,
+        discoveryImageUrl,
+        discoveryYoutubeUrl
+      );
+    } else {
+      if (!content || content === "<p><br></p>") {
+        errorEl.textContent = "Please write discovery notes while the structured flow is disabled.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      const duplicateError = await detectDiscoveryDuplicateCP({
+        title: title,
+        category: cat,
+        subcategory: needsSubcategory ? discoverySubcat : "",
+        payload: null,
+      });
+      if (duplicateError) {
+        errorEl.textContent = duplicateError;
+        errorEl.style.display = "block";
+        return;
+      }
+
+      payload.content = buildDiscoveryMediaContent(title, content, discoveryImageUrl, discoveryYoutubeUrl);
+    }
     if (needsSubcategory) {
       postMeta.subcategory = discoverySubcat;
     }
@@ -289,11 +501,25 @@ async function handleSubmit(e) {
   }
 
   if (files.length > 0) {
+    const uploadValidationError = validateDiscoveryFilesCP(files, currentPostType === "discovery" ? payload.category : "");
+    if (uploadValidationError) {
+      errorEl.textContent = uploadValidationError;
+      errorEl.style.display = "block";
+      return;
+    }
     const uploadResult = await uploadDiscoveryFiles(userId, files);
     if (uploadResult.error) {
       errorEl.textContent = uploadResult.error;
       errorEl.style.display = "block";
       return;
+    }
+    if (currentPostType === "discovery" && structuredDiscoveryEnabled) {
+      const existingEvidence = Array.isArray(postMeta.discovery_evidence) ? postMeta.discovery_evidence : [];
+      const fileEvidence = buildDiscoveryEvidenceMetaCP({
+        supports: discoveryEvidenceState.supports || [],
+        note: discoveryEvidenceState.note || "",
+      }, uploadResult.files, "", "");
+      postMeta.discovery_evidence = existingEvidence.concat(fileEvidence);
     }
     payload.content = buildPostContentWithAttachments(payload.content, uploadResult.files, currentPostType === "discovery");
   }
@@ -410,6 +636,111 @@ async function uploadDiscoveryFiles(userId, files) {
   return { files: uploaded };
 }
 
+function validateDiscoveryFilesCP(files, category) {
+  if (!files || !files.length) return "";
+  const rules = typeof getDiscoveryUploadRulesForCategory === "function"
+    ? getDiscoveryUploadRulesForCategory(category)
+    : { maxFiles: 8, maxFileSizeMb: 8, minImages: 0, allowedExtensions: [".jpg", ".jpeg", ".png", ".webp", ".gif", ".pdf", ".zip", ".txt"] };
+
+  if (rules.maxFiles && files.length > rules.maxFiles) {
+    return "Too many attachments. Maximum allowed: " + rules.maxFiles + ".";
+  }
+
+  const allowedExtensions = Array.isArray(rules.allowedExtensions) ? rules.allowedExtensions.map(function(ext) { return ext.toLowerCase(); }) : [];
+  const maxBytes = (rules.maxFileSizeMb || 8) * 1024 * 1024;
+  let imageCount = 0;
+
+  for (const file of files) {
+    const lowerName = String(file.name || "").toLowerCase();
+    const extension = lowerName.includes(".") ? lowerName.slice(lowerName.lastIndexOf(".")) : "";
+    if (allowedExtensions.length && !allowedExtensions.includes(extension)) {
+      return "Unsupported attachment type for " + file.name + ".";
+    }
+    if (file.size > maxBytes) {
+      return file.name + " exceeds the size limit of " + (rules.maxFileSizeMb || 8) + " MB.";
+    }
+    if ((file.type || "").startsWith("image/")) imageCount += 1;
+  }
+
+  if (rules.minImages && imageCount < rules.minImages) {
+    return "This discovery type requires at least " + rules.minImages + " image attachment(s).";
+  }
+
+  return "";
+}
+
+async function detectDiscoveryDuplicateCP(input) {
+  const category = input && input.category ? input.category : "";
+  const title = input && input.title ? input.title : "";
+  if (!category || !title) return "";
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("id, title, category, guide_subcategory, content, status")
+    .eq("is_discovery", true)
+    .eq("category", category)
+    .in("status", ["pending", "published", "approved"])
+    .limit(40);
+
+  if (error || !Array.isArray(data)) return "";
+
+  const bestMatch = data.map(function(candidate) {
+    return {
+      candidate: candidate,
+      score: computeDiscoveryDuplicateScoreCP(input, candidate),
+    };
+  }).sort(function(a, b) {
+    return b.score - a.score;
+  })[0];
+
+  if (bestMatch && bestMatch.score >= 7) {
+    return 'Potential duplicate detected: "' + bestMatch.candidate.title + '" already looks very similar. Please refine the entry or use the existing discovery context.';
+  }
+
+  return "";
+}
+
+function computeDiscoveryDuplicateScoreCP(input, candidate) {
+  let score = 0;
+  const inputTitle = normalizeDiscoveryCompareCP(input.title);
+  const candidateTitle = normalizeDiscoveryCompareCP(candidate.title);
+  if (inputTitle && candidateTitle && inputTitle === candidateTitle) score += 5;
+
+  const candidateMeta = parsePostMetaCP(candidate.content || "");
+  const inputSub = normalizeDiscoveryCompareCP(input.subcategory || "");
+  const candidateSub = normalizeDiscoveryCompareCP(candidateMeta.subcategory || candidate.guide_subcategory || "");
+  if (inputSub && candidateSub && inputSub === candidateSub) score += 1;
+
+  const inputFoundIn = normalizeDiscoveryCompareCP(input.payload && input.payload.found_in ? input.payload.found_in : "");
+  const candidatePayload = candidateMeta.discovery_payload && typeof candidateMeta.discovery_payload === "object" ? candidateMeta.discovery_payload : null;
+  const candidateFoundIn = normalizeDiscoveryCompareCP(candidatePayload && candidatePayload.found_in ? candidatePayload.found_in : "");
+  if (inputFoundIn && candidateFoundIn && inputFoundIn === candidateFoundIn) score += 3;
+
+  score += Math.min(countSharedDiscoveryTermsCP(inputTitle, candidateTitle), 2);
+  return score;
+}
+
+function normalizeDiscoveryCompareCP(value) {
+  if (typeof normalizeDiscoveryLookupTerm === "function") {
+    return normalizeDiscoveryLookupTerm(value);
+  }
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function countSharedDiscoveryTermsCP(a, b) {
+  const termsA = typeof tokenizeDiscoveryLookupTerms === "function"
+    ? tokenizeDiscoveryLookupTerms(a)
+    : a.split(/\s+/).filter(function(term) { return term.length >= 4; });
+  const termsB = new Set(typeof tokenizeDiscoveryLookupTerms === "function"
+    ? tokenizeDiscoveryLookupTerms(b)
+    : b.split(/\s+/).filter(function(term) { return term.length >= 4; }));
+  return termsA.filter(function(term) { return termsB.has(term); }).length;
+}
+
 function buildPostContentWithAttachments(baseHtml, files, isDiscovery) {
   if (!files || files.length === 0) return baseHtml;
 
@@ -445,6 +776,816 @@ function buildDiscoveryMediaContent(title, baseHtml, imageUrl, youtubeUrl) {
     content += '<h3>Discovery Video</h3><p><a href="' + safeVideo + '" target="_blank" rel="noopener">Watch on YouTube</a></p>';
   }
   return content;
+}
+
+function getDiscoveryConfig(category) {
+  if (typeof getDiscoverySchemaForCategory === "function") {
+    return getDiscoverySchemaForCategory(category);
+  }
+  return {
+    fields: [
+      { key: "found_in", label: "Where found", type: "text", required: true, max: 120 },
+      { key: "how_to_reproduce", label: "How to reproduce", type: "textarea", required: true, max: 1200 },
+      { key: "observed_result", label: "Observed result", type: "textarea", required: true, max: 600 },
+    ],
+    relations: ["items", "creatures", "locations", "guides"],
+  };
+}
+
+function getDiscoveryRelationConfig() {
+  if (typeof getDiscoveryRelationGroups === "function") {
+    return getDiscoveryRelationGroups();
+  }
+  return {
+    items: { label: "Used Items", relationType: "uses_item" },
+    creatures: { label: "Related Creatures", relationType: "related_creature" },
+    locations: { label: "Related Locations/Biomes", relationType: "found_in" },
+    guides: { label: "Related Guides", relationType: "reference_guide" },
+  };
+}
+
+function renderDiscoveryStructuredFields() {
+  const wrap = document.getElementById("discoveryStructuredFields");
+  if (!wrap) return;
+  if (!structuredDiscoveryEnabled) {
+    wrap.innerHTML = "";
+    wrap.style.display = "none";
+    return;
+  }
+
+  const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+  if (!category) {
+    wrap.style.display = "block";
+    wrap.innerHTML = "<h3 style='margin:0 0 8px;'>Discovery Data</h3><p class='field-hint'>Choose a discovery category first to load the specialized questions for that discovery type.</p>";
+    return;
+  }
+  const config = getDiscoveryConfig(category);
+  const fields = Array.isArray(config.fields) ? config.fields : [];
+  if (!fields.length) {
+    wrap.innerHTML = "";
+    return;
+  }
+
+  wrap.innerHTML = "<h3 style='margin:0 0 8px;'>Discovery Data</h3>";
+
+  fields.forEach(function(field) {
+    const group = document.createElement("div");
+    group.className = "form-group";
+    group.style.marginTop = "10px";
+
+    const label = document.createElement("label");
+    label.setAttribute("for", "discField_" + field.key);
+    label.textContent = field.label + (field.required ? " *" : "");
+    group.appendChild(label);
+
+    let input;
+    const current = discoveryFieldState[field.key] != null ? discoveryFieldState[field.key] : "";
+    if (field.type === "textarea") {
+      input = document.createElement("textarea");
+      input.rows = 4;
+      input.maxLength = field.max || 1200;
+      input.className = "form-input";
+      input.value = current;
+    } else if (field.type === "select") {
+      input = document.createElement("select");
+      input.className = "form-input";
+      const empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = "Select...";
+      input.appendChild(empty);
+      (field.options || []).forEach(function(opt) {
+        const option = document.createElement("option");
+        option.value = opt;
+        option.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
+        input.appendChild(option);
+      });
+      input.value = current;
+    } else {
+      input = document.createElement("input");
+      input.type = field.type === "number" ? "number" : "text";
+      input.className = "form-input";
+      input.maxLength = field.max || 240;
+      if (field.type === "number" && typeof field.min === "number") input.min = String(field.min);
+      input.value = current;
+    }
+
+    input.id = "discField_" + field.key;
+    input.dataset.discoveryField = field.key;
+    if (field.required) input.setAttribute("data-required", "1");
+
+    input.addEventListener("input", function() {
+      discoveryFieldState[field.key] = input.value;
+    });
+
+    group.appendChild(input);
+    wrap.appendChild(group);
+  });
+}
+
+function renderDiscoveryRelationFields() {
+  const wrap = document.getElementById("discoveryRelationFields");
+  if (!wrap) return;
+  if (!structuredDiscoveryEnabled) {
+    wrap.innerHTML = "";
+    wrap.style.display = "none";
+    return;
+  }
+
+  const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+  if (!category) {
+    wrap.style.display = "none";
+    wrap.innerHTML = "";
+    return;
+  }
+  const config = getDiscoveryConfig(category);
+  const groups = Array.isArray(config.relations) ? config.relations : [];
+
+  wrap.innerHTML = "";
+  if (!groups.length) return;
+
+  const title = document.createElement("h3");
+  title.textContent = "Auto Relations";
+  title.style.margin = "4px 0 8px";
+  wrap.appendChild(title);
+
+  const help = document.createElement("p");
+  help.className = "field-hint";
+  help.textContent = "Start typing to find existing entries. Click a suggestion to create a direct relation.";
+  wrap.appendChild(help);
+
+  groups.forEach(function(groupKey) {
+    const relationConfig = getDiscoveryRelationConfig();
+    const cfg = relationConfig[groupKey];
+    if (!cfg) return;
+
+    const box = document.createElement("div");
+    box.className = "form-group";
+    box.style.marginTop = "8px";
+
+    const label = document.createElement("label");
+    label.setAttribute("for", "relationInput_" + groupKey);
+    label.textContent = cfg.label;
+    box.appendChild(label);
+
+    const input = document.createElement("input");
+    input.id = "relationInput_" + groupKey;
+    input.className = "form-input";
+    input.placeholder = "Type at least 2 letters...";
+    box.appendChild(input);
+
+    const suggestions = document.createElement("div");
+    suggestions.id = "relationSuggestions_" + groupKey;
+    suggestions.style.marginTop = "6px";
+    box.appendChild(suggestions);
+
+    const selected = document.createElement("div");
+    selected.id = "relationSelected_" + groupKey;
+    selected.style.marginTop = "8px";
+    box.appendChild(selected);
+
+    input.addEventListener("input", function() {
+      const value = (input.value || "").trim();
+      if (relationInputTimers[groupKey]) {
+        clearTimeout(relationInputTimers[groupKey]);
+      }
+      relationInputTimers[groupKey] = setTimeout(function() {
+        fetchRelationSuggestions(groupKey, value);
+      }, 220);
+    });
+
+    input.addEventListener("keydown", function(evt) {
+      if (evt.key === "Enter") {
+        evt.preventDefault();
+        const value = (input.value || "").trim();
+        if (!value) return;
+        addDiscoveryRelation(groupKey, {
+          title: value,
+          slug: null,
+          id: null,
+          category: null,
+          post_type: null,
+          relation_type: cfg.relationType,
+          resolved: false,
+        });
+        input.value = "";
+        renderRelationSuggestions(groupKey);
+      }
+    });
+
+    wrap.appendChild(box);
+    renderRelationSuggestions(groupKey);
+    renderSelectedRelations(groupKey);
+  });
+}
+
+function renderDiscoveryEvidenceFields() {
+  const wrap = document.getElementById("discoveryEvidenceFields");
+  if (!wrap) return;
+  if (!structuredDiscoveryEnabled) {
+    wrap.innerHTML = "";
+    wrap.style.display = "none";
+    return;
+  }
+
+  const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+  if (!category) {
+    wrap.style.display = "none";
+    wrap.innerHTML = "";
+    return;
+  }
+  const config = getDiscoveryConfig(category);
+  const fields = Array.isArray(config.fields) ? config.fields : [];
+  wrap.style.display = "block";
+  wrap.className = "form-group bl-discovery-panel";
+    wrap.innerHTML = "<h3 class='bl-discovery-panel-title'>Evidence Mapping</h3>";
+
+  const help = document.createElement("p");
+  help.className = "field-hint";
+  help.textContent = "Select which structured facts your screenshots, uploads, or video evidence support.";
+  wrap.appendChild(help);
+
+  const supportsBox = document.createElement("div");
+    supportsBox.className = "bl-evidence-grid";
+
+  fields.forEach(function(field) {
+    const label = document.createElement("label");
+      label.className = "bl-evidence-option";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = field.key;
+    checkbox.checked = discoveryEvidenceState.supports.includes(field.key);
+    checkbox.addEventListener("change", function() {
+      if (checkbox.checked) {
+        if (!discoveryEvidenceState.supports.includes(field.key)) discoveryEvidenceState.supports.push(field.key);
+      } else {
+        discoveryEvidenceState.supports = discoveryEvidenceState.supports.filter(function(item) { return item !== field.key; });
+      }
+    });
+    label.appendChild(checkbox);
+    const text = document.createElement("span");
+    text.textContent = field.label;
+    label.appendChild(text);
+    supportsBox.appendChild(label);
+  });
+  wrap.appendChild(supportsBox);
+
+  const noteLabel = document.createElement("label");
+  noteLabel.setAttribute("for", "discoveryEvidenceNote");
+  noteLabel.textContent = "Evidence note (optional)";
+  wrap.appendChild(noteLabel);
+
+  const note = document.createElement("textarea");
+  note.id = "discoveryEvidenceNote";
+  note.className = "form-input";
+  note.rows = 3;
+  note.maxLength = 400;
+  note.placeholder = "Example: first screenshot shows the spawn location; second image confirms the taming item.";
+  note.value = discoveryEvidenceState.note || "";
+  note.addEventListener("input", function() {
+    discoveryEvidenceState.note = note.value;
+  });
+  wrap.appendChild(note);
+}
+
+function renderGuideReferenceFields() {
+  const wrap = document.getElementById("guideReferenceFields");
+  if (!wrap) return;
+  wrap.innerHTML = "<h3 class='bl-discovery-panel-title'>Guide References</h3>";
+
+  const help = document.createElement("p");
+  help.className = "field-hint";
+  help.textContent = "Optionally link the entries this guide explains, uses, or recommends.";
+  wrap.appendChild(help);
+
+  const row = document.createElement("div");
+  row.className = "form-group";
+
+  const categoryLabel = document.createElement("label");
+  categoryLabel.setAttribute("for", "guideReferenceCategory");
+  categoryLabel.textContent = "Reference category";
+  row.appendChild(categoryLabel);
+
+  const categorySelect = document.createElement("select");
+  categorySelect.id = "guideReferenceCategory";
+  categorySelect.className = "form-input";
+  categorySelect.innerHTML = '<option value="">Choose category...</option>';
+  const referenceCategories = getGuideReferenceCategoryOptionsCP();
+  referenceCategories.forEach(function(cat) {
+    const opt = document.createElement("option");
+    opt.value = cat.slug;
+    opt.textContent = cat.label;
+    categorySelect.appendChild(opt);
+  });
+  categorySelect.value = guideReferenceCategory || "";
+  categorySelect.addEventListener("change", function() {
+    guideReferenceCategory = categorySelect.value;
+    guideReferenceSuggestions = [];
+    renderGuideReferenceFields();
+  });
+  row.appendChild(categorySelect);
+
+  const inputLabel = document.createElement("label");
+  inputLabel.setAttribute("for", "guideReferenceSearch");
+  inputLabel.style.marginTop = "12px";
+  inputLabel.textContent = "Find existing entry";
+  row.appendChild(inputLabel);
+
+  const input = document.createElement("input");
+  input.id = "guideReferenceSearch";
+  input.className = "form-input";
+  input.placeholder = guideReferenceCategory ? "Type to search existing entries..." : "Choose a category first...";
+  input.disabled = !guideReferenceCategory;
+  input.addEventListener("input", function() {
+    const value = (input.value || "").trim();
+    if (guideReferenceTimer) clearTimeout(guideReferenceTimer);
+    guideReferenceTimer = setTimeout(function() {
+      fetchGuideReferenceSuggestionsCP(value);
+    }, 220);
+  });
+  row.appendChild(input);
+
+  const suggestions = document.createElement("div");
+  suggestions.id = "guideReferenceSuggestions";
+  suggestions.style.marginTop = "8px";
+  row.appendChild(suggestions);
+
+  const selected = document.createElement("div");
+  selected.id = "guideReferenceSelected";
+  selected.style.marginTop = "10px";
+  row.appendChild(selected);
+
+  wrap.appendChild(row);
+  renderGuideReferenceSuggestions();
+  renderGuideReferenceSelected();
+}
+
+function getGuideReferenceCategoryOptionsCP() {
+  const categories = Array.isArray(window.BOUNDLORE_CATEGORIES)
+    ? window.BOUNDLORE_CATEGORIES
+    : [];
+  return categories.filter(function(cat) {
+    return cat.slug !== "community" && cat.slug !== "news";
+  }).concat([{ slug: "guides", label: "Guides" }]).filter(function(item, index, arr) {
+    return arr.findIndex(function(other) { return other.slug === item.slug; }) === index;
+  });
+}
+
+async function fetchGuideReferenceSuggestionsCP(term) {
+  const cleanTerm = String(term || "").trim();
+  if (!guideReferenceCategory || cleanTerm.length < 2) {
+    guideReferenceSuggestions = [];
+    renderGuideReferenceSuggestions();
+    return;
+  }
+
+  let query = supabase
+    .from("posts")
+    .select("id, slug, title, category, post_type, status")
+    .in("status", ["published", "approved"])
+    .ilike("title", "%" + cleanTerm + "%")
+    .limit(10);
+
+  if (guideReferenceCategory === "guides") {
+    query = query.eq("post_type", "guide");
+  } else {
+    query = query.eq("category", guideReferenceCategory);
+  }
+
+  const { data, error } = await query;
+  if (error || !Array.isArray(data)) {
+    guideReferenceSuggestions = [];
+    renderGuideReferenceSuggestions();
+    return;
+  }
+
+  guideReferenceSuggestions = data.map(function(item) {
+    return {
+      id: item.id,
+      slug: item.slug || null,
+      title: item.title,
+      category: item.category || guideReferenceCategory,
+      post_type: item.post_type || null,
+      score: typeof scoreDiscoveryLookupMatch === "function"
+        ? scoreDiscoveryLookupMatch(cleanTerm, item.title || "")
+        : 1,
+    };
+  }).filter(function(item) {
+    return item.score > 0;
+  }).sort(function(a, b) {
+    if (b.score !== a.score) return b.score - a.score;
+    return String(a.title || "").localeCompare(String(b.title || ""));
+  }).slice(0, 6);
+
+  renderGuideReferenceSuggestions();
+}
+
+function renderGuideReferenceSuggestions() {
+  const wrap = document.getElementById("guideReferenceSuggestions");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  guideReferenceSuggestions.forEach(function(item) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-secondary";
+    btn.style.margin = "4px 6px 0 0";
+    btn.textContent = item.title + " (" + (item.post_type === "guide" ? "Guide" : (item.category || "Entry")) + ")";
+    btn.addEventListener("click", function() {
+      addGuideReferenceCP(item);
+      guideReferenceSuggestions = [];
+      renderGuideReferenceFields();
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function addGuideReferenceCP(item) {
+  const duplicate = guideReferenceState.some(function(existing) {
+    if (item.id && existing.id) return existing.id === item.id;
+    return String(existing.title || "").toLowerCase() === String(item.title || "").toLowerCase();
+  });
+  if (duplicate) return;
+  guideReferenceState.push(item);
+  renderGuideReferenceSelected();
+}
+
+function renderGuideReferenceSelected() {
+  const wrap = document.getElementById("guideReferenceSelected");
+  if (!wrap) return;
+  if (!guideReferenceState.length) {
+    wrap.innerHTML = "<span class='field-hint'>No guide references selected yet.</span>";
+    return;
+  }
+  wrap.innerHTML = "";
+  guideReferenceState.forEach(function(item, idx) {
+    const chip = document.createElement("span");
+    chip.className = "bl-post-context-chip";
+    chip.style.display = "inline-flex";
+    chip.style.marginRight = "6px";
+    chip.style.marginTop = "6px";
+    chip.textContent = item.title;
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "x";
+    removeBtn.style.marginLeft = "8px";
+    removeBtn.style.background = "transparent";
+    removeBtn.style.border = "none";
+    removeBtn.style.color = "inherit";
+    removeBtn.style.cursor = "pointer";
+    removeBtn.addEventListener("click", function() {
+      guideReferenceState.splice(idx, 1);
+      renderGuideReferenceSelected();
+    });
+    chip.appendChild(removeBtn);
+    wrap.appendChild(chip);
+  });
+}
+
+async function fetchRelationSuggestions(groupKey, term) {
+  const cleanTerm = String(term || "").trim();
+  if (cleanTerm.length < 2) {
+    discoverySuggestionState[groupKey] = [];
+    renderRelationSuggestions(groupKey);
+    return;
+  }
+
+  let query = supabase
+    .from("posts")
+    .select("id, slug, title, category, post_type, status")
+    .in("status", ["published", "approved"])
+    .ilike("title", "%" + cleanTerm + "%")
+    .limit(10);
+
+  const { data, error } = await query;
+  if (error || !Array.isArray(data)) {
+    discoverySuggestionState[groupKey] = [];
+    renderRelationSuggestions(groupKey);
+    return;
+  }
+
+  const relationConfig = getDiscoveryRelationConfig();
+
+  discoverySuggestionState[groupKey] = data.filter(function(item) {
+    return relationCandidateMatchesGroup(groupKey, item);
+  }).map(function(item) {
+    return {
+      id: item.id,
+      slug: item.slug || null,
+      title: item.title,
+      category: item.category || null,
+      post_type: item.post_type || null,
+      relation_type: relationConfig[groupKey].relationType,
+      resolved: true,
+      suggestionScore: computeRelationSuggestionScoreCP(cleanTerm, item.title || ""),
+    };
+  }).filter(function(item) {
+    return item.suggestionScore > 0;
+  }).sort(function(a, b) {
+    if (b.suggestionScore !== a.suggestionScore) return b.suggestionScore - a.suggestionScore;
+    return String(a.title || "").localeCompare(String(b.title || ""));
+  }).slice(0, 6);
+
+  renderRelationSuggestions(groupKey);
+}
+
+function computeRelationSuggestionScoreCP(input, candidateTitle) {
+  if (typeof scoreDiscoveryLookupMatch === "function") {
+    return scoreDiscoveryLookupMatch(input, candidateTitle);
+  }
+  const query = normalizeDiscoveryCompareCP(input);
+  const title = normalizeDiscoveryCompareCP(candidateTitle);
+  if (!query || !title) return 0;
+  if (title === query) return 100;
+  if (title.startsWith(query)) return 70;
+  if (title.includes(query)) return 50;
+
+  const queryTerms = query.split(/\s+/).filter(Boolean);
+  const titleTerms = new Set(title.split(/\s+/).filter(Boolean));
+  let score = 0;
+  queryTerms.forEach(function(term) {
+    if (titleTerms.has(term)) score += 15;
+  });
+  return score;
+}
+
+function relationCandidateMatchesGroup(groupKey, item) {
+  if (groupKey === "guides") return item.post_type === "guide";
+  if (groupKey === "items") return item.category === "items";
+  if (groupKey === "creatures") return item.category === "creatures";
+  if (groupKey === "locations") return item.category === "locations" || item.category === "biomes";
+  return true;
+}
+
+function renderRelationSuggestions(groupKey) {
+  const wrap = document.getElementById("relationSuggestions_" + groupKey);
+  if (!wrap) return;
+  const suggestions = discoverySuggestionState[groupKey] || [];
+  if (!suggestions.length) {
+    wrap.innerHTML = "";
+    return;
+  }
+
+  wrap.innerHTML = "";
+  suggestions.forEach(function(suggestion) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-secondary";
+    btn.style.margin = "4px 6px 0 0";
+    const label = suggestion.post_type === "guide"
+      ? "Guide"
+      : (suggestion.category || "Entry");
+    btn.textContent = suggestion.title + " (" + label + ")";
+    btn.addEventListener("click", function() {
+      addDiscoveryRelation(groupKey, suggestion);
+      const input = document.getElementById("relationInput_" + groupKey);
+      if (input) input.value = "";
+      discoverySuggestionState[groupKey] = [];
+      renderRelationSuggestions(groupKey);
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function addDiscoveryRelation(groupKey, relation) {
+  const list = discoveryRelationState[groupKey] || [];
+  const duplicate = list.some(function(item) {
+    if (relation.id && item.id) return item.id === relation.id;
+    return String(item.title || "").toLowerCase() === String(relation.title || "").toLowerCase();
+  });
+  if (duplicate) return;
+  list.push(relation);
+  discoveryRelationState[groupKey] = list;
+  renderSelectedRelations(groupKey);
+}
+
+function removeDiscoveryRelation(groupKey, idx) {
+  const list = discoveryRelationState[groupKey] || [];
+  if (idx < 0 || idx >= list.length) return;
+  list.splice(idx, 1);
+  renderSelectedRelations(groupKey);
+}
+
+function renderSelectedRelations(groupKey) {
+  const wrap = document.getElementById("relationSelected_" + groupKey);
+  if (!wrap) return;
+
+  const list = discoveryRelationState[groupKey] || [];
+  if (!list.length) {
+    wrap.innerHTML = "<span class='field-hint'>No linked entries selected yet.</span>";
+    return;
+  }
+
+  wrap.innerHTML = "";
+  list.forEach(function(item, idx) {
+    const chip = document.createElement("span");
+    chip.className = "bl-post-context-chip";
+    chip.style.marginRight = "6px";
+    chip.style.marginTop = "6px";
+    chip.style.display = "inline-flex";
+    chip.textContent = item.title + (item.resolved ? "" : " (new)");
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "x";
+    removeBtn.style.marginLeft = "8px";
+    removeBtn.style.background = "transparent";
+    removeBtn.style.color = "inherit";
+    removeBtn.style.border = "none";
+    removeBtn.style.cursor = "pointer";
+    removeBtn.addEventListener("click", function() {
+      removeDiscoveryRelation(groupKey, idx);
+    });
+    chip.appendChild(removeBtn);
+    wrap.appendChild(chip);
+  });
+}
+
+function collectStructuredDiscoveryInput() {
+  const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+  const config = getDiscoveryConfig(category);
+  const payload = {};
+
+  for (const field of config.fields || []) {
+    const value = (discoveryFieldState[field.key] == null ? "" : String(discoveryFieldState[field.key])).trim();
+    if (field.required && !value) {
+      return { error: "Please fill the required field: " + field.label };
+    }
+
+    if (value && (field.type === "text" || field.type === "textarea")) {
+      const qualityError = validateDiscoveryTextQuality(field, value);
+      if (qualityError) {
+        return { error: qualityError };
+      }
+    }
+
+    if (field.type === "number" && value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric) || numeric < 0) {
+        return { error: "Please provide a valid number for " + field.label + "." };
+      }
+      payload[field.key] = numeric;
+    } else if (value) {
+      payload[field.key] = value;
+    }
+  }
+
+  if (String(payload.how_to_reproduce || "").length < 20) {
+    return { error: "Please provide clearer reproduction steps (at least 20 characters)." };
+  }
+
+  const relations = [];
+  const relationConfig = getDiscoveryRelationConfig();
+  Object.keys(relationConfig).forEach(function(groupKey) {
+    const groupItems = discoveryRelationState[groupKey] || [];
+    groupItems.forEach(function(item) {
+      relations.push({
+        group: groupKey,
+        relation_type: item.relation_type || relationConfig[groupKey].relationType,
+        id: item.id || null,
+        slug: item.slug || null,
+        title: item.title,
+        category: item.category || null,
+        post_type: item.post_type || null,
+        resolved: !!item.resolved,
+      });
+    });
+  });
+
+  return { payload: payload, relations: relations };
+}
+
+function validateDiscoveryTextQuality(field, value) {
+  const clean = String(value || "").trim();
+  const lower = clean.toLowerCase();
+
+  if (DISCOVERY_PLACEHOLDER_VALUES.includes(lower)) {
+    return field.label + ": please provide real discovery details, not placeholders.";
+  }
+
+  if (/(.)\1{5,}/.test(clean)) {
+    return field.label + ": repeated characters detected. Please provide readable information.";
+  }
+
+  const noSpace = clean.replace(/\s+/g, "");
+  const uniqueChars = new Set(noSpace.toLowerCase().split("")).size;
+  if (noSpace.length >= 8 && uniqueChars <= 2) {
+    return field.label + ": content looks too repetitive. Please provide specific details.";
+  }
+
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (field.required && field.type === "textarea" && words.length < 4) {
+    return field.label + ": please add at least 4 meaningful words.";
+  }
+
+  const looksLikeRandom = /^[a-z0-9\s]+$/i.test(clean) && /^(?:[a-z]{1,3}\s*){3,}$/i.test(clean) && words.length >= 4;
+  if (looksLikeRandom && words.every(function(w) { return w.length <= 3; })) {
+    return field.label + ": input is too unspecific. Please add concrete in-game details.";
+  }
+
+  if (field.key !== "coordinates") {
+    const hasLetter = /[a-z]/i.test(clean);
+    if (!hasLetter) {
+      return field.label + ": please include descriptive text, not only symbols or numbers.";
+    }
+  }
+
+  return "";
+}
+
+function collectDiscoveryEvidenceInputCP(context) {
+  const supports = Array.isArray(discoveryEvidenceState.supports)
+    ? discoveryEvidenceState.supports.filter(Boolean)
+    : [];
+  const note = String(discoveryEvidenceState.note || "").trim();
+  if (context && context.hasExternalEvidence && supports.length === 0) {
+    return { error: "Please map your evidence to at least one structured discovery field." };
+  }
+  if (note && note.split(/\s+/).filter(Boolean).length < 3) {
+    return { error: "Evidence note is too short. Add a clearer explanation or leave it empty." };
+  }
+  return { supports: supports, note: note };
+}
+
+function buildDiscoveryEvidenceMetaCP(evidenceInput, uploadedFiles, imageUrl, youtubeUrl) {
+  const supports = Array.isArray(evidenceInput && evidenceInput.supports) ? evidenceInput.supports : [];
+  const note = evidenceInput && evidenceInput.note ? evidenceInput.note : "";
+  const entries = [];
+
+  if (imageUrl) {
+    entries.push({
+      kind: "image_url",
+      label: "External image",
+      url: imageUrl,
+      supports: supports.slice(0, 12),
+      note: note,
+    });
+  }
+  if (youtubeUrl) {
+    entries.push({
+      kind: "video_url",
+      label: "YouTube video",
+      url: youtubeUrl,
+      supports: supports.slice(0, 12),
+      note: note,
+    });
+  }
+  (uploadedFiles || []).forEach(function(file) {
+    entries.push({
+      kind: (file.type || "").startsWith("image/") ? "upload_image" : "upload_file",
+      label: file.name,
+      url: file.url || "",
+      file_type: file.type || "application/octet-stream",
+      supports: supports.slice(0, 12),
+      note: note,
+    });
+  });
+  return entries;
+}
+
+function buildStructuredDiscoveryContent(title, category, payload, relations, imageUrl, youtubeUrl) {
+  const config = getDiscoveryConfig(category);
+  const fieldLookup = {};
+  (config.fields || []).forEach(function(field) {
+    fieldLookup[field.key] = field;
+  });
+
+  let html =
+    '<section class="discovery-entry-head" style="padding:14px 16px;border:1px solid rgba(255,215,0,0.35);border-radius:10px;background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,255,255,0.04));margin-bottom:12px;">' +
+      '<p style="margin:0 0 6px;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#d8b65d;">Community Discovery</p>' +
+      '<h2 style="margin:0;font-size:1.2rem;line-height:1.35;">' + escapeHtmlCP(title || "Discovery") + '</h2>' +
+    '</section>';
+
+  html += '<h3>Structured Findings</h3><ul>';
+  Object.keys(payload || {}).forEach(function(key) {
+    const val = payload[key];
+    if (val == null || val === "") return;
+    const label = fieldLookup[key]?.label || key;
+    html += '<li><strong>' + escapeHtmlCP(label) + ':</strong> ' + escapeHtmlCP(String(val)) + '</li>';
+  });
+  html += '</ul>';
+
+  if (Array.isArray(relations) && relations.length > 0) {
+    html += '<h3>Related Entries</h3><ul>';
+    relations.forEach(function(rel) {
+      const relLabel = escapeHtmlCP(rel.relation_type || "related_to");
+      if (rel.slug) {
+        const safeSlug = encodeURIComponent(rel.slug);
+        html += '<li><strong>' + relLabel + ':</strong> <a href="/wiki/post/?slug=' + safeSlug + '">' + escapeHtmlCP(rel.title || "Entry") + '</a></li>';
+      } else {
+        html += '<li><strong>' + relLabel + ':</strong> ' + escapeHtmlCP(rel.title || "Entry") + '</li>';
+      }
+    });
+    html += '</ul>';
+  }
+
+  if (imageUrl) {
+    const safeImage = escapeAttrCP(imageUrl);
+    html += '<h3>Discovery Image</h3><p><a href="' + safeImage + '" target="_blank" rel="noopener">Open image</a></p><p><img src="' + safeImage + '" alt="Discovery image" style="max-width:360px;border-radius:8px;" /></p>';
+  }
+  if (youtubeUrl) {
+    const safeVideo = escapeAttrCP(youtubeUrl);
+    html += '<h3>Discovery Video</h3><p><a href="' + safeVideo + '" target="_blank" rel="noopener">Watch on YouTube</a></p>';
+  }
+  return html;
 }
 
 function isValidHttpUrl(value) {
@@ -493,6 +1634,24 @@ function collectPostMetaCP() {
   };
 }
 
+function validateGuideReferencesCP() {
+  if (guideReferenceState.length > 12) {
+    return "Please limit guide references to 12 entries.";
+  }
+  return "";
+}
+
+function parsePostMetaCP(html) {
+  const match = String(html || "").match(/<!--BLMETA\s+([\s\S]*?)\s*-->/i);
+  if (!match) return {};
+  try {
+    const parsed = JSON.parse(match[1]);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    return {};
+  }
+}
+
 function normalizePostMetaCP(meta) {
   if (!meta || typeof meta !== "object") return null;
   const out = {};
@@ -500,6 +1659,58 @@ function normalizePostMetaCP(meta) {
   if (meta.patch_tag) out.patch_tag = String(meta.patch_tag).slice(0, 40);
   if (meta.source_url) out.source_url = String(meta.source_url).slice(0, 500);
   if (meta.subcategory) out.subcategory = String(meta.subcategory).slice(0, 60);
+  if (meta.discovery_payload && typeof meta.discovery_payload === "object") {
+    const payload = {};
+    Object.keys(meta.discovery_payload).forEach(function(key) {
+      const value = meta.discovery_payload[key];
+      if (value == null || value === "") return;
+      payload[String(key).slice(0, 60)] = String(value).slice(0, 1400);
+    });
+    if (Object.keys(payload).length) out.discovery_payload = payload;
+  }
+  if (Array.isArray(meta.discovery_relations)) {
+    out.discovery_relations = meta.discovery_relations.slice(0, 40).map(function(rel) {
+      return {
+        group: String(rel.group || "").slice(0, 40),
+        relation_type: String(rel.relation_type || "related_to").slice(0, 40),
+        id: rel.id || null,
+        slug: rel.slug ? String(rel.slug).slice(0, 160) : null,
+        title: String(rel.title || "").slice(0, 140),
+        category: rel.category ? String(rel.category).slice(0, 60) : null,
+        post_type: rel.post_type ? String(rel.post_type).slice(0, 40) : null,
+        resolved: !!rel.resolved,
+      };
+    }).filter(function(rel) {
+      return !!rel.title;
+    });
+  }
+  if (Array.isArray(meta.discovery_evidence)) {
+    out.discovery_evidence = meta.discovery_evidence.slice(0, 20).map(function(item) {
+      return {
+        kind: String(item.kind || "evidence").slice(0, 40),
+        label: String(item.label || "Evidence").slice(0, 140),
+        url: item.url ? String(item.url).slice(0, 600) : "",
+        file_type: item.file_type ? String(item.file_type).slice(0, 80) : null,
+        supports: Array.isArray(item.supports) ? item.supports.slice(0, 12).map(function(key) { return String(key).slice(0, 60); }) : [],
+        note: item.note ? String(item.note).slice(0, 400) : "",
+      };
+    }).filter(function(item) {
+      return !!item.url || !!item.label;
+    });
+  }
+  if (Array.isArray(meta.guide_references)) {
+    out.guide_references = meta.guide_references.slice(0, 12).map(function(ref) {
+      return {
+        id: ref.id || null,
+        slug: ref.slug ? String(ref.slug).slice(0, 160) : null,
+        title: String(ref.title || "").slice(0, 140),
+        category: ref.category ? String(ref.category).slice(0, 60) : null,
+        post_type: ref.post_type ? String(ref.post_type).slice(0, 40) : null,
+      };
+    }).filter(function(ref) {
+      return !!ref.title;
+    });
+  }
   return Object.keys(out).length ? out : null;
 }
 

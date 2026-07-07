@@ -1736,6 +1736,65 @@ a:hover { color: var(--gold-light); }
   margin-bottom: 16px;
 }
 
+.bl-discovery-panel {
+  margin-top: 12px;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(201,168,76,0.05));
+}
+
+.bl-discovery-panel-title {
+  margin: 0 0 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: var(--gold-light);
+  letter-spacing: 0.04em;
+}
+
+.bl-discovery-panel .field-hint {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.bl-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.bl-evidence-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  background: rgba(15,16,23,0.7);
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+  cursor: pointer;
+}
+
+.bl-evidence-option:hover {
+  border-color: rgba(201,168,76,0.35);
+  background: rgba(24,25,36,0.86);
+  transform: translateY(-1px);
+}
+
+.bl-evidence-option input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold);
+  flex-shrink: 0;
+}
+
+.bl-evidence-option span {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.35;
+}
+
 .help-dot {
   display: inline-flex;
   align-items: center;

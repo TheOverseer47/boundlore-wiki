@@ -42,9 +42,18 @@
   <p class="breadcrumb"><a href="/">Home</a> &rsaquo; Create Post</p>
   <h1>Create a Post</h1>
   <p>Choose whether you are writing a Guide or reporting a Discovery.</p>
+  <p style="margin-top:14px;">
+    <a href="/wiki/submit-tutorial/" class="btn-contribute" style="display:inline-block;">Help / Tutorial: How to Submit Guides &amp; Discoveries</a>
+  </p>
 </div>
 
 <div class="form-box" style="max-width:700px;margin:40px auto;">
+
+  <div id="tutorialGateBox" class="form-group" style="display:none;margin-bottom:16px;padding:12px;border:1px solid rgba(201,168,76,0.4);border-radius:10px;background:rgba(201,168,76,0.08);">
+    <p style="margin:0 0 8px;"><strong>Tutorial Confirmation Required:</strong> Before submitting your first Guide or Discovery, you must read and confirm the submission tutorial.</p>
+    <p style="margin:0 0 10px;color:var(--text-muted);">This prevents low-quality or incomplete submissions and keeps data useful for everyone.</p>
+    <a id="tutorialGateLink" href="/wiki/submit-tutorial/" class="btn-contribute" style="display:inline-block;">Open Tutorial And Confirm</a>
+  </div>
 
   <div class="post-type-toggle">
     <button type="button" id="btnTypeGuide" class="type-btn active">Guide</button>
@@ -98,22 +107,14 @@
         <option value="quests">Quests</option>
         <option value="talents">Talents</option>
       </select>
+      <div id="guideReferenceFields" class="form-group bl-discovery-panel" style="margin-top:14px;"></div>
     </div>
 
     <div id="discoveryFields" style="display:none;">
+      <p id="discoveryModeHint" class="field-hint" style="display:none;"></p>
       <label for="discoveryCategory">Which category does this discovery belong to?</label>
       <select id="discoveryCategory" class="form-input">
         <option value="">Select a category...</option>
-        <option value="creatures">Creatures</option>
-        <option value="classes">Classes</option>
-        <option value="biomes">Biomes</option>
-        <option value="items">Items</option>
-        <option value="guilds">Guilds</option>
-        <option value="building">Building</option>
-        <option value="dungeons">Dungeons</option>
-        <option value="locations">Locations</option>
-        <option value="lore">Lore</option>
-        <option value="crafting">Crafting</option>
       </select>
       <div id="discoverySubcategoryWrap" class="form-group" style="display:none;margin-top:12px;">
         <label for="discoverySubcategory">Subcategory</label>
@@ -123,6 +124,14 @@
         <p class="field-hint">Required for categories like Creatures, Classes, and Items so entries stay easy to scan.</p>
       </div>
       <p class="field-hint">Your discovery will appear in this category with a "Community Discovery" badge, pending admin review.</p>
+      <p class="field-hint">Provide reproducible facts. Discovery entries use structured fields and automatic relation matching.</p>
+
+      <div id="discoveryStructuredFields" class="form-group" style="margin-top:14px;"></div>
+
+      <div id="discoveryRelationFields" class="form-group" style="margin-top:10px;"></div>
+
+      <div id="discoveryEvidenceFields" class="form-group" style="margin-top:10px;"></div>
+
       <p class="field-hint">Add screenshots/files below. Admins can review and download your attachments directly from the dashboard.</p>
 
       <label for="discoveryImageUrl">Image URL (optional)</label>
@@ -153,8 +162,10 @@
       </label>
     </div>
 
-    <label for="postContent" style="margin-top:16px;display:block;">Content</label>
-    <div id="postEditor" style="height:250px;background:#111;border:1px solid #333;"></div>
+    <div id="contentEditorWrap">
+      <label for="postContent" id="postContentLabel" style="margin-top:16px;display:block;">Content</label>
+      <div id="postEditor" style="height:250px;background:#111;border:1px solid #333;"></div>
+    </div>
 
     <label for="postMedia" style="margin-top:16px;display:block;">Attach files (optional)</label>
     <input type="file" id="postMedia" accept="image/*,.pdf,.zip,.txt,.webp" multiple class="form-input" />
@@ -174,11 +185,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js?v=5"></script>
+<script src="/js/categories-config.js?v=8"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/search.js"></script>
 <script src="/js/main.js?v=3"></script>
-<script src="/js/create-post.js?v=3"></script>
+<script src="/js/create-post.js?v=4"></script>
 </body>
 </html>
 

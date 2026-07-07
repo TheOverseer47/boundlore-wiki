@@ -88,6 +88,7 @@
 </div>
 
 <div id="dashboard" style="display:none;max-width:1100px;margin:0 auto 60px;padding:0 20px;">
+  <div id="adminSystemNotice" class="form-box" style="display:none;margin-bottom:16px;"></div>
   <div class="admin-tabs">
     <button class="tab-btn active" data-tab="overview">Overview</button>
     <button class="tab-btn" data-tab="pending">Pending Posts (<span id="countPending">0</span>)</button>
@@ -222,7 +223,7 @@
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js"></script>
+<script src="/js/categories-config.js?v=8"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notifications.js"></script>
@@ -238,8 +239,12 @@ let usersCache = [];
 let canUseExtendedProfileFields = false;
 let canUseExtendedPostFields = false;
 let canUseAdminActions = false;
+let canUseEntityBackbone = false;
+let canUseCategoryExtensions = false;
+let canUseDiscoveryEvidenceTable = false;
 let composeBodyEditor = null;
 let composePublishInFlight = false;
+const ADMIN_DISCOVERY_PLACEHOLDER_VALUES = ["asdf", "qwerty", "test", "todo", "none", "n/a", "na", "unknown", "idk", "???", "12345"];
 
 async function checkAdmin() {
   setGateStatus("Checking permissions...");
@@ -278,6 +283,10 @@ async function checkAdmin() {
     document.getElementById("dashboard").style.display = "block";
 
     await detectDashboardFeatures();
+    if (typeof ensureCategoryExtensionsLoaded === "function") {
+      await ensureCategoryExtensionsLoaded();
+    }
+    syncAdminSystemNotice();
     initDiscoveryComposer();
     initAdminControls();
     await Promise.all([loadOverview(), loadPending(), loadDiscoveries(), loadAllPosts(), loadUsers(), loadReports(), loadModerationLog()]);
@@ -341,6 +350,24 @@ async function detectDashboardFeatures() {
     .select("id")
     .limit(1);
   canUseAdminActions = !modProbe.error;
+
+  const entityProbe = await supabase
+    .from("wiki_entities")
+    .select("id")
+    .limit(1);
+  canUseEntityBackbone = !entityProbe.error;
+
+  const extensionProbe = await supabase
+    .from("wiki_category_extensions")
+    .select("id")
+    .limit(1);
+  canUseCategoryExtensions = !extensionProbe.error;
+
+  const evidenceProbe = await supabase
+    .from("wiki_discovery_evidence")
+    .select("id")
+    .limit(1);
+  canUseDiscoveryEvidenceTable = !evidenceProbe.error;
 }
 
 function initAdminControls() {
@@ -357,6 +384,28 @@ function initAdminControls() {
   document.getElementById("btnReloadUsers")?.addEventListener("click", loadUsers);
   document.getElementById("btnReloadPosts")?.addEventListener("click", loadAllPosts);
   document.getElementById("btnReloadModlog")?.addEventListener("click", loadModerationLog);
+}
+
+function syncAdminSystemNotice() {
+  const notice = document.getElementById("adminSystemNotice");
+  if (!notice) return;
+
+  const missing = [];
+  if (!canUseEntityBackbone) missing.push("entity backbone tables");
+  if (!canUseCategoryExtensions) missing.push("dynamic category extension tables");
+  if (!canUseDiscoveryEvidenceTable) missing.push("discovery evidence table");
+
+  if (!missing.length) {
+    notice.style.display = "none";
+    notice.innerHTML = "";
+    return;
+  }
+
+  notice.style.display = "block";
+  notice.innerHTML =
+    '<h3 style="margin-top:0;">SQL Setup Required</h3>' +
+    '<p style="color:var(--text-muted);margin-bottom:10px;">The local discovery v1 code is ready, but Supabase is still missing: <strong>' + escapeHtmlA(missing.join(', ')) + '</strong>.</p>' +
+    '<p style="color:var(--text-muted);margin-bottom:0;">Run the SQL from <code>supabase/discovery_entity_backbone.sql</code> in the Supabase SQL editor before testing entity sync, dynamic subcategory persistence, and evidence persistence.</p>';
 }
 
 async function loadOverview() {
@@ -445,7 +494,17 @@ async function loadPending() {
   list.querySelectorAll("[data-action=\"approve\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
       const target = posts.find(function(p) { return p.id === btn.dataset.id; });
+      if (target && target.is_discovery) {
+        const review = evaluateDiscoveryForApprovalA(target);
+        if (!review.ok) {
+          alert("Discovery cannot be approved yet:\n- " + review.issues.join("\n- "));
+          return;
+        }
+      }
       await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
+      if (target && target.post_type === "guide") {
+        await syncGuideBackboneA(target);
+      }
       await notifyPostOwner(target, "post_status", "Your post was approved", "An admin approved and published your post.", buildPostUrl(target));
       await logAdminAction("approve_post", "post", this.dataset.id, "Published from pending queue");
       loadPending(); loadDiscoveries(); loadAllPosts(); loadOverview();
@@ -490,6 +549,19 @@ async function loadDiscoveries() {
   discoveries.forEach(function(post) {
     const authorName = post.profiles ? post.profiles.username : "Unknown";
     const assets = extractDiscoveryAttachmentLinks(post.content);
+    const meta = parsePostMetaA(post.content || "");
+    const evidence = Array.isArray(meta.discovery_evidence) ? meta.discovery_evidence : [];
+    const review = evaluateDiscoveryForApprovalA(post);
+    const reviewBadge = review.ok
+      ? '<span class="badge badge-published" style="margin-left:8px;">Ready</span>'
+      : '<span class="badge badge-pending" style="margin-left:8px;">Needs fixes</span>';
+    const reviewSummary = review.ok
+      ? '<p style="font-size:0.82rem;color:#50c878;margin:6px 0 10px;">Structured data is complete enough for approval.</p>'
+      : ('<div style="margin:8px 0 10px;padding:10px 12px;border-radius:8px;background:rgba(224,168,58,0.14);border:1px solid rgba(224,168,58,0.35);">' +
+         '<p style="margin:0 0 6px;color:#f0d089;font-size:0.82rem;"><strong>Approval blocked until fixed:</strong></p>' +
+         '<ul style="margin:0;padding-left:18px;color:#f4e7bb;font-size:0.81rem;">' +
+         review.issues.map(function(issue) { return '<li>' + escapeHtmlA(issue) + '</li>'; }).join('') +
+         '</ul></div>');
     const attachmentHtml = assets.length
       ? ('<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">Attachments & Media</p><div class="discovery-asset-grid">' +
          assets.map(function(asset, index) {
@@ -506,6 +578,9 @@ async function loadDiscoveries() {
             '</div>';
          }).join("") + '</div>')
       : '<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">No attachments</p>';
+    const evidenceSummary = evidence.length
+      ? ('<p style="font-size:0.82rem;color:var(--text-muted);margin:6px 0 10px;">Evidence mapped: <strong>' + evidence.length + '</strong> item(s)</p>')
+      : '<p style="font-size:0.82rem;color:var(--text-muted);margin:6px 0 10px;">Evidence mapped: <strong>0</strong></p>';
 
     const div = document.createElement("div");
     div.className = "form-box";
@@ -513,17 +588,19 @@ async function loadDiscoveries() {
     div.innerHTML =
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">' +
       '<h3 style="margin:0;">' + escapeHtmlA(post.title) + '</h3>' +
-      '<span class="badge badge-discovery">\u2728 Discovery</span>' +
+      '<div><span class="badge badge-discovery">\u2728 Discovery</span>' + reviewBadge + '</div>' +
       '</div>' +
       '<p style="color:var(--text-muted);font-size:0.84rem;margin-top:6px;">By ' + escapeHtmlA(authorName) + ' &middot; ' + new Date(post.created_at).toLocaleString() + '</p>' +
       '<p style="color:var(--text-muted);font-size:0.82rem;margin:6px 0 10px;">Target category: <strong>' + escapeHtmlA(post.category || '-') + '</strong></p>' +
+      reviewSummary +
+      evidenceSummary +
       attachmentHtml +
       '<div style="background:#fff;color:#111;padding:12px;border-radius:6px;margin:8px 0;max-height:160px;overflow-y:auto;">' +
         stripHeavyDiscoveryContent(post.content) +
       '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-      '<button class="btn-small" style="background:#50c878;" data-action="approve-discovery" data-id="' + post.id + '">Approve Discovery</button>' +
-      '<button class="btn-small" style="background:#2a8bdc;" data-action="compose-from-discovery" data-id="' + post.id + '">Build Category Post</button>' +
+      '<button class="btn-small" style="background:#50c878;" data-action="approve-discovery" data-id="' + post.id + '"' + (review.ok ? '' : ' disabled') + '>Approve Discovery</button>' +
+      '<button class="btn-small" style="background:#2a8bdc;" data-action="compose-from-discovery" data-id="' + post.id + '"' + (review.ok ? '' : ' disabled') + '>Build Category Post</button>' +
       '<button class="btn-small" style="background:#e05555;" data-action="reject-discovery" data-id="' + post.id + '">Reject</button>' +
       '</div>';
     list.appendChild(div);
@@ -532,7 +609,13 @@ async function loadDiscoveries() {
   list.querySelectorAll('[data-action="approve-discovery"]').forEach(function(btn) {
     btn.addEventListener("click", async function() {
       const target = discoveries.find(function(p) { return p.id === btn.dataset.id; });
+      const review = evaluateDiscoveryForApprovalA(target);
+      if (!review.ok) {
+        alert("Discovery cannot be approved yet:\n- " + review.issues.join("\n- "));
+        return;
+      }
       await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
+      await syncDiscoveryBackboneA(target);
       await notifyPostOwner(target, "discovery", "Discovery approved", "Your discovery was approved and published.", buildPostUrl(target));
       await logAdminAction("approve_discovery", "post", this.dataset.id, "Approved discovery post");
       loadDiscoveries(); loadPending(); loadAllPosts(); loadOverview();
@@ -552,6 +635,12 @@ async function loadDiscoveries() {
 
   list.querySelectorAll('[data-action="compose-from-discovery"]').forEach(function(btn) {
     btn.addEventListener("click", function() {
+      const target = discoveries.find(function(p) { return p.id === btn.dataset.id; });
+      const review = evaluateDiscoveryForApprovalA(target);
+      if (!review.ok) {
+        alert("Discovery must be structurally valid before it can be curated:\n- " + review.issues.join("\n- "));
+        return;
+      }
       openDiscoveryComposer(this.dataset.id);
       document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
       document.querySelector('[data-tab="discoveries"]').classList.add('active');
@@ -743,6 +832,7 @@ async function publishComposedCategoryPost() {
   }
 
   await supabase.from("posts").update({ status: "approved" }).eq("id", sourceId);
+  await syncDiscoveryBackboneA(sourceDiscovery);
   await notifyPostOwner(sourceDiscovery, "discovery", "Discovery converted into wiki post", "An admin used your discovery to create a curated wiki post.", "/wiki/account/");
   await logAdminAction("compose_from_discovery", "post", sourceId, "Composed curated wiki post");
   msg.textContent = "Category post published. Source discovery was marked as approved (not publicly published).";
@@ -856,6 +946,92 @@ function parsePostMetaA(html) {
   }
 }
 
+function evaluateDiscoveryForApprovalA(post) {
+  const issues = [];
+  if (!post || !post.is_discovery) {
+    return { ok: true, issues: issues };
+  }
+
+  const structuredEnabled = typeof isStructuredDiscoveryEnabled === "function"
+    ? isStructuredDiscoveryEnabled()
+    : false;
+  if (!structuredEnabled) {
+    return { ok: true, issues: issues };
+  }
+
+  const meta = parsePostMetaA(post.content || "");
+  const payload = meta && typeof meta.discovery_payload === "object" ? meta.discovery_payload : null;
+  const relations = Array.isArray(meta && meta.discovery_relations) ? meta.discovery_relations : [];
+  const evidence = Array.isArray(meta && meta.discovery_evidence) ? meta.discovery_evidence : [];
+  const schema = typeof getDiscoverySchemaForCategory === "function"
+    ? getDiscoverySchemaForCategory(post.category || "")
+    : null;
+  const requiredFields = Array.isArray(schema && schema.fields) ? schema.fields.filter(function(field) { return !!field.required; }) : [];
+
+  if (!payload || !Object.keys(payload).length) {
+    issues.push("Missing structured discovery payload.");
+  }
+
+  requiredFields.forEach(function(field) {
+    const value = payload ? payload[field.key] : null;
+    const textValue = value == null ? "" : String(value).trim();
+    if (!textValue) {
+      issues.push("Missing required field: " + field.label + ".");
+      return;
+    }
+    if (field.type === "textarea" || field.type === "text") {
+      const qualityIssue = validateDiscoveryTextForAdminA(field, textValue);
+      if (qualityIssue) issues.push(qualityIssue);
+    }
+    if (field.type === "number") {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric) || numeric < 0) {
+        issues.push("Invalid number for " + field.label + ".");
+      }
+    }
+  });
+
+  if (payload && payload.how_to_reproduce && String(payload.how_to_reproduce).trim().split(/\s+/).filter(Boolean).length < 4) {
+    issues.push("Reproduction steps are too short.");
+  }
+
+  if (!relations.length) {
+    issues.push("No linked dependencies or references selected.");
+  }
+
+  const assets = extractDiscoveryAttachmentLinks(post.content || "");
+  if (assets.length > 0 && evidence.length === 0) {
+    issues.push("Attachments or media exist, but no evidence mapping was stored.");
+  }
+
+  return { ok: issues.length === 0, issues: issues };
+}
+
+function validateDiscoveryTextForAdminA(field, value) {
+  const clean = String(value || "").trim();
+  const lower = clean.toLowerCase();
+  if (!clean) return field.label + ": empty value.";
+  if (ADMIN_DISCOVERY_PLACEHOLDER_VALUES.includes(lower)) {
+    return field.label + ": placeholder content detected.";
+  }
+  if (/(.)\1{5,}/.test(clean)) {
+    return field.label + ": repeated characters detected.";
+  }
+  const noSpace = clean.replace(/\s+/g, "");
+  const uniqueChars = new Set(noSpace.toLowerCase().split("")).size;
+  if (noSpace.length >= 8 && uniqueChars <= 2) {
+    return field.label + ": content is too repetitive.";
+  }
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (field.required && (field.type === "textarea") && words.length < 4) {
+    return field.label + ": at least 4 meaningful words required.";
+  }
+  if (field.key !== "coordinates" && !/[a-z]/i.test(clean)) {
+    return field.label + ": descriptive text required, not only symbols or numbers.";
+  }
+  return "";
+}
+
 function normalizePostMetaA(meta) {
   if (!meta || typeof meta !== "object") return null;
   const out = {};
@@ -949,6 +1125,312 @@ async function forceDownloadAsset(asset) {
 
 function escapeAttrA(value) {
   return String(value == null ? "" : value).replace(/"/g, "&quot;");
+}
+
+async function syncDiscoveryBackboneA(post) {
+  if (!canUseEntityBackbone || !post || !post.id) return;
+
+  const meta = parsePostMetaA(post.content || "");
+  const entityType = deriveEntityTypeA(post, meta);
+  const entitySlug = slugifyEntityA(post.title || "");
+  if (!entityType || !entitySlug) return;
+
+  const entityMetadata = {
+    update_phase: meta.update_phase || null,
+    patch_tag: meta.patch_tag || null,
+    source_url: meta.source_url || null,
+    discovery_payload: meta.discovery_payload || null,
+  };
+
+  const { data: entityRows, error: entityError } = await supabase
+    .from("wiki_entities")
+    .upsert({
+      entity_type: entityType,
+      canonical_name: post.title,
+      slug: entitySlug,
+      category_slug: post.category || null,
+      subcategory_slug: meta.subcategory || null,
+      status: "active",
+      source_post_id: post.id,
+      metadata: entityMetadata,
+      created_by: currentAdminId,
+    }, {
+      onConflict: "entity_type,slug"
+    })
+    .select("id")
+    .limit(1);
+
+  if (entityError || !entityRows || !entityRows.length) {
+    console.warn("Entity backbone sync failed for discovery", entityError);
+    return;
+  }
+
+  const sourceEntityId = entityRows[0].id;
+  await syncDiscoveryAliasesA(sourceEntityId, post);
+  await syncDiscoveryRelationsA(sourceEntityId, post, meta);
+  await syncDiscoveryEvidenceA(sourceEntityId, post, meta);
+  await syncCategoryExtensionA(post, meta);
+}
+
+async function syncDiscoveryAliasesA(sourceEntityId, post) {
+  if (!sourceEntityId || !post) return;
+  const aliases = [post.title].filter(Boolean).map(function(value) {
+    return {
+      entity_id: sourceEntityId,
+      alias_name: value,
+      normalized_alias: normalizeEntityAliasA(value),
+      source_post_id: post.id,
+    };
+  }).filter(function(item) {
+    return !!item.normalized_alias;
+  });
+
+  if (!aliases.length) return;
+  await supabase.from("wiki_entity_aliases").upsert(aliases, { onConflict: "entity_id,normalized_alias" });
+}
+
+async function syncDiscoveryRelationsA(sourceEntityId, post, meta) {
+  const relations = Array.isArray(meta.discovery_relations) ? meta.discovery_relations : [];
+  if (!relations.length) return;
+
+  const relationRows = [];
+  for (const rel of relations) {
+    const targetSlug = slugifyEntityA(rel.title || rel.slug || "");
+    const targetType = deriveRelatedEntityTypeA(rel);
+    if (!targetSlug || !targetType) continue;
+
+    const { data: targetRows, error: targetError } = await supabase
+      .from("wiki_entities")
+      .upsert({
+        entity_type: targetType,
+        canonical_name: rel.title || rel.slug || targetSlug,
+        slug: targetSlug,
+        category_slug: rel.category || inferCategoryFromRelationGroupA(rel.group),
+        subcategory_slug: null,
+        status: rel.resolved ? "active" : "draft",
+        source_post_id: rel.id || post.id,
+        metadata: { relation_hint: true },
+        created_by: currentAdminId,
+      }, { onConflict: "entity_type,slug" })
+      .select("id")
+      .limit(1);
+
+    if (targetError || !targetRows || !targetRows.length) continue;
+    relationRows.push({
+      source_entity_id: sourceEntityId,
+      target_entity_id: targetRows[0].id,
+      relation_type: rel.relation_type || "related_to",
+      source_post_id: post.id,
+      confidence: rel.resolved ? 85 : 60,
+      metadata: {
+        relation_group: rel.group || null,
+        target_post_type: rel.post_type || null,
+      },
+    });
+  }
+
+  if (relationRows.length) {
+    await supabase.from("wiki_entity_relations").upsert(relationRows, { onConflict: "source_entity_id,target_entity_id,relation_type" });
+  }
+}
+
+async function syncDiscoveryEvidenceA(sourceEntityId, post, meta) {
+  if (!canUseDiscoveryEvidenceTable) return;
+  const evidence = Array.isArray(meta.discovery_evidence) ? meta.discovery_evidence : [];
+
+  await supabase.from("wiki_discovery_evidence").delete().eq("source_post_id", post.id);
+  if (!evidence.length) return;
+
+  const rows = evidence.map(function(item) {
+    return {
+      source_post_id: post.id,
+      entity_id: sourceEntityId,
+      evidence_kind: item.kind || "evidence",
+      label: item.label || null,
+      url: item.url || null,
+      file_type: item.file_type || null,
+      supports_fields: Array.isArray(item.supports) ? item.supports : [],
+      note: item.note || null,
+      metadata: {},
+    };
+  });
+  await supabase.from("wiki_discovery_evidence").insert(rows);
+}
+
+async function syncCategoryExtensionA(post, meta) {
+  if (!canUseCategoryExtensions) return;
+  const subcategory = meta && meta.subcategory ? String(meta.subcategory).trim() : "";
+  const category = post && post.category ? String(post.category).trim() : "";
+  if (!category || !subcategory) return;
+
+  const knownSubcategories = typeof getCategorySubcategories === "function"
+    ? getCategorySubcategories(category).map(function(item) { return item.slug; })
+    : [];
+  if (knownSubcategories.includes(subcategory)) return;
+
+  await supabase.from("wiki_category_extensions").upsert({
+    category_slug: category,
+    subcategory_slug: subcategory,
+    display_label: humanizeEntityLabelA(subcategory),
+    status: "approved",
+    source_post_id: post.id,
+    metadata: {},
+  }, { onConflict: "category_slug,subcategory_slug" });
+}
+
+async function syncGuideBackboneA(post) {
+  if (!canUseEntityBackbone || !post || !post.id) return;
+  const meta = parsePostMetaA(post.content || "");
+  const guideSlug = slugifyEntityA(post.title || "");
+  if (!guideSlug) return;
+
+  const { data: entityRows, error: entityError } = await supabase
+    .from("wiki_entities")
+    .upsert({
+      entity_type: "guide",
+      canonical_name: post.title,
+      slug: guideSlug,
+      category_slug: "guides",
+      subcategory_slug: post.guide_subcategory || null,
+      status: "active",
+      source_post_id: post.id,
+      metadata: {
+        update_phase: meta.update_phase || null,
+        patch_tag: meta.patch_tag || null,
+        source_url: meta.source_url || null,
+        guide_references: meta.guide_references || null,
+      },
+      created_by: currentAdminId,
+    }, { onConflict: "entity_type,slug" })
+    .select("id")
+    .limit(1);
+
+  if (entityError || !entityRows || !entityRows.length) return;
+  const guideEntityId = entityRows[0].id;
+  await syncGuideAliasesA(guideEntityId, post);
+  await syncGuideRelationsA(guideEntityId, post, meta);
+}
+
+async function syncGuideAliasesA(guideEntityId, post) {
+  if (!guideEntityId || !post) return;
+  await supabase.from("wiki_entity_aliases").upsert({
+    entity_id: guideEntityId,
+    alias_name: post.title,
+    normalized_alias: normalizeEntityAliasA(post.title),
+    source_post_id: post.id,
+  }, { onConflict: "entity_id,normalized_alias" });
+}
+
+async function syncGuideRelationsA(guideEntityId, post, meta) {
+  const refs = Array.isArray(meta.guide_references) ? meta.guide_references : [];
+  if (!refs.length) return;
+  const relationRows = [];
+
+  for (const ref of refs) {
+    const targetSlug = slugifyEntityA(ref.title || ref.slug || "");
+    const targetType = deriveRelatedEntityTypeA(ref);
+    if (!targetSlug || !targetType) continue;
+
+    const { data: targetRows, error: targetError } = await supabase
+      .from("wiki_entities")
+      .upsert({
+        entity_type: targetType,
+        canonical_name: ref.title || ref.slug || targetSlug,
+        slug: targetSlug,
+        category_slug: ref.category || inferCategoryFromRelationGroupA(ref.category),
+        subcategory_slug: null,
+        status: ref.id ? "active" : "draft",
+        source_post_id: ref.id || post.id,
+        metadata: { guide_reference_hint: true },
+        created_by: currentAdminId,
+      }, { onConflict: "entity_type,slug" })
+      .select("id")
+      .limit(1);
+
+    if (targetError || !targetRows || !targetRows.length) continue;
+    relationRows.push({
+      source_entity_id: guideEntityId,
+      target_entity_id: targetRows[0].id,
+      relation_type: "references_entry",
+      source_post_id: post.id,
+      confidence: 85,
+      metadata: {
+        target_post_type: ref.post_type || null,
+        target_category: ref.category || null,
+      },
+    });
+  }
+
+  if (relationRows.length) {
+    await supabase.from("wiki_entity_relations").upsert(relationRows, { onConflict: "source_entity_id,target_entity_id,relation_type" });
+  }
+}
+
+function deriveEntityTypeA(post, meta) {
+  const subcategory = meta && meta.subcategory ? String(meta.subcategory).trim() : "";
+  if (subcategory) return singularizeEntityTypeA(subcategory);
+  if (post && post.category) return singularizeEntityTypeA(post.category);
+  return "entry";
+}
+
+function deriveRelatedEntityTypeA(rel) {
+  if (rel.category) return singularizeEntityTypeA(rel.category);
+  if (rel.group === "guides") return "guide";
+  if (rel.group) return singularizeEntityTypeA(rel.group);
+  return "entry";
+}
+
+function inferCategoryFromRelationGroupA(group) {
+  if (group === "guides") return "guides";
+  if (group === "locations") return "locations";
+  return group || null;
+}
+
+function singularizeEntityTypeA(value) {
+  const normalized = String(value || "").toLowerCase().trim();
+  if (!normalized) return "entry";
+  const irregular = {
+    creatures: "creature",
+    classes: "class",
+    items: "item",
+    guides: "guide",
+    locations: "location",
+    biomes: "biome",
+    dungeons: "dungeon",
+    mounts: "mount",
+    monsters: "monster",
+    races: "race",
+    npcs: "npc",
+    guilds: "guild",
+  };
+  if (irregular[normalized]) return irregular[normalized];
+  return normalized.endsWith("s") ? normalized.slice(0, -1) : normalized;
+}
+
+function slugifyEntityA(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 120);
+}
+
+function normalizeEntityAliasA(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 160);
+}
+
+function humanizeEntityLabelA(value) {
+  return String(value || "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, function(char) { return char.toUpperCase(); })
+    .trim();
 }
 
 async function loadAllPosts() {
