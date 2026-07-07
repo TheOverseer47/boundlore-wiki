@@ -969,6 +969,26 @@ a:hover { color: var(--gold-light); }
   color: var(--text-muted);
 }
 
+.bl-subcategory-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.bl-subcategory-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.03);
+  color: #b2b8c9;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 @media (max-width: 760px) {
   .bl-category-group-grid {
     grid-template-columns: 1fr;
