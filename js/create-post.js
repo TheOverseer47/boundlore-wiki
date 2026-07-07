@@ -36,10 +36,13 @@ let discoverySuggestionState = {
   locations: [],
   guides: [],
 };
+let discoveryWizardStep = 1;
+let discoveryRelationsSkipped = false;
 const relationInputTimers = {};
 const DISCOVERY_PLACEHOLDER_VALUES = [
   "asdf", "qwerty", "test", "todo", "none", "n/a", "na", "unknown", "idk", "???", "12345"
 ];
+const DISCOVERY_SKIP_VALUES = ["unclear", "no", "not observed", "unknown", "not sure"];
 
 document.addEventListener("DOMContentLoaded", async () => {
   quillEditor = new Quill("#postEditor", {
@@ -196,8 +199,67 @@ function syncDiscoveryModeHint() {
   if (!hint) return;
   hint.style.display = "block";
   hint.textContent = structuredDiscoveryEnabled
-    ? "Structured discovery mode is active for this local session."
-    : "Structured discovery mode is currently disabled. Add ?enableStructuredDiscovery=1 to test the new structured flow locally.";
+    ? "Structured discovery mode is active."
+    : "Structured discovery mode is disabled for this session (?enableStructuredDiscovery=0).";
+}
+
+function renderDiscoveryWizard() {
+  const nav = document.getElementById("discoveryWizardNav");
+  const step1 = document.getElementById("discoveryStep1Basics");
+  const step2 = document.getElementById("discoveryStep2Data");
+  const step3 = document.getElementById("discoveryStep3Relations");
+  const step4 = document.getElementById("discoveryStep4Evidence");
+  if (!nav || !step1 || !step2 || !step3 || !step4) return;
+
+  const maxStep = structuredDiscoveryEnabled ? 4 : 2;
+  if (discoveryWizardStep < 1) discoveryWizardStep = 1;
+  if (discoveryWizardStep > maxStep) discoveryWizardStep = maxStep;
+
+  step1.style.display = discoveryWizardStep === 1 ? "block" : "none";
+  step2.style.display = structuredDiscoveryEnabled && discoveryWizardStep === 2 ? "block" : "none";
+  step3.style.display = structuredDiscoveryEnabled && discoveryWizardStep === 3 ? "block" : "none";
+  step4.style.display = discoveryWizardStep === maxStep ? "block" : "none";
+
+  nav.innerHTML = "";
+  const progress = document.createElement("p");
+  progress.className = "field-hint";
+  progress.textContent = "Discovery step " + discoveryWizardStep + " of " + maxStep + ".";
+  nav.appendChild(progress);
+
+  const controls = document.createElement("div");
+  controls.style.display = "flex";
+  controls.style.gap = "8px";
+
+  if (discoveryWizardStep > 1) {
+    const prev = document.createElement("button");
+    prev.type = "button";
+    prev.className = "btn-secondary";
+    prev.textContent = "Back";
+    prev.addEventListener("click", function() {
+      discoveryWizardStep -= 1;
+      renderDiscoveryWizard();
+    });
+    controls.appendChild(prev);
+  }
+
+  if (discoveryWizardStep < maxStep) {
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "btn-contribute";
+    next.textContent = "Continue";
+    next.addEventListener("click", function() {
+      discoveryWizardStep += 1;
+      renderDiscoveryWizard();
+    });
+    controls.appendChild(next);
+  } else {
+    const done = document.createElement("span");
+    done.className = "field-hint";
+    done.textContent = "Final step. Review and submit when ready.";
+    controls.appendChild(done);
+  }
+
+  nav.appendChild(controls);
 }
 
 function setPostType(type) {
@@ -220,6 +282,8 @@ function setPostType(type) {
   const structuredWrap = document.getElementById("discoveryStructuredFields");
   const relationWrap = document.getElementById("discoveryRelationFields");
   const guideReferenceWrap = document.getElementById("guideReferenceFields");
+  const titleInput = document.getElementById("postTitle");
+  const titleLabel = document.querySelector("label[for='postTitle']");
 
   if (type === "guide") {
     guideFields.style.display = "block";
@@ -238,6 +302,11 @@ function setPostType(type) {
     if (contentWrap) contentWrap.style.display = "block";
     if (contentLabel) contentLabel.textContent = "Content";
     if (guideReferenceWrap) guideReferenceWrap.style.display = "block";
+    if (titleInput) {
+      titleInput.setAttribute("required", "required");
+      titleInput.placeholder = "";
+    }
+    if (titleLabel) titleLabel.textContent = "Title";
     renderGuideReferenceFields();
   } else if (type === "discovery") {
     guideFields.style.display = "none";
@@ -261,6 +330,13 @@ function setPostType(type) {
     if (contentWrap) contentWrap.style.display = structuredDiscoveryEnabled ? "none" : "block";
     if (contentLabel) contentLabel.textContent = structuredDiscoveryEnabled ? "Content" : "Discovery Notes";
     if (guideReferenceWrap) guideReferenceWrap.style.display = "none";
+    if (titleInput) {
+      titleInput.removeAttribute("required");
+      titleInput.placeholder = "Optional. Will be generated from discovery data if left empty.";
+    }
+    if (titleLabel) titleLabel.textContent = "Report Title (optional)";
+    discoveryWizardStep = 1;
+    renderDiscoveryWizard();
   } else {
     guideFields.style.display = "none";
     discoveryFields.style.display = "none";
@@ -278,6 +354,11 @@ function setPostType(type) {
     if (structuredWrap) structuredWrap.style.display = "none";
     if (relationWrap) relationWrap.style.display = "none";
     if (guideReferenceWrap) guideReferenceWrap.style.display = "none";
+    if (titleInput) {
+      titleInput.setAttribute("required", "required");
+      titleInput.placeholder = "";
+    }
+    if (titleLabel) titleLabel.textContent = "Title";
   }
 }
 
@@ -312,7 +393,7 @@ async function handleSubmit(e) {
   const mediaInput = document.getElementById("postMedia");
   const files = mediaInput && mediaInput.files ? Array.from(mediaInput.files) : [];
 
-  if (!title) {
+  if (!title && currentPostType !== "discovery") {
     errorEl.textContent = "Please enter a title.";
     errorEl.style.display = "block";
     return;
@@ -405,14 +486,12 @@ async function handleSubmit(e) {
         return;
       }
 
-      if (!structuredResult.relations || structuredResult.relations.length === 0) {
-        errorEl.textContent = "Please link at least one related entry, dependency, item, location, creature, or guide.";
-        errorEl.style.display = "block";
-        return;
-      }
+      const dedupeTitle = title
+        || String(structuredResult.payload && structuredResult.payload.entity_name ? structuredResult.payload.entity_name : "").trim()
+        || buildDiscoveryAutoTitle(structuredResult.payload, cat);
 
       const duplicateError = await detectDiscoveryDuplicateCP({
-        title: title,
+        title: dedupeTitle,
         category: cat,
         subcategory: needsSubcategory ? discoverySubcat : "",
         payload: structuredResult.payload,
@@ -425,6 +504,7 @@ async function handleSubmit(e) {
 
       postMeta.discovery_payload = structuredResult.payload;
       postMeta.discovery_relations = structuredResult.relations;
+      postMeta.discovery_relations_skipped = discoveryRelationsSkipped === true;
       const evidenceInput = collectDiscoveryEvidenceInputCP({
         hasExternalEvidence: !!discoveryImageUrl || !!discoveryYoutubeUrl || files.length > 0,
       });
@@ -442,6 +522,9 @@ async function handleSubmit(e) {
         discoveryImageUrl,
         discoveryYoutubeUrl
       );
+      if (!title) {
+        payload.title = buildDiscoveryAutoTitle(structuredResult.payload, cat);
+      }
     } else {
       if (!content || content === "<p><br></p>") {
         errorEl.textContent = "Please write discovery notes while the structured flow is disabled.";
@@ -462,6 +545,9 @@ async function handleSubmit(e) {
       }
 
       payload.content = buildDiscoveryMediaContent(title, content, discoveryImageUrl, discoveryYoutubeUrl);
+      if (!title) {
+        payload.title = buildDiscoveryAutoTitle(null, cat);
+      }
     }
     if (needsSubcategory) {
       postMeta.subcategory = discoverySubcat;
@@ -826,7 +912,7 @@ function renderDiscoveryStructuredFields() {
     return;
   }
 
-  wrap.innerHTML = "<h3 style='margin:0 0 8px;'>Discovery Data</h3>";
+  wrap.innerHTML = "<h3 style='margin:0 0 8px;'>Discovery Data</h3><p class='field-hint'>Answer one question at a time. Use quick-skip when data is unknown.</p>";
 
   fields.forEach(function(field) {
     const group = document.createElement("div");
@@ -845,6 +931,7 @@ function renderDiscoveryStructuredFields() {
       input.rows = 4;
       input.maxLength = field.max || 1200;
       input.className = "form-input";
+      input.placeholder = field.placeholder || "Add concrete details.";
       input.value = current;
     } else if (field.type === "select") {
       input = document.createElement("select");
@@ -866,6 +953,9 @@ function renderDiscoveryStructuredFields() {
       input.className = "form-input";
       input.maxLength = field.max || 240;
       if (field.type === "number" && typeof field.min === "number") input.min = String(field.min);
+      if (field.type !== "number") {
+        input.placeholder = field.placeholder || "Add your finding...";
+      }
       input.value = current;
     }
 
@@ -875,11 +965,54 @@ function renderDiscoveryStructuredFields() {
 
     input.addEventListener("input", function() {
       discoveryFieldState[field.key] = input.value;
+      toggleFieldSuggestionHint(hint, input);
+    });
+
+    input.addEventListener("focus", function() {
+      toggleFieldSuggestionHint(hint, input);
+    });
+
+    input.addEventListener("blur", function() {
+      toggleFieldSuggestionHint(hint, input);
     });
 
     group.appendChild(input);
+
+    const hint = document.createElement("p");
+    hint.className = "field-hint";
+    hint.textContent = field.placeholder || "Tip: keep this factual and reproducible.";
+    group.appendChild(hint);
+    toggleFieldSuggestionHint(hint, input);
+
+    if (field.required && field.type !== "number") {
+      const quickRow = document.createElement("div");
+      quickRow.style.display = "flex";
+      quickRow.style.flexWrap = "wrap";
+      quickRow.style.gap = "6px";
+      ["Unclear", "No", "Not observed"].forEach(function(labelText) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-secondary";
+        btn.textContent = labelText;
+        btn.addEventListener("click", function() {
+          input.value = labelText.toLowerCase();
+          discoveryFieldState[field.key] = input.value;
+          toggleFieldSuggestionHint(hint, input);
+        });
+        quickRow.appendChild(btn);
+      });
+      group.appendChild(quickRow);
+    }
+
     wrap.appendChild(group);
   });
+}
+
+function toggleFieldSuggestionHint(hintEl, inputEl) {
+  if (!hintEl || !inputEl) return;
+  const hasValue = String(inputEl.value || "").trim().length > 0;
+  const focused = document.activeElement === inputEl;
+  hintEl.style.display = hasValue || focused ? "none" : "block";
 }
 
 function renderDiscoveryRelationFields() {
@@ -910,8 +1043,34 @@ function renderDiscoveryRelationFields() {
 
   const help = document.createElement("p");
   help.className = "field-hint";
-  help.textContent = "Start typing to find existing entries. Click a suggestion to create a direct relation.";
+  help.textContent = "Optional: start typing to find existing entries. Click a suggestion to create a direct relation.";
   wrap.appendChild(help);
+
+  const skipWrap = document.createElement("label");
+  skipWrap.style.display = "flex";
+  skipWrap.style.alignItems = "center";
+  skipWrap.style.gap = "8px";
+  skipWrap.style.margin = "4px 0 6px";
+  const skipInput = document.createElement("input");
+  skipInput.type = "checkbox";
+  skipInput.checked = discoveryRelationsSkipped === true;
+  skipInput.addEventListener("change", function() {
+    discoveryRelationsSkipped = skipInput.checked;
+    renderDiscoveryRelationFields();
+  });
+  skipWrap.appendChild(skipInput);
+  const skipText = document.createElement("span");
+  skipText.textContent = "Skip auto-relations for this report (unclear / not available).";
+  skipWrap.appendChild(skipText);
+  wrap.appendChild(skipWrap);
+
+  if (discoveryRelationsSkipped) {
+    const skipped = document.createElement("p");
+    skipped.className = "field-hint";
+    skipped.textContent = "Auto-relations skipped. You can still submit without linked entries.";
+    wrap.appendChild(skipped);
+    return;
+  }
 
   groups.forEach(function(groupKey) {
     const relationConfig = getDiscoveryRelationConfig();
@@ -1457,6 +1616,10 @@ function validateDiscoveryTextQuality(field, value) {
   const clean = String(value || "").trim();
   const lower = clean.toLowerCase();
 
+  if (DISCOVERY_SKIP_VALUES.includes(lower)) {
+    return "";
+  }
+
   if (DISCOVERY_PLACEHOLDER_VALUES.includes(lower)) {
     return field.label + ": please provide real discovery details, not placeholders.";
   }
@@ -1588,6 +1751,24 @@ function buildStructuredDiscoveryContent(title, category, payload, relations, im
   return html;
 }
 
+function buildDiscoveryAutoTitle(payload, category) {
+  const safePayload = payload && typeof payload === "object" ? payload : {};
+  const entityName = String(safePayload.entity_name || "").trim();
+  const foundIn = String(safePayload.found_in || "").trim();
+  const categoryLabel = category ? String(category).charAt(0).toUpperCase() + String(category).slice(1) : "Discovery";
+
+  if (entityName && foundIn) {
+    return entityName + " in " + foundIn;
+  }
+  if (entityName) {
+    return entityName + " (" + categoryLabel + ")";
+  }
+  if (foundIn) {
+    return categoryLabel + " in " + foundIn;
+  }
+  return categoryLabel + " Report " + new Date().toISOString().slice(0, 10);
+}
+
 function isValidHttpUrl(value) {
   try {
     const url = new URL(value);
@@ -1683,6 +1864,9 @@ function normalizePostMetaCP(meta) {
     }).filter(function(rel) {
       return !!rel.title;
     });
+  }
+  if (typeof meta.discovery_relations_skipped === "boolean") {
+    out.discovery_relations_skipped = meta.discovery_relations_skipped;
   }
   if (Array.isArray(meta.discovery_evidence)) {
     out.discovery_evidence = meta.discovery_evidence.slice(0, 20).map(function(item) {

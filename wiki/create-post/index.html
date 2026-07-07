@@ -112,34 +112,44 @@
 
     <div id="discoveryFields" style="display:none;">
       <p id="discoveryModeHint" class="field-hint" style="display:none;"></p>
-      <label for="discoveryCategory">Which category does this discovery belong to?</label>
-      <select id="discoveryCategory" class="form-input">
-        <option value="">Select a category...</option>
-      </select>
-      <div id="discoverySubcategoryWrap" class="form-group" style="display:none;margin-top:12px;">
-        <label for="discoverySubcategory">Subcategory</label>
-        <select id="discoverySubcategory" class="form-input">
-          <option value="">Select a subcategory...</option>
+      <div id="discoveryStep1Basics">
+        <label for="discoveryCategory">Which category does this discovery belong to?</label>
+        <select id="discoveryCategory" class="form-input">
+          <option value="">Select a category...</option>
         </select>
-        <p class="field-hint">Required for categories like Creatures, Classes, and Items so entries stay easy to scan.</p>
+        <div id="discoverySubcategoryWrap" class="form-group" style="display:none;margin-top:12px;">
+          <label for="discoverySubcategory">Subcategory</label>
+          <select id="discoverySubcategory" class="form-input">
+            <option value="">Select a subcategory...</option>
+          </select>
+          <p class="field-hint">Required for categories like Creatures, Classes, and Items so entries stay easy to scan.</p>
+        </div>
+        <p class="field-hint">Your discovery will appear in this category with a "Community Discovery" badge, pending admin review.</p>
+        <p class="field-hint">Provide reproducible facts. Discovery entries use structured fields and automatic relation matching.</p>
       </div>
-      <p class="field-hint">Your discovery will appear in this category with a "Community Discovery" badge, pending admin review.</p>
-      <p class="field-hint">Provide reproducible facts. Discovery entries use structured fields and automatic relation matching.</p>
 
-      <div id="discoveryStructuredFields" class="form-group" style="margin-top:14px;"></div>
+      <div id="discoveryStep2Data">
+        <div id="discoveryStructuredFields" class="form-group" style="margin-top:14px;"></div>
+      </div>
 
-      <div id="discoveryRelationFields" class="form-group" style="margin-top:10px;"></div>
+      <div id="discoveryStep3Relations">
+        <div id="discoveryRelationFields" class="form-group" style="margin-top:10px;"></div>
+      </div>
 
-      <div id="discoveryEvidenceFields" class="form-group" style="margin-top:10px;"></div>
+      <div id="discoveryStep4Evidence">
+        <div id="discoveryEvidenceFields" class="form-group" style="margin-top:10px;"></div>
 
-      <p class="field-hint">Add screenshots/files below. Admins can review and download your attachments directly from the dashboard.</p>
+        <p class="field-hint">Add screenshots/files below. Admins can review and download your attachments directly from the dashboard.</p>
 
-      <label for="discoveryImageUrl">Image URL (optional)</label>
-      <input type="url" id="discoveryImageUrl" class="form-input" placeholder="https://.../image.jpg" />
+        <label for="discoveryImageUrl">Image URL (optional)</label>
+        <input type="url" id="discoveryImageUrl" class="form-input" placeholder="https://.../image.jpg" />
 
-      <label for="discoveryYoutubeUrl">YouTube URL (optional)</label>
-      <input type="url" id="discoveryYoutubeUrl" class="form-input" placeholder="https://www.youtube.com/watch?v=..." />
-      <p class="field-hint">You can provide one YouTube link for your discovery clip.</p>
+        <label for="discoveryYoutubeUrl">YouTube URL (optional)</label>
+        <input type="url" id="discoveryYoutubeUrl" class="form-input" placeholder="https://www.youtube.com/watch?v=..." />
+        <p class="field-hint">You can provide one YouTube link for your discovery clip.</p>
+      </div>
+
+      <div id="discoveryWizardNav" class="form-group" style="margin-top:12px;"></div>
     </div>
 
     <div id="wikiFields" style="display:none;">
@@ -185,11 +195,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js?v=8"></script>
+<script src="/js/categories-config.js?v=9"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/search.js"></script>
 <script src="/js/main.js?v=3"></script>
-<script src="/js/create-post.js?v=4"></script>
+<script src="/js/create-post.js?v=5"></script>
 </body>
 </html>
 

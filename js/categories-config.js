@@ -119,9 +119,11 @@ const BOUNDLORE_DISCOVERY_RELATION_GROUPS = {
 
 const BOUNDLORE_DISCOVERY_SCHEMA_DEFAULT = {
   fields: [
-    { key: 'found_in', label: 'Where found', type: 'text', required: true, max: 120 },
-    { key: 'how_to_reproduce', label: 'How to reproduce', type: 'textarea', required: true, max: 1200 },
-    { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600 },
+    { key: 'entity_name', label: 'Name of the discovered entity (Item/NPC/Location/etc.)', type: 'text', required: true, max: 120, placeholder: 'e.g. Ashfang Stag, Ancient Watcher NPC, Whispering Mine' },
+    { key: 'found_in', label: 'Where found', type: 'text', required: true, max: 120, placeholder: 'e.g. Frostpine Valley, near broken tower' },
+    { key: 'how_to_reproduce', label: 'How to reproduce', type: 'textarea', required: true, max: 1200, placeholder: 'Step-by-step: what you did, in what order, and under which conditions.' },
+    { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600, placeholder: 'What happened exactly?' },
+    { key: 'expected_result', label: 'Expected result (or expected behavior)', type: 'textarea', required: true, max: 600, placeholder: 'What should happen instead?' },
     { key: 'notes', label: 'Notes (optional)', type: 'textarea', required: false, max: 500 },
   ],
   relations: ['items', 'creatures', 'locations', 'guides'],
@@ -136,13 +138,15 @@ const BOUNDLORE_DISCOVERY_SCHEMA_DEFAULT = {
 const BOUNDLORE_DISCOVERY_SCHEMA_BY_CATEGORY = {
   creatures: {
     fields: [
-      { key: 'found_in', label: 'Where found', type: 'text', required: true, max: 120 },
-      { key: 'spawn_conditions', label: 'Spawn conditions', type: 'textarea', required: true, max: 500 },
-      { key: 'taming_method', label: 'How to tame', type: 'textarea', required: true, max: 500 },
+      { key: 'entity_name', label: 'Creature / NPC name', type: 'text', required: true, max: 120, placeholder: 'e.g. Emberhorn Elk, Watcher Warden NPC' },
+      { key: 'found_in', label: 'Where found', type: 'text', required: true, max: 120, placeholder: 'e.g. South ridge of Stormfen' },
+      { key: 'spawn_conditions', label: 'Spawn conditions', type: 'textarea', required: true, max: 500, placeholder: 'Time/weather/biome/trigger requirements' },
+      { key: 'taming_method', label: 'How to tame', type: 'textarea', required: true, max: 500, placeholder: 'If unknown, use quick-skip "Unclear".' },
       { key: 'mountable', label: 'Can be mounted?', type: 'select', required: true, options: ['yes', 'no', 'unknown'] },
       { key: 'health_points', label: 'Health (if known)', type: 'number', required: false, min: 0 },
-      { key: 'how_to_reproduce', label: 'Reproduction steps', type: 'textarea', required: true, max: 1200 },
-      { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600 },
+      { key: 'how_to_reproduce', label: 'Reproduction steps', type: 'textarea', required: true, max: 1200, placeholder: 'Steps another player can repeat 1:1' },
+      { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600, placeholder: 'What happened in your test run?' },
+      { key: 'expected_result', label: 'Expected result', type: 'textarea', required: true, max: 600, placeholder: 'What should happen under normal behavior?' },
     ],
     relations: ['items', 'locations', 'guides', 'creatures'],
     media: {
@@ -154,11 +158,13 @@ const BOUNDLORE_DISCOVERY_SCHEMA_BY_CATEGORY = {
   },
   items: {
     fields: [
-      { key: 'found_in', label: 'Where found', type: 'text', required: true, max: 120 },
+      { key: 'entity_name', label: 'Item name', type: 'text', required: true, max: 120, placeholder: 'e.g. Sunforged Compass' },
+      { key: 'found_in', label: 'Where found', type: 'text', required: true, max: 120, placeholder: 'e.g. Ancient Vault, floor 3 chest' },
       { key: 'rarity', label: 'Rarity', type: 'text', required: false, max: 60 },
-      { key: 'item_effect', label: 'Effect / use', type: 'textarea', required: true, max: 600 },
-      { key: 'how_to_reproduce', label: 'How to obtain', type: 'textarea', required: true, max: 1200 },
-      { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600 },
+      { key: 'item_effect', label: 'Effect / use', type: 'textarea', required: true, max: 600, placeholder: 'What does the item do?' },
+      { key: 'how_to_reproduce', label: 'How to obtain', type: 'textarea', required: true, max: 1200, placeholder: 'Exact farming/crafting/loot steps' },
+      { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600, placeholder: 'What was the actual drop/behavior?' },
+      { key: 'expected_result', label: 'Expected result', type: 'textarea', required: true, max: 600, placeholder: 'What should have happened?' },
     ],
     relations: ['creatures', 'locations', 'guides', 'items'],
     media: {
@@ -170,11 +176,13 @@ const BOUNDLORE_DISCOVERY_SCHEMA_BY_CATEGORY = {
   },
   locations: {
     fields: [
+      { key: 'entity_name', label: 'Location name', type: 'text', required: true, max: 120, placeholder: 'e.g. Sunken Gate Ruins' },
       { key: 'found_in', label: 'Region/area', type: 'text', required: true, max: 120 },
       { key: 'coordinates', label: 'Coordinates (if available)', type: 'text', required: false, max: 80 },
       { key: 'requirements', label: 'Requirements', type: 'textarea', required: false, max: 500 },
-      { key: 'how_to_reproduce', label: 'How to reach', type: 'textarea', required: true, max: 1200 },
-      { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600 },
+      { key: 'how_to_reproduce', label: 'How to reach', type: 'textarea', required: true, max: 1200, placeholder: 'Travel route and requirements, step-by-step' },
+      { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600, placeholder: 'What did you find there?' },
+      { key: 'expected_result', label: 'Expected result', type: 'textarea', required: true, max: 600, placeholder: 'What should normally be there?' },
     ],
     relations: ['items', 'creatures', 'guides', 'locations'],
     media: {
@@ -186,10 +194,12 @@ const BOUNDLORE_DISCOVERY_SCHEMA_BY_CATEGORY = {
   },
   biomes: {
     fields: [
+      { key: 'entity_name', label: 'Biome or zone name', type: 'text', required: true, max: 120, placeholder: 'e.g. Mistglass Basin' },
       { key: 'found_in', label: 'Biome region', type: 'text', required: true, max: 120 },
       { key: 'climate', label: 'Climate', type: 'text', required: false, max: 80 },
-      { key: 'how_to_reproduce', label: 'How to find', type: 'textarea', required: true, max: 1200 },
-      { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600 },
+      { key: 'how_to_reproduce', label: 'How to find', type: 'textarea', required: true, max: 1200, placeholder: 'Route + conditions + time/weather if relevant' },
+      { key: 'observed_result', label: 'Observed result', type: 'textarea', required: true, max: 600, placeholder: 'What was observed in the biome?' },
+      { key: 'expected_result', label: 'Expected result', type: 'textarea', required: true, max: 600, placeholder: 'What should be expected here?' },
     ],
     relations: ['items', 'creatures', 'guides', 'locations'],
     media: {
