@@ -524,6 +524,12 @@ async function handleSubmit(e) {
         return;
       }
 
+      if (!Array.isArray(structuredResult.relations) || (structuredResult.relations.length === 0 && discoveryRelationsSkipped !== true)) {
+        errorEl.textContent = "Please link at least one dependency/reference or enable 'Skip auto-relations' before submitting.";
+        errorEl.style.display = "block";
+        return;
+      }
+
       const dedupeTitle = title
         || String(structuredResult.payload && structuredResult.payload.entity_name ? structuredResult.payload.entity_name : "").trim()
         || buildDiscoveryAutoTitle(structuredResult.payload, cat);
