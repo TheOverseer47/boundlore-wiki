@@ -1073,7 +1073,7 @@ async function handleSubmit(e) {
 
   const title = document.getElementById("postTitle").value.trim();
   const content = quillEditor.root.innerHTML.trim();
-  const postMeta = collectPostMetaCP();
+  let postMeta = collectPostMetaCP();
   const mediaInput = document.getElementById("postMedia");
   const files = mediaInput && mediaInput.files ? Array.from(mediaInput.files) : [];
 
