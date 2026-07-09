@@ -132,6 +132,9 @@ as $$
     when 'contains' then 'PART_OF'
     when 'requires' then 'REQUIRES'
     when 'unlocks' then 'UNLOCKS'
+    when 'crafted_from' then 'CRAFTED_FROM'
+    when 'crafted_at' then 'CRAFTED_AT'
+    when 'ingredient_of' then 'INGREDIENT_OF'
     when 'variant_of' then 'VARIANT_OF'
     when 'changed_by_patch' then 'CHANGED_BY_PATCH'
     when '' then case lower(coalesce(p_relation_group, ''))

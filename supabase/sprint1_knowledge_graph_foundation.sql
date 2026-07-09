@@ -62,6 +62,9 @@ values
   ('DROPS', 'Drops', 'Entity drops another entity/item.'),
   ('REQUIRES', 'Requires', 'Entity/event requires another prerequisite entity.'),
   ('UNLOCKS', 'Unlocks', 'Entity/event unlocks another entity/state.'),
+  ('CRAFTED_FROM', 'Crafted From', 'Crafted item requires ingredient/resource.'),
+  ('CRAFTED_AT', 'Crafted At', 'Crafted item is made at a station.'),
+  ('INGREDIENT_OF', 'Ingredient Of', 'Resource/ingredient is used in another crafted item.'),
   ('PART_OF', 'Part Of', 'Entity is part of a larger entity/group/system.'),
   ('VARIANT_OF', 'Variant Of', 'Entity is a variant of another base entity.'),
   ('CHANGED_BY_PATCH', 'Changed By Patch', 'Behavior/entity changed by a patch/version.')

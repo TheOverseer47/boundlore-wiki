@@ -96,7 +96,41 @@ window.KnowledgeRelations = (function() {
       showOnTarget: ["creatures", "items", "locations", "biomes"],
       targetProminence: "secondary",
     },
+    crafted_from: {
+      label: "Crafted from",
+      inverse: "ingredient_of",
+      group: "items",
+      showOnSource: ["items"],
+      showOnTarget: ["items"],
+      targetProminence: "secondary",
+    },
+    crafted_at: {
+      label: "Crafted at",
+      inverse: null,
+      group: "crafting",
+      showOnSource: ["items"],
+      showOnTarget: ["items"],
+      targetProminence: "secondary",
+    },
+    ingredient_of: {
+      label: "Used in",
+      inverse: "crafted_from",
+      group: "items",
+      showOnSource: ["items"],
+      showOnTarget: ["items"],
+      targetProminence: "secondary",
+    },
+    unlocks: {
+      label: "Unlocks",
+      inverse: null,
+      group: "items",
+      showOnSource: ["items", "creatures"],
+      showOnTarget: ["items"],
+      targetProminence: "secondary",
+    },
   };
+
+  const CRAFT_RELATION_TYPES = ["crafted_from", "crafted_at", "ingredient_of", "unlocks"];
 
   const BIOME_SELECT_VALUES = {
     forest: "Forest",
@@ -113,7 +147,7 @@ window.KnowledgeRelations = (function() {
 
   const SECTION_ORDER = {
     creatures: ["observed_in", "located_in", "found_in", "found_near", "drops", "dropped_by", "requires", "related_discovery", "evidence_for"],
-    items: ["dropped_by", "found_in", "observed_in", "located_in", "related_discovery", "evidence_for"],
+    items: ["dropped_by", "crafted_from", "crafted_at", "found_in", "observed_in", "located_in", "related_discovery", "evidence_for"],
     biomes: ["contains", "creatures", "items", "locations", "discoveries"],
     locations: ["contains", "creatures", "items", "locations", "discoveries"],
     discoveries: ["observed_in", "located_in", "drops", "dropped_by", "found_in", "related_discovery", "evidence_for"],
@@ -156,7 +190,8 @@ window.KnowledgeRelations = (function() {
       dropped_by: "drops",
     };
     if (map[js]) return map[js];
-    if (["found_in", "drops", "part_of", "requires", "unlocks", "variant_of", "related_to"].includes(js)) {
+    if (["found_in", "drops", "part_of", "requires", "unlocks", "variant_of", "related_to",
+      "crafted_from", "crafted_at", "ingredient_of"].includes(js)) {
       return js;
     }
     const groupKey = String(group || "").toLowerCase();
@@ -228,12 +263,176 @@ window.KnowledgeRelations = (function() {
 
   function inferGroupFromRelation(type) {
     const cfg = RELATION_TYPES[normalizeRelationType(type)];
-    return cfg ? cfg.group : "discoveries";
+    if (cfg) return cfg.group;
+    const reg = getRelationsRegistry();
+    if (reg && reg.isKnownRelationType(type)) {
+      const def = reg.getRelationDefinition(type);
+      if (def && def.family === reg.RELATION_FAMILIES.CRAFT) return "items";
+    }
+    return "discoveries";
+  }
+
+  function isCraftRelationType(type) {
+    return CRAFT_RELATION_TYPES.indexOf(normalizeRelationType(type)) >= 0;
+  }
+
+  function craftRelationQuantity(rel) {
+    if (!rel) return null;
+    const raw = rel.quantity != null ? rel.quantity : rel.output_quantity;
+    return Number.isFinite(Number(raw)) ? Number(raw) : null;
+  }
+
+  function craftRelationIdentityKey(rel) {
+    if (!rel) return "";
+    const built = buildRelation(rel);
+    const type = normalizeRelationType(built.relation_type);
+    const entityKey = relationEntityDedupeKey(built);
+    if (!entityKey) return "";
+    return type + "|" + entityKey;
+  }
+
+  function relationMergeDedupeKey(rel) {
+    if (isCraftRelationType(rel && rel.relation_type)) {
+      return craftRelationIdentityKey(rel);
+    }
+    return relationEntityDedupeKey(rel);
+  }
+
+  function craftRelationsConflict(existing, incoming) {
+    if (!existing || !incoming) return false;
+    if (!isCraftRelationType(existing.relation_type) || !isCraftRelationType(incoming.relation_type)) {
+      return false;
+    }
+    if (craftRelationIdentityKey(existing) !== craftRelationIdentityKey(incoming)) {
+      return false;
+    }
+    const existingQty = craftRelationQuantity(existing);
+    const incomingQty = craftRelationQuantity(incoming);
+    if (existingQty == null && incomingQty == null) return false;
+    return existingQty !== incomingQty;
+  }
+
+  function recipeIngredientFingerprint(ingredients) {
+    if (!Array.isArray(ingredients)) return "";
+    return ingredients.map(function(row) {
+      const name = normalizeTitleKey(row && (row.name || row.title || row.target_name) || "");
+      const qty = row && row.quantity != null ? String(row.quantity) : "";
+      const unit = row && row.unit ? String(row.unit) : "";
+      return name + ":" + qty + ":" + unit;
+    }).sort().join("|");
+  }
+
+  function buildCraftRelationsFromRecipe(recipe) {
+    if (!recipe || typeof recipe !== "object") return [];
+    const out = [];
+    const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+    ingredients.forEach(function(row) {
+      const title = meaningfulValue(row && (row.name || row.title || row.target_name));
+      if (!title) return;
+      out.push({
+        group: "items",
+        relation_type: "crafted_from",
+        title: title,
+        quantity: craftRelationQuantity(row),
+        unit: row && row.unit ? String(row.unit).slice(0, 24) : null,
+        confidence: row && row.confidence ? row.confidence : "single_observation",
+        evidence_tier: recipe.evidence_tier || row.evidence_tier || "reported",
+        target_entity_key: row && row.target_entity_key ? row.target_entity_key : null,
+      });
+    });
+    const station = meaningfulValue(recipe.station || recipe.crafting_station);
+    if (station) {
+      out.push({
+        group: "crafting",
+        relation_type: "crafted_at",
+        title: station,
+        confidence: recipe.confidence || "single_observation",
+        evidence_tier: recipe.evidence_tier || "reported",
+        unlock_condition: recipe.unlock_condition || null,
+        output_quantity: recipe.output_quantity != null ? recipe.output_quantity : null,
+      });
+    }
+    return out.map(sanitizeRelationForMeta);
+  }
+
+  function sanitizeRecipeFactForMeta(recipe) {
+    if (!recipe || typeof recipe !== "object") return null;
+    const out = {};
+    if (meaningfulValue(recipe.station)) out.station = String(recipe.station).slice(0, 140);
+    if (recipe.output_quantity != null) out.output_quantity = Number(recipe.output_quantity);
+    if (meaningfulValue(recipe.unlock_condition)) out.unlock_condition = String(recipe.unlock_condition).slice(0, 240);
+    if (meaningfulValue(recipe.evidence_tier)) out.evidence_tier = String(recipe.evidence_tier).slice(0, 16);
+    if (meaningfulValue(recipe.confidence)) out.confidence = String(recipe.confidence).slice(0, 32);
+    if (meaningfulValue(recipe.notes)) out.notes = String(recipe.notes).slice(0, 500);
+    if (Array.isArray(recipe.ingredients)) {
+      out.ingredients = recipe.ingredients.slice(0, 24).map(function(row) {
+        return {
+          name: String((row && (row.name || row.title || row.target_name)) || "").slice(0, 140),
+          quantity: row && row.quantity != null && Number.isFinite(Number(row.quantity)) ? Number(row.quantity) : null,
+          unit: row && row.unit ? String(row.unit).slice(0, 24) : null,
+          target_entity_key: row && row.target_entity_key ? String(row.target_entity_key).slice(0, 160) : null,
+          evidence_tier: row && row.evidence_tier ? String(row.evidence_tier).slice(0, 16) : null,
+        };
+      }).filter(function(row) { return !!row.name; });
+    }
+    return Object.keys(out).length ? out : null;
+  }
+
+  function mergeRecipePayloadBlock(targetPayload, sourcePayload, conflicts, mergedFields) {
+    const sourceRecipe = sourcePayload && sourcePayload.recipe && typeof sourcePayload.recipe === "object"
+      ? sourcePayload.recipe
+      : null;
+    if (!sourceRecipe) return;
+    const existingRecipe = targetPayload.recipe && typeof targetPayload.recipe === "object"
+      ? targetPayload.recipe
+      : null;
+    if (!existingRecipe) {
+      targetPayload.recipe = sanitizeRecipeFactForMeta(sourceRecipe);
+      mergedFields.push("recipe");
+      return;
+    }
+    const existingStation = meaningfulValue(existingRecipe.station);
+    const incomingStation = meaningfulValue(sourceRecipe.station);
+    if (existingStation && incomingStation && normalizeTitleKey(existingStation) !== normalizeTitleKey(incomingStation)) {
+      conflicts.push({
+        field: "recipe_station",
+        existing: existingStation,
+        submitted: incomingStation,
+        status: "needs_review",
+      });
+    } else if (!existingStation && incomingStation) {
+      existingRecipe.station = incomingStation;
+      mergedFields.push("recipe_station");
+    }
+    const existingFp = recipeIngredientFingerprint(existingRecipe.ingredients);
+    const incomingFp = recipeIngredientFingerprint(sourceRecipe.ingredients);
+    if (!existingFp && incomingFp) {
+      existingRecipe.ingredients = sourceRecipe.ingredients;
+      mergedFields.push("recipe_ingredients");
+    } else if (existingFp && incomingFp && existingFp !== incomingFp) {
+      conflicts.push({
+        field: "recipe_ingredients",
+        existing: existingFp,
+        submitted: incomingFp,
+        status: "needs_review",
+      });
+    }
+    if (sourceRecipe.output_quantity != null && existingRecipe.output_quantity == null) {
+      existingRecipe.output_quantity = sourceRecipe.output_quantity;
+      mergedFields.push("recipe_output_quantity");
+    }
+    if (meaningfulValue(sourceRecipe.unlock_condition) && !meaningfulValue(existingRecipe.unlock_condition)) {
+      existingRecipe.unlock_condition = sourceRecipe.unlock_condition;
+      mergedFields.push("recipe_unlock_condition");
+    }
+    targetPayload.recipe = sanitizeRecipeFactForMeta(existingRecipe);
   }
 
   function inferTargetEntityType(group, relationType) {
     const groupKey = String(group || "").toLowerCase();
     const type = normalizeRelationType(relationType);
+    if (type === "crafted_at") return "station";
+    if (type === "crafted_from" || type === "ingredient_of" || type === "unlocks") return "item";
     if (groupKey === "items" || type === "drops" || type === "requires") return "item";
     if (groupKey === "creatures" || type === "dropped_by") return "creature";
     if (groupKey === "guides") return "guide";
@@ -1174,6 +1373,15 @@ window.KnowledgeRelations = (function() {
       source_date: built.source_date ? String(built.source_date).slice(0, 40) : null,
       report_count: Number.isFinite(Number(built.report_count)) ? Math.max(1, Number(built.report_count)) : 1,
       direction: built.direction ? String(built.direction).slice(0, 20) : "outbound",
+      quantity: craftRelationQuantity(built),
+      unit: built.unit ? String(built.unit).slice(0, 24) : null,
+      station: built.station ? String(built.station).slice(0, 140) : null,
+      output_quantity: built.output_quantity != null && Number.isFinite(Number(built.output_quantity))
+        ? Number(built.output_quantity)
+        : null,
+      unlock_condition: built.unlock_condition ? String(built.unlock_condition).slice(0, 240) : null,
+      evidence_tier: built.evidence_tier ? String(built.evidence_tier).slice(0, 16) : null,
+      notes: built.notes ? String(built.notes).slice(0, 400) : null,
     };
   }
 
@@ -1656,6 +1864,46 @@ window.KnowledgeRelations = (function() {
     return false;
   }
 
+  function formatCraftRelationPreviewLabel(rel) {
+    if (!rel) return "";
+    const type = normalizeRelationType(rel.relation_type);
+    const label = getRelationLabel(type, rel);
+    let text = label + " " + (rel.title || "");
+    const qty = craftRelationQuantity(rel);
+    if (qty != null) text += " x" + qty;
+    if (rel.unit) text += " " + rel.unit;
+    return text.trim();
+  }
+
+  function resolveContributionRelations(meta) {
+    const direct = Array.isArray(meta.discovery_relations) ? meta.discovery_relations.slice() : [];
+    const payload = meta.discovery_payload && typeof meta.discovery_payload === "object" ? meta.discovery_payload : {};
+    if (payload.recipe && typeof payload.recipe === "object") {
+      const built = buildCraftRelationsFromRecipe(payload.recipe);
+      built.forEach(function(rel) {
+        const key = relationMergeDedupeKey(rel);
+        if (!direct.some(function(existing) { return relationMergeDedupeKey(existing) === key; })) {
+          direct.push(rel);
+        }
+      });
+    }
+    return direct;
+  }
+
+  function compareRecipeContributionDuplicates(existingInfo, params) {
+    if (!existingInfo || !params) return false;
+    if (params.intent !== "add_recipe" && existingInfo.intent !== "add_recipe") return true;
+    if (existingInfo.intent !== params.intent) return false;
+    const existingRecipe = existingInfo.payload && existingInfo.payload.recipe;
+    const incomingRecipe = params.recipe || (params.payload && params.payload.recipe) || null;
+    if (!existingRecipe && !incomingRecipe) return true;
+    if (!existingRecipe || !incomingRecipe) return false;
+    const stationA = normalizeTitleKey(existingRecipe.station || "");
+    const stationB = normalizeTitleKey(incomingRecipe.station || "");
+    if (stationA !== stationB) return false;
+    return recipeIngredientFingerprint(existingRecipe.ingredients) === recipeIngredientFingerprint(incomingRecipe.ingredients);
+  }
+
   function getContributionInfo(post, meta) {
     const m = meta || (post ? parseMetaFromHtml(post.content || "") : {});
     const block = m.contribution && typeof m.contribution === "object" ? m.contribution : {};
@@ -1671,7 +1919,7 @@ window.KnowledgeRelations = (function() {
       submitted_fields: block.submitted_fields && typeof block.submitted_fields === "object" ? block.submitted_fields : {},
       status: block.status || "pending_review",
       evidence: Array.isArray(m.discovery_evidence) ? m.discovery_evidence : [],
-      relations: Array.isArray(m.discovery_relations) ? m.discovery_relations : [],
+      relations: resolveContributionRelations(m),
       payload: payload,
     };
   }
@@ -1776,6 +2024,8 @@ window.KnowledgeRelations = (function() {
       }
     }
 
+    mergeRecipePayloadBlock(targetPayload, info.payload, conflicts, mergedFields);
+
     // Evidence: always additive, never overwrite. First image automatically
     // becomes the hero image if the target has none.
     let evidenceAdded = 0;
@@ -1811,17 +2061,28 @@ window.KnowledgeRelations = (function() {
       try {
         const inbound = await fetchInboundRelations(client, targetPost, targetMeta);
         inboundKeys = new Set((inbound || []).map(function(rel) {
-          return relationEntityDedupeKey(rel);
+          return relationMergeDedupeKey(rel);
         }).filter(Boolean));
       } catch (inboundErr) { /* best effort — fall back to local matching */ }
       info.relations.forEach(function(incoming) {
         if (!incoming || !incoming.title) return;
-        const incomingKey = relationEntityDedupeKey(incoming);
+        const incomingKey = relationMergeDedupeKey(incoming);
         const match = existingRelations.find(function(rel) {
-          return rel && relationEntityDedupeKey(rel) === incomingKey;
+          return rel && relationMergeDedupeKey(rel) === incomingKey;
         }) || graphRelations.find(function(rel) {
-          return rel && relationEntityDedupeKey(rel) === incomingKey;
+          return rel && relationMergeDedupeKey(rel) === incomingKey;
         });
+        if (match && craftRelationsConflict(match, incoming)) {
+          conflicts.push({
+            field: "recipe_" + normalizeRelationType(incoming.relation_type),
+            existing: formatCraftRelationPreviewLabel(match),
+            submitted: formatCraftRelationPreviewLabel(incoming),
+            relation_type: incoming.relation_type,
+            target: incoming.title,
+            status: "needs_review",
+          });
+          return;
+        }
         if (match) {
           // Same entity already linked: confirm it (extra source), never a
           // duplicate row.
@@ -1920,6 +2181,17 @@ window.KnowledgeRelations = (function() {
 
     const willAdd = [];
     const willConflict = [];
+    const recipeMerged = [];
+    const recipeConflicts = [];
+    const previewPayload = Object.assign({}, targetPayload);
+    mergeRecipePayloadBlock(previewPayload, sourceValues, recipeConflicts, recipeMerged);
+    recipeMerged.forEach(function(field) {
+      willAdd.push({ field: field, value: "(recipe block)" });
+    });
+    recipeConflicts.forEach(function(conflict) {
+      willConflict.push(conflict);
+    });
+
     CONTRIBUTION_MERGE_FIELDS.forEach(function(key) {
       const value = meaningfulValue(sourceValues[key]);
       if (!value) return;
@@ -1937,13 +2209,27 @@ window.KnowledgeRelations = (function() {
         : []);
     const relationsNew = [];
     const relationsConfirm = [];
+    const relationsConflict = [];
     (info.relations || []).forEach(function(incoming) {
       if (!incoming || !incoming.title) return;
-      const key = relationEntityDedupeKey(incoming);
-      const exists = existingRelations.some(function(rel) {
-        return rel && relationEntityDedupeKey(rel) === key;
+      const key = relationMergeDedupeKey(incoming);
+      const match = existingRelations.find(function(rel) {
+        return rel && relationMergeDedupeKey(rel) === key;
       });
-      (exists ? relationsConfirm : relationsNew).push(incoming.title);
+      if (match && craftRelationsConflict(match, incoming)) {
+        relationsConflict.push({
+          label: formatCraftRelationPreviewLabel(incoming),
+          existing: formatCraftRelationPreviewLabel(match),
+          submitted: formatCraftRelationPreviewLabel(incoming),
+          relation_type: incoming.relation_type,
+        });
+        return;
+      }
+      if (match) {
+        relationsConfirm.push(formatCraftRelationPreviewLabel(incoming) || incoming.title);
+        return;
+      }
+      relationsNew.push(formatCraftRelationPreviewLabel(incoming) || incoming.title);
     });
 
     return {
@@ -1952,6 +2238,7 @@ window.KnowledgeRelations = (function() {
       willConflict: willConflict,
       relationsNew: relationsNew,
       relationsConfirm: relationsConfirm,
+      relationsConflict: relationsConflict,
       evidenceCount: info.evidence.length,
     };
   }
@@ -1973,7 +2260,8 @@ window.KnowledgeRelations = (function() {
       const info = getContributionInfo(row, meta);
       const sameTarget = (params.targetPostId && info.target_post_id === params.targetPostId)
         || (params.targetPostSlug && info.target_post_slug === params.targetPostSlug);
-      return sameTarget && info.intent === params.intent;
+      return sameTarget && info.intent === params.intent
+        && compareRecipeContributionDuplicates(info, params);
     }) || null;
   }
 
@@ -2010,6 +2298,11 @@ window.KnowledgeRelations = (function() {
       Object.keys(meta.discovery_payload).forEach(function(key) {
         const value = meta.discovery_payload[key];
         if (value == null || value === "") return;
+        if (key === "recipe" && typeof value === "object") {
+          const recipe = sanitizeRecipeFactForMeta(value);
+          if (recipe) payload.recipe = recipe;
+          return;
+        }
         if (typeof value === "number") payload[String(key).slice(0, 60)] = value;
         else payload[String(key).slice(0, 60)] = String(value).slice(0, 1400);
       });
@@ -2415,6 +2708,15 @@ window.KnowledgeRelations = (function() {
     isContributionPost: isContributionPost,
     getContributionInfo: getContributionInfo,
     resolveContributionTargetPost: resolveContributionTargetPost,
+    CRAFT_RELATION_TYPES: CRAFT_RELATION_TYPES,
+    isCraftRelationType: isCraftRelationType,
+    craftRelationIdentityKey: craftRelationIdentityKey,
+    relationMergeDedupeKey: relationMergeDedupeKey,
+    craftRelationsConflict: craftRelationsConflict,
+    buildCraftRelationsFromRecipe: buildCraftRelationsFromRecipe,
+    sanitizeRecipeFactForMeta: sanitizeRecipeFactForMeta,
+    compareRecipeContributionDuplicates: compareRecipeContributionDuplicates,
+    formatCraftRelationPreviewLabel: formatCraftRelationPreviewLabel,
     mergeContributionIntoTarget: mergeContributionIntoTarget,
     previewContributionMerge: previewContributionMerge,
     findPendingContributionDuplicate: findPendingContributionDuplicate,

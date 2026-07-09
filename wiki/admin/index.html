@@ -285,7 +285,7 @@
 <script src="/js/test-data.js?v=1"></script>
 <script src="/js/categories-config.js?v=17"></script>
 <script src="/js/relations-registry.js?v=1"></script>
-<script src="/js/knowledge-relations.js?v=17"></script>
+<script src="/js/knowledge-relations.js?v=18"></script>
 <script src="/js/entity-core.js?v=9"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
@@ -780,6 +780,13 @@ async function approveContributionA(target, options) {
     if (preview.relationsConfirm.length) {
       lines.push("Confirms existing relations (no duplicate): " + preview.relationsConfirm.join(", "));
     }
+    if (preview.relationsConflict && preview.relationsConflict.length) {
+      lines.push("");
+      lines.push("RELATION CONFLICTS (needs review — quantities/stations differ):");
+      preview.relationsConflict.forEach(function(c) {
+        lines.push("  ! " + c.label + ": existing \"" + String(c.existing).slice(0, 60) + "\" vs submitted \"" + String(c.submitted).slice(0, 60) + "\"");
+      });
+    }
     if (preview.evidenceCount) {
       lines.push("Evidence items: " + preview.evidenceCount);
     }
@@ -791,7 +798,8 @@ async function approveContributionA(target, options) {
       });
     }
     if (!preview.willAdd.length && !preview.relationsNew.length && !preview.relationsConfirm.length
-      && !preview.evidenceCount && !preview.willConflict.length) {
+      && !preview.evidenceCount && !preview.willConflict.length
+      && !(preview.relationsConflict && preview.relationsConflict.length)) {
       lines.push("");
       lines.push("Note: nothing mergeable detected — approval will only archive the contribution.");
     }

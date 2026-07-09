@@ -133,9 +133,9 @@ Canonical relation types for BoundLore knowledge graph. Implementation registry:
 | Allowed source domains | OBJECT |
 | Allowed target domains | OBJECT |
 | Required properties | quantity (recommended) |
-| Optional properties | confidence, evidence_tier, source_post_id |
-| Merge rule | **Never auto-merge** — always review |
-| Conflict rule | Parallel recipes coexist as `reported` |
+| Optional properties | quantity, unit, confidence, evidence_tier, source_post_id, report_count, notes |
+| Merge rule | Same target + type + ingredient ⇒ CONFIRM (`report_count++`); new ingredient ⇒ ADD |
+| Conflict rule | Same ingredient, different quantity ⇒ `needs_review` conflict (never silent overwrite) |
 | Render widget | Recipe ingredient list on item page |
 | Example | Staff of Fire `crafted_from` Ember Shard ×3 |
 
@@ -151,8 +151,8 @@ Canonical relation types for BoundLore knowledge graph. Implementation registry:
 | Allowed target domains | SYSTEM |
 | Required properties | — |
 | Optional properties | confidence, evidence_tier, source_post_id |
-| Merge rule | Review required |
-| Conflict rule | Multiple stations coexist |
+| Merge rule | Same station ⇒ CONFIRM; new station on empty target ⇒ ADD |
+| Conflict rule | Different station on confirmed target ⇒ `recipe_station` conflict (`needs_review`) |
 | Render widget | "Crafted at: Forge" link |
 | Example | Staff of Fire `crafted_at` Forge |
 
