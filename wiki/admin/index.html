@@ -140,6 +140,12 @@
       <button id="btnRepairSwampTestData" class="btn-small" type="button">Repair Swamp test data</button>
       <p id="swampRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
     </div>
+    <div class="form-box" id="structuredMetaRepairPanel" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">Structured BLMETA Repair</h3>
+      <p style="color:var(--text-muted);margin:0 0 10px;">Finds posts with missing <code>discovery_payload</code> / <code>discovery_relations</code> in BLMETA and persists data reconstructed from legacy Structured Findings HTML. Idempotent — skips posts that already have full structured data.</p>
+      <button id="btnRepairStructuredMeta" class="btn-small" type="button">Repair structured BLMETA</button>
+      <p id="structuredMetaRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
+    </div>
     <div class="form-box" id="contributionRepairPanel" style="margin-bottom:16px;">
       <h3 style="margin-top:0;">Contribution Duplicate Repair</h3>
       <p style="color:var(--text-muted);margin:0 0 10px;">Finds contribution posts that were published as standalone entries (old bug), merges their evidence/fields into the canonical target entry, and archives the duplicate. No hard deletes. Idempotent.</p>
@@ -275,7 +281,7 @@
 <script src="/js/supabase-config.js"></script>
 <script src="/js/test-data.js?v=1"></script>
 <script src="/js/categories-config.js?v=17"></script>
-<script src="/js/knowledge-relations.js?v=12"></script>
+<script src="/js/knowledge-relations.js?v=14"></script>
 <script src="/js/entity-core.js?v=7"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
@@ -461,11 +467,45 @@ function initAdminControls() {
     saveWikiPatchModeA(false);
   });
   document.getElementById("btnRepairSwampTestData")?.addEventListener("click", repairSwampTestDataA);
+  document.getElementById("btnRepairStructuredMeta")?.addEventListener("click", repairStructuredMetaA);
   document.getElementById("btnRepairContributionDuplicates")?.addEventListener("click", repairContributionDuplicatesA);
 }
 
 // Repairs contribution posts that leaked into public lists as standalone
 // entities: merges them into their target entry and archives the duplicate.
+async function repairStructuredMetaA() {
+  const msg = document.getElementById("structuredMetaRepairMsg");
+  if (typeof KnowledgeRelations === "undefined" || !KnowledgeRelations.repairStructuredMetaForPosts) {
+    if (msg) msg.textContent = "knowledge-relations.js repair helper not loaded.";
+    return;
+  }
+  if (!confirm("Repair structured BLMETA for legacy posts?\n\nPersists discovery_payload and discovery_relations from HTML fallback where missing. No deletes.")) {
+    return;
+  }
+  if (msg) msg.textContent = "Scanning and repairing...";
+
+  const result = await KnowledgeRelations.repairStructuredMetaForPosts(supabase, { limit: 200 });
+  if (!result.ok) {
+    if (msg) msg.textContent = "Repair failed: " + (result.reason || "unknown error");
+    return;
+  }
+
+  let slugResult = { inspected: 0, repaired: 0, skipped: 0, notes: [] };
+  if (KnowledgeRelations.repairCanonicalEntitySlugsForPosts) {
+    slugResult = await KnowledgeRelations.repairCanonicalEntitySlugsForPosts(supabase, { limit: 200 });
+  }
+
+  let text = "Meta: inspected " + result.inspected + ", repaired " + result.repaired + ", skipped " + result.skipped + ".";
+  if (slugResult.inspected) {
+    text += " Slugs: inspected " + slugResult.inspected + ", repaired " + slugResult.repaired + ", skipped " + slugResult.skipped + ".";
+  }
+  if (result.notes && result.notes.length) {
+    text += " Notes: " + result.notes.slice(0, 5).join("; ");
+  }
+  if (msg) msg.textContent = text;
+  await logAdminAction("repair_structured_meta", "system", null, text);
+}
+
 async function repairContributionDuplicatesA() {
   const msg = document.getElementById("contributionRepairMsg");
   if (typeof KnowledgeRelations === "undefined" || !KnowledgeRelations.isContributionPost) {
@@ -615,7 +655,16 @@ async function repairSwampTestDataA() {
     if (!updateError) repaired += 1;
   }
 
-  if (msg) {
+  // Persist HTML-reconstructed payload/relations for known slugs.
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.repairStructuredMetaForPosts) {
+    const structResult = await KnowledgeRelations.repairStructuredMetaForPosts(supabase, { slugs: SWAMP_REPAIR_SLUGS });
+    if (msg && structResult.repaired) {
+      msg.textContent = "Repaired " + repaired + " of " + SWAMP_REPAIR_SLUGS.length
+        + " known test post(s). Structured BLMETA: +" + structResult.repaired + ".";
+    }
+  }
+
+  if (msg && !msg.textContent.includes("Structured BLMETA")) {
     msg.textContent = "Repaired " + repaired + " of " + SWAMP_REPAIR_SLUGS.length + " known test post(s).";
   }
   await logAdminAction("repair_swamp_test_data", "system", null, "Repaired " + repaired + " swamp test stubs");
@@ -743,6 +792,22 @@ async function approveDiscoveryViaRpcA(target, options) {
   if (!target || !target.id) throw new Error("Discovery target missing");
   if (!canUseDiscoverySyncRpc) throw new Error("Discovery RPC migration missing (wiki_sync_logs / rpc_sync_discovery_submission)");
   if (!canUseSubmissionLifecycle) throw new Error("Submission lifecycle columns are missing on posts");
+
+  const rawMeta = parsePostMetaA(target.content || "");
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.prepareDiscoveryMetaForApproval) {
+    const prepared = KnowledgeRelations.prepareDiscoveryMetaForApproval(target, rawMeta);
+    const preparedContent = injectPostMetaA(stripPostMetaA(target.content || ""), prepared.meta);
+    const prepUpdate = {
+      content: preparedContent,
+    };
+    if (prepared.title) prepUpdate.title = prepared.title;
+    if (prepared.slug && prepared.slug !== target.slug) prepUpdate.slug = prepared.slug;
+    const { error: prepError } = await supabase.from("posts").update(prepUpdate).eq("id", target.id);
+    if (prepError) {
+      throw new Error(prepError.message || "Could not normalize discovery meta before approval");
+    }
+    target = Object.assign({}, target, prepUpdate);
+  }
 
   const pre = await transitionDiscoveryStatusA(target.id, "validating", "Admin approval pipeline started");
   if (!pre.ok) throw new Error(pre.reason || "Could not transition discovery to validating");

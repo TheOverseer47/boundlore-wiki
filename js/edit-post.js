@@ -591,9 +591,21 @@ async function handleEditSubmit(e) {
         buildEditKnowledgeSourceContextEP(structuredResult.payload, title, effectiveCategory)
       );
       meta.discovery_payload = structuredResult.payload;
-      meta.discovery_relations = structuredResult.relations;
+      meta.discovery_relations = (structuredResult.relations || []).map(function(rel) {
+        return typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.sanitizeRelationForMeta
+          ? KnowledgeRelations.sanitizeRelationForMeta(rel)
+          : rel;
+      });
       meta.discovery_relations_skipped = !structuredResult.relations || structuredResult.relations.length === 0;
       meta.discovery_evidence = evidenceInput.items;
+      // Keep the persisted canonical identity in sync after edits.
+      if (typeof EntityCore !== "undefined") {
+        const pseudoPost = { title: title || editPost.title, category: effectiveCategory };
+        meta.entity_profile = EntityCore.buildEntityProfile(pseudoPost, meta);
+        if (meta.entity_profile && meta.entity_profile.taxonomy) {
+          meta.entity_taxonomy = meta.entity_profile.taxonomy;
+        }
+      }
       updates.content = buildEditStructuredDiscoveryContent(title, effectiveCategory, structuredResult.payload, structuredResult.relations);
     } else {
       if (!content || content === "<p><br></p>") {
@@ -723,6 +735,9 @@ function validateEditGuideReferencesEP() {
 }
 
 function normalizePostMetaEP(meta) {
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.serializePostMetaForStorage) {
+    return KnowledgeRelations.serializePostMetaForStorage(meta);
+  }
   if (!meta || typeof meta !== "object") return null;
   const out = {};
   if (meta.update_phase) out.update_phase = String(meta.update_phase).slice(0, 32);

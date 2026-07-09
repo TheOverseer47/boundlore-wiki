@@ -362,6 +362,34 @@ window.WikiEntryLayout = (function() {
       missing.push({ key: key, label: label, intent: intent || key });
     }
 
+    function isFactKnown(key) {
+      const f = classification && classification[key];
+      if (!f) return false;
+      if (typeof f.status !== "undefined") return f.status !== "unknown";
+      return meaningful(f.value);
+    }
+
+    function shouldSkipMissingKey(key) {
+      if (cat === "items") {
+        if (key === "dropped_by" && isFactKnown("dropped_by")) return true;
+        if ((key === "found_in" || key === "biome" || key === "region_name" || key === "biome_context") &&
+          (isFactKnown("found_in") || isFactKnown("biome") || isFactKnown("area"))) return true;
+        if ((key === "how_obtain" || key === "how_to_obtain" || key === "source_type") &&
+          (isFactKnown("how_obtain") || isFactKnown("dropped_by"))) return true;
+      }
+      if (cat === "creatures") {
+        if (key === "dropped_items" && isFactKnown("drops")) return true;
+        if ((key === "found_in" || key === "observed_at") && isFactKnown("observed_at")) return true;
+        if ((key === "biome" || key === "region_name") && isFactKnown("biome")) return true;
+      }
+      if ((cat === "biomes" || cat === "locations") && (key === "known_creature" || key === "known_item")) {
+        const counts = countRelationBuckets(relations, cat);
+        if (key === "known_creature" && counts.creatures > 0) return true;
+        if (key === "known_item" && counts.items > 0) return true;
+      }
+      return false;
+    }
+
     if (cat === "items") {
       function isUnknown(key) {
         const f = classification[key];
@@ -386,13 +414,14 @@ window.WikiEntryLayout = (function() {
         add("behavior", "Behavior", "add_behavior");
       }
     } else if (cat === "biomes" || cat === "locations") {
-      const counts = countRelationBuckets(relations);
+      const counts = countRelationBuckets(relations, cat);
       if (!counts.creatures) add("known_creature", "Known Creature", "add_known_creature");
       if (!counts.items) add("known_item", "Known Item", "add_known_item");
     }
 
     if (Array.isArray(meta && meta.knowledge_entry && meta.knowledge_entry.missing_fields)) {
       meta.knowledge_entry.missing_fields.forEach(function(key) {
+        if (shouldSkipMissingKey(key)) return;
         if (!missing.some(function(item) { return item.key === key; })) {
           add(key, formatLabel(key), "add_info");
         }
@@ -406,15 +435,18 @@ window.WikiEntryLayout = (function() {
     return missing.slice(0, 8);
   }
 
-  // Remove legacy rendered discovery blocks (Community Discovery header,
-  // Structured Findings, Related Entries) so they don't reappear as raw
-  // dumps under "Additional Notes" on entity pages.
+  // Remove legacy rendered discovery blocks so they don't reappear as raw
+  // dumps under supplemental sections on entity pages.
   function stripLegacyDiscoveryHtml(cleanContent) {
     const text = String(cleanContent || "");
-    if (!/Structured Findings|Related Entries|discovery-entry-head/i.test(text)) return text;
+    if (!/bl-discovery-|Structured Findings|Related Entries|discovery-entry-head/i.test(text)) return text;
     const wrapper = document.createElement("div");
     wrapper.innerHTML = text;
-    wrapper.querySelectorAll("section.discovery-entry-head, .bl-discovery-hero").forEach(function(node) {
+    wrapper.querySelectorAll(
+      "section.discovery-entry-head, .bl-discovery-hero, .bl-discovery-entry-head, " +
+      ".bl-discovery-fact-grid, .bl-discovery-fact-card, .bl-discovery-links, .bl-discovery-media, " +
+      ".bl-discovery-summary, .bl-discovery-kicker"
+    ).forEach(function(node) {
       node.remove();
     });
     wrapper.querySelectorAll("h3").forEach(function(heading) {
@@ -427,6 +459,75 @@ window.WikiEntryLayout = (function() {
       if (list) list.remove();
     });
     return wrapper.innerHTML.trim();
+  }
+
+  const SOURCE_DISCOVERY_SKIP_KEYS = {
+    entity_name: true,
+    discovery_type: true,
+    region_name: true,
+    found_in: true,
+    biome_context: true,
+    encounter_context: true,
+    location_hint: true,
+    exact_location: true,
+    dropped_items: true,
+    dropped_by: true,
+    world_name: true,
+    source_type: true,
+    confidence_level: true,
+    impact_area: true,
+  };
+
+  function buildSourceDiscoveryHtml(payload, meta, post, cleanContent) {
+    const data = payload && typeof payload === "object" ? payload : {};
+    const rows = [];
+    const addRow = function(label, value) {
+      const text = String(value || "").trim();
+      if (!text) return;
+      rows.push({ label: label, value: text });
+    };
+
+    addRow("Observed result", data.observed_result);
+    addRow("Spawn conditions", data.spawn_conditions);
+    addRow("How to reproduce", data.how_to_reproduce);
+    addRow("Time of day", data.time_of_day);
+    addRow("Weather", data.weather_condition);
+    addRow("Group size", data.group_size);
+    addRow("Combat outcome", data.combat_outcome);
+    addRow("Taming method", data.taming_method);
+    addRow("Alt names", data.alt_names);
+    addRow("Coordinates", data.coordinates);
+    addRow("Drop conditions", data.drop_conditions || data.loot_conditions);
+    addRow("Drop rate note", data.drop_rate_observation);
+    addRow("Reporter notes", data.additional_notes || data.notes);
+
+    Object.keys(data).forEach(function(key) {
+      if (SOURCE_DISCOVERY_SKIP_KEYS[key]) return;
+      if (rows.some(function(row) { return row.label === formatLabel(key); })) return;
+      const value = data[key];
+      if (value == null || value === "") return;
+      if (typeof value === "object") return;
+      addRow(formatLabel(key), value);
+    });
+
+    const stripped = stripLegacyDiscoveryHtml(cleanContent || "");
+    const strippedText = stripped.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    if (strippedText && strippedText.length > 40 && !isStubBoilerplateContent(stripped)) {
+      addRow("Original notes", strippedText.slice(0, 420) + (strippedText.length > 420 ? "…" : ""));
+    }
+
+    if (!rows.length) return "";
+
+    let html = '<details class="bl-wiki-source-discovery"><summary>Original Report Details</summary>';
+    html += '<dl class="bl-wiki-source-discovery-list">';
+    rows.slice(0, 12).forEach(function(row) {
+      html += '<div class="bl-wiki-source-discovery-row">';
+      html += "<dt>" + escapeHtml(row.label) + "</dt>";
+      html += "<dd>" + escapeHtml(row.value) + "</dd>";
+      html += "</div>";
+    });
+    html += "</dl></details>";
+    return html;
   }
 
   function extractHeroImage(cleanContent, meta) {
@@ -661,7 +762,25 @@ window.WikiEntryLayout = (function() {
     });
   }
 
-  function countRelationBuckets(relations) {
+  function resolveRelationBucket(rel) {
+    if (typeof EntityCore !== "undefined" && EntityCore.resolveRelationCategory) {
+      return EntityCore.resolveRelationCategory(rel);
+    }
+    const cat = String(rel.category || rel.group || "").toLowerCase();
+    const targetType = String(rel.target_entity_type || "").toLowerCase();
+    if (cat === "items" || targetType === "item") return "items";
+    if (cat === "creatures" || targetType === "creature" || targetType === "monster") return "creatures";
+    if (cat === "discoveries" || targetType === "discovery") return "discoveries";
+    if (cat === "biomes" || targetType === "biome") return "biomes";
+    if (cat === "locations" || targetType === "location") return "locations";
+    return "";
+  }
+
+  function countRelationBuckets(relations, viewerCategory) {
+    const viewer = String(viewerCategory || "biomes").toLowerCase();
+    if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.countKnownEntitiesForViewer) {
+      return KnowledgeRelations.countKnownEntitiesForViewer(relations, viewer);
+    }
     const rels = dedupeRelationsLocal(relations);
     let creatures = 0;
     let items = 0;
@@ -670,16 +789,16 @@ window.WikiEntryLayout = (function() {
     const seenI = new Set();
     const seenD = new Set();
     rels.forEach(function(rel) {
-      const type = normalizeRelType(rel.relation_type);
-      const cat = String(rel.category || rel.group || "").toLowerCase();
-      const key = String(rel.slug || rel.id || rel.title).toLowerCase();
-      if (type === "drops" || cat === "creatures" || rel.target_entity_type === "creature") {
+      const bucket = resolveRelationBucket(rel);
+      const name = typeof EntityCore !== "undefined"
+        ? EntityCore.getRelationDisplayName(rel)
+        : (rel.display_name || rel.title || "");
+      const key = String(name || rel.slug || rel.id || rel.title || "").trim().toLowerCase();
+      if (bucket === "creatures") {
         if (!seenC.has(key)) { seenC.add(key); creatures += 1; }
-      }
-      if (type === "dropped_by" || cat === "items" || rel.target_entity_type === "item") {
+      } else if (bucket === "items") {
         if (!seenI.has(key)) { seenI.add(key); items += 1; }
-      }
-      if (cat === "discoveries" || rel.target_entity_type === "discovery" || type === "related_discovery") {
+      } else if (bucket === "discoveries") {
         if (!seenD.has(key)) { seenD.add(key); discoveries += 1; }
       }
     });
@@ -756,7 +875,7 @@ window.WikiEntryLayout = (function() {
     } else if (category === "biomes" || category === "locations") {
       add("Type", f.place_type, false);
       add("Part Of", f.parent, true);
-      const counts = countRelationBuckets(relations);
+      const counts = countRelationBuckets(relations, category);
       facts.push({ label: "Known Creatures", html: '<span class="bl-wiki-value">' + counts.creatures + "</span>" });
       facts.push({ label: "Known Items", html: '<span class="bl-wiki-value">' + counts.items + "</span>" });
       if (counts.discoveries) {
@@ -780,16 +899,16 @@ window.WikiEntryLayout = (function() {
 
     function pushRelations(key, title, items, emptyLabel) {
       if (!items || !items.length) return;
-      // One card per entity within a section, even when several relation
-      // types (e.g. found_in + contains) point at the same entity.
-      const seenTitles = new Set();
+      const seenKeys = new Set();
       const deduped = items.filter(function(rel) {
-        const name = typeof EntityCore !== "undefined"
-          ? (EntityCore.getRelationDisplayName(rel) || rel.display_name || rel.title)
-          : (rel.display_name || rel.title);
-        const titleKey = String(name || "").trim().toLowerCase().replace(/\s+/g, " ");
-        if (!titleKey || seenTitles.has(titleKey)) return false;
-        seenTitles.add(titleKey);
+        const dedupeKey = typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.relationEntityDedupeKey
+          ? KnowledgeRelations.relationEntityDedupeKey(rel)
+          : (typeof EntityCore !== "undefined"
+            ? EntityCore.getRelationDisplayName(rel)
+            : (rel.display_name || rel.title || ""));
+        const entityKey = String(dedupeKey || "").trim().toLowerCase();
+        if (!entityKey || seenKeys.has(entityKey)) return false;
+        seenKeys.add(entityKey);
         return true;
       });
       if (!deduped.length) return;
@@ -816,39 +935,18 @@ window.WikiEntryLayout = (function() {
       if (f.time_weather && f.time_weather.status !== "unknown") pushFact("time_weather", "Time / Weather", f.time_weather);
     } else if (category === "biomes" || category === "locations") {
       const rels = dedupeRelationsLocal(relations);
-      const effectiveCategory = typeof EntityCore !== "undefined"
-        ? EntityCore.getEffectiveCategory({ category: category }, { discovery_payload: resolved && resolved.facts ? {} : {} })
-        : category;
       const creatures = rels.filter(function(rel) {
-        const type = normalizeRelType(rel.relation_type);
-        const cat = String(rel.category || rel.group || "").toLowerCase();
-        return type === "observed_in"
-          || type === "contains"
-          || type === "located_in"
-          || cat === "creatures"
-          || rel.target_entity_type === "creature"
-          || rel.direction === "inbound" && (cat === "creatures" || rel.target_entity_type === "creature");
-      }).filter(function(rel) {
-        return String(rel.category || rel.group || "").toLowerCase() !== "biomes";
+        return resolveRelationBucket(rel) === "creatures";
       });
       const items = rels.filter(function(rel) {
-        const type = normalizeRelType(rel.relation_type);
-        const cat = String(rel.category || rel.group || "").toLowerCase();
-        return type === "drops"
-          || type === "dropped_by"
-          || type === "related_discovery"
-          || cat === "items"
-          || rel.target_entity_type === "item";
+        return resolveRelationBucket(rel) === "items";
       });
       const locs = rels.filter(function(rel) {
         if (typeof EntityCore !== "undefined" && EntityCore.isVagueLocationHint(rel.title)) return false;
-        const cat = String(rel.category || rel.group || "").toLowerCase();
-        return (cat === "locations" || rel.target_entity_type === "location") && isLocationRelation(rel);
+        return resolveRelationBucket(rel) === "locations";
       });
       const discoveries = rels.filter(function(rel) {
-        const cat = String(rel.category || rel.group || "").toLowerCase();
-        if (cat === "items" || cat === "creatures" || rel.target_entity_type === "item" || rel.target_entity_type === "creature") return false;
-        return cat === "discoveries" || rel.target_entity_type === "discovery" || normalizeRelType(rel.relation_type) === "related_discovery";
+        return resolveRelationBucket(rel) === "discoveries";
       });
       const encounterContexts = collectEncounterContexts(meta || {}, rels);
       pushRelations("creatures", "Known Creatures", creatures);
@@ -873,11 +971,11 @@ window.WikiEntryLayout = (function() {
     return { sections: sections, usedKeys: usedKeys };
   }
 
-  function renderRelationRow(rel) {
+  function renderRelationRow(rel, viewerCategory, sectionKey) {
     const typeLabel = formatLabel(rel.target_entity_type || rel.category || rel.group || "entry");
     const context = renderRelationContext(rel);
     const relLabel = typeof KnowledgeRelations !== "undefined"
-      ? KnowledgeRelations.getRelationLabel(rel.relation_type)
+      ? KnowledgeRelations.getRelationLabel(rel.relation_type, rel, viewerCategory || sectionKey)
       : formatLabel(rel.relation_type);
     let html = '<div class="bl-wiki-rel-card">';
     html += '<div class="bl-wiki-rel-card-head">';
@@ -896,8 +994,9 @@ window.WikiEntryLayout = (function() {
 
     if (section.type === "relations") {
       html += '<div class="bl-wiki-rel-card-grid">';
+      const viewerCategory = String(post.category || "").toLowerCase();
       section.items.forEach(function(rel) {
-        html += renderRelationRow(rel);
+        html += renderRelationRow(rel, viewerCategory, section.key);
       });
       html += "</div>";
     } else if (section.type === "fact") {
@@ -944,7 +1043,7 @@ window.WikiEntryLayout = (function() {
       html += '<h3 class="bl-wiki-detail-card-title">' + escapeHtml(getContextualSectionTitle(section.key, viewerCategory)) + "</h3>";
       html += '<div class="bl-wiki-rel-card-grid">';
       section.items.forEach(function(rel) {
-        html += renderRelationRow(rel);
+        html += renderRelationRow(rel, viewerCategory, section.key);
       });
       html += "</div>";
       if (section.hasMore) {
@@ -1085,10 +1184,11 @@ window.WikiEntryLayout = (function() {
       sourceUrl: sourceUrl,
       sourceTitle: meta.knowledge_entry && meta.knowledge_entry.source_post_title,
       displayName: displayName,
-      supplementalHtml: (function() {
-        const stripped = stripLegacyDiscoveryHtml(cleanContent);
-        return isStubBoilerplateContent(stripped) ? "" : stripped;
+      sourceDiscoveryHtml: (function() {
+        if (!payload || !Object.keys(payload).length) return "";
+        return buildSourceDiscoveryHtml(payload, meta, post, cleanContent);
       })(),
+      supplementalHtml: "",
     };
   }
 
@@ -1153,9 +1253,9 @@ window.WikiEntryLayout = (function() {
       html += renderDetailSection(missingSection, post, model.meta);
     }
 
-    if (model.supplementalHtml) {
-      html += '<section class="bl-wiki-supplemental"><h3 class="bl-wiki-section-title">Additional Notes</h3><div class="bl-wiki-supplemental-body">' +
-        model.supplementalHtml + "</div></section>";
+    if (model.sourceDiscoveryHtml) {
+      html += '<section class="bl-wiki-supplemental bl-wiki-supplemental-compact">' +
+        model.sourceDiscoveryHtml + "</section>";
     }
 
     html += "</article>";

@@ -1012,6 +1012,65 @@ a:hover { color: var(--gold-light); }
   overflow-wrap: anywhere;
 }
 
+.bl-compact-knowledge-header {
+  pointer-events: none;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8f97ad;
+  background: rgba(12,12,18,0.96) !important;
+}
+
+.bl-compact-knowledge-header .bl-compact-knowledge-name {
+  color: #8f97ad;
+  font-weight: 600;
+}
+
+.bl-wiki-source-discovery {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  background: rgba(17,17,24,0.72);
+  padding: 10px 12px;
+}
+
+.bl-wiki-source-discovery summary {
+  cursor: pointer;
+  color: var(--gold);
+  font-weight: 600;
+  list-style: none;
+}
+
+.bl-wiki-source-discovery summary::-webkit-details-marker {
+  display: none;
+}
+
+.bl-wiki-source-discovery-list {
+  margin: 10px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.bl-wiki-source-discovery-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.9fr) minmax(0, 1.4fr);
+  gap: 8px;
+  font-size: 0.86rem;
+}
+
+.bl-wiki-source-discovery-row dt {
+  color: #9ea5bd;
+  margin: 0;
+}
+
+.bl-wiki-source-discovery-row dd {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.bl-wiki-supplemental-compact {
+  margin-top: 18px;
+}
+
 .bl-category-filters {
   margin-bottom: 14px;
   padding: 12px;

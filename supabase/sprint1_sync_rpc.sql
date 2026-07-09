@@ -109,13 +109,48 @@ create or replace function public.bl_normalize_discovery_relation_code(
 )
 returns text
 language sql
-immutable
+stable
 as $$
-  select case
-    when lower(coalesce(p_relation_type, '')) = 'related_creature' then 'RELATED_TO'
-    when lower(coalesce(p_relation_group, '')) = 'creatures' and coalesce(p_relation_type, '') = '' then 'RELATED_TO'
-    when coalesce(p_relation_type, '') = '' then upper(coalesce(nullif(p_relation_group, ''), 'RELATED_TO'))
-    else upper(p_relation_type)
+  select case lower(replace(replace(coalesce(p_relation_type, ''), '-', '_'), ' ', '_'))
+    when 'related_creature' then 'RELATED_TO'
+    when 'related_discovery' then 'RELATED_TO'
+    when 'related_to' then 'RELATED_TO'
+    when 'located_in' then 'FOUND_IN'
+    when 'found_in' then 'FOUND_IN'
+    when 'observed_in' then 'FOUND_IN'
+    when 'observed_at' then 'FOUND_IN'
+    when 'found_near' then 'FOUND_IN'
+    when 'encounter_context' then 'FOUND_IN'
+    when 'location_hint' then 'FOUND_IN'
+    when 'area' then 'FOUND_IN'
+    when 'biome' then 'FOUND_IN'
+    when 'drops' then 'DROPS'
+    when 'dropped_by' then 'DROPS'
+    when 'drop' then 'DROPS'
+    when 'loot' then 'DROPS'
+    when 'part_of' then 'PART_OF'
+    when 'contains' then 'PART_OF'
+    when 'requires' then 'REQUIRES'
+    when 'unlocks' then 'UNLOCKS'
+    when 'variant_of' then 'VARIANT_OF'
+    when 'changed_by_patch' then 'CHANGED_BY_PATCH'
+    when '' then case lower(coalesce(p_relation_group, ''))
+      when 'creatures' then 'RELATED_TO'
+      when 'items' then 'DROPS'
+      when 'locations' then 'FOUND_IN'
+      when 'biomes' then 'FOUND_IN'
+      else 'RELATED_TO'
+    end
+    else coalesce(
+      (
+        select rt.relation_code
+        from public.wiki_relation_types rt
+        where rt.relation_code = upper(replace(replace(coalesce(p_relation_type, ''), '-', '_'), ' ', '_'))
+          and rt.is_active = true
+        limit 1
+      ),
+      'RELATED_TO'
+    )
   end;
 $$;
 

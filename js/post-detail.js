@@ -28,19 +28,15 @@ async function init() {
     isAdmin = profile && profile.role === "admin";
   }
 
-  let postQuery = supabase
-    .from("posts")
-    .select("*, profiles:author_id(*)");
+  const resolved = await resolvePostRequestPD(slug, postId);
+  const post = resolved.post;
+  if (!post) return showNotFound();
 
-  if (slug) {
-    postQuery = postQuery.eq("slug", slug);
-  } else {
-    postQuery = postQuery.eq("id", postId);
+  if (resolved.canonicalSlug && slug && resolved.canonicalSlug !== slug && post.slug === resolved.canonicalSlug) {
+    const nextUrl = new URL(window.location.href);
+    nextUrl.searchParams.set("slug", resolved.canonicalSlug);
+    window.history.replaceState(null, "", nextUrl.pathname + nextUrl.search);
   }
-
-  const { data: post, error } = await postQuery.single();
-
-  if (error || !post) return showNotFound();
   if (post.deleted_at && !isAdmin) return showNotFound();
 
   currentPost = post;
@@ -48,6 +44,64 @@ async function init() {
   loadReactions(post.id);
   loadComments(post.id);
   wireCommentForm(post.id);
+}
+
+async function resolvePostRequestPD(slug, postId) {
+  const select = "*, profiles:author_id(*)";
+
+  if (postId) {
+    const { data, error } = await supabase.from("posts").select(select).eq("id", postId).maybeSingle();
+    return { post: error ? null : data, canonicalSlug: data && data.slug ? data.slug : null };
+  }
+
+  if (!slug) return { post: null, canonicalSlug: null };
+
+  const { data: direct, error: directError } = await supabase
+    .from("posts")
+    .select(select)
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!directError && direct) {
+    const meta = parsePostMetaPD(direct.content || "");
+    const canonical = getCanonicalPostSlugPD(direct, meta);
+    return {
+      post: direct,
+      canonicalSlug: canonical,
+      requestedSlug: slug,
+    };
+  }
+
+  const { data: pool, error: poolError } = await supabase
+    .from("posts")
+    .select(select)
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .in("category", ["creatures", "items", "biomes", "locations"])
+    .order("created_at", { ascending: false })
+    .limit(250);
+
+  if (!poolError && Array.isArray(pool)) {
+    for (let i = 0; i < pool.length; i += 1) {
+      const candidate = pool[i];
+      const meta = parsePostMetaPD(candidate.content || "");
+      if (typeof EntityCore !== "undefined" && EntityCore.postMatchesSlugAlias(candidate, meta, slug)) {
+        return {
+          post: candidate,
+          canonicalSlug: getCanonicalPostSlugPD(candidate, meta),
+          requestedSlug: slug,
+        };
+      }
+    }
+  }
+
+  return { post: null, canonicalSlug: null };
+}
+
+function getCanonicalPostSlugPD(post, meta) {
+  const profile = meta && meta.entity_profile ? meta.entity_profile : {};
+  if (profile.canonical_slug) return profile.canonical_slug;
+  if (post && post.slug) return post.slug;
+  return null;
 }
 
 function showNotFound() {
@@ -181,9 +235,7 @@ async function renderPost(post) {
   if (breadcrumbTitle) breadcrumbTitle.textContent = displayTitle;
   document.title = displayTitle + " - BoundLore";
 
-  const postTypeLabel = post.post_type === "guide"
-    ? "Guide"
-    : (post.post_type === "discovery" ? "Discovery" : "Post");
+  const postTypeLabel = getPostTypeLabelPD(post, postMeta, useWikiLayout);
 
   const readTime = estimateReadTimeMinutes(cleanContent);
 
@@ -526,14 +578,32 @@ function formatDiscoveryLocationPD(payload) {
 }
 
 function getPostDisplayTitlePD(post, postMeta) {
+  const useWikiLayout = typeof WikiEntryLayout !== "undefined" && WikiEntryLayout.isWikiLayoutPost(post);
+  if (typeof EntityCore !== "undefined" && useWikiLayout) {
+    return EntityCore.getDisplayName(postMeta, post) || (post && post.title) || "BoundLore Post";
+  }
   const payload = postMeta && typeof postMeta.discovery_payload === "object" ? postMeta.discovery_payload : null;
   if (post && post.post_type === "discovery" && payload) {
     const entityName = getMeaningfulDiscoveryValuePD(payload.entity_name);
-    const primaryPlace = getDiscoveryPrimaryPlacePD(payload);
-    if (entityName && primaryPlace) return entityName + " in " + primaryPlace;
     if (entityName) return entityName;
   }
   return (post && post.title) || "BoundLore Post";
+}
+
+function getPostTypeLabelPD(post, postMeta, useWikiLayout) {
+  if (post.post_type === "guide") return "Guide";
+  if (useWikiLayout) {
+    const category = typeof EntityCore !== "undefined"
+      ? EntityCore.getEffectiveCategory(post, postMeta)
+      : String(post.category || "").toLowerCase();
+    if (category === "creatures") return "Creature Entry";
+    if (category === "items") return "Item Entry";
+    if (category === "biomes") return "Biome Entry";
+    if (category === "locations") return "Location Entry";
+    return "Wiki Entry";
+  }
+  if (post.post_type === "discovery") return "Discovery";
+  return "Post";
 }
 
 function getDiscoveryPrimaryPlacePD(payload) {
@@ -1050,6 +1120,10 @@ async function loadRelatedPosts(post, postMeta) {
     });
   }).filter(function(item) {
     return item.relatedScore > 0;
+  }).filter(function(item) {
+    return !isPrimaryRelationTargetPD(post, postMeta, item);
+  }).filter(function(item) {
+    return !isContextualSeeAlsoDuplicatePD(post, postMeta, item);
   }).sort(function(a, b) {
     if (b.relatedScore !== a.relatedScore) return b.relatedScore - a.relatedScore;
     return new Date(b.created_at) - new Date(a.created_at);
@@ -1107,11 +1181,10 @@ function getPostLabelSafe(post) {
 }
 
 function getSeeAlsoLabelPD(post) {
-  const typeLabel = post.post_type === "guide"
-    ? "Guide"
-    : (post.post_type === "discovery" ? "Discovery" : "Post");
-  const categoryLabel = getPostLabelSafe(post);
   const postMeta = parsePostMetaPD(post.content || "");
+  const useWikiLayout = typeof WikiEntryLayout !== "undefined" && WikiEntryLayout.isWikiLayoutPost(post);
+  const typeLabel = getPostTypeLabelPD(post, postMeta, useWikiLayout);
+  const categoryLabel = getPostLabelSafe(post);
   const subcategoryLabel = getPostSubcategoryLabelPD(post, postMeta);
   return subcategoryLabel
     ? (typeLabel + " · " + categoryLabel + " · " + subcategoryLabel)
@@ -1128,6 +1201,42 @@ function getPostSubcategoryLabelPD(post, postMeta) {
     return getGuideSubcategoryLabel(subcategory);
   }
   return subcategory;
+}
+
+function collectPrimaryRelationTargetsPD(postMeta) {
+  const keys = new Set();
+  const rels = postMeta && Array.isArray(postMeta.discovery_relations) ? postMeta.discovery_relations : [];
+  rels.forEach(function(rel) {
+    if (!rel) return;
+    if (rel.id) keys.add(String(rel.id));
+    if (rel.slug) keys.add(String(rel.slug).toLowerCase());
+  });
+  return keys;
+}
+
+function isPrimaryRelationTargetPD(post, postMeta, candidate) {
+  const keys = collectPrimaryRelationTargetsPD(postMeta);
+  if (candidate.id && keys.has(String(candidate.id))) return true;
+  if (candidate.slug && keys.has(String(candidate.slug).toLowerCase())) return true;
+  return false;
+}
+
+function isContextualSeeAlsoDuplicatePD(currentPost, currentMeta, candidate) {
+  const candidateMeta = parsePostMetaPD(candidate.content || "");
+  const currentName = typeof EntityCore !== "undefined"
+    ? String(EntityCore.getDisplayName(currentMeta, currentPost) || "").toLowerCase()
+    : String(currentPost.title || "").toLowerCase();
+  const candidateName = typeof EntityCore !== "undefined"
+    ? String(EntityCore.getDisplayName(candidateMeta, candidate) || "").toLowerCase()
+    : String(candidate.title || "").toLowerCase();
+  if (currentName && candidateName && currentName === candidateName) return true;
+  if (typeof EntityCore !== "undefined" && EntityCore.slugLooksContextual(candidate.slug, candidateName)) return true;
+  const title = String(candidate.title || "");
+  if (title && /\s+in\s+/i.test(title) && candidate.category === currentPost.category) {
+    const baseTitle = title.replace(/\s+in\s+.+$/i, "").trim().toLowerCase();
+    if (baseTitle && baseTitle === currentName) return true;
+  }
+  return false;
 }
 
 function computeRelatedScorePD(currentPost, currentMeta, candidate) {
@@ -1166,8 +1275,15 @@ function computeRelatedScorePD(currentPost, currentMeta, candidate) {
     score += Math.min(countSharedTermsPD(currentLabelTokens, candidateLabelTokens), 1);
   }
 
+  const candidateDisplayName = typeof EntityCore !== "undefined"
+    ? EntityCore.getDisplayName(candidateMeta, candidate)
+    : (candidate.title || "");
+  if (typeof EntityCore !== "undefined" && EntityCore.slugLooksContextual(candidate.slug, candidateDisplayName)) {
+    score -= 6;
+  }
+
   const currentSlugTokens = tokenizeRelatedTermsPD(currentPost.slug || currentPost.title || "");
-  const candidateSlugTokens = tokenizeRelatedTermsPD(candidate.slug || candidate.title || "");
+  const candidateSlugTokens = tokenizeRelatedTermsPD(candidate.slug || candidateDisplayName || "");
   if (sameSubcategory || sameSource) {
     score += Math.min(countSharedTermsPD(currentSlugTokens, candidateSlugTokens), 1);
   }

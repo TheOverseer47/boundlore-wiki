@@ -100,9 +100,13 @@ async function renderCategoryPosts(categorySlug) {
   if (emptyMsg) emptyMsg.style.display = "none";
 
   const postsWithScores = await attachReactionStats(filteredPosts);
-  const sortedPosts = shouldGroupBySubcategory(categorySlug)
+  let sortedPosts = shouldGroupBySubcategory(categorySlug)
     ? sortGroupedCategoryPosts(postsWithScores, sortMode)
     : sortPostsByCategoryLogic(postsWithScores, categorySlug);
+
+  if (categorySlug === "biomes") {
+    sortedPosts = await attachBiomeListCountsRP(sortedPosts);
+  }
 
   if (categorySlug === "guilds") {
     sortedPosts.forEach(function(post) {
@@ -242,6 +246,10 @@ function renderGroupedCategoryPosts(container, posts, categorySlug) {
       ? 'bl-compact-knowledge-list'
       : 'bl-category-group-grid';
 
+    if (shouldUseCompactKnowledgeListRP(categorySlug) && String(categorySlug || "").toLowerCase() === "biomes") {
+      groupGrid.appendChild(renderCompactKnowledgeHeaderRP(categorySlug));
+    }
+
     items.forEach(function(post) {
       groupGrid.appendChild(shouldUseCompactKnowledgeListRP(categorySlug)
         ? renderCompactKnowledgeRowRP(post, categorySlug)
@@ -255,16 +263,43 @@ function renderGroupedCategoryPosts(container, posts, categorySlug) {
 }
 
 function shouldUseCompactKnowledgeListRP(categorySlug) {
-  return ["items", "locations", "creatures"].includes(String(categorySlug || "").toLowerCase());
+  return ["items", "locations", "creatures", "biomes"].includes(String(categorySlug || "").toLowerCase());
 }
 
 function renderCompactKnowledgeListRP(container, posts, categorySlug) {
   const list = document.createElement("div");
   list.className = "bl-compact-knowledge-list";
+  if (String(categorySlug || "").toLowerCase() === "biomes") {
+    list.appendChild(renderCompactKnowledgeHeaderRP(categorySlug));
+  }
   posts.forEach(function(post) {
     list.appendChild(renderCompactKnowledgeRowRP(post, categorySlug));
   });
   container.appendChild(list);
+}
+
+function renderCompactKnowledgeHeaderRP(categorySlug) {
+  const row = document.createElement("div");
+  row.className = "bl-compact-knowledge-row bl-compact-knowledge-header";
+  row.setAttribute("aria-hidden", "true");
+  if (String(categorySlug || "").toLowerCase() === "biomes") {
+    row.innerHTML =
+      '<span class="bl-compact-knowledge-name">Name</span>' +
+      "<span>Type</span>" +
+      "<span>Subcategory</span>" +
+      "<span>Known Creatures</span>" +
+      "<span>Known Items</span>" +
+      "<span>Updated</span>";
+    row.style.gridTemplateColumns = "minmax(160px, 1.35fr) minmax(90px, 0.8fr) minmax(100px, 0.8fr) minmax(90px, 0.7fr) minmax(90px, 0.7fr) minmax(82px, 0.55fr)";
+  } else {
+    row.innerHTML =
+      '<span class="bl-compact-knowledge-name">Name</span>' +
+      "<span>Type</span>" +
+      "<span>Subcategory</span>" +
+      "<span>Source</span>" +
+      "<span>Updated</span>";
+  }
+  return row;
 }
 
 function getCompactKnowledgeDisplayNameRP(post, meta, payload) {
@@ -290,14 +325,31 @@ function renderCompactKnowledgeRowRP(post, categorySlug) {
   const payload = meta.discovery_payload && typeof meta.discovery_payload === "object" ? meta.discovery_payload : {};
   const subcategoryLabel = getPostSubcategoryLabel(post) || getCategorySubcategoryLabelRP(categorySlug, getRenderableSubcategorySlug(post)) || "-";
   const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
-  const dateLabel = post.created_at ? new Date(post.created_at).toLocaleDateString() : "-";
-  const sourceText = getCompactKnowledgeSourceRP(payload, post, meta);
-  const typeText = getCompactKnowledgeTypeRP(post, meta, payload, categorySlug);
+  const dateLabel = post.updated_at
+    ? new Date(post.updated_at).toLocaleDateString()
+    : (post.created_at ? new Date(post.created_at).toLocaleDateString() : "-");
   const displayName = getCompactKnowledgeDisplayNameRP(post, meta, payload);
 
   const row = document.createElement("a");
   row.className = "bl-compact-knowledge-row";
   row.href = postUrl;
+
+  if (String(categorySlug || "").toLowerCase() === "biomes") {
+    const typeText = getCompactKnowledgeTypeRP(post, meta, payload, categorySlug);
+    const counts = post._biomeCounts || countBiomeRelationsFromMetaRP(meta);
+    row.style.gridTemplateColumns = "minmax(160px, 1.35fr) minmax(90px, 0.8fr) minmax(100px, 0.8fr) minmax(90px, 0.7fr) minmax(90px, 0.7fr) minmax(82px, 0.55fr)";
+    row.innerHTML =
+      '<span class="bl-compact-knowledge-name">' + escapeHtmlRP(displayName) + '</span>' +
+      '<span>' + escapeHtmlRP(typeText || "Biome") + '</span>' +
+      '<span>' + escapeHtmlRP(subcategoryLabel) + '</span>' +
+      '<span>' + escapeHtmlRP(String(counts.creatures || 0)) + '</span>' +
+      '<span>' + escapeHtmlRP(String(counts.items || 0)) + '</span>' +
+      '<span>' + escapeHtmlRP(dateLabel) + '</span>';
+    return row;
+  }
+
+  const sourceText = getCompactKnowledgeSourceRP(payload, post, meta);
+  const typeText = getCompactKnowledgeTypeRP(post, meta, payload, categorySlug);
   row.innerHTML =
     '<span class="bl-compact-knowledge-name">' + escapeHtmlRP(displayName) + '</span>' +
     '<span>' + escapeHtmlRP(typeText || "-") + '</span>' +
@@ -305,6 +357,50 @@ function renderCompactKnowledgeRowRP(post, categorySlug) {
     '<span>' + escapeHtmlRP(sourceText || "-") + '</span>' +
     '<span>' + escapeHtmlRP(dateLabel) + '</span>';
   return row;
+}
+
+function countBiomeRelationsFromMetaRP(meta) {
+  const rels = meta && Array.isArray(meta.discovery_relations) ? meta.discovery_relations : [];
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.countKnownEntitiesForViewer) {
+    return KnowledgeRelations.countKnownEntitiesForViewer(rels, "biomes");
+  }
+  let creatures = 0;
+  let items = 0;
+  rels.forEach(function(rel) {
+    if (!rel) return;
+    const group = String(rel.group || rel.category || "").toLowerCase();
+    if (group === "creatures") creatures += 1;
+    if (group === "items") items += 1;
+  });
+  return { creatures: creatures, items: items };
+}
+
+async function attachBiomeListCountsRP(posts) {
+  if (!Array.isArray(posts) || !posts.length) return posts;
+
+  const enriched = [];
+  for (let i = 0; i < posts.length; i += 1) {
+    const post = posts[i];
+    const meta = parsePostMetaRP(post.content || "");
+    let counts = { creatures: 0, items: 0 };
+
+    try {
+      if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.fetchInboundRelations) {
+        const inbound = await KnowledgeRelations.fetchInboundRelations(supabase, post, meta);
+        if (KnowledgeRelations.countKnownEntitiesForViewer) {
+          counts = KnowledgeRelations.countKnownEntitiesForViewer(inbound, "biomes");
+        }
+      } else {
+        counts = countBiomeRelationsFromMetaRP(meta);
+      }
+    } catch (err) {
+      console.warn("Biome list count failed:", err);
+      counts = countBiomeRelationsFromMetaRP(meta);
+    }
+
+    enriched.push(Object.assign({}, post, { _biomeCounts: counts }));
+  }
+  return enriched;
 }
 
 function getCompactKnowledgeSourceRP(payload, post, meta) {

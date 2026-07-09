@@ -1067,11 +1067,25 @@ async function handleSubmit(e) {
       }
 
       postMeta.discovery_payload = structuredResult.payload;
-      postMeta.discovery_relations = structuredResult.relations;
+      postMeta.discovery_relations = (structuredResult.relations || []).map(function(rel) {
+        return typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.sanitizeRelationForMeta
+          ? KnowledgeRelations.sanitizeRelationForMeta(rel)
+          : rel;
+      });
       postMeta.discovery_relations_skipped = discoveryRelationsSkipped === true;
       postMeta.discovery_record_id = postMeta.discovery_record_id || generateDiscoveryRecordIdCP();
       postMeta.discovery_record_status = "unverified";
       postMeta.discovery_submitted_at = new Date().toISOString();
+      // Persist canonical entity identity so pages never depend on
+      // re-deriving it from rendered HTML later.
+      if (typeof EntityCore !== "undefined") {
+        const entityTitle = dedupeTitle || title;
+        const pseudoPost = { title: entityTitle, category: cat };
+        postMeta.entity_profile = EntityCore.buildEntityProfile(pseudoPost, postMeta);
+        if (postMeta.entity_profile && postMeta.entity_profile.taxonomy) {
+          postMeta.entity_taxonomy = postMeta.entity_profile.taxonomy;
+        }
+      }
       if (typeof DiscoveryCore !== "undefined" && DiscoveryCore.isKnowledgeGraphDiscoveryEnabled()) {
         postMeta.discovery_form = "lean";
       }
@@ -2476,7 +2490,6 @@ function collectStructuredDiscoveryInput() {
   if (v2Schema) {
     if (!payload.confidence_level) payload.confidence_level = "2-single-observation";
     if (!payload.impact_area) payload.impact_area = "gameplay";
-    if (!payload.world_name) payload.world_name = "Light No Fire";
   }
 
   const relations = [];
@@ -2754,6 +2767,9 @@ function buildDiscoveryAutoTitle(payload, category) {
   const categoryLabel = category ? String(category).charAt(0).toUpperCase() + String(category).slice(1) : "Discovery";
 
   if (entityName && primaryPlace) {
+    if (/^(?:near|at|around|by|close to|inside|within)\b/i.test(primaryPlace)) {
+      return entityName + " " + primaryPlace;
+    }
     return entityName + " in " + primaryPlace;
   }
   if (entityName) {
@@ -2767,6 +2783,9 @@ function buildDiscoveryAutoTitle(payload, category) {
 
 function getDiscoveryPrimaryPlaceCP(payload) {
   const data = payload && typeof payload === "object" ? payload : {};
+  const encounter = getMeaningfulDiscoveryValueCP(data.encounter_context)
+    || getMeaningfulDiscoveryValueCP(data.location_hint);
+  if (encounter) return encounter;
   const foundIn = getMeaningfulDiscoveryValueCP(data.found_in);
   if (foundIn && !isGenericDiscoveryAreaCP(foundIn)) return foundIn;
   const region = getMeaningfulDiscoveryValueCP(data.region_name);
@@ -2876,6 +2895,9 @@ function parsePostMetaCP(html) {
 }
 
 function normalizePostMetaCP(meta) {
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.serializePostMetaForStorage) {
+    return KnowledgeRelations.serializePostMetaForStorage(meta);
+  }
   if (!meta || typeof meta !== "object") return null;
   const out = {};
   if (meta.update_phase) out.update_phase = String(meta.update_phase).slice(0, 32);

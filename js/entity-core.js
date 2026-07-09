@@ -87,7 +87,10 @@ window.EntityCore = (function() {
     }
 
     const canonical = parts[0].trim();
-    const contextLocation = parts.slice(1).join(" ").trim();
+    let contextLocation = parts.slice(1).join(" ").trim();
+    if (contextLocation && /^in\s+(?:near|at|around|by|close to|within)\b/i.test(contextLocation)) {
+      contextLocation = contextLocation.replace(/^in\s+/i, "").trim();
+    }
     const biomeHint = inferBiomeFromLocationLabel(contextLocation);
     return {
       canonical_name: canonical || raw,
@@ -277,14 +280,15 @@ window.EntityCore = (function() {
     const opts = options || {};
     const payload = opts.payload && typeof opts.payload === "object" ? opts.payload : {};
     const payloadName = meaningful(payload.entity_name);
+    const payloadParsed = payloadName ? parseTitleContext(payloadName) : { canonical_name: "", context_location: "", location_hint: "" };
     const parsed = parseTitleContext(title);
-    let canonical = payloadName || parsed.canonical_name || meaningful(title);
+    let canonical = payloadParsed.canonical_name || payloadName || parsed.canonical_name || meaningful(title);
     const cat = String(category || "").toLowerCase();
 
     if (payloadName && title && normalizeTitleKey(payloadName) !== normalizeTitleKey(title)) {
       const titleParsed = parseTitleContext(title);
-      if (titleParsed.context_location && normalizeTitleKey(titleParsed.canonical_name) === normalizeTitleKey(payloadName)) {
-        canonical = payloadName;
+      if (titleParsed.context_location && normalizeTitleKey(titleParsed.canonical_name) === normalizeTitleKey(payloadParsed.canonical_name || payloadName)) {
+        canonical = payloadParsed.canonical_name || payloadName;
       }
     }
 
@@ -293,10 +297,10 @@ window.EntityCore = (function() {
     return {
       canonical_name: canonical,
       display_name: canonical,
-      context_title: parsed.context_title || (title && normalizeTitleKey(title) !== normalizeTitleKey(canonical) ? title : ""),
-      context_location: meaningful(payload.found_in) || parsed.context_location || meaningful(payload.region_name) || "",
-      biome_hint: meaningful(payload.region_name) || parsed.biome_hint || inferBiomeFromLocationLabel(parsed.context_location),
-      location_hint: meaningful(payload.found_in) || parsed.location_hint || "",
+      context_title: parsed.context_title || payloadParsed.context_title || (title && normalizeTitleKey(title) !== normalizeTitleKey(canonical) ? title : ""),
+      context_location: meaningful(payload.found_in) || parsed.context_location || payloadParsed.context_location || meaningful(payload.region_name) || "",
+      biome_hint: meaningful(payload.region_name) || parsed.biome_hint || payloadParsed.biome_hint || inferBiomeFromLocationLabel(parsed.context_location || payloadParsed.context_location),
+      location_hint: meaningful(payload.encounter_context) || meaningful(payload.location_hint) || parsed.location_hint || payloadParsed.location_hint || "",
       category: cat,
     };
   }
@@ -305,6 +309,82 @@ window.EntityCore = (function() {
     const cat = String(category || "entry").toLowerCase();
     const slug = slugify(canonicalName);
     return cat + "|" + (slug || "entry");
+  }
+
+  function extractSlugSuffix(existingSlug) {
+    const match = String(existingSlug || "").match(/-([0-9a-f]{4,8})$/i);
+    return match ? match[1].toLowerCase() : "";
+  }
+
+  function buildCanonicalPostSlug(canonicalName, existingSlug) {
+    const base = slugify(meaningful(canonicalName) || "entry");
+    const suffix = extractSlugSuffix(existingSlug) || Math.random().toString(16).slice(2, 8);
+    return base + "-" + suffix;
+  }
+
+  function slugLooksContextual(slug, canonicalName) {
+    const rawSlug = String(slug || "").toLowerCase();
+    const canonicalSlug = slugify(canonicalName || "");
+    if (!rawSlug || !canonicalSlug) return false;
+    if (rawSlug.indexOf(canonicalSlug) !== 0) return true;
+    return /(?:^|-)(?:in|near|at|from|around|within)-/.test(rawSlug);
+  }
+
+  function applyCanonicalSlugMeta(post, meta) {
+    const repairMeta = meta && typeof meta === "object" ? Object.assign({}, meta) : {};
+    const payload = repairMeta.discovery_payload && typeof repairMeta.discovery_payload === "object"
+      ? Object.assign({}, repairMeta.discovery_payload)
+      : {};
+    const identity = extractCanonicalIdentity(
+      meaningful(payload.entity_name) || (post && post.title),
+      post && post.category,
+      { payload: payload }
+    );
+    const canonicalName = identity.canonical_name || meaningful(post && post.title) || "";
+    if (!canonicalName) {
+      return { meta: repairMeta, title: post && post.title, slug: post && post.slug, changed: false };
+    }
+
+    payload.entity_name = canonicalName;
+    repairMeta.discovery_payload = payload;
+
+    const canonicalSlug = buildCanonicalPostSlug(canonicalName, post && post.slug);
+    const profile = buildEntityProfile(
+      Object.assign({}, post || {}, { title: canonicalName }),
+      repairMeta
+    );
+    profile.canonical_slug = canonicalSlug;
+    profile.slug = canonicalSlug;
+
+    const aliases = Array.isArray(profile.aliases) ? profile.aliases.slice() : [];
+    const slugAliases = Array.isArray(repairMeta.entity_profile && repairMeta.entity_profile.slug_aliases)
+      ? repairMeta.entity_profile.slug_aliases.slice()
+      : [];
+    const oldSlug = post && post.slug ? String(post.slug) : "";
+    if (oldSlug && oldSlug !== canonicalSlug && slugAliases.indexOf(oldSlug) === -1) {
+      slugAliases.push(oldSlug);
+    }
+    profile.slug_aliases = slugAliases.slice(0, 8);
+    repairMeta.entity_profile = profile;
+
+    const changed = (post && post.slug !== canonicalSlug) || (post && post.title !== canonicalName);
+    return {
+      meta: repairMeta,
+      title: canonicalName,
+      slug: canonicalSlug,
+      previousSlug: oldSlug && oldSlug !== canonicalSlug ? oldSlug : null,
+      changed: !!changed,
+    };
+  }
+
+  function postMatchesSlugAlias(post, meta, slug) {
+    const wanted = String(slug || "").toLowerCase();
+    if (!wanted || !post) return false;
+    if (String(post.slug || "").toLowerCase() === wanted) return true;
+    const profile = meta && meta.entity_profile ? meta.entity_profile : {};
+    if (String(profile.canonical_slug || "").toLowerCase() === wanted) return true;
+    const aliases = Array.isArray(profile.slug_aliases) ? profile.slug_aliases : [];
+    return aliases.some(function(alias) { return String(alias || "").toLowerCase() === wanted; });
   }
 
   function mapCategoryToEntityType(category) {
@@ -669,6 +749,8 @@ window.EntityCore = (function() {
       category: String(post && post.category || "").toLowerCase(),
       entity_type: mapCategoryToEntityType(post && post.category),
       slug: post && post.slug ? post.slug : null,
+      canonical_slug: null,
+      slug_aliases: [],
       post_id: post && post.id ? post.id : null,
       status: status,
       aliases: Array.isArray(meta && meta.entity_profile && meta.entity_profile.aliases)
@@ -684,16 +766,38 @@ window.EntityCore = (function() {
   }
 
   function resolveRelationCategory(rel) {
-    let category = String(rel && (rel.category || rel.group) || "").toLowerCase();
+    const category = String(rel && (rel.category || rel.group) || "").toLowerCase();
     const entityType = String(rel && rel.target_entity_type || "").toLowerCase();
+    const relType = normalizeRelationType(rel && rel.relation_type);
+
     if (entityType === "biome" || category === "biomes") return "biomes";
-    if (entityType === "creature" || category === "creatures") return "creatures";
+    if (entityType === "creature" || entityType === "monster" || entityType === "npc" || entityType === "boss" || category === "creatures") {
+      return "creatures";
+    }
     if (entityType === "item" || category === "items") return "items";
+    if (entityType === "discovery" || category === "discoveries") return "discoveries";
     if (entityType === "location" || category === "locations") {
       if (rel && rel.title && isKnownBiomeName(rel.title)) return "biomes";
+      if (rel && rel.title && isVagueLocationHint(rel.title)) return "location_hint";
       return "locations";
     }
-    return category || "entry";
+
+    if (relType === "drops") return "items";
+    if (relType === "dropped_by") return "creatures";
+
+    const title = meaningful(rel && (rel.canonical_target_name || rel.title));
+    if (title) {
+      const itemTax = inferItemTaxonomy(title, {});
+      if (itemTax.item_type && itemTax.item_type.value !== "unknown") return "items";
+      if (/\b(staff|sword|bow|wand|rod|axe|armor|potion|ring|amulet|shield|helmet|boots|ore|ingot|material|weapon|tool|consumable)\b/i.test(title)) {
+        return "items";
+      }
+      if (/\b(ogre|mage|dragon|wolf|spider|boss|beast|monster|creature|goblin|troll|demon|undead|npc|firefrog)\b/i.test(title)) {
+        return "creatures";
+      }
+    }
+
+    return category || "";
   }
 
   function getRelationDisplayName(rel) {
@@ -963,6 +1067,10 @@ window.EntityCore = (function() {
     ITEM_TYPES: ITEM_TYPES,
     meaningful: meaningful,
     slugify: slugify,
+    buildCanonicalPostSlug: buildCanonicalPostSlug,
+    applyCanonicalSlugMeta: applyCanonicalSlugMeta,
+    postMatchesSlugAlias: postMatchesSlugAlias,
+    slugLooksContextual: slugLooksContextual,
     normalizeTitleKey: normalizeTitleKey,
     parseTitleContext: parseTitleContext,
     extractCanonicalIdentity: extractCanonicalIdentity,

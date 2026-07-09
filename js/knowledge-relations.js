@@ -127,12 +127,50 @@ window.KnowledgeRelations = (function() {
     if (raw === "loot" || raw === "drop") return "drops";
     if (raw === "source" || raw === "drop_source") return "dropped_by";
     if (raw === "area" || raw === "biome") return "located_in";
-    if (raw === "seen_at" || raw === "spotted_in") return "observed_in";
+    if (raw === "seen_at" || raw === "spotted_in" || raw === "observed_at") return "observed_in";
+    if (raw === "encounter_context" || raw === "location_hint") return "observed_in";
+    if (raw === "related_to") return "related_discovery";
     return "related_discovery";
   }
 
-  function getRelationLabel(type) {
+  // Maps JS relation types to vocabulary stored in wiki_relation_types (via RPC upper()).
+  function normalizeRelationTypeForDbSync(type, group) {
+    const js = normalizeRelationType(type);
+    const map = {
+      located_in: "found_in",
+      observed_in: "found_in",
+      observed_at: "found_in",
+      found_near: "found_in",
+      encounter_context: "found_in",
+      location_hint: "found_in",
+      contains: "part_of",
+      related_discovery: "related_to",
+      dropped_by: "drops",
+    };
+    if (map[js]) return map[js];
+    if (["found_in", "drops", "part_of", "requires", "unlocks", "variant_of", "related_to"].includes(js)) {
+      return js;
+    }
+    const groupKey = String(group || "").toLowerCase();
+    if (groupKey === "locations" || groupKey === "biomes") return "found_in";
+    if (groupKey === "items") return "drops";
+    if (groupKey === "creatures") return "related_to";
+    return "related_to";
+  }
+
+  function getRelationLabel(type, rel, viewerCategory) {
     const key = normalizeRelationType(type);
+    const viewer = String(viewerCategory || "").toLowerCase();
+    if (viewer === "biomes" || viewer === "locations") {
+      const entityCat = rel && typeof EntityCore !== "undefined" && EntityCore.resolveRelationCategory
+        ? EntityCore.resolveRelationCategory(rel)
+        : "";
+      if (entityCat === "creatures") return "Known creature";
+      if (entityCat === "items") return "Known item";
+      if (entityCat === "discoveries") return "Related discovery";
+      if (key === "observed_in" || key === "found_near") return "Observed in";
+      if (key === "located_in" || key === "found_in" || key === "part_of") return "Found in biome";
+    }
     return (RELATION_TYPES[key] && RELATION_TYPES[key].label) || formatLabel(key);
   }
 
@@ -642,6 +680,69 @@ window.KnowledgeRelations = (function() {
     return prominence === "primary";
   }
 
+  function relationEntityDedupeKey(rel) {
+    if (!rel) return "";
+    const enriched = typeof EntityCore !== "undefined" ? EntityCore.enrichRelation(rel) : rel;
+    if (enriched.target_entity_key) return String(enriched.target_entity_key).toLowerCase();
+    if (enriched.target_post_id || enriched.id) {
+      const cat = typeof EntityCore !== "undefined"
+        ? EntityCore.resolveRelationCategory(enriched)
+        : String(enriched.category || enriched.group || "entry").toLowerCase();
+      return cat + "|post:" + String(enriched.target_post_id || enriched.id);
+    }
+    if (enriched.target_post_slug || enriched.slug) {
+      const cat = typeof EntityCore !== "undefined"
+        ? EntityCore.resolveRelationCategory(enriched)
+        : String(enriched.category || enriched.group || "entry").toLowerCase();
+      return cat + "|slug:" + String(enriched.target_post_slug || enriched.slug).toLowerCase();
+    }
+    const display = typeof EntityCore !== "undefined"
+      ? EntityCore.getRelationDisplayName(enriched)
+      : (enriched.canonical_target_name || enriched.display_name || enriched.title || "");
+    const cat = typeof EntityCore !== "undefined"
+      ? EntityCore.resolveRelationCategory(enriched)
+      : String(enriched.category || enriched.group || "entry").toLowerCase();
+    return cat + "|" + normalizeTitleKey(display);
+  }
+
+  function countKnownEntitiesForViewer(relations, viewerCategory) {
+    const viewer = String(viewerCategory || "").toLowerCase();
+    if (viewer !== "biomes" && viewer !== "locations") {
+      return { creatures: 0, items: 0, discoveries: 0 };
+    }
+
+    const rels = dedupeRelationsForDisplay(relations);
+    const seenCreatures = new Set();
+    const seenItems = new Set();
+    const seenDiscoveries = new Set();
+    let creatures = 0;
+    let items = 0;
+    let discoveries = 0;
+
+    rels.forEach(function(rel) {
+      const bucket = typeof EntityCore !== "undefined"
+        ? EntityCore.resolveRelationCategory(rel)
+        : String(rel.category || rel.group || "").toLowerCase();
+      if (bucket !== "creatures" && bucket !== "items" && bucket !== "discoveries") return;
+
+      const key = relationEntityDedupeKey(rel);
+      if (!key) return;
+
+      if (bucket === "creatures" && !seenCreatures.has(key)) {
+        seenCreatures.add(key);
+        creatures += 1;
+      } else if (bucket === "items" && !seenItems.has(key)) {
+        seenItems.add(key);
+        items += 1;
+      } else if (bucket === "discoveries" && !seenDiscoveries.has(key)) {
+        seenDiscoveries.add(key);
+        discoveries += 1;
+      }
+    });
+
+    return { creatures: creatures, items: items, discoveries: discoveries };
+  }
+
   function groupRelationsForDisplay(relations, viewerCategory, options) {
     const opts = Object.assign({ limit: isLargeNodeCategory(viewerCategory) ? SECTION_LIMIT_DEFAULT : 24 }, options || {});
     const viewer = String(viewerCategory || "default").toLowerCase();
@@ -654,7 +755,14 @@ window.KnowledgeRelations = (function() {
       const type = normalizeRelationType(rel.relation_type);
       let sectionKey = type;
       if (isLargeNodeCategory(viewer)) {
-        if (type === "drops" || rel.group === "items" || rel.target_entity_type === "item") sectionKey = "items";
+        const entityCat = typeof EntityCore !== "undefined" && EntityCore.resolveRelationCategory
+          ? EntityCore.resolveRelationCategory(rel)
+          : "";
+        if (entityCat === "items") sectionKey = "items";
+        else if (entityCat === "creatures") sectionKey = "creatures";
+        else if (entityCat === "discoveries") sectionKey = "discoveries";
+        else if (entityCat === "locations" || entityCat === "biomes") sectionKey = "locations";
+        else if (type === "drops" || rel.group === "items" || rel.target_entity_type === "item") sectionKey = "items";
         else if (type === "dropped_by" || rel.group === "creatures" || rel.target_entity_type === "creature") sectionKey = "creatures";
         else if (rel.group === "discoveries" || rel.target_entity_type === "discovery") sectionKey = "discoveries";
         else if (rel.group === "locations" || rel.target_entity_type === "location" || rel.target_entity_type === "biome") sectionKey = "locations";
@@ -1196,10 +1304,14 @@ window.KnowledgeRelations = (function() {
     return reconstructDiscoveryMetaFromHtml(html, meta);
   }
 
+  // LEGACY/TEST-DATA FALLBACK ONLY.
   // Older discovery posts stored their payload only as rendered
   // "Structured Findings" HTML, without discovery_payload in BLMETA.
-  // Rebuild the payload + relations from that HTML so the entity/relation
-  // pipeline works for them too.
+  // New posts always persist structured data in BLMETA at create/edit time
+  // (see create-post.js / edit-post.js) and must never rely on this parser.
+  // Reconstruction runs ONLY when structured data is missing; structured
+  // BLMETA always wins and the two sources are never mixed per field group,
+  // so no duplicate relations can result.
   const DISCOVERY_LABEL_KEY_FALLBACKS = {
     "reproduction steps": "how_to_reproduce",
     "name of the discovered entity (item/npc/location/etc.)": "entity_name",
@@ -1309,9 +1421,30 @@ window.KnowledgeRelations = (function() {
     });
 
     const out = Object.assign({}, base);
-    if (!hasPayload && Object.keys(payload).length) out.discovery_payload = payload;
-    if (!hasRelations && relations.length) out.discovery_relations = relations;
+    if (!hasPayload && Object.keys(payload).length) {
+      out.discovery_payload = payload;
+      // Provenance marker: this meta was rebuilt from legacy HTML at runtime.
+      // The admin repair tool uses it to persist the data back into BLMETA.
+      out.discovery_meta_source = "html_reconstruction";
+    }
+    if (!hasRelations && relations.length) {
+      out.discovery_relations = relations;
+      out.discovery_meta_source = "html_reconstruction";
+    }
     return out;
+  }
+
+  // Raw BLMETA parse without the legacy HTML fallback. Used to check what is
+  // actually persisted in the database (e.g. by the admin repair tool).
+  function parseRawMetaFromHtml(html) {
+    const match = String(html || "").match(/<!--BLMETA\s+([\s\S]*?)\s*-->/i);
+    if (!match) return {};
+    try {
+      const parsed = JSON.parse(match[1]);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (err) {
+      return {};
+    }
   }
 
   function injectMetaIntoHtml(html, meta) {
@@ -1677,6 +1810,385 @@ window.KnowledgeRelations = (function() {
     }) || null;
   }
 
+  // Canonical BLMETA serializer used by create-post and edit-post.
+  // Must preserve every structured field the entity/relation pipeline needs.
+  function serializePostMetaForStorage(meta) {
+    if (!meta || typeof meta !== "object") return null;
+    const out = {};
+
+    function setStr(key, value, max) {
+      if (value == null || value === "") return;
+      out[key] = String(value).slice(0, max || 500);
+    }
+
+    setStr("update_phase", meta.update_phase, 32);
+    setStr("patch_tag", meta.patch_tag, 40);
+    setStr("source_url", meta.source_url, 500);
+    setStr("subcategory", meta.subcategory, 60);
+    setStr("discovery_form", meta.discovery_form, 16);
+    setStr("content_origin", meta.content_origin, 16);
+    setStr("discovery_record_id", meta.discovery_record_id, 64);
+    setStr("discovery_record_status", meta.discovery_record_status, 40);
+    setStr("discovery_submitted_at", meta.discovery_submitted_at, 40);
+    setStr("contribution_intent", meta.contribution_intent, 40);
+    setStr("contribution_target", meta.contribution_target, 160);
+    setStr("contribution_field", meta.contribution_field, 60);
+    setStr("place_role", meta.place_role, 40);
+    setStr("discovery_meta_repaired_at", meta.discovery_meta_repaired_at, 40);
+
+    if (meta.discovery_payload && typeof meta.discovery_payload === "object") {
+      const payload = {};
+      Object.keys(meta.discovery_payload).forEach(function(key) {
+        const value = meta.discovery_payload[key];
+        if (value == null || value === "") return;
+        if (typeof value === "number") payload[String(key).slice(0, 60)] = value;
+        else payload[String(key).slice(0, 60)] = String(value).slice(0, 1400);
+      });
+      if (Object.keys(payload).length) out.discovery_payload = payload;
+    }
+
+    if (Array.isArray(meta.discovery_relations)) {
+      out.discovery_relations = meta.discovery_relations.slice(0, 40).map(function(rel) {
+        return sanitizeRelationForMeta(rel);
+      }).filter(function(rel) { return !!rel.title; });
+    }
+
+    if (typeof meta.discovery_relations_skipped === "boolean") {
+      out.discovery_relations_skipped = meta.discovery_relations_skipped;
+    }
+
+    if (Array.isArray(meta.discovery_evidence)) {
+      out.discovery_evidence = meta.discovery_evidence.slice(0, 20).map(function(item) {
+        return {
+          kind: String(item.kind || "evidence").slice(0, 40),
+          label: String(item.label || "Evidence").slice(0, 140),
+          url: item.url ? String(item.url).slice(0, 600) : "",
+          file_type: item.file_type ? String(item.file_type).slice(0, 80) : null,
+          supports: Array.isArray(item.supports) ? item.supports.slice(0, 12).map(function(k) { return String(k).slice(0, 60); }) : [],
+          note: item.note ? String(item.note).slice(0, 400) : "",
+        };
+      }).filter(function(item) { return !!item.url || !!item.label; });
+    }
+
+    if (meta.entity_profile && typeof meta.entity_profile === "object") {
+      const ep = meta.entity_profile;
+      out.entity_profile = {
+        entity_key: String(ep.entity_key || "").slice(0, 160),
+        canonical_name: String(ep.canonical_name || "").slice(0, 140),
+        display_name: String(ep.display_name || "").slice(0, 140),
+        context_title: String(ep.context_title || "").slice(0, 200),
+        context_location: String(ep.context_location || "").slice(0, 200),
+        category: String(ep.category || "").slice(0, 60),
+        entity_type: String(ep.entity_type || "").slice(0, 40),
+      slug: ep.slug ? String(ep.slug).slice(0, 160) : null,
+      canonical_slug: ep.canonical_slug ? String(ep.canonical_slug).slice(0, 160) : null,
+      slug_aliases: Array.isArray(ep.slug_aliases) ? ep.slug_aliases.slice(0, 8).map(function(a) { return String(a).slice(0, 160); }) : [],
+      post_id: ep.post_id || null,
+        status: String(ep.status || "").slice(0, 40),
+        biome_primary: String(ep.biome_primary || "").slice(0, 120),
+        location_context: String(ep.location_context || "").slice(0, 200),
+        source_post_id: ep.source_post_id || null,
+        source_post_slug: ep.source_post_slug ? String(ep.source_post_slug).slice(0, 160) : null,
+        source_post_title: ep.source_post_title ? String(ep.source_post_title).slice(0, 140) : null,
+        aliases: Array.isArray(ep.aliases) ? ep.aliases.slice(0, 8).map(function(a) { return String(a).slice(0, 80); }) : [],
+      };
+      if (ep.taxonomy && typeof ep.taxonomy === "object") {
+        out.entity_profile.taxonomy = ep.taxonomy;
+      }
+    }
+
+    if (meta.entity_taxonomy && typeof meta.entity_taxonomy === "object") {
+      out.entity_taxonomy = meta.entity_taxonomy;
+    }
+
+    if (meta.contribution && typeof meta.contribution === "object") {
+      const c = meta.contribution;
+      out.contribution = {
+        target_post_id: c.target_post_id || null,
+        target_post_slug: c.target_post_slug ? String(c.target_post_slug).slice(0, 160) : null,
+        target_title: c.target_title ? String(c.target_title).slice(0, 140) : null,
+        target_category: c.target_category ? String(c.target_category).slice(0, 60) : null,
+        target_entity_type: c.target_entity_type ? String(c.target_entity_type).slice(0, 40) : null,
+        entity_key: c.entity_key ? String(c.entity_key).slice(0, 160) : null,
+        intent: c.intent ? String(c.intent).slice(0, 40) : null,
+        missing_field: c.missing_field ? String(c.missing_field).slice(0, 60) : null,
+        source_page: c.source_page ? String(c.source_page).slice(0, 300) : null,
+        status: c.status ? String(c.status).slice(0, 40) : "pending_review",
+        confidence_level: c.confidence_level ? String(c.confidence_level).slice(0, 40) : null,
+        created_from_existing_entry: !!c.created_from_existing_entry,
+        submitted_at: c.submitted_at ? String(c.submitted_at).slice(0, 40) : null,
+        merged_at: c.merged_at ? String(c.merged_at).slice(0, 40) : null,
+        submitted_fields: c.submitted_fields && typeof c.submitted_fields === "object" ? c.submitted_fields : {},
+      };
+    }
+
+    if (Array.isArray(meta.contribution_log)) {
+      out.contribution_log = meta.contribution_log.slice(0, 30);
+    }
+
+    const knowledgeMeta = normalizeKnowledgeMeta(meta);
+    if (knowledgeMeta) {
+      if (knowledgeMeta.knowledge_entry) out.knowledge_entry = knowledgeMeta.knowledge_entry;
+      if (knowledgeMeta.knowledge_graph) out.knowledge_graph = knowledgeMeta.knowledge_graph;
+    }
+
+    if (Array.isArray(meta.guide_references)) {
+      out.guide_references = meta.guide_references.slice(0, 12).map(function(ref) {
+        return {
+          id: ref.id || null,
+          slug: ref.slug ? String(ref.slug).slice(0, 160) : null,
+          title: String(ref.title || "").slice(0, 140),
+          category: ref.category ? String(ref.category).slice(0, 60) : null,
+          post_type: ref.post_type ? String(ref.post_type).slice(0, 40) : null,
+        };
+      }).filter(function(ref) { return !!ref.title; });
+    }
+
+    return Object.keys(out).length ? out : null;
+  }
+
+  // Persist structured BLMETA for legacy posts that only have rendered HTML.
+  // Idempotent: skips posts that already have full structured data.
+  async function repairStructuredMetaForPosts(client, options) {
+    const opts = options || {};
+    if (!client) return { ok: false, reason: "Client missing", inspected: 0, repaired: 0, skipped: 0 };
+
+    let query = client
+      .from("posts")
+      .select("id, slug, title, category, post_type, content, status")
+      .is("deleted_at", null)
+      .order("created_at", { ascending: true })
+      .limit(opts.limit || 200);
+
+    if (Array.isArray(opts.slugs) && opts.slugs.length) {
+      query = query.in("slug", opts.slugs);
+    } else if (opts.status) {
+      query = query.eq("status", opts.status);
+    }
+
+    const { data: posts, error } = await query;
+    if (error) return { ok: false, reason: error.message, inspected: 0, repaired: 0, skipped: 0 };
+
+    let inspected = 0;
+    let repaired = 0;
+    let skipped = 0;
+    const notes = [];
+
+    for (let i = 0; i < (posts || []).length; i += 1) {
+      const post = posts[i];
+      inspected += 1;
+      const raw = parseRawMetaFromHtml(post.content || "");
+      const hasPayload = raw.discovery_payload && typeof raw.discovery_payload === "object"
+        && Object.keys(raw.discovery_payload).length > 0;
+      const hasRelations = Array.isArray(raw.discovery_relations) && raw.discovery_relations.length > 0;
+      const needsEntityProfile = hasPayload && !(raw.entity_profile && raw.entity_profile.entity_key);
+      const needsRelationCanon = hasRelations && raw.discovery_relations.some(function(rel) {
+        return rel && rel.title && (!rel.canonical_target_name || !rel.target_entity_key);
+      });
+
+      if (hasPayload && hasRelations && !needsEntityProfile && !needsRelationCanon) {
+        skipped += 1;
+        continue;
+      }
+
+      const full = parseMetaFromHtml(post.content || "");
+      const canPayload = !hasPayload && full.discovery_payload && Object.keys(full.discovery_payload).length > 0;
+      const canRelations = !hasRelations && Array.isArray(full.discovery_relations) && full.discovery_relations.length > 0;
+
+      if (!canPayload && !canRelations && !needsEntityProfile && !needsRelationCanon) {
+        skipped += 1;
+        continue;
+      }
+
+      const repairMeta = Object.assign({}, raw);
+      if (canPayload) repairMeta.discovery_payload = full.discovery_payload;
+      if (canRelations) {
+        repairMeta.discovery_relations = full.discovery_relations.map(function(rel) {
+          return sanitizeRelationForMeta(rel);
+        });
+      } else if (needsRelationCanon) {
+        repairMeta.discovery_relations = raw.discovery_relations.map(function(rel) {
+          return sanitizeRelationForMeta(rel);
+        });
+      }
+
+      if (typeof EntityCore !== "undefined") {
+        const normalized = EntityCore.normalizeEntityMeta(post, repairMeta, { repairPayload: true });
+        Object.assign(repairMeta, normalized.meta);
+        if (needsEntityProfile || !repairMeta.entity_profile) {
+          repairMeta.entity_profile = EntityCore.buildEntityProfile(post, repairMeta);
+          if (repairMeta.entity_profile && repairMeta.entity_profile.taxonomy) {
+            repairMeta.entity_taxonomy = repairMeta.entity_profile.taxonomy;
+          }
+        }
+      }
+
+      if (typeof BoundLoreTestData !== "undefined" && BoundLoreTestData.shouldMarkAsTestData()) {
+        repairMeta.content_origin = BoundLoreTestData.ORIGIN_TEST;
+      }
+      repairMeta.discovery_meta_repaired_at = new Date().toISOString();
+      delete repairMeta.discovery_meta_source;
+
+      const serialized = serializePostMetaForStorage(repairMeta);
+      if (!serialized) {
+        skipped += 1;
+        notes.push(post.slug + ": nothing to serialize");
+        continue;
+      }
+
+      const content = injectMetaIntoHtml(post.content || "", serialized);
+      const { error: updateError } = await client.from("posts").update({ content: content }).eq("id", post.id);
+      if (updateError) {
+        skipped += 1;
+        notes.push(post.slug + ": " + updateError.message);
+        continue;
+      }
+      repaired += 1;
+    }
+
+    return { ok: true, inspected: inspected, repaired: repaired, skipped: skipped, notes: notes };
+  }
+
+  // Normalize discovery BLMETA immediately before admin approval / RPC sync.
+  function prepareDiscoveryMetaForApproval(post, meta) {
+    const repairMeta = Object.assign({}, meta || {});
+    const payload = Object.assign({}, repairMeta.discovery_payload || {});
+    let canonicalTitle = String(post && post.title || "").trim();
+
+    if (typeof EntityCore !== "undefined") {
+      const normalized = EntityCore.normalizeEntityMeta(post, repairMeta, { repairPayload: true });
+      Object.assign(repairMeta, normalized.meta);
+      Object.assign(payload, repairMeta.discovery_payload || {});
+
+      const identity = EntityCore.extractCanonicalIdentity(
+        meaningfulValue(payload.entity_name) || post.title,
+        post.category,
+        { payload: payload }
+      );
+      if (identity.canonical_name) {
+        payload.entity_name = identity.canonical_name;
+        canonicalTitle = identity.canonical_name;
+      }
+
+      let hint = meaningfulValue(payload.encounter_context)
+        || meaningfulValue(payload.location_hint)
+        || identity.location_hint
+        || "";
+      if (hint && /^in\s+(?:near|at|around|by|close to)\b/i.test(hint)) {
+        hint = hint.replace(/^in\s+/i, "").trim();
+      }
+      if (hint) {
+        payload.encounter_context = hint;
+        payload.location_hint = hint;
+        if (EntityCore.isVagueLocationHint(hint)) {
+          if (meaningfulValue(payload.found_in) && EntityCore.isVagueLocationHint(payload.found_in)) {
+            delete payload.found_in;
+          }
+        }
+      }
+
+      repairMeta.entity_profile = EntityCore.buildEntityProfile(
+        Object.assign({}, post, { title: canonicalTitle }),
+        Object.assign({}, repairMeta, { discovery_payload: payload })
+      );
+      if (repairMeta.entity_profile && repairMeta.entity_profile.taxonomy) {
+        repairMeta.entity_taxonomy = repairMeta.entity_profile.taxonomy;
+      }
+    }
+
+    if (typeof EntityCore !== "undefined" && EntityCore.applyCanonicalSlugMeta) {
+      const slugRepair = EntityCore.applyCanonicalSlugMeta(post, repairMeta);
+      Object.assign(repairMeta, slugRepair.meta);
+      canonicalTitle = slugRepair.title || canonicalTitle;
+    }
+
+    repairMeta.discovery_payload = payload;
+
+    if (Array.isArray(repairMeta.discovery_relations)) {
+      repairMeta.discovery_relations = repairMeta.discovery_relations.map(function(rel) {
+        const sanitized = sanitizeRelationForMeta(rel);
+        sanitized.relation_type = normalizeRelationTypeForDbSync(sanitized.relation_type, sanitized.group);
+        if (!sanitized.category && sanitized.group) {
+          sanitized.category = mapGroupToCategory(String(sanitized.group).toLowerCase(), sanitized);
+        }
+        return sanitized;
+      });
+    }
+
+    const serialized = serializePostMetaForStorage(repairMeta);
+    const slugUpdate = repairMeta.entity_profile && repairMeta.entity_profile.canonical_slug
+      ? repairMeta.entity_profile.canonical_slug
+      : null;
+    return {
+      meta: serialized || repairMeta,
+      title: canonicalTitle,
+      slug: slugUpdate,
+      previousSlug: (post && post.slug && slugUpdate && post.slug !== slugUpdate) ? post.slug : null,
+    };
+  }
+
+  async function repairCanonicalEntitySlugsForPosts(client, options) {
+    const opts = options || {};
+    if (!client || typeof EntityCore === "undefined" || !EntityCore.applyCanonicalSlugMeta) {
+      return { ok: false, reason: "Helpers missing", inspected: 0, repaired: 0, skipped: 0 };
+    }
+
+    let query = client
+      .from("posts")
+      .select("id, slug, title, category, post_type, content, status")
+      .is("deleted_at", null)
+      .eq("status", "published")
+      .order("created_at", { ascending: true })
+      .limit(opts.limit || 200);
+
+    if (Array.isArray(opts.slugs) && opts.slugs.length) {
+      query = query.in("slug", opts.slugs);
+    } else {
+      query = query.in("category", ["creatures", "items", "biomes", "locations"]);
+    }
+
+    const { data: posts, error } = await query;
+    if (error) return { ok: false, reason: error.message, inspected: 0, repaired: 0, skipped: 0 };
+
+    let inspected = 0;
+    let repaired = 0;
+    let skipped = 0;
+    const notes = [];
+
+    for (let i = 0; i < (posts || []).length; i += 1) {
+      const post = posts[i];
+      inspected += 1;
+      const raw = parseRawMetaFromHtml(post.content || "");
+      const repair = EntityCore.applyCanonicalSlugMeta(post, raw);
+      const needsSlug = repair.slug && post.slug !== repair.slug;
+      const needsTitle = repair.title && post.title !== repair.title;
+      if (!needsSlug && !needsTitle) {
+        skipped += 1;
+        continue;
+      }
+      if (repair.slug && !EntityCore.slugLooksContextual(post.slug, repair.title) && !needsTitle) {
+        skipped += 1;
+        continue;
+      }
+
+      const serialized = serializePostMetaForStorage(repair.meta);
+      const content = injectMetaIntoHtml(post.content || "", serialized || repair.meta);
+      const update = { content: content };
+      if (repair.title) update.title = repair.title;
+      if (repair.slug) update.slug = repair.slug;
+
+      const { error: updateError } = await client.from("posts").update(update).eq("id", post.id);
+      if (updateError) {
+        skipped += 1;
+        notes.push(post.slug + ": " + updateError.message);
+        continue;
+      }
+      repaired += 1;
+    }
+
+    return { ok: true, inspected: inspected, repaired: repaired, skipped: skipped, notes: notes };
+  }
+
   return {
     RELATION_TYPES: RELATION_TYPES,
     normalizeRelationType: normalizeRelationType,
@@ -1698,12 +2210,15 @@ window.KnowledgeRelations = (function() {
     applyFollowUpAnswersToPayload: applyFollowUpAnswersToPayload,
     appendInboundRelationToPost: appendInboundRelationToPost,
     dedupeRelationsForDisplay: dedupeRelationsForDisplay,
+    relationEntityDedupeKey: relationEntityDedupeKey,
+    countKnownEntitiesForViewer: countKnownEntitiesForViewer,
     relationsFromDiscoveryPost: relationsFromDiscoveryPost,
     collectEntityRelations: collectEntityRelations,
     inferRelationsFromPayloadForApproval: inferRelationsFromPayloadForApproval,
     evaluateKnowledgeEntryApproval: evaluateKnowledgeEntryApproval,
     findExistingKnowledgePost: findExistingKnowledgePost,
     safeParseMeta: safeParseMeta,
+    parseRawMetaFromHtml: parseRawMetaFromHtml,
     normalizeTitleKey: normalizeTitleKey,
     mapGroupToCategory: mapGroupToCategory,
     inferTargetEntityType: inferTargetEntityType,
@@ -1720,5 +2235,10 @@ window.KnowledgeRelations = (function() {
     resolveContributionTargetPost: resolveContributionTargetPost,
     mergeContributionIntoTarget: mergeContributionIntoTarget,
     findPendingContributionDuplicate: findPendingContributionDuplicate,
+    serializePostMetaForStorage: serializePostMetaForStorage,
+    repairStructuredMetaForPosts: repairStructuredMetaForPosts,
+    normalizeRelationTypeForDbSync: normalizeRelationTypeForDbSync,
+    prepareDiscoveryMetaForApproval: prepareDiscoveryMetaForApproval,
+    repairCanonicalEntitySlugsForPosts: repairCanonicalEntitySlugsForPosts,
   };
 })();
