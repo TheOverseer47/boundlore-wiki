@@ -138,14 +138,6 @@
       <p style="color:#e0a83a;margin:10px 0 14px;font-size:0.9rem;border:1px solid rgba(224,168,58,0.35);padding:10px 12px;border-radius:6px;background:rgba(224,168,58,0.08);">
         These actions modify database content. Use only for maintenance.
       </p>
-      <!-- Lifecycle: PRE-RELEASE ONLY — remove before deploy -->
-      <div class="form-box" id="swampRepairPanel" style="margin-bottom:16px;border-color:rgba(224,168,58,0.25);">
-        <h3 style="margin-top:0;">Swamp Test Data Repair</h3>
-        <p style="color:var(--text-muted);margin:0 0 10px;">Normalize known Swamp/Swamplands test stubs (category, title, BLMETA). <strong>Pre-release only.</strong></p>
-        <p style="color:var(--text-muted);margin:0 0 10px;font-size:0.88rem;">SQL baseline: <code>supabase/repair_swamp_test_data.sql</code></p>
-        <button id="btnRepairSwampTestData" class="btn-small" type="button" style="background:#c97c2d;">Run Swamp repair (preview → confirm)</button>
-        <p id="swampRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
-      </div>
       <!-- Lifecycle: LEGACY MIGRATION — remove when all posts have structured BLMETA -->
       <div class="form-box" id="structuredMetaRepairPanel" style="margin-bottom:16px;border-color:rgba(224,168,58,0.25);">
         <h3 style="margin-top:0;">Structured BLMETA Repair</h3>
@@ -255,8 +247,10 @@
       <p style="color:var(--text-muted);">Current wiki content is development/test data. Before launch, run the guarded SQL reset in Supabase to remove marked test posts without touching system configuration.</p>
       <ul class="source-list">
         <li>Marker: BLMETA <code>content_origin: "test"</code> (auto on localhost)</li>
-        <li>SQL file: <code>supabase/pre_release_test_data_reset.sql</code></li>
-        <li>Confirmation token required inside SQL session — no in-app delete button</li>
+        <li>Dry-run (read-only, run first): <code>supabase/pre_release_reset_dry_run.sql</code></li>
+        <li>Destructive reset: <code>supabase/pre_release_test_data_reset.sql</code></li>
+        <li>Docs: <code>supabase/PRE_RELEASE_RESET_README.md</code></li>
+        <li>Confirmation token required in same SQL Editor batch — no in-app delete button</li>
       </ul>
       <p id="preReleaseTestCount" style="margin-top:12px;color:var(--text-muted);">Loading test data stats...</p>
     </div>
@@ -475,7 +469,6 @@ function initAdminControls() {
   document.getElementById("btnDisablePatchMode")?.addEventListener("click", function() {
     saveWikiPatchModeA(false);
   });
-  document.getElementById("btnRepairSwampTestData")?.addEventListener("click", runSwampRepairWithDangerZoneA);
   document.getElementById("btnRepairStructuredMeta")?.addEventListener("click", runStructuredMetaRepairWithDangerZoneA);
   document.getElementById("btnRepairContributionDuplicates")?.addEventListener("click", runContributionRepairWithDangerZoneA);
 }
@@ -485,69 +478,6 @@ function requireDangerZoneTypedConfirmationA(expectedPhrase, actionLabel) {
     "DANGER ZONE\n\nType exactly:\n" + expectedPhrase + "\n\nTo confirm: " + actionLabel
   );
   return String(typed || "").trim() === expectedPhrase;
-}
-
-async function previewSwampRepairA() {
-  if (typeof EntityCore === "undefined") return { ok: false, reason: "EntityCore missing" };
-  const { data: posts, error } = await supabase
-    .from("posts")
-    .select("id, slug, title, category, content, post_type")
-    .in("slug", SWAMP_REPAIR_SLUGS);
-  if (error || !Array.isArray(posts)) {
-    return { ok: false, reason: error && error.message ? error.message : "load failed" };
-  }
-  let wouldRepair = 0;
-  let skipped = 0;
-  for (let i = 0; i < posts.length; i += 1) {
-    const post = posts[i];
-    const meta = parsePostMetaA(post.content || "");
-    const repair = EntityCore.normalizeEntityMeta(post, meta, { repairPayload: true });
-    const payload = repair.meta.discovery_payload && typeof repair.meta.discovery_payload === "object"
-      ? repair.meta.discovery_payload
-      : {};
-    const placeInfo = EntityCore.classifyPlaceEntry(post.title, post.category, payload);
-    let category = post.category;
-    let title = post.title;
-    if (placeInfo.effective_category === "biomes") {
-      category = "biomes";
-      title = placeInfo.canonical_name || "Swamp";
-    } else if (placeInfo.effective_category === "location_hint") {
-      title = placeInfo.location_hint || placeInfo.canonical_name || title;
-    } else if (post.slug === "ogre-mage-in-swamplands-near-a-campfire-9651e6") {
-      category = "creatures";
-      title = EntityCore.extractCanonicalIdentity(post.title, "creatures", { payload: payload }).canonical_name || "Ogre Mage";
-    }
-    const content = injectPostMetaA(stripPostMetaA(post.content || ""), repair.meta);
-    if (category !== post.category || title !== post.title || content !== (post.content || "")) {
-      wouldRepair += 1;
-    } else {
-      skipped += 1;
-    }
-  }
-  return { ok: true, inspected: posts.length, wouldRepair: wouldRepair, skipped: skipped };
-}
-
-async function runSwampRepairWithDangerZoneA() {
-  const msg = document.getElementById("swampRepairMsg");
-  if (typeof EntityCore === "undefined") {
-    if (msg) msg.textContent = "EntityCore is not loaded.";
-    return;
-  }
-  if (msg) msg.textContent = "Running preview...";
-  const preview = await previewSwampRepairA();
-  if (!preview.ok) {
-    if (msg) msg.textContent = "Preview failed: " + (preview.reason || "unknown error");
-    return;
-  }
-  if (msg) {
-    msg.textContent = "Preview: inspected " + preview.inspected + ", would repair " + preview.wouldRepair
-      + ", would skip " + preview.skipped + ". Type REPAIR SWAMP to continue.";
-  }
-  if (!requireDangerZoneTypedConfirmationA("REPAIR SWAMP", "Swamp test data repair")) {
-    if (msg) msg.textContent = (msg.textContent || "") + " Cancelled.";
-    return;
-  }
-  await repairSwampTestDataA(true);
 }
 
 // Repairs contribution posts that leaked into public lists as standalone
@@ -739,85 +669,6 @@ async function repairContributionDuplicatesA(fromDangerZone) {
   }
   await logAdminAction("repair_contribution_duplicates", "system", null,
     "Merged " + merged + ", archived " + archived + ", skipped " + skipped);
-}
-
-const SWAMP_REPAIR_SLUGS = [
-  "swamplands-94dadc07",
-  "swamplands-near-a-campfire-787bbd19",
-  "ogre-mage-in-swamplands-near-a-campfire-9651e6",
-];
-
-async function repairSwampTestDataA(fromDangerZone) {
-  const msg = document.getElementById("swampRepairMsg");
-  if (typeof EntityCore === "undefined") {
-    if (msg) msg.textContent = "EntityCore is not loaded.";
-    return;
-  }
-  if (!fromDangerZone) return;
-  if (msg) msg.textContent = "Repairing...";
-
-  const { data: posts, error } = await supabase
-    .from("posts")
-    .select("id, slug, title, category, content, post_type")
-    .in("slug", SWAMP_REPAIR_SLUGS);
-
-  if (error || !Array.isArray(posts)) {
-    if (msg) msg.textContent = "Failed to load posts: " + (error && error.message ? error.message : "unknown error");
-    return;
-  }
-
-  let repaired = 0;
-  for (let i = 0; i < posts.length; i += 1) {
-    const post = posts[i];
-    const meta = parsePostMetaA(post.content || "");
-    const repair = EntityCore.normalizeEntityMeta(post, meta, { repairPayload: true });
-    const payload = repair.meta.discovery_payload && typeof repair.meta.discovery_payload === "object"
-      ? repair.meta.discovery_payload
-      : {};
-    const placeInfo = EntityCore.classifyPlaceEntry(post.title, post.category, payload);
-    let category = post.category;
-    let title = post.title;
-
-    if (placeInfo.effective_category === "biomes") {
-      category = "biomes";
-      title = placeInfo.canonical_name || "Swamp";
-      repair.meta.subcategory = "swamp";
-      if (!payload.discovery_type) payload.discovery_type = "biome";
-    } else if (placeInfo.effective_category === "location_hint") {
-      title = placeInfo.location_hint || placeInfo.canonical_name || title;
-      repair.meta.place_role = "location_hint";
-      if (!repair.meta.knowledge_entry) repair.meta.knowledge_entry = {};
-      repair.meta.knowledge_entry.status = "needs_details";
-      repair.meta.knowledge_entry.completeness = "stub";
-      if (placeInfo.biome_name) payload.region_name = placeInfo.biome_name;
-    } else if (post.slug === "ogre-mage-in-swamplands-near-a-campfire-9651e6") {
-      category = "creatures";
-      title = EntityCore.extractCanonicalIdentity(post.title, "creatures", { payload: payload }).canonical_name || "Ogre Mage";
-      if (!payload.discovery_type) payload.discovery_type = "monster";
-    }
-
-    repair.meta.discovery_payload = payload;
-    const content = injectPostMetaA(stripPostMetaA(post.content || ""), repair.meta);
-    const { error: updateError } = await supabase
-      .from("posts")
-      .update({ category: category, title: title, content: content })
-      .eq("id", post.id);
-    if (!updateError) repaired += 1;
-  }
-
-  // Persist HTML-reconstructed payload/relations for known slugs.
-  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.repairStructuredMetaForPosts) {
-    const structResult = await KnowledgeRelations.repairStructuredMetaForPosts(supabase, { slugs: SWAMP_REPAIR_SLUGS });
-    if (msg && structResult.repaired) {
-      msg.textContent = "Repaired " + repaired + " of " + SWAMP_REPAIR_SLUGS.length
-        + " known test post(s). Structured BLMETA: +" + structResult.repaired + ".";
-    }
-  }
-
-  if (msg && !msg.textContent.includes("Structured BLMETA")) {
-    msg.textContent = "Repaired " + repaired + " of " + SWAMP_REPAIR_SLUGS.length + " known test post(s).";
-  }
-  await logAdminAction("repair_swamp_test_data", "system", null, "Repaired " + repaired + " swamp test stubs");
 }
 
 async function archivePostA(postId, reason) {

@@ -54,8 +54,10 @@ window.BoundLoreTestData = (function() {
   function getResetInstructions() {
     return {
       token: RESET_CONFIRM_TOKEN,
+      dryRunFile: "supabase/pre_release_reset_dry_run.sql",
       sqlFile: "supabase/pre_release_test_data_reset.sql",
-      summary: "Run manually in Supabase SQL editor before game release. Requires confirmation token inside the SQL file.",
+      readme: "supabase/PRE_RELEASE_RESET_README.md",
+      summary: "Run dry-run first, then destructive reset manually in Supabase SQL editor before game release. Requires confirmation token in same SQL Editor batch.",
     };
   }
 

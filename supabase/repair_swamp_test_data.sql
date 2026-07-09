@@ -1,7 +1,12 @@
--- Swamp biome test data repair (idempotent)
--- Run in Supabase SQL editor after wiki_patch_mode.sql if needed.
+-- =============================================================================
+-- Swamp biome test data repair — PRE-RELEASE / TEST-ONLY
+-- =============================================================================
+-- NOT exposed in Admin UI (removed before deploy).
+-- For local Swamp/Swamplands QA normalization only.
 -- Does NOT delete posts. Only normalizes known test slugs.
--- For BLMETA / entity_profile repair, also run Admin → "Repair Swamp test data".
+-- Idempotent. Run manually in Supabase SQL Editor if needed during dev.
+-- See: supabase/PRE_RELEASE_RESET_README.md
+-- =============================================================================
 
 begin;
 

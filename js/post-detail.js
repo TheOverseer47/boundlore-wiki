@@ -28,7 +28,7 @@ async function init() {
     isAdmin = profile && profile.role === "admin";
   }
 
-  const resolved = await resolvePostRequestPD(slug, postId);
+  const resolved = await resolvePostRequestPD(slug, postId, { publicOnly: !isAdmin });
   const post = resolved.post;
   if (!post) return showNotFound();
 
@@ -46,21 +46,23 @@ async function init() {
   wireCommentForm(post.id);
 }
 
-async function resolvePostRequestPD(slug, postId) {
+async function resolvePostRequestPD(slug, postId, options) {
+  const opts = options || {};
+  const publicOnly = !!opts.publicOnly;
   const select = "*, profiles:author_id(*)";
 
   if (postId) {
-    const { data, error } = await supabase.from("posts").select(select).eq("id", postId).maybeSingle();
+    let byIdQuery = supabase.from("posts").select(select).eq("id", postId);
+    if (publicOnly) byIdQuery = byIdQuery.is("deleted_at", null);
+    const { data, error } = await byIdQuery.maybeSingle();
     return { post: error ? null : data, canonicalSlug: data && data.slug ? data.slug : null };
   }
 
   if (!slug) return { post: null, canonicalSlug: null };
 
-  const { data: direct, error: directError } = await supabase
-    .from("posts")
-    .select(select)
-    .eq("slug", slug)
-    .maybeSingle();
+  let directQuery = supabase.from("posts").select(select).eq("slug", slug);
+  if (publicOnly) directQuery = directQuery.is("deleted_at", null);
+  const { data: direct, error: directError } = await directQuery.maybeSingle();
   if (!directError && direct) {
     const meta = parsePostMetaPD(direct.content || "");
     const canonical = getCanonicalPostSlugPD(direct, meta);
