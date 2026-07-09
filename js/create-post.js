@@ -1385,6 +1385,7 @@ async function handleSubmit(e) {
     currentPostType === "discovery"
     && typeof DiscoveryWizard !== "undefined"
     && DiscoveryWizard.isActive()
+    && !isResourceQuickAddModeCP()
     && structuredDiscoveryEnabled
     && postMeta.discovery_payload
   ) {
