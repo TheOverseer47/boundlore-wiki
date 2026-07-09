@@ -1,0 +1,82 @@
+{
+  "$schema": "boundlore/evidence-tier-vocabulary",
+  "description": "Controlled vocabulary for evidence tiering on facts and relations.",
+  "evidence_tiers": {
+    "confirmed": {
+      "label": "Confirmed",
+      "description": "Official source or admin-verified with linked evidence",
+      "badge_color": "green",
+      "sort_priority": 4,
+      "examples": ["Official trailer mechanic", "Admin promotion with source link"]
+    },
+    "observed": {
+      "label": "Observed",
+      "description": "Player observation with screenshot, video, or reproducible steps",
+      "badge_color": "blue",
+      "sort_priority": 3,
+      "examples": ["Screenshot of drop", "Video of boss fight"]
+    },
+    "reported": {
+      "label": "Reported",
+      "description": "Community report without strong evidence attachment",
+      "badge_color": "amber",
+      "sort_priority": 2,
+      "examples": ["Stat contribution without screenshot", "Recipe from memory"]
+    },
+    "speculative": {
+      "label": "Speculative",
+      "description": "Community interpretation or unverified theory",
+      "badge_color": "gray",
+      "sort_priority": 1,
+      "examples": ["Lore interpretation", "Unconfirmed quest hint"]
+    }
+  },
+  "confidence_levels": {
+    "single_observation": {
+      "label": "Single observation",
+      "description": "One independent report",
+      "min_report_count": 1
+    },
+    "corroborated": {
+      "label": "Corroborated",
+      "description": "Multiple independent matching reports",
+      "min_report_count": 2
+    },
+    "verified": {
+      "label": "Verified",
+      "description": "Admin or official source confirmed",
+      "min_report_count": null
+    }
+  },
+  "example_fact_with_provenance": {
+    "field": "damage",
+    "value": 42,
+    "evidence_tier": "reported",
+    "confidence": "corroborated",
+    "sources": [
+      {
+        "post_id": "contribution-stats-aaa",
+        "user_id": "user-111",
+        "submitted_at": "2026-07-09T10:00:00Z",
+        "evidence_type": null
+      },
+      {
+        "post_id": "contribution-stats-bbb",
+        "user_id": "user-222",
+        "submitted_at": "2026-07-09T14:00:00Z",
+        "evidence_type": "screenshot"
+      }
+    ],
+    "conflict": {
+      "status": "needs_review",
+      "disputed_value": 77,
+      "disputed_source": "contribution-stats-ccc"
+    }
+  },
+  "normalization_rules": {
+    "default_tier_for_contributions": "reported",
+    "default_tier_for_official_import": "confirmed",
+    "default_confidence_for_new_relation": "single_observation",
+    "promotion_requires": "admin_or_trusted_with_evidence_link"
+  }
+}

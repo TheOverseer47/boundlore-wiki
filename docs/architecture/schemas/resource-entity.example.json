@@ -1,0 +1,56 @@
+{
+  "$schema": "boundlore/blmeta-example",
+  "description": "Example BLMETA for a resource entity. Recipes are NOT separate posts.",
+  "entity_domain": "OBJECT",
+  "entity_subtype": "resource",
+  "content_origin": "test",
+  "evidence_tier": "reported",
+  "completeness": "needs_details",
+  "facts": {
+    "source_type": {
+      "value": "mining",
+      "tier": "reported",
+      "sources": ["post:qa-ember-shard-abc123"]
+    },
+    "rarity": {
+      "value": "uncommon",
+      "tier": "reported",
+      "sources": ["post:qa-ember-shard-abc123"]
+    }
+  },
+  "relations_out": [
+    {
+      "type": "harvested_from",
+      "target_slug": "volcanic-biome-stub",
+      "target_domain": "PLACE",
+      "confidence": "single_observation",
+      "evidence_tier": "reported",
+      "properties": {
+        "conditions": null,
+        "quantity": null,
+        "rate": null,
+        "source_post_id": "qa-ember-shard-abc123",
+        "report_count": 1
+      }
+    }
+  ],
+  "relations_in": [
+    {
+      "type": "ingredient_of",
+      "source_slug": "qa-staff-of-fire-2b742628",
+      "source_domain": "OBJECT",
+      "confidence": "single_observation",
+      "evidence_tier": "reported",
+      "properties": {
+        "quantity": 3,
+        "source_post_id": "contribution-recipe-xyz",
+        "report_count": 1
+      }
+    }
+  ],
+  "discovery_payload": {
+    "discovery_type": "resource",
+    "entity_name": "Ember Shard",
+    "found_in": "Volcanic"
+  }
+}

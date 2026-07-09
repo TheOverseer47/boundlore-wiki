@@ -1,0 +1,62 @@
+{
+  "$schema": "boundlore/blmeta-example",
+  "description": "Lore entry with separated transcript and interpretation.",
+  "entity_domain": "KNOWLEDGE",
+  "entity_subtype": "inscription",
+  "content_origin": "test",
+  "evidence_tier": "observed",
+  "completeness": "solid",
+  "facts": {
+    "transcript": {
+      "value": "When the tides recede, the Tyrant of the Marsh awakens beneath the sunken stones.",
+      "tier": "observed",
+      "sources": ["post:qa-lore-tablet-of-tides-ghi789"],
+      "evidence_type": "in_game_text_transcript",
+      "note": "Verbatim — edits require review"
+    },
+    "interpretation": {
+      "value": "Likely refers to Marsh Tyrant boss in Sunken Temple.",
+      "tier": "speculative",
+      "sources": ["post:qa-lore-tablet-of-tides-ghi789"],
+      "note": "Always speculative until corroborated — visually separated on page"
+    },
+    "found_location": {
+      "value": "Sunken Temple entrance",
+      "tier": "observed"
+    }
+  },
+  "relations_out": [
+    {
+      "type": "found_in",
+      "target_slug": "qa-sunken-temple-def456",
+      "target_domain": "PLACE",
+      "confidence": "single_observation",
+      "evidence_tier": "observed"
+    },
+    {
+      "type": "mentions",
+      "target_slug": "qa-boss-marsh-tyrant",
+      "target_domain": "BEING",
+      "target_subtype": "boss",
+      "confidence": "single_observation",
+      "evidence_tier": "speculative",
+      "properties": {
+        "note": "Interpretation link — tier matches interpretation fact"
+      }
+    }
+  ],
+  "evidence_requirements": {
+    "transcript": {
+      "required": true,
+      "accepted_types": ["screenshot", "in_game_text_transcript", "video_clip"]
+    },
+    "interpretation": {
+      "required": false,
+      "always_tier": "speculative"
+    }
+  },
+  "discovery_payload": {
+    "discovery_type": "lore",
+    "entity_name": "Tablet of Tides"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "boundlore/recipe-fact-example",
+  "description": "Recipe stored as relations on target item — NOT a separate post/entity.",
+  "target_item": {
+    "slug": "qa-staff-of-fire-2b742628",
+    "title": "QA Staff of Fire",
+    "entity_domain": "OBJECT",
+    "entity_subtype": "weapon"
+  },
+  "recipe": {
+    "evidence_tier": "reported",
+    "confidence": "single_observation",
+    "source_post_id": "contribution-add-recipe-xyz789",
+    "review_status": "pending",
+    "crafted_at": {
+      "relation_type": "crafted_at",
+      "target_slug": "forge-station-stub",
+      "target_domain": "SYSTEM",
+      "target_subtype": "crafting_station",
+      "title": "Forge"
+    },
+    "ingredients": [
+      {
+        "relation_type": "crafted_from",
+        "target_slug": "qa-ember-shard-abc123",
+        "target_domain": "OBJECT",
+        "target_subtype": "resource",
+        "title": "Ember Shard",
+        "quantity": 3,
+        "evidence_tier": "reported"
+      },
+      {
+        "relation_type": "crafted_from",
+        "target_slug": "wood-resource-stub",
+        "target_domain": "OBJECT",
+        "target_subtype": "resource",
+        "title": "Wood",
+        "quantity": 1,
+        "evidence_tier": "reported"
+      }
+    ],
+    "unlock_condition": null,
+    "skill_required": null,
+    "notes": "Always review — never auto-merge or overwrite existing recipe facts."
+  },
+  "merge_rules": {
+    "auto_merge": false,
+    "conflict_behavior": "coexist_as_reported",
+    "duplicate_blocking": true
+  }
+}

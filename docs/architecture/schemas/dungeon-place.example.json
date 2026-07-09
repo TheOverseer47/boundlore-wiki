@@ -1,0 +1,67 @@
+{
+  "$schema": "boundlore/blmeta-example",
+  "description": "Example dungeon/place entity with spatial and loot relations.",
+  "entity_domain": "PLACE",
+  "entity_subtype": "temple",
+  "content_origin": "test",
+  "evidence_tier": "observed",
+  "completeness": "needs_details",
+  "facts": {
+    "place_role": {
+      "value": "dungeon",
+      "tier": "observed"
+    },
+    "difficulty": {
+      "value": "moderate",
+      "tier": "reported",
+      "note": "Subjective — always reported tier unless corroborated"
+    }
+  },
+  "relations_out": [
+    {
+      "type": "located_in",
+      "target_slug": "swamplands-94dadc07",
+      "target_domain": "PLACE",
+      "target_subtype": "biome",
+      "confidence": "corroborated",
+      "evidence_tier": "observed",
+      "properties": {
+        "source_post_id": "qa-sunken-temple-def456",
+        "report_count": 2
+      }
+    },
+    {
+      "type": "contains_loot",
+      "target_slug": "qa-staff-of-fire-2b742628",
+      "target_domain": "OBJECT",
+      "confidence": "single_observation",
+      "evidence_tier": "reported",
+      "properties": {
+        "quantity": 1,
+        "source_post_id": "qa-sunken-temple-def456",
+        "report_count": 1
+      }
+    }
+  ],
+  "observations": [
+    {
+      "context_type": "sighting",
+      "entity_slug": "qa-ogre-mage-1103f2",
+      "entity_domain": "BEING",
+      "note": "Ogre Mage seen inside temple — observation, not new entity",
+      "evidence_tier": "reported"
+    }
+  ],
+  "optional_relations": {
+    "boss": {
+      "type": "contains",
+      "target_slug": "qa-boss-marsh-tyrant",
+      "note": "Only if named boss confirmed in this location"
+    }
+  },
+  "discovery_payload": {
+    "discovery_type": "landmark",
+    "entity_name": "Sunken Temple",
+    "found_in": "Swamp"
+  }
+}
