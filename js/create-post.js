@@ -709,6 +709,10 @@ function showDiscoveryWizardError(message) {
 }
 
 function hasRequiredDiscoveryFieldsFilledCP() {
+  if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
+    const collected = ResourceQuickAdd.collectPayload();
+    return !collected.error;
+  }
   const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
   const config = getDiscoveryConfig(category);
   const fields = Array.isArray(config.fields) ? config.fields : [];
