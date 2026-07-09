@@ -18,7 +18,7 @@
 | Settlement | Quick-Add | Name, region/biome | Size, NPCs, services | Faction | Screenshot recommended | Biome/region | Procedural villages → archetype/instance |
 | Item (generic) | exists | Name, category, obtain method | Subtype, rarity, effect | Stats, requirements | none | Source creature/biome stub | solved |
 | Weapon / Armor / Tool | Item wizard + subtype branch | + subtype, slot | Damage/defense, damage type | Scaling, durability | none | like item | Stat conflicts expected |
-| Resource | Quick-Add, minimal | Name, source type (biome/creature/plant) | Harvest tool, occurrence | Processing chain | none | Source stub | **Name duplicates** → synonym search |
+| Resource | **Quick-Add live** (`?type=resource` or Item type resource) | Name, source type, biome (optional), source detail, tool, rarity, notes, confidence | — (single panel) | Processing chain | optional screenshot | `found_in`/`harvested_from` to biome; entity only if explicit | Synonym warn (non-blocking) — **no** `/wiki/resources/` yet |
 | Recipe | **relation-first** on item page — no standalone discovery | Ingredients (item picker), station | Quantity, skill req | Unlock condition | Screenshot recommended | Ingredient + station stubs | Wrong ingredients → review, never auto-merge |
 | Crafting Station | Quick-Add | Name, where found/built | Craftable list (via relations later) | Tier | none | — | low |
 | Building Part | Item subtype wizard | Name, material | Build cost, station | Snap behavior | none | Material stubs | low |

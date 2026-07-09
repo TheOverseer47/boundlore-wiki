@@ -40,6 +40,31 @@ let discoveryWizardStep = 1;
 let discoveryDataFieldIndex = 0;
 let discoveryRelationsSkipped = false;
 const relationInputTimers = {};
+
+function isResourceQuickAddModeCP() {
+  return typeof ResourceQuickAdd !== "undefined" && ResourceQuickAdd.isActive();
+}
+
+function initResourceQuickAddModeCP() {
+  if (typeof ResourceQuickAdd === "undefined") return;
+  ResourceQuickAdd.activate();
+  discoveryRelationsSkipped = true;
+  const discoveryCategorySelect = document.getElementById("discoveryCategory");
+  if (discoveryCategorySelect) {
+    discoveryCategorySelect.value = "items";
+    currentDiscoveryCategory = "items";
+    discoveryCategorySelect.disabled = true;
+  }
+  const modeHint = document.getElementById("discoveryModeHint");
+  if (modeHint) {
+    modeHint.style.display = "block";
+    modeHint.textContent = "Resource Quick-Add — gatherable resources are saved as items with subtype resource.";
+  }
+  discoveryWizardStep = 1;
+  renderDiscoveryStructuredFields();
+  renderDiscoveryRelationFields();
+  renderDiscoveryWizard();
+}
 const DISCOVERY_PLACEHOLDER_VALUES = [
   "asdf", "qwerty", "test", "todo", "none", "n/a", "na", "unknown", "idk", "???", "12345"
 ];
@@ -141,6 +166,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderDiscoveryStructuredFields();
     renderDiscoveryRelationFields();
     renderDiscoveryEvidenceFields();
+  }
+
+  if (typeParam === "resource") {
+    setPostType("discovery");
+    initResourceQuickAddModeCP();
   }
 });
 
@@ -590,19 +620,28 @@ function renderDiscoveryWizard() {
   const step4 = document.getElementById("discoveryStep4Evidence");
   if (!nav || !step1 || !step2 || !step3 || !step4) return;
 
-  const maxStep = structuredDiscoveryEnabled ? 4 : 2;
+  const resourceMode = isResourceQuickAddModeCP();
+  const maxStep = resourceMode ? 3 : (structuredDiscoveryEnabled ? 4 : 2);
   if (discoveryWizardStep < 1) discoveryWizardStep = 1;
   if (discoveryWizardStep > maxStep) discoveryWizardStep = maxStep;
 
   step1.style.display = discoveryWizardStep === 1 ? "block" : "none";
-  step2.style.display = structuredDiscoveryEnabled && discoveryWizardStep === 2 ? "block" : "none";
-  step3.style.display = structuredDiscoveryEnabled && discoveryWizardStep === 3 ? "block" : "none";
-  step4.style.display = discoveryWizardStep === maxStep ? "block" : "none";
+  if (resourceMode) {
+    step2.style.display = discoveryWizardStep === 2 ? "block" : "none";
+    step3.style.display = "none";
+    step4.style.display = discoveryWizardStep === 3 ? "block" : "none";
+  } else {
+    step2.style.display = structuredDiscoveryEnabled && discoveryWizardStep === 2 ? "block" : "none";
+    step3.style.display = structuredDiscoveryEnabled && discoveryWizardStep === 3 ? "block" : "none";
+    step4.style.display = discoveryWizardStep === maxStep ? "block" : "none";
+  }
 
   nav.innerHTML = "";
-  const stepLabels = structuredDiscoveryEnabled
-    ? ["Basics", "Facts", "Links", "Evidence"]
-    : ["Basics", "Notes"];
+  const stepLabels = resourceMode
+    ? ["Basics", "Resource", "Evidence"]
+    : (structuredDiscoveryEnabled
+      ? ["Basics", "Facts", "Links", "Evidence"]
+      : ["Basics", "Notes"]);
   const progress = document.createElement("p");
   progress.className = "field-hint";
   progress.textContent = "Step " + discoveryWizardStep + " of " + maxStep + ": " + stepLabels[discoveryWizardStep - 1] + ".";
@@ -1120,6 +1159,17 @@ async function handleSubmit(e) {
     payload.guide_subcategory = null;
     payload.is_discovery = true;
     if (structuredDiscoveryEnabled) {
+      if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
+        const synonym = await ResourceQuickAdd.checkSynonymBeforeSubmit(supabase);
+        if (!synonym.ok) {
+          errorEl.textContent = synonym.message;
+          errorEl.style.display = "block";
+          discoveryWizardStep = 2;
+          renderDiscoveryWizard();
+          return;
+        }
+      }
+
       const structuredResult = collectStructuredDiscoveryInput();
       if (structuredResult.error) {
         errorEl.textContent = structuredResult.error;
@@ -1133,7 +1183,8 @@ async function handleSubmit(e) {
       const hasRelProof = files.length > 0 || hasLootHint;
       const relCount = Array.isArray(structuredResult.relations) ? structuredResult.relations.length : 0;
 
-      if (relCount === 0 && discoveryRelationsSkipped !== true) {
+      const resourceMode = isResourceQuickAddModeCP();
+      if (!resourceMode && relCount === 0 && discoveryRelationsSkipped !== true) {
         if (!v2ActiveRelations) {
           errorEl.textContent = "Please link at least one dependency/reference or enable 'Skip auto-relations' before submitting.";
           errorEl.style.display = "block";
@@ -1151,7 +1202,7 @@ async function handleSubmit(e) {
         || buildDiscoveryAutoTitle(structuredResult.payload, cat);
 
       const knowledgeGraphSubmitActive = typeof DiscoveryWizard !== "undefined" && DiscoveryWizard.isActive();
-      if (!knowledgeGraphSubmitActive && !window.__boundloreContributionContext) {
+      if (!knowledgeGraphSubmitActive && !window.__boundloreContributionContext && !isResourceQuickAddModeCP()) {
         const duplicateError = await detectDiscoveryDuplicateCP({
           title: dedupeTitle,
           category: cat,
@@ -1193,6 +1244,9 @@ async function handleSubmit(e) {
       }
       if (typeof EntityCore !== "undefined" && EntityCore.normalizeEntityClassification) {
         postMeta = EntityCore.normalizeEntityClassification(postMeta, { title: dedupeTitle || title, category: cat });
+      }
+      if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
+        postMeta = ResourceQuickAdd.applyMetaDefaults(postMeta);
       }
       if (window.__boundloreContributionContext) {
         postMeta.contribution_target = window.__boundloreContributionContext.target || null;
@@ -1745,6 +1799,9 @@ function buildDiscoveryMediaContent(title, baseHtml, imageUrl, youtubeUrl) {
 }
 
 function getDiscoveryConfig(category) {
+  if (isResourceQuickAddModeCP() && typeof getResourceQuickAddSchema === "function") {
+    return getResourceQuickAddSchema();
+  }
   if (typeof getDiscoverySchemaForCategory === "function") {
     return getDiscoverySchemaForCategory(category);
   }
@@ -1780,6 +1837,17 @@ function renderDiscoveryStructuredFields() {
   }
 
   const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+  if (category === "items" && discoveryFieldState.discovery_type === "resource" && !isResourceQuickAddModeCP()) {
+    initResourceQuickAddModeCP();
+    return;
+  }
+
+  if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
+    wrap.style.display = "block";
+    ResourceQuickAdd.renderPanel(wrap, typeof supabase !== "undefined" ? supabase : null);
+    return;
+  }
+
   if (!category) {
     wrap.style.display = "block";
     wrap.innerHTML = "<h3 style='margin:0 0 8px;'>Discovery Data</h3><p class='field-hint'>Choose a discovery category first to load the specialized questions for that discovery type.</p>";
@@ -2036,6 +2104,14 @@ function renderDiscoveryRelationFields() {
   const groups = Array.isArray(config.relations) ? config.relations : [];
 
   wrap.innerHTML = "";
+  if (isResourceQuickAddModeCP()) {
+    wrap.style.display = "block";
+    const note = document.createElement("p");
+    note.className = "field-hint";
+    note.textContent = "Resource relations (found_in / harvested_from) are inferred automatically from biome and optional source entity. Generic source details stay as facts only.";
+    wrap.appendChild(note);
+    return;
+  }
   if (!groups.length) return;
 
   const title = document.createElement("h3");
@@ -2563,6 +2639,22 @@ function renderSelectedRelations(groupKey) {
 
 function collectStructuredDiscoveryInput() {
   const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
+
+  if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
+    const collected = ResourceQuickAdd.collectPayload();
+    if (collected.error) return collected;
+    const relations = [];
+    if (typeof KnowledgeRelations !== "undefined") {
+      KnowledgeRelations.appendAutoRelations(relations, collected.payload, category, {
+        sourceTitle: collected.payload.entity_name,
+        sourceCategory: category,
+        entitySubtype: "resource",
+        discoveryForm: "resource_quick",
+      });
+    }
+    return { payload: collected.payload, relations: relations };
+  }
+
   const config = getDiscoveryConfig(category);
   const payload = {};
 

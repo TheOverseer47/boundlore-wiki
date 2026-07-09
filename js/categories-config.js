@@ -320,7 +320,7 @@ const BOUNDLORE_DISCOVERY_SCHEMA_V2_BY_CATEGORY = {
   },
   items: {
     fields: [
-      { key: 'discovery_type', label: 'Item type', type: 'select', required: true, options: ['weapon', 'armor', 'tool', 'consumable', 'material', 'quest-item', 'recipe', 'artifact', 'cosmetic', 'other'] },
+      { key: 'discovery_type', label: 'Item type', type: 'select', required: true, options: ['weapon', 'armor', 'tool', 'consumable', 'material', 'resource', 'quest-item', 'recipe', 'artifact', 'cosmetic', 'other'] },
       { key: 'entity_name', label: 'Item name', type: 'text', required: true, max: 120, placeholder: 'Name from inventory / tooltip' },
       { key: 'world_name', label: 'World', type: 'text', required: false, max: 80 },
       { key: 'region_name', label: 'Region / zone', type: 'text', required: true, max: 120 },
@@ -363,6 +363,55 @@ const BOUNDLORE_DISCOVERY_SCHEMA_V2_BY_CATEGORY = {
 
 const BOUNDLORE_DISCOVERY_SCHEMA_LEAN_DEFAULT = BOUNDLORE_DISCOVERY_SCHEMA_V2_DEFAULT;
 const BOUNDLORE_DISCOVERY_SCHEMA_LEAN_BY_CATEGORY = BOUNDLORE_DISCOVERY_SCHEMA_V2_BY_CATEGORY;
+
+const BOUNDLORE_RESOURCE_SOURCE_TYPE_LABELS = {
+  mining: "Mining / Ore / Deposit",
+  plant: "Plant / Flora",
+  "creature-drop": "Creature Drop",
+  biome: "Biome / Environment",
+  water: "Water / Ocean / River",
+  loot: "Loot / Container",
+  unknown: "Unknown",
+};
+
+const BOUNDLORE_DISCOVERY_SCHEMA_RESOURCE_QUICK = {
+  fields: [
+    { key: "entity_name", label: "Resource Name", type: "text", required: true, max: 120, placeholder: "e.g. Ember Shard" },
+    { key: "source_type", label: "Source Type", type: "select", required: true, options: ["mining", "plant", "creature-drop", "biome", "water", "loot", "unknown"] },
+    { key: "region_name", label: "Biome / Region", type: "text", required: false, max: 120, placeholder: "Optional but recommended — e.g. Volcanic" },
+    { key: "source_detail", label: "Source Detail", type: "text", required: false, max: 240, placeholder: 'e.g. "red crystal nodes", "large mushrooms"' },
+    { key: "source_entity_name", label: "Source Entity (optional)", type: "text", required: false, max: 120, placeholder: "Named creature, plant, or deposit only" },
+    { key: "gathering_tool", label: "Gathering Tool", type: "text", required: false, max: 80, placeholder: "Unknown if unsure" },
+    { key: "rarity", label: "Rarity", type: "select", required: false, options: ["common", "uncommon", "rare", "very-rare", "epic", "legendary", "unique", "unknown"] },
+    { key: "notes", label: "Notes", type: "textarea", required: false, max: 500, placeholder: "Optional observation notes" },
+    { key: "confidence_level", label: "Confidence", type: "select", required: false, options: ["2-single-observation", "3-reported", "4-confirmed"] },
+  ],
+  relations: [],
+  media: { maxFiles: 6, maxFileSizeMb: 10, minImages: 0, allowedExtensions: [".jpg", ".jpeg", ".png", ".webp", ".gif"] },
+};
+
+function isResourceQuickAddRoute() {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    return (params.get("type") || "").toLowerCase() === "resource";
+  } catch (err) {
+    return false;
+  }
+}
+
+function isResourceDiscoveryMeta(meta) {
+  if (!meta || typeof meta !== "object") return false;
+  if (meta.discovery_form === "resource_quick") return true;
+  if (meta.entity_subtype === "resource") return true;
+  const payload = meta.discovery_payload;
+  if (!payload || typeof payload !== "object") return false;
+  return payload.discovery_type === "resource"
+    || (payload.resource && typeof payload.resource === "object");
+}
+
+function getResourceQuickAddSchema() {
+  return BOUNDLORE_DISCOVERY_SCHEMA_RESOURCE_QUICK;
+}
 
 const BOUNDLORE_DISCOVERY_STOPWORDS = [
   'the', 'and', 'for', 'with', 'from', 'into', 'this', 'that', 'your', 'their', 'over', 'under',
@@ -451,6 +500,9 @@ function shouldUseDiscoveryLeanSchema(meta) {
 
 function getDiscoverySchemaForApproval(post, meta) {
   const categorySlug = post && post.category ? post.category : '';
+  if (isResourceDiscoveryMeta(meta)) {
+    return BOUNDLORE_DISCOVERY_SCHEMA_RESOURCE_QUICK;
+  }
   if (usesLeanDiscoveryForm(meta)) {
     return categorySlug
       ? (BOUNDLORE_DISCOVERY_SCHEMA_LEAN_BY_CATEGORY[categorySlug] || BOUNDLORE_DISCOVERY_SCHEMA_LEAN_DEFAULT)
@@ -460,6 +512,9 @@ function getDiscoverySchemaForApproval(post, meta) {
 }
 
 function getDiscoverySchemaForCategory(categorySlug, meta) {
+  if (isResourceQuickAddRoute() || isResourceDiscoveryMeta(meta)) {
+    return BOUNDLORE_DISCOVERY_SCHEMA_RESOURCE_QUICK;
+  }
   if (usesLeanDiscoveryForm(meta) || isDiscoveryLeanSchemaActive()) {
     if (!categorySlug) return BOUNDLORE_DISCOVERY_SCHEMA_LEAN_DEFAULT;
     return BOUNDLORE_DISCOVERY_SCHEMA_LEAN_BY_CATEGORY[categorySlug] || BOUNDLORE_DISCOVERY_SCHEMA_LEAN_DEFAULT;

@@ -396,6 +396,19 @@ window.WikiEntryLayout = (function() {
     }
 
     if (cat === "items") {
+      const subtype = typeof EntityCore !== "undefined"
+        ? EntityCore.resolveEntitySubtype(meta, { category: cat, title: post && post.title })
+        : (meta && meta.entity_subtype) || "";
+      if (subtype === "resource") {
+        const resource = payload && payload.resource && typeof payload.resource === "object" ? payload.resource : payload;
+        if (!meaningful(resource && (resource.source_type || payload.source_type))) {
+          add("source_type", "Source Type", "add_info");
+        }
+        if (!meaningful(resource && (resource.biome || payload.region_name))) {
+          add("region_name", "Biome / Region", "confirm_location");
+        }
+        return missing.slice(0, 4);
+      }
       function isUnknown(key) {
         const f = classification[key];
         if (!f) return false;

@@ -9,16 +9,17 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  
-**Slug idea:** `qa-ember-shard`
+**Slug idea:** `qa-ember-shard`  
+**P0-C status:** Steps 1, 2, 5 implemented (resource quick-add + synonym warning). Steps 3–4, 6 deferred (Usage widget, `/wiki/resources/`).
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Resource Quick-Add: "Ember Shard", source Mining in Volcanic biome | Post created with `entity_subtype: resource` |
-| 2 | Approve discovery | Published resource page |
-| 3 | View resource detail page | Usage section empty with prominent CTA |
-| 4 | View `/wiki/resources/` | Resource appears; filter "mining" works |
-| 5 | Second submit "Embershard" (typo variant) | Synonym/duplicate warning shown |
-| 6 | Add Usage via contribution (ingredient_of on another item) | Usage section populated after merge |
+| Step | Action | Expected | P0-C |
+|------|--------|----------|------|
+| 1 | Resource Quick-Add: `QA Ember Shard`, mining, `QA Volcanic`, detail `red crystal nodes` | `entity_subtype: resource`, `discovery_payload.resource` | `[~]` manual |
+| 2 | Approve discovery | Published resource page | `[~]` needs admin session |
+| 3 | View resource detail page | Usage section empty with prominent CTA | `[ ]` P0-F |
+| 4 | View `/wiki/resources/` | Resource appears; filter "mining" works | `[ ]` P0-E |
+| 5 | Second submit `QA EmberShard` | Synonym warning → `QA Ember Shard` | `[~]` manual |
+| 6 | Add Usage via contribution (`ingredient_of`) | Usage populated after merge | `[ ]` P0-D/F |
 
 **Relations expected:** `harvested_from` → Volcanic biome stub
 

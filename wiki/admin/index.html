@@ -283,9 +283,9 @@
 
 <script src="/js/supabase-config.js"></script>
 <script src="/js/test-data.js?v=1"></script>
-<script src="/js/categories-config.js?v=17"></script>
+<script src="/js/categories-config.js?v=18"></script>
 <script src="/js/relations-registry.js?v=1"></script>
-<script src="/js/knowledge-relations.js?v=18"></script>
+<script src="/js/knowledge-relations.js?v=19"></script>
 <script src="/js/entity-core.js?v=9"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
@@ -741,6 +741,41 @@ function renderContributionSubmittedFieldsA(info) {
       "</dt><dd style=\"margin:0;color:var(--text-muted);\">" + escapeHtmlA(String(fields[key]).slice(0, 200)) + "</dd></div>";
   });
   html += "</dl>";
+  return html;
+}
+
+function renderResourceDiscoverySummaryA(meta) {
+  if (typeof isResourceDiscoveryMeta !== "function" || !isResourceDiscoveryMeta(meta)) return "";
+  const payload = meta.discovery_payload && typeof meta.discovery_payload === "object" ? meta.discovery_payload : {};
+  const resource = payload.resource && typeof payload.resource === "object" ? payload.resource : payload;
+  const labels = typeof BOUNDLORE_RESOURCE_SOURCE_TYPE_LABELS === "object" ? BOUNDLORE_RESOURCE_SOURCE_TYPE_LABELS : {};
+  const rows = [
+    ["Type", "Resource · OBJECT/resource"],
+    ["Name", payload.entity_name || ""],
+    ["Source", labels[resource.source_type] || resource.source_type || payload.source_type || ""],
+    ["Biome", resource.biome || payload.region_name || ""],
+    ["Detail", resource.source_detail || payload.source_detail || ""],
+    ["Tool", resource.gathering_tool || payload.gathering_tool || ""],
+    ["Rarity", resource.rarity || payload.rarity || "unknown"],
+  ].filter(function(row) { return String(row[1] || "").trim(); });
+  const relations = Array.isArray(meta.discovery_relations) ? meta.discovery_relations : [];
+  const inferred = typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.inferRelationsFromPayloadForApproval
+    ? KnowledgeRelations.inferRelationsFromPayloadForApproval(payload, "items")
+    : [];
+  const relLines = relations.concat(inferred).map(function(rel) {
+    return (rel.relation_type || "related") + " → " + (rel.title || "?");
+  }).filter(Boolean).slice(0, 6);
+  let html = '<p style="font-size:0.82rem;color:#9cc4ef;margin:6px 0 10px;"><strong>Resource Quick-Add</strong></p>';
+  html += '<dl style="margin:0 0 8px;padding:8px 10px;background:rgba(74,120,184,0.12);border-radius:6px;font-size:0.82rem;">';
+  rows.forEach(function(row) {
+    html += '<div style="display:flex;gap:8px;"><dt style="color:#9cc4ef;min-width:110px;">' + escapeHtmlA(row[0]) +
+      '</dt><dd style="margin:0;color:var(--text-muted);">' + escapeHtmlA(String(row[1]).slice(0, 200)) + '</dd></div>';
+  });
+  html += "</dl>";
+  if (relLines.length) {
+    html += '<p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 10px;">Relations: ' +
+      escapeHtmlA(relLines.join(", ")) + "</p>";
+  }
   return html;
 }
 
@@ -1313,9 +1348,12 @@ async function loadDiscoveries() {
     const review = isContribution
       ? { ok: true, issues: [], warnings: [], mode: "contribution" }
       : evaluateDiscoveryForApprovalA(post);
+    const isResource = typeof isResourceDiscoveryMeta === "function" && isResourceDiscoveryMeta(meta);
     const reviewBadge = isContribution
       ? '<span class="badge" style="margin-left:8px;background:#4a78b8;color:#fff;">Contribution</span>'
-      : (isStub
+      : (isResource
+        ? '<span class="badge" style="margin-left:8px;background:#3d7a52;color:#fff;">Resource</span>'
+        : (isStub
         ? '<span class="badge" style="margin-left:8px;background:#8a6a2a;color:#111;">Knowledge stub</span>'
         : (review.ok
           ? '<span class="badge badge-published" style="margin-left:8px;">Ready</span>'
@@ -1327,7 +1365,7 @@ async function loadDiscoveries() {
         + (contributionInfo.evidence.length ? ' · ' + contributionInfo.evidence.length + ' evidence item(s)' : '')
         + '. Approval merges it into the existing entry — no new post is created.</p>'
         + renderContributionSubmittedFieldsA(contributionInfo)
-      : "";
+      : (isResource ? renderResourceDiscoverySummaryA(meta) : "");
     const reviewSummary = contributionSummary ? contributionSummary : review.ok
       ? '<p style="font-size:0.82rem;color:#50c878;margin:6px 0 10px;">' + (isStub ? 'Knowledge stub can be published as incomplete.' : 'Structured data is complete enough for approval.') + '</p>'
       : ('<div style="margin:8px 0 10px;padding:10px 12px;border-radius:8px;background:rgba(224,168,58,0.14);border:1px solid rgba(224,168,58,0.35);">' +
@@ -2024,6 +2062,7 @@ function evaluateDiscoveryForApprovalA(post) {
   const relations = Array.isArray(meta && meta.discovery_relations) ? meta.discovery_relations : [];
   const relationsSkipped = !!(meta && meta.discovery_relations_skipped === true);
   const evidence = Array.isArray(meta && meta.discovery_evidence) ? meta.discovery_evidence : [];
+  const resourceDiscovery = typeof isResourceDiscoveryMeta === "function" && isResourceDiscoveryMeta(meta);
   const leanForm = typeof usesLeanDiscoveryForm === "function"
     ? usesLeanDiscoveryForm(meta)
     : !!(payload && !payload.observed_result && !payload.expected_result && !payload.how_to_reproduce);
@@ -2033,7 +2072,7 @@ function evaluateDiscoveryForApprovalA(post) {
       ? getDiscoverySchemaForCategory(post.category || "", meta)
       : null);
   let requiredFields = Array.isArray(schema && schema.fields) ? schema.fields.filter(function(field) { return !!field.required; }) : [];
-  if (leanForm) {
+  if (leanForm && !resourceDiscovery) {
     requiredFields = requiredFields.filter(function(field) {
       return !["world_name", "observed_result", "expected_result", "how_to_reproduce", "impact_area", "confidence_level", "spawn_conditions", "taming_method", "item_effect", "source_type", "how_to_obtain"].includes(field.key);
     });
@@ -2071,8 +2110,8 @@ function evaluateDiscoveryForApprovalA(post) {
     : [];
   const hasRelations = relations.length > 0 || inferredRelations.length > 0 || relationsSkipped;
   const hasKnowledgeSource = !!(meta && meta.knowledge_entry && (meta.knowledge_entry.source_post_id || meta.knowledge_entry.source_post_slug));
-  const hasEntityContext = !!(payload && (payload.entity_name || payload.found_in || payload.region_name || payload.dropped_items || payload.dropped_by));
-  if (!hasRelations && !hasKnowledgeSource && !hasEntityContext) {
+  const hasEntityContext = !!(payload && (payload.entity_name || payload.found_in || payload.region_name || payload.dropped_items || payload.dropped_by || (payload.resource && typeof payload.resource === "object")));
+  if (!resourceDiscovery && !hasRelations && !hasKnowledgeSource && !hasEntityContext) {
     issues.push("No linked dependencies or references selected.");
   }
 

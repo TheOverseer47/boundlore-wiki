@@ -135,6 +135,7 @@ as $$
     when 'crafted_from' then 'CRAFTED_FROM'
     when 'crafted_at' then 'CRAFTED_AT'
     when 'ingredient_of' then 'INGREDIENT_OF'
+    when 'harvested_from' then 'HARVESTED_FROM'
     when 'variant_of' then 'VARIANT_OF'
     when 'changed_by_patch' then 'CHANGED_BY_PATCH'
     when '' then case lower(coalesce(p_relation_group, ''))

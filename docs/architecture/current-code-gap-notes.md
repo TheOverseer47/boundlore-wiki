@@ -1,142 +1,104 @@
 # Current Code Gap Notes
 
 Audit of BoundLore codebase against the content architecture blueprint.  
-**Last updated:** 2026-07-09 (P0-B: CRAFT relation family preparation)
+**Last updated:** 2026-07-09 (P0-C: Resource Quick-Add + synonym warning)
 
 ---
 
-## 1. CRAFT Relations — Runtime Status (P0-B)
+## 1. Resource Quick-Add — Runtime Status (P0-C)
 
-### Relation types prepared
+### Entry points
 
-| Type | Label | Role |
-|------|-------|------|
-| `crafted_from` | Crafted from | Target item → ingredient/resource |
-| `crafted_at` | Crafted at | Target item → crafting station |
-| `ingredient_of` | Used in | Inverse of `crafted_from` (derived; not double-persisted in merge) |
-| `unlocks` | Unlocks | Prepared; not actively used yet |
+| Route / path | Behavior |
+|--------------|----------|
+| `/wiki/create-post/?type=resource` | Discovery mode, category locked to `items`, Resource Quick-Add panel |
+| Items lean form → Item type `resource` | Switches to same Resource Quick-Add panel |
 
-### Files that know CRAFT
+### Form fields (required: Resource Name + Source Type)
+
+Resource Name, Source Type (mining/plant/creature-drop/biome/water/loot/unknown), Biome/Region (optional), Source Detail, Source Entity (optional), Gathering Tool, Rarity (default unknown), Notes, Confidence.
+
+### BLMETA on submit
+
+| Field | Value |
+|-------|-------|
+| `entity_domain` | `OBJECT` |
+| `entity_subtype` | `resource` |
+| `discovery_form` | `resource_quick` |
+| `discovery_payload.discovery_type` | `resource` |
+| `discovery_payload.resource` | Structured block (`source_type`, `biome`, `source_detail`, …) |
+
+### Files
 
 | File | Role |
 |------|------|
-| `js/relations-registry.js` | Canonical CRAFT family definitions, labels, merge metadata |
-| `js/knowledge-relations.js` (v18) | `RELATION_TYPES`, normalization, merge/preview/dedup, recipe serializer |
-| `supabase/sprint1_sync_rpc.sql` | `bl_normalize_discovery_relation_code` → CRAFTED_* codes |
-| `supabase/sprint1_knowledge_graph_foundation.sql` | `wiki_relation_types` seed rows |
-| `supabase/craft_relation_types_preparation.sql` | Standalone INSERT for existing DBs (manual run) |
-| `qa/mock-craft-relation-payload.md` | Mock payload + expected merge behavior |
-| `wiki/admin/index.html` | Preview shows CRAFT relation conflicts |
+| `js/resource-quick-add.js` | Form panel, payload builder, synonym warning |
+| `js/categories-config.js` | `BOUNDLORE_DISCOVERY_SCHEMA_RESOURCE_QUICK`, route helpers |
+| `js/create-post.js` | Route init, submit path, relation skip, meta defaults |
+| `js/knowledge-relations.js` | `harvested_from`, resource `appendAutoRelations`, resource serializer |
+| `js/wiki-entry-layout.js` | Resource-specific missing-info (no weapon CTAs) |
+| `wiki/admin/index.html` | Resource badge + compact preview summary |
+| `supabase/sprint1_sync_rpc.sql` | `harvested_from` → `HARVESTED_FROM` |
+| `supabase/harvested_from_relation_preparation.sql` | Manual INSERT for existing DBs |
 
-### Normalization / labels
+### Auto-relations (resource)
 
-- Registry-known CRAFT types are **not** degraded to `related_discovery`
-- `getRelationLabel()` prefers registry labels; `RELATION_TYPES` provides fallback
-- `normalizeRelationTypeForDbSync()` passes through `crafted_from`, `crafted_at`, `ingredient_of`, `unlocks`
+| Condition | Relation |
+|-----------|----------|
+| Biome/region given | `found_in` → biome; `harvested_from` → biome (mining/plant/biome/water) |
+| Explicit source entity + creature-drop/plant/mining | `harvested_from` → entity |
+| Generic source detail only | Stored as fact — **no location stub** |
 
-### Merge / preview / dedup (P0-B)
-
-| Behavior | Implementation |
-|----------|----------------|
-| Dedupe key | `relationMergeDedupeKey()` = `relation_type` + target entity key |
-| Same ingredient + same qty | CONFIRM, `report_count++` |
-| Same ingredient + different qty | `relationsConflict` / `contribution_conflicts`, `needs_review` |
-| Same station twice | CONFIRM, no duplicate |
-| Different station on confirmed target | `recipe_station` conflict |
-| Different ingredient sets | `recipe_ingredients` conflict |
-| Recipe fact block | `discovery_payload.recipe` preserved (nested object) |
-| Relations from recipe | `buildCraftRelationsFromRecipe()`, `resolveContributionRelations()` |
-| Future duplicate detection | `compareRecipeContributionDuplicates()` for `add_recipe` |
-
-### Exported helpers (`BoundLoreKnowledgeRelations`)
-
-- `isCraftRelationType`, `craftRelationIdentityKey`, `relationMergeDedupeKey`
-- `craftRelationsConflict`, `buildCraftRelationsFromRecipe`, `sanitizeRecipeFactForMeta`
-- `compareRecipeContributionDuplicates`, `formatCraftRelationPreviewLabel`
-
-### Properties preserved on relations
-
-`quantity`, `unit`, `station`, `output_quantity`, `unlock_condition`, `evidence_tier`, `confidence`, `source_post_id`, `report_count`, `notes`
+`ingredient_of` not auto-created (P0-F Usage widget).
 
 ---
 
-## 2. Relations Registry — Runtime Status
+## 2. Synonym / Duplicate Warning (P0-C)
 
-### Loaded on these pages (before `knowledge-relations.js`)
+| Behavior | Status |
+|----------|--------|
+| Trigger | On Resource Name blur/input debounce + pre-submit |
+| Compare | Normalized names, tokens, light Levenshtein, aliases from BLMETA |
+| Pool | Published/pending/approved `items` posts |
+| UX | Warn-only banner: Open existing / Continue anyway / Cancel and edit |
+| Blocks submit | Only until user acknowledges or no match |
 
-| Page | Script order |
-|------|--------------|
-| `wiki/admin/index.html` | relations-registry → knowledge-relations → entity-core |
-| `wiki/create-post/index.html` | relations-registry → knowledge-relations → entity-core |
-| `wiki/post/index.html` | relations-registry → knowledge-relations → entity-core |
-| `wiki/items/index.html` | relations-registry → entity-core → knowledge-relations |
-| `wiki/creatures/index.html` | relations-registry → entity-core → knowledge-relations |
-| `wiki/biomes/index.html` | relations-registry → entity-core → knowledge-relations |
-| `wiki/locations/index.html` | relations-registry → entity-core → knowledge-relations |
+Module: `ResourceQuickAdd.findSimilarResources()`, `namesAreSimilar()`.
 
-**Not yet loaded:** `wiki/edit-post/index.html` (unchanged in P0-B).
+Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-only path).
 
 ---
 
-## 3. Legacy Relation Types — Still Compatible
+## 3. CRAFT Relations (P0-B, unchanged)
 
-| Type | Status |
-|------|--------|
-| `contains` | Active — biome aggregation |
-| `observed_in` | Active |
-| `dropped_by` | Active — not aliased to `drops` |
-| `found_in` / `located_in` / `found_near` | Active |
-| `drops` / `part_of` / `related_discovery` / `evidence_for` | Active |
+`crafted_from`, `crafted_at`, `ingredient_of`, `unlocks` — prepared in merge/serializer/SQL. No Add Recipe UI yet.
 
 ---
 
-## 4. SQL / RPC Mappings (prepared, not executed)
+## 4. SQL / RPC (prepared, not executed)
 
-| Mapping | Location |
-|---------|----------|
-| `crafted_from` → `CRAFTED_FROM` | `sprint1_sync_rpc.sql` |
-| `crafted_at` → `CRAFTED_AT` | `sprint1_sync_rpc.sql` |
-| `ingredient_of` → `INGREDIENT_OF` | `sprint1_sync_rpc.sql` |
-| `unlocks` → `UNLOCKS` | Already present |
-| DB seed rows | `sprint1_knowledge_graph_foundation.sql` + `craft_relation_types_preparation.sql` |
+| Code | Mapping |
+|------|---------|
+| `HARVESTED_FROM` | `harvested_from` in sync RPC + foundation seed |
+| CRAFT codes | From P0-B |
 
-**Manual SQL later:** If remote DB was created before P0-B, run `supabase/craft_relation_types_preparation.sql` and redeploy `bl_normalize_discovery_relation_code` from `sprint1_sync_rpc.sql` at launch window.
+**Manual SQL later:** `supabase/harvested_from_relation_preparation.sql` + redeploy `bl_normalize_discovery_relation_code` if remote DB predates P0-C.
 
 ---
 
-## 5. entity_domain / entity_subtype Baseline (P0-A, unchanged)
-
-Helpers in `js/entity-core.js`; serialized via `serializePostMetaForStorage()`. Existing posts not backfilled.
-
----
-
-## 6. Still Not Implemented (by design)
+## 5. Still Not Implemented (by design)
 
 | Area | Priority |
 |------|----------|
-| Add Recipe UI / `intent=add_recipe` form | P0-D |
-| Resource Quick-Add + synonym warning | P0-C |
 | `/wiki/resources/` landing | P0-E |
-| Recipe / Usage widgets | P0-F |
-| Evidence-tier UI badges | P0-G |
-| E2E T1/T2 recipe flows | After UI |
-| `ingredient_of` auto-persist on resource pages | P0-F (derived inverse) |
-| Boss wizard / NPC / Settlement flows | P1 |
-| Data backfill / repair scripts | Never without explicit approval |
+| Usage / Recipe widgets | P0-F |
+| Add Recipe intent UI | P0-D |
+| Evidence-tier badge UI | P0-G |
+| `ingredient_of` auto-persist on resource pages | P0-F |
+| E2E T1 full chain (usage step) | After P0-D/F |
 
 ---
 
-## 7. Duplication / Misclassification Risks
+## 6. Next Step
 
-| Risk | Mitigation status |
-|------|-------------------|
-| Resource name duplicates | P0-C synonym warning |
-| Recipe duplicate pages | Blueprint: facts on item — merge path ready |
-| Recipe quantity conflicts | P0-B conflict logging |
-| Procedural POI flood | `classifyPlaceEntry` — works |
-
----
-
-## 8. Next Step
-
-**P0-C:** Resource Quick-Add + Synonym-Warnung
+**P0-D:** Add Recipe Intent

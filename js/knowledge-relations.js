@@ -96,6 +96,14 @@ window.KnowledgeRelations = (function() {
       showOnTarget: ["creatures", "items", "locations", "biomes"],
       targetProminence: "secondary",
     },
+    harvested_from: {
+      label: "Harvested from",
+      inverse: null,
+      group: "items",
+      showOnSource: ["items"],
+      showOnTarget: ["creatures", "items", "locations", "biomes"],
+      targetProminence: "secondary",
+    },
     crafted_from: {
       label: "Crafted from",
       inverse: "ingredient_of",
@@ -147,7 +155,7 @@ window.KnowledgeRelations = (function() {
 
   const SECTION_ORDER = {
     creatures: ["observed_in", "located_in", "found_in", "found_near", "drops", "dropped_by", "requires", "related_discovery", "evidence_for"],
-    items: ["dropped_by", "crafted_from", "crafted_at", "found_in", "observed_in", "located_in", "related_discovery", "evidence_for"],
+    items: ["dropped_by", "harvested_from", "crafted_from", "crafted_at", "found_in", "observed_in", "located_in", "related_discovery", "evidence_for"],
     biomes: ["contains", "creatures", "items", "locations", "discoveries"],
     locations: ["contains", "creatures", "items", "locations", "discoveries"],
     discoveries: ["observed_in", "located_in", "drops", "dropped_by", "found_in", "related_discovery", "evidence_for"],
@@ -191,7 +199,7 @@ window.KnowledgeRelations = (function() {
     };
     if (map[js]) return map[js];
     if (["found_in", "drops", "part_of", "requires", "unlocks", "variant_of", "related_to",
-      "crafted_from", "crafted_at", "ingredient_of"].includes(js)) {
+      "crafted_from", "crafted_at", "ingredient_of", "harvested_from"].includes(js)) {
       return js;
     }
     const groupKey = String(group || "").toLowerCase();
@@ -717,6 +725,31 @@ window.KnowledgeRelations = (function() {
     return "primary";
   }
 
+  function isResourceDiscoveryPayload(data, sourceContext) {
+    const payload = data && typeof data === "object" ? data : {};
+    const ctx = sourceContext || {};
+    if (payload.discovery_type === "resource") return true;
+    if (payload.resource && typeof payload.resource === "object") return true;
+    if (ctx.entitySubtype === "resource") return true;
+    if (ctx.discoveryForm === "resource_quick") return true;
+    return false;
+  }
+
+  function sanitizeResourceFactForMeta(resource) {
+    if (!resource || typeof resource !== "object") return null;
+    const out = {};
+    if (meaningfulValue(resource.source_type)) out.source_type = String(resource.source_type).slice(0, 40);
+    if (meaningfulValue(resource.source_detail)) out.source_detail = String(resource.source_detail).slice(0, 240);
+    if (meaningfulValue(resource.biome)) out.biome = String(resource.biome).slice(0, 120);
+    if (meaningfulValue(resource.gathering_tool)) out.gathering_tool = String(resource.gathering_tool).slice(0, 80);
+    if (meaningfulValue(resource.rarity)) out.rarity = String(resource.rarity).slice(0, 24);
+    if (meaningfulValue(resource.notes)) out.notes = String(resource.notes).slice(0, 500);
+    if (meaningfulValue(resource.source_entity_name)) out.source_entity_name = String(resource.source_entity_name).slice(0, 120);
+    if (meaningfulValue(resource.evidence_tier)) out.evidence_tier = String(resource.evidence_tier).slice(0, 16);
+    if (meaningfulValue(resource.confidence)) out.confidence = String(resource.confidence).slice(0, 32);
+    return Object.keys(out).length ? out : null;
+  }
+
   function appendAutoRelations(relations, payload, sourceCategory, sourceContext) {
     const list = Array.isArray(relations) ? relations : [];
     const seen = new Set(list.map(dedupeKeyForRelation));
@@ -791,6 +824,54 @@ window.KnowledgeRelations = (function() {
           confidence: 80,
         });
       });
+    }
+
+    if (String(sourceCategory || "").toLowerCase() === "items" && isResourceDiscoveryPayload(data, ctx)) {
+      const resource = data.resource && typeof data.resource === "object" ? data.resource : {};
+      const sourceType = meaningfulValue(resource.source_type) || meaningfulValue(data.source_type) || "unknown";
+      const biomeTitle = meaningfulValue(resource.biome)
+        || meaningfulValue(data.region_name)
+        || meaningfulValue(data.found_in);
+      const sourceEntity = meaningfulValue(resource.source_entity_name) || meaningfulValue(data.source_entity_name);
+      const sourceDetail = meaningfulValue(resource.source_detail) || meaningfulValue(data.source_detail);
+      const evidenceTier = resource.evidence_tier || data.evidence_tier || "reported";
+
+      if (biomeTitle) {
+        const biomeInfo = classifyBiomeTitle(biomeTitle, data.biome_context);
+        const resolvedBiome = (biomeInfo && biomeInfo.title) || biomeTitle;
+        add("biomes", "found_in", resolvedBiome, {
+          target_entity_type: "biome",
+          category: "biomes",
+          confidence: 84,
+          evidence_tier: evidenceTier,
+        });
+        if (["mining", "plant", "biome", "water"].indexOf(String(sourceType).toLowerCase()) >= 0) {
+          add("biomes", "harvested_from", resolvedBiome, {
+            target_entity_type: "biome",
+            category: "biomes",
+            confidence: 82,
+            evidence_tier: evidenceTier,
+            notes: sourceDetail || null,
+          });
+        }
+      }
+
+      const linkEntity = typeof ResourceQuickAdd !== "undefined"
+        && ResourceQuickAdd.shouldLinkHarvestedFromEntity
+        && ResourceQuickAdd.shouldLinkHarvestedFromEntity(Object.assign({}, data, resource))
+        ? sourceEntity
+        : (String(sourceType).toLowerCase() === "creature-drop" ? sourceEntity : null);
+      if (linkEntity) {
+        const entityGroup = String(sourceType).toLowerCase() === "creature-drop" ? "creatures" : "items";
+        add(entityGroup, "harvested_from", linkEntity, {
+          target_entity_type: entityGroup === "creatures" ? "creature" : "item",
+          category: entityGroup,
+          confidence: 80,
+          evidence_tier: evidenceTier,
+          notes: sourceDetail || null,
+        });
+      }
+      return list;
     }
 
     if (String(sourceCategory || "").toLowerCase() === "items") {
@@ -2303,6 +2384,11 @@ window.KnowledgeRelations = (function() {
           if (recipe) payload.recipe = recipe;
           return;
         }
+        if (key === "resource" && typeof value === "object") {
+          const resource = sanitizeResourceFactForMeta(value);
+          if (resource) payload.resource = resource;
+          return;
+        }
         if (typeof value === "number") payload[String(key).slice(0, 60)] = value;
         else payload[String(key).slice(0, 60)] = String(value).slice(0, 1400);
       });
@@ -2715,6 +2801,8 @@ window.KnowledgeRelations = (function() {
     craftRelationsConflict: craftRelationsConflict,
     buildCraftRelationsFromRecipe: buildCraftRelationsFromRecipe,
     sanitizeRecipeFactForMeta: sanitizeRecipeFactForMeta,
+    sanitizeResourceFactForMeta: sanitizeResourceFactForMeta,
+    isResourceDiscoveryPayload: isResourceDiscoveryPayload,
     compareRecipeContributionDuplicates: compareRecipeContributionDuplicates,
     formatCraftRelationPreviewLabel: formatCraftRelationPreviewLabel,
     mergeContributionIntoTarget: mergeContributionIntoTarget,

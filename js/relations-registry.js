@@ -161,7 +161,7 @@ window.BoundLoreRelationsRegistry = (function() {
       mergeBehavior: "additive",
       conflictBehavior: "none",
       renderHint: "source_list",
-      dbCode: null,
+      dbCode: "HARVESTED_FROM",
       priority: "P0",
       properties: ["quantity", "rate", "conditions", "confidence", "evidence_tier", "source_post_id"],
     },
