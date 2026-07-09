@@ -41,9 +41,10 @@ async function init() {
   const { data: post, error } = await postQuery.single();
 
   if (error || !post) return showNotFound();
+  if (post.deleted_at && !isAdmin) return showNotFound();
 
   currentPost = post;
-  renderPost(post);
+  await renderPost(post);
   loadReactions(post.id);
   loadComments(post.id);
   wireCommentForm(post.id);
@@ -62,14 +63,22 @@ function showNotFound() {
   if (breadcrumbTitle) breadcrumbTitle.textContent = "Not found";
 }
 
-function renderPost(post) {
+async function renderPost(post) {
   document.getElementById("postLoading").style.display = "none";
   document.getElementById("postContent").style.display = "block";
 
-  const postMeta = parsePostMetaPD(post.content || "");
+  let postMeta = parsePostMetaPD(post.content || "");
+  const useWikiLayout = typeof WikiEntryLayout !== "undefined" && WikiEntryLayout.isWikiLayoutPost(post);
+  if (typeof EntityCore !== "undefined" && useWikiLayout) {
+    const repaired = EntityCore.normalizeEntityMeta(post, postMeta, { repairPayload: true });
+    postMeta = repaired.meta;
+  }
   const cleanContent = stripPostMetaPD(post.content || "");
+  const displayTitle = typeof EntityCore !== "undefined" && useWikiLayout
+    ? EntityCore.getDisplayName(postMeta, post)
+    : getPostDisplayTitlePD(post, postMeta);
 
-  document.getElementById("postTitle").textContent = post.title;
+  document.getElementById("postTitle").textContent = displayTitle;
   document.getElementById("postAuthor").textContent = post.profiles?.username || "Unknown";
 
   const authorHost = document.getElementById("postAuthorAvatar");
@@ -90,17 +99,87 @@ function renderPost(post) {
     document.getElementById("postEditedTag").style.display = "inline";
   }
 
-  document.getElementById("postBody").innerHTML = cleanContent;
+  const isStructuredDiscovery = post.post_type === "discovery" && postMeta && typeof postMeta.discovery_payload === "object";
+  let wikiLayoutRendered = false;
+
+  if (useWikiLayout && typeof KnowledgeRelations !== "undefined") {
+    try {
+      const effectiveCategory = typeof EntityCore !== "undefined"
+        ? EntityCore.getEffectiveCategory(post, postMeta)
+        : String(post.category || "").toLowerCase();
+      const viewPost = effectiveCategory && effectiveCategory !== "location_hint" && effectiveCategory !== post.category
+        ? Object.assign({}, post, { category: effectiveCategory })
+        : post;
+      let wikiRelations = KnowledgeRelations.collectEntityRelations(viewPost, postMeta);
+      wikiRelations = KnowledgeRelations.dedupeRelationsForDisplay(wikiRelations);
+      if (typeof KnowledgeRelations.fetchInboundRelations === "function") {
+        const inbound = await KnowledgeRelations.fetchInboundRelations(supabase, viewPost, postMeta);
+        wikiRelations = KnowledgeRelations.mergeRelations(wikiRelations, inbound);
+      }
+      wikiRelations = await resolveKnowledgeRelationsPD(wikiRelations);
+      wikiRelations = await enrichTransitiveItemRelationsPD(viewPost, postMeta, wikiRelations);
+      wikiRelations = await resolveKnowledgeRelationsPD(wikiRelations);
+      if (postMeta.discovery_payload && typeof WikiEntryLayout.enrichPayloadFromRelations === "function") {
+        postMeta.discovery_payload = WikiEntryLayout.enrichPayloadFromRelations(
+          postMeta.discovery_payload || {},
+          wikiRelations,
+          postMeta.knowledge_entry
+        );
+      } else if (typeof WikiEntryLayout.enrichPayloadFromRelations === "function") {
+        postMeta.discovery_payload = WikiEntryLayout.enrichPayloadFromRelations(
+          {},
+          wikiRelations,
+          postMeta.knowledge_entry
+        );
+      }
+      const wikiModel = WikiEntryLayout.buildModel(viewPost, postMeta, wikiRelations, cleanContent);
+      document.getElementById("postBody").innerHTML = WikiEntryLayout.render(wikiModel);
+      wikiLayoutRendered = true;
+      document.getElementById("postContent").classList.add("bl-wiki-page");
+      const postTypeBadge = document.getElementById("postTypeBadge");
+      if (postTypeBadge) postTypeBadge.textContent = getPostLabelSafe(post);
+    } catch (wikiErr) {
+      console.warn("Wiki entry layout failed:", wikiErr);
+    }
+  }
+
+  if (!wikiLayoutRendered && isStructuredDiscovery) {
+    try {
+      const relationSource = typeof KnowledgeRelations !== "undefined"
+        ? KnowledgeRelations.relationsFromDiscoveryPost(post, postMeta)
+        : (postMeta.discovery_relations || []);
+      postMeta.discovery_relations = await resolveDiscoveryRelationsPD(relationSource);
+    } catch (relErr) {
+      console.warn("Related entry resolution failed:", relErr);
+      postMeta.discovery_relations = Array.isArray(postMeta.discovery_relations) ? postMeta.discovery_relations : [];
+    }
+  }
+  if (!wikiLayoutRendered) {
+  try {
+    document.getElementById("postBody").innerHTML = isStructuredDiscovery
+      ? renderDiscoveryArticlePD(post, postMeta, cleanContent)
+      : cleanContent;
+  } catch (renderErr) {
+    console.warn("Post body render failed:", renderErr);
+    document.getElementById("postBody").innerHTML = cleanContent || "<p>Content could not be rendered.</p>";
+  }
+  }
   enhancePostImagesPD();
 
   const label = typeof getPostCategoryLabel === "function"
     ? getPostCategoryLabel(post)
     : (post.category || "Post");
+  const effectiveCategory = typeof EntityCore !== "undefined"
+    ? EntityCore.getEffectiveCategory(post, postMeta)
+    : String(post.category || "");
+  const displayCategoryLabel = effectiveCategory === "biomes"
+    ? "Biomes"
+    : (effectiveCategory === "location_hint" ? "Encounter Context" : label);
     const subcategoryLabel = getPostSubcategoryLabelPD(post, postMeta);
-  document.getElementById("breadcrumbCategory").textContent = label;
+  document.getElementById("breadcrumbCategory").textContent = displayCategoryLabel;
   const breadcrumbTitle = document.getElementById("breadcrumbTitle");
-  if (breadcrumbTitle) breadcrumbTitle.textContent = post.title;
-  document.title = post.title + " - BoundLore";
+  if (breadcrumbTitle) breadcrumbTitle.textContent = displayTitle;
+  document.title = displayTitle + " - BoundLore";
 
   const postTypeLabel = post.post_type === "guide"
     ? "Guide"
@@ -120,7 +199,7 @@ function renderPost(post) {
 
   const sideCategory = document.getElementById("sideCategory");
   if (sideCategory) {
-    sideCategory.textContent = label;
+    sideCategory.textContent = displayCategoryLabel;
   }
 
   const sideSubcategory = document.getElementById("sideSubcategory");
@@ -130,7 +209,7 @@ function renderPost(post) {
 
   const postCategoryChip = document.getElementById("postCategoryChip");
   if (postCategoryChip) {
-    postCategoryChip.textContent = label;
+    postCategoryChip.textContent = displayCategoryLabel;
   }
 
     const subcategoryChip = document.getElementById("postSubcategoryChip");
@@ -210,14 +289,14 @@ function renderPost(post) {
       '<li><a href="#commentsList">Jump to comments</a></li>' +
       '<li><a href="#relatedPostsSection">See also</a></li>';
 
-    const headings = extractHeadings(cleanContent).slice(0, 5);
-    headings.forEach(function(heading, index) {
+    // Build nav from what is actually rendered, not from the raw content
+    // (legacy discovery HTML may contain headings that are no longer shown).
+    const nodes = document.querySelectorAll("#postBody h1, #postBody h2, #postBody h3");
+    Array.prototype.slice.call(nodes, 0, 5).forEach(function(node, index) {
+      const heading = String(node.textContent || "").trim();
+      if (!heading) return;
       const headingId = "post-heading-" + index;
-      const match = document.querySelector("#postBody h1, #postBody h2, #postBody h3");
-      if (!match) return;
-      const nodes = document.querySelectorAll("#postBody h1, #postBody h2, #postBody h3");
-      if (!nodes[index]) return;
-      nodes[index].id = headingId;
+      node.id = headingId;
       const li = document.createElement("li");
       li.innerHTML = '<a href="#' + headingId + '">' + escapeHtml(heading) + '</a>';
       quickNav.appendChild(li);
@@ -233,8 +312,458 @@ function renderPost(post) {
   }
 
   loadRelatedPosts(post, postMeta);
-  renderStructuredDiscoveryPD(post, postMeta);
-  renderGuideReferencesPD(post, postMeta);
+  try {
+    if (!wikiLayoutRendered) {
+      await loadKnowledgeGraphPD(post, postMeta);
+    }
+  } catch (kgErr) {
+    console.warn("Knowledge graph render failed:", kgErr);
+  }
+  try {
+    renderStructuredDiscoveryPD(post, postMeta);
+    renderGuideReferencesPD(post, postMeta);
+  } catch (auxErr) {
+    console.warn("Auxiliary discovery sections failed:", auxErr);
+  }
+  renderTestDataBadgePD(postMeta);
+}
+
+function renderTestDataBadgePD(postMeta) {
+  if (!postMeta || postMeta.content_origin !== "test") return;
+  const header = document.querySelector(".bl-post-header-card");
+  if (!header || header.querySelector(".bl-test-data-badge")) return;
+  const badge = document.createElement("p");
+  badge.className = "bl-test-data-badge";
+  badge.textContent = "Test data — pre-release development content";
+  header.appendChild(badge);
+}
+
+function renderDiscoveryArticlePD(post, postMeta, cleanContent) {
+  const payload = postMeta.discovery_payload || {};
+  const resolvedRelations = Array.isArray(postMeta.discovery_relations) ? postMeta.discovery_relations : [];
+  const relations = resolvedRelations.length
+    ? resolvedRelations
+    : buildDiscoveryDisplayRelationsPD(post, postMeta, payload);
+  const displayRelations = typeof KnowledgeRelations !== "undefined"
+    ? KnowledgeRelations.dedupeRelationsForDisplay(relations)
+    : relations;
+  const evidence = Array.isArray(postMeta.discovery_evidence) ? postMeta.discovery_evidence : [];
+  const media = extractDiscoveryMediaPD(evidence, cleanContent);
+  const hero = media.find(function(item) { return item.type === "image"; });
+  const title = escapeHtml(getPostDisplayTitlePD(post, postMeta));
+  const summary = escapeHtml(buildDiscoverySummaryPD(payload));
+  const locationLine = formatDiscoveryLocationPD(payload);
+  const confidence = formatDiscoveryValuePD(payload.confidence_level || "");
+  const rarity = formatDiscoveryValuePD(payload.rarity || "");
+  const foundName = escapeHtml(payload.entity_name || post.title || "This discovery");
+  const sections = buildDiscoveryArticleSectionsPD(payload);
+
+  let html = '<article class="bl-discovery-article">';
+  html += '<section class="bl-discovery-hero-card">';
+  if (hero) {
+    html += '<figure class="bl-discovery-hero-media"><img src="' + escapeHtml(hero.url) + '" alt="' + title + ' evidence" /><figcaption>' + escapeHtml(hero.label || "Discovery evidence") + '</figcaption></figure>';
+  }
+  html += '<div class="bl-discovery-hero-copy">' +
+    '<p class="bl-discovery-kicker">Community Discovery</p>' +
+    '<h2>' + title + '</h2>' +
+    '<p>' + summary + '</p>' +
+    '<div class="bl-discovery-quickfacts">' +
+      renderDiscoveryQuickFactPD("Type", formatDiscoveryValuePD(payload.discovery_type || "Discovery")) +
+      renderDiscoveryQuickFactPD("Location", locationLine || "Unknown") +
+      renderDiscoveryQuickFactPD("Confidence", confidence || "Unknown") +
+      renderDiscoveryQuickFactPD("Rarity", rarity || "Unknown") +
+    '</div>' +
+    '</div></section>';
+
+  html += '<section class="bl-discovery-story-section"><h3>What Was Found</h3><p>' +
+    foundName + ' was submitted as a community discovery' +
+    (locationLine ? ' from ' + escapeHtml(locationLine) : '') +
+    '. The report highlights the observed behavior first, then keeps the supporting details in focused sections below.</p></section>';
+
+  sections.forEach(function(section) {
+    if (!section.body) return;
+    html += '<section class="bl-discovery-story-section"><h3>' + escapeHtml(section.title) + '</h3><p>' + escapeHtml(section.body) + '</p></section>';
+  });
+
+  if (media.length) {
+    html += '<section class="bl-discovery-story-section"><h3>Evidence</h3><div class="bl-discovery-gallery">';
+    media.forEach(function(item) {
+      if (item.type === "image") {
+        html += '<a class="bl-discovery-gallery-item" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener"><img src="' + escapeHtml(item.url) + '" alt="' + escapeHtml(item.label || "Discovery evidence") + '" /><span>' + escapeHtml(item.label || "Evidence image") + '</span></a>';
+      } else {
+        html += '<a class="bl-discovery-file-item" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' + escapeHtml(item.label || "Evidence file") + '</a>';
+      }
+    });
+    html += '</div></section>';
+  }
+
+  if (displayRelations.length) {
+    const viewerCategory = typeof KnowledgeRelations !== "undefined"
+      ? KnowledgeRelations.resolveViewerCategory(post, postMeta)
+      : "discoveries";
+    const sections = typeof KnowledgeRelations !== "undefined"
+      ? KnowledgeRelations.groupRelationsForDisplay(displayRelations, viewerCategory, { context: "discovery_post" })
+      : [];
+    html += '<section class="bl-discovery-story-section"><h3>Related Entries</h3>';
+    if (sections.length && typeof KnowledgeRelations !== "undefined") {
+      html += KnowledgeRelations.renderKnowledgeGraphHtml(sections);
+    } else {
+      html += '<div class="bl-discovery-relation-table-wrap"><table class="bl-discovery-relation-table"><thead><tr><th>Relation</th><th>Type</th><th>Entry</th></tr></thead><tbody>';
+      displayRelations.forEach(function(rel) {
+        const label = escapeHtml(typeof KnowledgeRelations !== "undefined"
+          ? KnowledgeRelations.getRelationLabel(rel.relation_type || rel.group)
+          : formatDiscoveryValuePD(rel.relation_type || rel.group || "related"));
+        const relTitle = escapeHtml(typeof EntityCore !== "undefined"
+          ? EntityCore.getRelationDisplayName(rel)
+          : (rel.canonical_target_name || rel.title || "Entry"));
+        const relType = escapeHtml(formatDiscoveryValuePD(rel.target_entity_type || inferRelationTargetTypePD(rel)));
+        const href = buildDiscoveryRelationHrefPD(rel);
+        html += '<tr><td>' + label + '</td><td>' + relType + '</td><td>' +
+          (href ? '<a href="' + escapeHtml(href) + '">' + relTitle + '</a>' : relTitle) +
+          '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</section>';
+    html += '<section class="bl-discovery-story-section"><p>If you know more about one of these linked entries, open it and submit a follow-up discovery to expand the knowledge network.</p></section>';
+  }
+
+  html += '<details class="bl-discovery-details"><summary>Full Submitted Data</summary><div class="bl-discovery-fact-grid">';
+  buildDiscoveryFactGroupsPD(payload).forEach(function(group) {
+    if (!group.items.length) return;
+    html += '<div class="bl-discovery-fact-card"><h4>' + escapeHtml(group.title) + '</h4><dl>';
+    group.items.forEach(function(item) {
+      html += '<div><dt>' + escapeHtml(item.label) + '</dt><dd>' + escapeHtml(String(item.value)) + '</dd></div>';
+    });
+    html += '</dl></div>';
+  });
+  html += '</div></details>';
+  html += '</article>';
+  return html;
+}
+
+function renderDiscoveryQuickFactPD(label, value) {
+  return '<span><strong>' + escapeHtml(label) + '</strong>' + escapeHtml(value || "-") + '</span>';
+}
+
+function buildDiscoveryArticleSectionsPD(payload) {
+  const location = formatDiscoveryLocationPD(payload);
+  const encounterParts = [
+    payload.time_of_day ? "Time of day: " + formatDiscoveryValuePD(payload.time_of_day) : "",
+    payload.weather_condition ? "Weather: " + formatDiscoveryValuePD(payload.weather_condition) : "",
+    payload.biome_context ? "Environment: " + formatDiscoveryValuePD(payload.biome_context) : "",
+    payload.spawn_conditions ? "Spawn conditions: " + payload.spawn_conditions : "",
+    payload.trigger_conditions ? "Trigger: " + payload.trigger_conditions : "",
+    payload.requirements ? "Requirements: " + payload.requirements : "",
+    payload.group_size ? "Observed group size: " + formatDiscoveryValuePD(payload.group_size) : "",
+    payload.taming_method ? "Taming method: " + payload.taming_method : "",
+    payload.key_item_used ? "Key item: " + payload.key_item_used : "",
+    payload.combat_outcome ? "After defeat: " + formatDiscoveryValuePD(payload.combat_outcome) : "",
+  ].filter(Boolean);
+  const lootParts = [
+    payload.dropped_items ? "Reported drops: " + payload.dropped_items : "",
+    payload.loot_or_rewards ? "Rewards: " + payload.loot_or_rewards : "",
+    payload.resources_or_rewards ? "Resources: " + payload.resources_or_rewards : "",
+    payload.drop_rate_observation ? "Drop rate observation: " + formatDiscoveryValuePD(payload.drop_rate_observation) : "",
+    payload.loot_conditions ? "Loot conditions: " + payload.loot_conditions : "",
+  ].filter(Boolean);
+
+  return [
+    {
+      title: "Location",
+      body: location ? "Players should start around " + location + ". Coordinates or route details are included when the submitter observed them." : "",
+    },
+    {
+      title: "Encounter Notes",
+      body: encounterParts.join(" "),
+    },
+    {
+      title: "Loot & Rewards",
+      body: lootParts.length ? lootParts.join(" ") : "No confirmed loot or reward data was submitted yet.",
+    },
+    {
+      title: "Verification",
+      body: [
+        payload.how_to_reproduce ? "How to reproduce: " + payload.how_to_reproduce : "",
+        payload.observed_result ? "Observed result: " + payload.observed_result : "",
+        payload.expected_result ? "Expected result: " + payload.expected_result : "",
+      ].filter(Boolean).join(" "),
+    },
+  ];
+}
+
+function extractDiscoveryMediaPD(evidence, cleanContent) {
+  const media = [];
+  (Array.isArray(evidence) ? evidence : []).forEach(function(item) {
+    if (!item || !item.url) return;
+    const type = String(item.kind || item.file_type || "").toLowerCase().includes("image") ? "image" : "file";
+    media.push({ type: type, url: item.url, label: item.label || "Evidence" });
+  });
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = cleanContent || "";
+  Array.from(wrapper.querySelectorAll("img[src]")).forEach(function(img) {
+    const url = img.getAttribute("src") || "";
+    if (!url || media.some(function(item) { return item.url === url; })) return;
+    media.push({ type: "image", url: url, label: img.getAttribute("alt") || "Discovery screenshot" });
+  });
+  return media;
+}
+
+function formatDiscoveryLocationPD(payload) {
+  const primary = getDiscoveryPrimaryPlacePD(payload);
+  const seen = new Set();
+  return [primary, payload.region_name, payload.coordinates]
+    .map(getMeaningfulDiscoveryValuePD)
+    .filter(function(value) {
+      if (!value) return false;
+      const key = value.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .join(" / ");
+}
+
+function getPostDisplayTitlePD(post, postMeta) {
+  const payload = postMeta && typeof postMeta.discovery_payload === "object" ? postMeta.discovery_payload : null;
+  if (post && post.post_type === "discovery" && payload) {
+    const entityName = getMeaningfulDiscoveryValuePD(payload.entity_name);
+    const primaryPlace = getDiscoveryPrimaryPlacePD(payload);
+    if (entityName && primaryPlace) return entityName + " in " + primaryPlace;
+    if (entityName) return entityName;
+  }
+  return (post && post.title) || "BoundLore Post";
+}
+
+function getDiscoveryPrimaryPlacePD(payload) {
+  const data = payload && typeof payload === "object" ? payload : {};
+  const foundIn = getMeaningfulDiscoveryValuePD(data.found_in);
+  if (foundIn && !isGenericDiscoveryAreaPD(foundIn)) return foundIn;
+  const region = getMeaningfulDiscoveryValuePD(data.region_name);
+  if (region && !isGenericDiscoveryAreaPD(region)) return formatDiscoveryValuePD(region);
+  const biome = getMeaningfulDiscoveryValuePD(data.biome_context);
+  if (biome && !isGenericDiscoveryAreaPD(biome)) return formatDiscoveryValuePD(biome);
+  const inferred = inferPlaceFromDiscoveryTextPD([
+    data.how_to_reproduce,
+    data.spawn_conditions,
+    data.taming_method,
+    data.observed_result,
+  ]);
+  if (inferred) return inferred;
+  const world = getMeaningfulDiscoveryValuePD(data.world_name);
+  if (world && !isGenericDiscoveryAreaPD(world)) return world;
+  return "";
+}
+
+function isGenericDiscoveryAreaPD(value) {
+  const lower = String(value || "").trim().toLowerCase();
+  return ["central", "center", "north", "northern", "south", "southern", "east", "eastern", "west", "western", "middle", "upper", "lower", "inner", "outer"].includes(lower);
+}
+
+function inferPlaceFromDiscoveryTextPD(values) {
+  const text = (values || []).map(function(value) { return String(value || ""); }).join(" ");
+  const match = text.match(/\b(?:in|inside|within|around|near)\s+(?:the\s+)?([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){0,3})\b/);
+  if (!match) return "";
+  const place = getMeaningfulDiscoveryValuePD(match[1]);
+  return place && !isGenericDiscoveryAreaPD(place) ? place : "";
+}
+
+function getMeaningfulDiscoveryValuePD(value) {
+  const clean = String(value || "").trim();
+  const lower = clean.toLowerCase();
+  if (!clean) return "";
+  if (["unclear", "unknown", "not observed", "not sure", "n/a", "na", "none", "no"].includes(lower)) return "";
+  return clean;
+}
+
+function buildDiscoveryDisplayRelationsPD(post, postMeta, payload) {
+  if (typeof KnowledgeRelations !== "undefined") {
+    return KnowledgeRelations.relationsFromDiscoveryPost(post, postMeta);
+  }
+  const relations = Array.isArray(postMeta && postMeta.discovery_relations) ? postMeta.discovery_relations.slice() : [];
+  const existing = new Set(relations.map(function(rel) {
+    return String(rel.group || "") + "|" + String(rel.title || "").toLowerCase();
+  }));
+
+  function add(group, relationType, title, opts) {
+    const cleanTitle = getMeaningfulDiscoveryValuePD(title);
+    if (!cleanTitle) return;
+    const key = group + "|" + cleanTitle.toLowerCase();
+    if (existing.has(key)) return;
+    existing.add(key);
+    relations.push(Object.assign({
+      group: group,
+      relation_type: relationType,
+      title: cleanTitle,
+      target_entity_type: inferRelationTargetTypePD({ group: group }),
+      auto_inferred: true,
+    }, opts || {}));
+  }
+
+  const primaryPlace = getDiscoveryPrimaryPlacePD(payload);
+  add("locations", "found_in", primaryPlace, { target_entity_type: "location" });
+  add("items", "requires", payload && payload.key_item_used, { target_entity_type: "item" });
+  extractLikelyItemNamesPD([
+    payload && payload.taming_method,
+    payload && payload.requirements,
+    payload && payload.loot_conditions,
+    payload && payload.how_to_reproduce,
+  ]).forEach(function(itemName) {
+    add("items", "requires", itemName, { target_entity_type: "item" });
+  });
+  extractListLikeValuesPD(payload && (payload.dropped_items || payload.loot_or_rewards || payload.resources_or_rewards)).forEach(function(itemName) {
+    add("items", "drops", itemName, { target_entity_type: "item" });
+  });
+
+  return relations;
+}
+
+async function resolveDiscoveryRelationsPD(sourceRelations) {
+  const source = Array.isArray(sourceRelations) ? sourceRelations : [];
+  const resolved = [];
+  const seen = new Set();
+
+  for (const rel of source) {
+    if (!rel || !rel.title) continue;
+    const dedupeKey = typeof KnowledgeRelations !== "undefined"
+      ? KnowledgeRelations.dedupeKeyForRelation(rel)
+      : String(rel.group || "") + "|" + String(rel.relation_type || "") + "|" + String(rel.title || "").trim().toLowerCase();
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    const next = Object.assign({}, rel);
+    if (!next.slug && !next.id) {
+      const match = await findKnowledgeTargetPostPD(next);
+      if (match) {
+        next.id = match.id;
+        next.slug = match.slug || null;
+        next.category = next.category || match.category || null;
+        next.post_type = next.post_type || match.post_type || null;
+        next.resolved = true;
+      }
+    }
+    if (typeof EntityCore !== "undefined") {
+      Object.assign(next, EntityCore.enrichRelation(next));
+    }
+    resolved.push(next);
+  }
+
+  return resolved;
+}
+
+async function findKnowledgeTargetPostPD(rel) {
+  const category = rel.category || mapRelationToCategoryPD(rel);
+  const title = String(rel && rel.canonical_target_name || rel && rel.title || "").trim();
+  if (!category || !title) return null;
+
+  let canonical = title;
+  let entityKey = null;
+  let aliases = [];
+  if (typeof EntityCore !== "undefined") {
+    const identity = EntityCore.extractCanonicalIdentity(title, category);
+    canonical = identity.canonical_name || title;
+    entityKey = EntityCore.buildEntityKey(category, canonical);
+    aliases = EntityCore.getBiomeAliases(canonical);
+  }
+
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.findExistingKnowledgePost) {
+    const existing = await KnowledgeRelations.findExistingKnowledgePost(supabase, canonical, category);
+    if (existing) return existing;
+    if (aliases.length) {
+      for (let i = 0; i < aliases.length; i += 1) {
+        const aliasMatch = await KnowledgeRelations.findExistingKnowledgePost(supabase, aliases[i], category);
+        if (aliasMatch) return aliasMatch;
+      }
+    }
+  }
+
+  let query = supabase
+    .from("posts")
+    .select("id, slug, title, category, post_type, content")
+    .eq("category", category)
+    .limit(40);
+
+  if (category === "guides") {
+    query = supabase
+      .from("posts")
+      .select("id, slug, title, category, post_type, content")
+      .eq("post_type", "guide")
+      .limit(40);
+  }
+
+  const { data, error } = await query;
+  if (error || !Array.isArray(data)) return null;
+  return data.find(function(row) {
+    if (typeof EntityCore !== "undefined" && EntityCore.titlesMatchEntity(row, canonical, entityKey)) {
+      return true;
+    }
+    return String(row.title || "").trim().toLowerCase() === title.toLowerCase();
+  }) || null;
+}
+
+function mapRelationToCategoryPD(rel) {
+  const group = String(rel && rel.group || "").toLowerCase();
+  if (group === "items") return "items";
+  if (group === "creatures") return "creatures";
+  if (group === "guides") return "guides";
+  if (group === "locations") {
+    const targetType = String(rel && rel.target_entity_type || "").toLowerCase();
+    return targetType === "biome" ? "biomes" : "locations";
+  }
+  return "";
+}
+
+function inferRelationTargetTypePD(rel) {
+  const group = String(rel && rel.group || "").toLowerCase();
+  if (group === "items") return "item";
+  if (group === "locations") return "location";
+  if (group === "creatures") return "creature";
+  if (group === "guides") return "guide";
+  return "entry";
+}
+
+function buildDiscoveryRelationHrefPD(rel) {
+  if (!rel) return "";
+  if (rel.slug) return "/wiki/post/?slug=" + encodeURIComponent(rel.slug);
+  if (rel.id) return "/wiki/post/?id=" + encodeURIComponent(rel.id);
+  const group = String(rel.group || "").toLowerCase();
+  const title = String(rel.title || "").trim();
+  if (!title) return "";
+  return "";
+}
+
+function extractLikelyItemNamesPD(values) {
+  const out = [];
+  (values || []).forEach(function(value) {
+    const text = String(value || "");
+    const quoted = text.match(/"([^"]{3,80})"/g) || [];
+    quoted.forEach(function(match) {
+      out.push(match.replace(/^"|"$/g, ""));
+    });
+    const itemNames = text.match(/\b([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){1,5}\s+(?:Medallion|Amulet|Key|Charm|Heart|Stone|Token|Relic|Compass|Crystal|Orb))\b/g) || [];
+    itemNames.forEach(function(match) { out.push(match); });
+  });
+  return Array.from(new Set(out.map(function(item) { return item.trim(); }).filter(Boolean)));
+}
+
+function extractListLikeValuesPD(value) {
+  return String(value || "")
+    .split(/[,;\n]+/)
+    .map(function(item) { return item.trim().replace(/^\d+x?\s*/i, ""); })
+    .filter(function(item) {
+      const lower = item.toLowerCase();
+      return item.length >= 3 && !["unknown", "unclear", "none", "not observed"].includes(lower);
+    })
+    .slice(0, 8);
+}
+
+function formatDiscoveryValuePD(value) {
+  return String(value || "")
+    .replace(/^\d-/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, function(c) { return c.toUpperCase(); })
+    .trim();
 }
 
 function renderStructuredDiscoveryPD(post, postMeta) {
@@ -247,29 +776,39 @@ function renderStructuredDiscoveryPD(post, postMeta) {
   const payload = postMeta && typeof postMeta.discovery_payload === "object" ? postMeta.discovery_payload : null;
   const relations = Array.isArray(postMeta && postMeta.discovery_relations) ? postMeta.discovery_relations : [];
   const evidence = Array.isArray(postMeta && postMeta.discovery_evidence) ? postMeta.discovery_evidence : [];
+  if (payload) return;
   if (!payload && relations.length === 0 && evidence.length === 0) return;
 
   section.style.display = "block";
   let html = '<h3 class="bl-related-title">Discovery Data Network</h3>';
 
   if (payload && Object.keys(payload).length) {
-    html += '<div class="bl-related-group"><h4 class="bl-related-group-title">Structured Facts</h4><ul class="source-list">';
-    Object.keys(payload).forEach(function(key) {
-      const value = payload[key];
-      if (value == null || value === "") return;
-      const label = String(key).replace(/_/g, " ").replace(/\b\w/g, function(c) { return c.toUpperCase(); });
-      html += '<li><strong>' + escapeHtml(label) + ':</strong> ' + escapeHtml(String(value)) + '</li>';
+    const summary = buildDiscoverySummaryPD(payload);
+    if (summary) {
+      html += '<p class="bl-discovery-summary">' + escapeHtml(summary) + '</p>';
+    }
+    html += '<div class="bl-discovery-fact-grid">';
+    buildDiscoveryFactGroupsPD(payload).forEach(function(group) {
+      if (!group.items.length) return;
+      html += '<div class="bl-discovery-fact-card"><h4>' + escapeHtml(group.title) + '</h4><dl>';
+      group.items.forEach(function(item) {
+        html += '<div><dt>' + escapeHtml(item.label) + '</dt><dd>' + escapeHtml(String(item.value)) + '</dd></div>';
+      });
+      html += '</dl></div>';
     });
-    html += '</ul></div>';
+    html += '</div>';
   }
 
   if (relations.length) {
     html += '<div class="bl-related-group"><h4 class="bl-related-group-title">Auto-Linked Dependencies</h4><ul class="source-list">';
     relations.forEach(function(rel) {
       const relLabel = escapeHtml(String(rel.relation_type || rel.group || "related_to").replace(/_/g, " "));
-      const title = escapeHtml(rel.title || "Entry");
-      if (rel.slug) {
-        html += '<li><strong>' + relLabel + ':</strong> <a href="/wiki/post/?slug=' + encodeURIComponent(rel.slug) + '">' + title + '</a></li>';
+      const title = escapeHtml(typeof EntityCore !== "undefined"
+        ? EntityCore.getRelationDisplayName(rel)
+        : (rel.canonical_target_name || rel.title || "Entry"));
+      const href = buildDiscoveryRelationHrefPD(rel);
+      if (href) {
+        html += '<li><strong>' + relLabel + ':</strong> <a href="' + escapeHtml(href) + '">' + title + '</a></li>';
       } else {
         html += '<li><strong>' + relLabel + ':</strong> ' + title + '</li>';
       }
@@ -297,6 +836,55 @@ function renderStructuredDiscoveryPD(post, postMeta) {
   section.innerHTML = html;
 }
 
+function buildDiscoverySummaryPD(payload) {
+  const data = payload && typeof payload === "object" ? payload : {};
+  const name = String(data.entity_name || "This discovery").trim();
+  const place = getDiscoveryPrimaryPlacePD(data);
+  const confidence = String(data.confidence_level || "").replace(/^\d-/, "").replace(/-/g, " ");
+  const loot = String(data.dropped_items || data.loot_or_rewards || data.resources_or_rewards || "").trim();
+  const parts = [];
+
+  parts.push(name + (place ? " was reported in " + place : " was reported by the community"));
+  if (loot) parts.push("loot or reward observations are included");
+  if (confidence) parts.push("confidence is marked as " + confidence);
+  return parts.join(", ") + ".";
+}
+
+function buildDiscoveryFactGroupsPD(payload) {
+  const data = payload && typeof payload === "object" ? payload : {};
+  const used = new Set();
+  const groups = [
+    { title: "Identity", keys: ["discovery_type", "entity_name", "alt_names", "rarity", "confidence_level", "impact_area"], items: [] },
+    { title: "Location", keys: ["world_name", "region_name", "found_in", "coordinates", "climate"], items: [] },
+    { title: "Encounter", keys: ["time_of_day", "weather_condition", "biome_context", "spawn_conditions", "trigger_conditions", "requirements", "group_size", "combat_outcome", "mountable", "health_points", "taming_method", "key_item_used"], items: [] },
+    { title: "Loot & Rewards", keys: ["dropped_items", "loot_or_rewards", "resources_or_rewards", "dropped_by", "source_type", "drop_rate_observation", "drop_conditions", "loot_conditions"], items: [] },
+    { title: "Verification", keys: ["how_to_reproduce", "observed_result", "expected_result", "first_seen_version", "last_confirmed_version", "automation_tags", "notes"], items: [] },
+  ];
+
+  groups.forEach(function(group) {
+    group.keys.forEach(function(key) {
+      const value = data[key];
+      if (value == null || value === "") return;
+      used.add(key);
+      group.items.push({ label: humanizeDiscoveryKeyPD(key), value: value });
+    });
+  });
+
+  Object.keys(data).forEach(function(key) {
+    if (used.has(key) || data[key] == null || data[key] === "") return;
+    groups[groups.length - 1].items.push({ label: humanizeDiscoveryKeyPD(key), value: data[key] });
+  });
+
+  return groups;
+}
+
+function humanizeDiscoveryKeyPD(value) {
+  return String(value || "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, function(c) { return c.toUpperCase(); })
+    .trim();
+}
+
 function renderGuideReferencesPD(post, postMeta) {
   const section = document.getElementById("postDiscoveryData");
   if (!section || !post || post.post_type !== "guide") return;
@@ -317,6 +905,122 @@ function renderGuideReferencesPD(post, postMeta) {
     '</ul></div>';
 }
 
+async function loadKnowledgeGraphPD(post, postMeta) {
+  const section = document.getElementById("postDiscoveryData");
+  if (!section || typeof KnowledgeRelations === "undefined") return;
+  if (post && post.post_type === "discovery" && postMeta && postMeta.discovery_payload) return;
+
+  let relations = [];
+  try {
+    relations = KnowledgeRelations.collectEntityRelations(post, postMeta || {});
+    relations = KnowledgeRelations.dedupeRelationsForDisplay(relations);
+    relations = await resolveKnowledgeRelationsPD(relations);
+  } catch (err) {
+    console.warn("Could not collect entity relations:", err);
+    return;
+  }
+
+  const viewerCategory = KnowledgeRelations.resolveViewerCategory(post, postMeta || {});
+  const sections = KnowledgeRelations.groupRelationsForDisplay(relations, viewerCategory);
+  if (!sections.length) return;
+
+  const stubMeta = postMeta && postMeta.knowledge_entry;
+  const stubBadge = stubMeta && (stubMeta.status === "needs_details" || stubMeta.completeness === "stub")
+    ? "Stub entry — some details still missing"
+    : "";
+
+  section.style.display = "block";
+  section.innerHTML = '<h3 class="bl-related-title">Knowledge Connections</h3>' +
+    KnowledgeRelations.renderKnowledgeGraphHtml(sections, { stubBadge: stubBadge });
+}
+
+async function enrichTransitiveItemRelationsPD(post, postMeta, relations) {
+  const cat = String(post && post.category || "").toLowerCase();
+  if (cat !== "items" || typeof EntityCore === "undefined") return relations;
+  const hasBiome = (Array.isArray(relations) ? relations : []).some(function(rel) {
+    const type = KnowledgeRelations.normalizeRelationType(rel.relation_type);
+    return (type === "located_in" || type === "part_of")
+      && (String(rel.category || "").toLowerCase() === "biomes" || rel.target_entity_type === "biome");
+  });
+  if (hasBiome) return relations;
+
+  const droppedRel = (Array.isArray(relations) ? relations : []).find(function(rel) {
+    return KnowledgeRelations.normalizeRelationType(rel.relation_type) === "dropped_by";
+  });
+  if (!droppedRel || !droppedRel.title) return relations;
+
+  const creature = await findKnowledgeTargetPostPD(Object.assign({}, droppedRel, {
+    group: "creatures",
+    category: "creatures",
+    target_entity_type: "creature",
+  }));
+  if (!creature) return relations;
+
+  const creatureMeta = parsePostMetaPD(creature.content || "");
+  const repairedMeta = typeof EntityCore !== "undefined"
+    ? EntityCore.normalizeEntityMeta(creature, creatureMeta, { repairPayload: true }).meta
+    : creatureMeta;
+  let creatureRels = KnowledgeRelations.collectEntityRelations(creature, repairedMeta);
+  if (!creatureRels.some(function(rel) {
+    const type = KnowledgeRelations.normalizeRelationType(rel.relation_type);
+    return (type === "located_in" || type === "part_of")
+      && (String(rel.category || "").toLowerCase() === "biomes" || rel.target_entity_type === "biome" || EntityCore.isKnownBiomeName(rel.title));
+  })) {
+    const inferred = [];
+    KnowledgeRelations.appendAutoRelations(
+      inferred,
+      repairedMeta.discovery_payload || {},
+      creature.category,
+      { sourceTitle: creature.title, sourceCategory: creature.category }
+    );
+    creatureRels = KnowledgeRelations.mergeRelations(creatureRels, inferred);
+  }
+  const biomeRel = creatureRels.find(function(rel) {
+    const type = KnowledgeRelations.normalizeRelationType(rel.relation_type);
+    return (type === "located_in" || type === "part_of")
+      && (String(rel.category || "").toLowerCase() === "biomes" || rel.target_entity_type === "biome" || EntityCore.isKnownBiomeName(rel.title));
+  });
+  if (!biomeRel) return relations;
+
+  return KnowledgeRelations.mergeRelations(relations, [Object.assign({}, biomeRel, {
+    relation_type: "located_in",
+    auto_inferred: true,
+    direction: "outbound",
+    confidence: Math.max(70, Number(biomeRel.confidence) || 75),
+  })]);
+}
+
+async function resolveKnowledgeRelationsPD(relations) {
+  const resolved = [];
+  const seen = new Set();
+
+  for (const rel of relations) {
+    if (!rel || !rel.title) continue;
+    const dedupeKey = typeof KnowledgeRelations !== "undefined"
+      ? KnowledgeRelations.dedupeKeyForRelation(rel)
+      : String(rel.group || "") + "|" + String(rel.title || "").toLowerCase();
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    const next = Object.assign({}, rel);
+    if (!next.slug && !next.id) {
+      const match = await findKnowledgeTargetPostPD(next);
+      if (match) {
+        next.id = match.id;
+        next.slug = match.slug || null;
+        next.category = next.category || match.category || null;
+        next.post_type = next.post_type || match.post_type || null;
+        next.resolved = true;
+      }
+    }
+    if (typeof EntityCore !== "undefined") {
+      Object.assign(next, EntityCore.enrichRelation(next));
+    }
+    resolved.push(next);
+  }
+  return resolved;
+}
+
 async function loadRelatedPosts(post, postMeta) {
   const wrap = document.getElementById("relatedPostsSection");
   const list = document.getElementById("relatedPostsList");
@@ -327,6 +1031,7 @@ async function loadRelatedPosts(post, postMeta) {
     .from("posts")
     .select("id, slug, title, category, post_type, guide_subcategory, content, created_at")
     .eq("status", "published")
+    .is("deleted_at", null)
     .neq("id", post.id)
     .order("created_at", { ascending: false });
 
@@ -548,7 +1253,9 @@ function renderRelatedItemPD(item) {
   const link = document.createElement("a");
   link.className = "bl-related-item";
   link.href = item.href || (item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id)));
-  const label = item.label || item.title || "Untitled";
+  const label = (typeof EntityCore !== "undefined" && item.content)
+    ? EntityCore.getDisplayName(parsePostMetaPD(item.content || ""), item)
+    : (item.label || item.title || "Untitled");
   const meta = item.meta || getSeeAlsoLabelPD(item);
   const datePart = item.created_at ? (' • ' + new Date(item.created_at).toLocaleDateString()) : "";
   link.innerHTML =
@@ -846,6 +1553,9 @@ function stripPostMetaPD(html) {
 }
 
 function parsePostMetaPD(html) {
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.safeParseMeta) {
+    return KnowledgeRelations.safeParseMeta(html);
+  }
   const match = String(html || "").match(/<!--BLMETA\s+([\s\S]*?)\s*-->/i);
   if (!match) return {};
   try {

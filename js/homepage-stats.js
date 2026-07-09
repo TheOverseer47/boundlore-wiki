@@ -66,7 +66,8 @@ async function countPublishedByCategory(category) {
     .from("posts")
     .select("id", { count: "exact", head: true })
     .eq("category", category)
-    .in("status", ["published", "approved"]);
+    .in("status", ["published", "approved"])
+    .is("deleted_at", null);
 
   if (error) {
     console.error("Homepage counter fallback failed for category", category, error);
@@ -81,12 +82,14 @@ async function countGuidesPublished() {
       .from("posts")
       .select("id", { count: "exact", head: true })
       .eq("post_type", "guide")
-      .in("status", ["published", "approved"]),
+      .in("status", ["published", "approved"])
+      .is("deleted_at", null),
     supabase
       .from("posts")
       .select("id", { count: "exact", head: true })
       .eq("category", "guides")
-      .in("status", ["published", "approved"]),
+      .in("status", ["published", "approved"])
+      .is("deleted_at", null),
   ]);
 
   const guideTypeCount = guideType.error ? 0 : (guideType.count || 0);

@@ -336,6 +336,128 @@ function setEditPostType(type) {
   }
 }
 
+function mapRelationGroupToPlaceholderCategoryEP(groupKey, relation) {
+  if (groupKey === "items") return "items";
+  if (groupKey === "creatures") return "creatures";
+  if (groupKey === "locations") {
+    const targetType = String(relation && relation.target_entity_type || "").toLowerCase();
+    return targetType === "biome" ? "biomes" : "locations";
+  }
+  return "";
+}
+
+function buildPlaceholderContentEP(title, relation) {
+  return [
+    "<section class=\"bl-kg-stub-head\">",
+    "<p class=\"bl-kg-stub-kicker\">Knowledge Node</p>",
+    "<h2>" + escapeHtmlEP(title || "Entry") + "</h2>",
+    "</section>",
+    "<p>Auto-created knowledge entry (" + escapeHtmlEP(String((relation && relation.relation_type) || "related").replace(/_/g, " ")) + ").</p>"
+  ].join("");
+}
+
+function buildEditKnowledgeSourceContextEP(payload, title, category) {
+  return {
+    payload: payload || {},
+    sourceTitle: String((payload && payload.entity_name) || title || "").trim(),
+    sourceCategory: category || "",
+    sourcePostId: editPost && editPost.id ? editPost.id : null,
+    sourcePostSlug: editPost && editPost.slug ? editPost.slug : null,
+    sourceDate: new Date().toISOString(),
+  };
+}
+
+async function ensureKnowledgeRelationTargetsEP(relations, sourceContext) {
+  const KR = window.KnowledgeRelations;
+  const items = Array.isArray(relations) ? relations : [];
+  const seen = new Set();
+  const ctx = sourceContext || {};
+
+  for (const rel of items) {
+    if (!rel || !rel.title) continue;
+    const groupKey = String(rel.group || "").toLowerCase();
+    const category = KR
+      ? KR.mapGroupToCategory(groupKey, rel)
+      : mapRelationGroupToPlaceholderCategoryEP(groupKey, rel);
+    if (!category) continue;
+
+    const normalizedTitle = String(rel.title).trim();
+    const dedupeKey = category + "|" + normalizedTitle.toLowerCase();
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    if (!rel.category) rel.category = category;
+
+    let query = supabase
+      .from("posts")
+      .select("id, slug, title, category, post_type, content")
+      .eq("title", normalizedTitle)
+      .limit(1);
+
+    if (category === "guides") {
+      query = query.eq("post_type", "guide");
+    } else {
+      query = query.eq("category", category);
+    }
+
+    const { data: existing } = await query.maybeSingle();
+    if (existing) {
+      rel.id = existing.id;
+      rel.slug = existing.slug || null;
+      rel.category = existing.category || category;
+      rel.post_type = existing.post_type || "wiki";
+      rel.resolved = true;
+      if (KR) {
+        const inverse = KR.createInverseRelation(rel, {
+          id: ctx.sourcePostId,
+          slug: ctx.sourcePostSlug,
+          title: ctx.sourceTitle,
+          category: ctx.sourceCategory,
+          post_type: "discovery",
+        });
+        if (inverse) await KR.appendInboundRelationToPost(supabase, existing.id, inverse);
+      }
+      continue;
+    }
+
+    if (rel.slug || rel.id) continue;
+
+    const stubMeta = KR ? KR.buildStubPostMeta(rel, ctx) : null;
+    const bodyHtml = KR
+      ? KR.buildStubPostContent(normalizedTitle, rel, ctx)
+      : buildPlaceholderContentEP(normalizedTitle, rel);
+    const content = stubMeta ? injectPostMetaEP(bodyHtml, stubMeta) : bodyHtml;
+
+    const placeholderPayload = {
+      author_id: editUserId,
+      title: normalizedTitle,
+      content: content,
+      status: "pending",
+      post_type: "wiki",
+      category: category,
+      guide_subcategory: null,
+      is_discovery: false,
+    };
+
+    const { data: created, error } = await supabase
+      .from("posts")
+      .insert(placeholderPayload)
+      .select("id, slug, title, category, post_type")
+      .single();
+
+    if (error) {
+      console.warn("Failed to create related knowledge entry:", error);
+      continue;
+    }
+
+    rel.id = created.id;
+    rel.slug = created.slug || null;
+    rel.category = created.category || category;
+    rel.post_type = created.post_type || "wiki";
+    rel.resolved = true;
+  }
+}
+
 async function handleEditSubmit(e) {
   e.preventDefault();
 
@@ -464,6 +586,10 @@ async function handleEditSubmit(e) {
         errEl.style.display = "block";
         return;
       }
+      await ensureKnowledgeRelationTargetsEP(
+        structuredResult.relations,
+        buildEditKnowledgeSourceContextEP(structuredResult.payload, title, effectiveCategory)
+      );
       meta.discovery_payload = structuredResult.payload;
       meta.discovery_relations = structuredResult.relations;
       meta.discovery_relations_skipped = !structuredResult.relations || structuredResult.relations.length === 0;
@@ -603,6 +729,8 @@ function normalizePostMetaEP(meta) {
   if (meta.patch_tag) out.patch_tag = String(meta.patch_tag).slice(0, 40);
   if (meta.source_url) out.source_url = String(meta.source_url).slice(0, 500);
   if (meta.subcategory) out.subcategory = String(meta.subcategory).slice(0, 60);
+  if (meta.discovery_form) out.discovery_form = String(meta.discovery_form).slice(0, 16);
+  if (meta.content_origin) out.content_origin = String(meta.content_origin).slice(0, 16);
   if (meta.discovery_payload && typeof meta.discovery_payload === "object") {
     const payload = {};
     Object.keys(meta.discovery_payload).forEach(function(key) {
@@ -622,6 +750,9 @@ function normalizePostMetaEP(meta) {
         title: String(rel.title || "").slice(0, 140),
         category: rel.category ? String(rel.category).slice(0, 60) : null,
         post_type: rel.post_type ? String(rel.post_type).slice(0, 40) : null,
+        target_entity_type: rel.target_entity_type ? String(rel.target_entity_type).slice(0, 40) : null,
+        confidence: Number.isFinite(Number(rel.confidence)) ? Math.max(0, Math.min(100, Number(rel.confidence))) : null,
+        auto_inferred: !!rel.auto_inferred,
         resolved: !!rel.resolved,
       };
     }).filter(function(rel) {
@@ -644,6 +775,13 @@ function normalizePostMetaEP(meta) {
     }).filter(function(item) {
       return !!item.url || !!item.label;
     });
+  }
+  if (typeof KnowledgeRelations !== "undefined") {
+    const knowledgeMeta = KnowledgeRelations.normalizeKnowledgeMeta(meta);
+    if (knowledgeMeta) {
+      if (knowledgeMeta.knowledge_entry) out.knowledge_entry = knowledgeMeta.knowledge_entry;
+      if (knowledgeMeta.knowledge_graph) out.knowledge_graph = knowledgeMeta.knowledge_graph;
+    }
   }
   if (Array.isArray(meta.guide_references)) {
     out.guide_references = meta.guide_references.slice(0, 12).map(function(ref) {
@@ -1481,8 +1619,11 @@ function buildEditStructuredDiscoveryContent(title, category, payload, relations
     html += '<h3>Related Entries</h3><ul>';
     relations.forEach(function(rel) {
       const relLabel = escapeHtmlEP(rel.relation_type || "related_to");
-      if (rel.slug) {
-        html += '<li><strong>' + relLabel + ':</strong> <a href="/wiki/post/?slug=' + encodeURIComponent(rel.slug) + '">' + escapeHtmlEP(rel.title || "Entry") + '</a></li>';
+      const href = rel.slug
+        ? ("/wiki/post/?slug=" + encodeURIComponent(rel.slug))
+        : (rel.id ? ("/wiki/post/?id=" + encodeURIComponent(rel.id)) : "");
+      if (href) {
+        html += '<li><strong>' + relLabel + ':</strong> <a href="' + href + '">' + escapeHtmlEP(rel.title || "Entry") + '</a></li>';
       } else {
         html += '<li><strong>' + relLabel + ':</strong> ' + escapeHtmlEP(rel.title || "Entry") + '</li>';
       }
@@ -1516,7 +1657,11 @@ function parsePostMetaEP(html) {
 
 function injectPostMetaEP(html, meta) {
   const cleaned = stripPostMetaEP(html);
-  const normalized = normalizePostMetaEP(meta);
+  let sourceMeta = meta && typeof meta === "object" ? meta : {};
+  if (typeof BoundLoreTestData !== "undefined") {
+    sourceMeta = BoundLoreTestData.markMeta(sourceMeta);
+  }
+  const normalized = normalizePostMetaEP(sourceMeta);
   if (!normalized) return cleaned;
   const json = JSON.stringify(normalized).replace(/-->/g, "--\\>");
   return cleaned + "\n<!--BLMETA " + json + " -->";

@@ -44,6 +44,7 @@ async function runSearch(query, resultsBox) {
       .from("posts")
       .select("id, title, category, post_type, slug, excerpt")
       .eq("status", "published")
+      .is("deleted_at", null)
       .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%`)
       .limit(8);
 
@@ -70,6 +71,11 @@ async function runSearch(query, resultsBox) {
       .join("");
 
     resultsBox.innerHTML = faqHtml + data
+      .filter(function(post) {
+        if (/^contribution-/i.test(String(post.slug || ""))) return false;
+        if (/^Contribution:/i.test(String(post.title || ""))) return false;
+        return true;
+      })
       .map((post) => {
         const path = buildPostPath(post);
         const categoryLabel = typeof getPostCategoryLabel === "function"

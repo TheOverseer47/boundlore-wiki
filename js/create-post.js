@@ -103,8 +103,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     setPostType("wiki");
   }
 
+  const route = typeof ContributionFlow !== "undefined"
+    ? ContributionFlow.parseRouteParams(window.location.search)
+    : null;
+
+  if (route && route.mode === "contribution" && route.contributeTo) {
+    if (typeof WikiPatchMode !== "undefined") {
+      const submitGuard = await WikiPatchMode.assertCanSubmit();
+      if (!submitGuard.ok) {
+        const errorEl = document.getElementById("formError");
+        if (errorEl) {
+          errorEl.textContent = submitGuard.message;
+          errorEl.style.display = "block";
+        }
+        return;
+      }
+    }
+    await initContributionModeCP(route);
+    return;
+  }
+
+  // Legacy URLs with contribute_to but without mode=contribution still must
+  // enter contribution mode — never fall through to a normal discovery post.
+  if (route && route.contributeTo && !route.mode) {
+    route.mode = "contribution";
+    await initContributionModeCP(route);
+    return;
+  }
+
   const presetCategory = (params.get("category") || params.get("cat") || "").toLowerCase();
   const presetSubcategory = (params.get("subcategory") || params.get("subcat") || "").toLowerCase();
+
   if (presetCategory && discoveryCategorySelect) {
     discoveryCategorySelect.value = presetCategory;
     currentDiscoveryCategory = presetCategory;
@@ -205,6 +234,287 @@ function syncDiscoveryModeHint() {
     : "Structured discovery mode is disabled for this session (?enableStructuredDiscovery=0).";
 }
 
+function showContributionBannerCP(target, entity, field, intent) {
+  const form = document.getElementById("createPostForm");
+  if (!form || form.querySelector(".bl-contribution-banner")) return;
+  const banner = document.createElement("div");
+  banner.className = "bl-contribution-banner";
+  const label = entity || target || "this wiki entry";
+  const fieldLabel = field ? String(field).replace(/_/g, " ") : "additional details";
+  banner.innerHTML = "<p><strong>Contributing to:</strong> " + escapeHtmlCP(label) +
+    "</p><p>You are submitting a moderated discovery to improve <em>" + escapeHtmlCP(fieldLabel) +
+    "</em>. Your report will be reviewed before it updates the live entry.</p>";
+  form.insertBefore(banner, form.firstChild);
+}
+
+async function initContributionModeCP(route) {
+  if (typeof ContributionFlow === "undefined") return;
+  const targetPost = await ContributionFlow.loadTargetPost(supabase, route.contributeTo);
+  let meta = {};
+  let entityType = route.entityType || "";
+  let displayName = route.entityName || route.contributeTo || "Wiki Entry";
+
+  if (targetPost) {
+    meta = parsePostMetaCP(targetPost.content || "");
+    entityType = entityType || String(targetPost.category || "").toLowerCase();
+    displayName = typeof EntityCore !== "undefined"
+      ? EntityCore.getDisplayName(meta, targetPost)
+      : (route.entityName || targetPost.title);
+  } else {
+    // Hard requirement: contributions may only ever attach to an existing
+    // entry. Without a resolvable target we must not offer the form at all,
+    // otherwise a new duplicate entity post could be created.
+    const errorEl = document.getElementById("formError");
+    if (errorEl) {
+      errorEl.textContent = "Could not find the wiki entry you want to contribute to. Please open the entry page and use its Add buttons.";
+      errorEl.style.display = "block";
+    }
+    const form = document.getElementById("createPostForm");
+    if (form) form.style.display = "none";
+    return;
+  }
+
+  const resolvedIntent = ContributionFlow.resolveIntent(route.intent, route.field);
+  const knownFacts = targetPost
+    ? ContributionFlow.buildKnownFactsSummary(targetPost, meta)
+    : [];
+  const context = {
+    active: true,
+    targetId: targetPost ? targetPost.id : null,
+    targetSlug: targetPost ? targetPost.slug : (route.contributeTo || null),
+    displayName: displayName,
+    entityType: entityType || "items",
+    intent: route.intent,
+    field: route.field,
+    resolvedIntent: resolvedIntent,
+    relationTarget: route.relationTarget,
+    sourcePage: route.sourcePage,
+    knownFacts: knownFacts,
+  };
+  window.__boundloreContributionContext = context;
+
+  setPostType("discovery");
+  currentPostType = "discovery";
+
+  const toggle = document.querySelector(".post-type-toggle");
+  const standardFields = document.getElementById("standardPostFields");
+  const panel = document.getElementById("contributionPanel");
+  const heroTitle = document.querySelector(".wiki-hero h1");
+  const heroCopy = document.querySelector(".wiki-hero p");
+  const submitBtn = document.querySelector("#createPostForm button[type='submit']");
+
+  if (toggle) toggle.style.display = "none";
+  if (standardFields) standardFields.style.display = "none";
+  if (panel) {
+    panel.style.display = "block";
+    panel.innerHTML = ContributionFlow.renderPanel(context);
+  }
+  if (heroTitle) heroTitle.textContent = "Contribute to Wiki Entry";
+  if (heroCopy) heroCopy.textContent = "Add focused information to an existing entry. Your submission goes to admin review.";
+  if (submitBtn) submitBtn.textContent = "Submit Contribution";
+
+  const discoverySelect = document.getElementById("discoveryCategory");
+  if (discoverySelect) discoverySelect.value = entityType;
+  currentDiscoveryCategory = entityType;
+
+  const titleInput = document.getElementById("postTitle");
+  if (titleInput) {
+    titleInput.value = ContributionFlow.buildContributionTitle(context);
+    titleInput.removeAttribute("required");
+  }
+}
+
+async function submitContributionCP(errorEl) {
+  const context = window.__boundloreContributionContext;
+  if (!context || !context.active || typeof ContributionFlow === "undefined") return false;
+
+  const mask = ContributionFlow.getMask(context.resolvedIntent, context.field, context.entityType);
+  const collected = ContributionFlow.collectFormValues(mask);
+  if (collected.errors.length) {
+    errorEl.textContent = collected.errors.join(" ");
+    errorEl.style.display = "block";
+    return true;
+  }
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) {
+    errorEl.textContent = "You must be logged in to submit a contribution.";
+    errorEl.style.display = "block";
+    return true;
+  }
+
+  await supabase.auth.refreshSession();
+  const { data: refreshedSession } = await supabase.auth.getSession();
+  const refreshedUser = refreshedSession && refreshedSession.session ? refreshedSession.session.user : null;
+  createTutorialConfirmed = !!(refreshedUser && refreshedUser.user_metadata && refreshedUser.user_metadata.submission_tutorial_v1_accepted === true);
+  if (!createTutorialConfirmed) {
+    errorEl.textContent = "Please read and confirm the submission tutorial once before submitting.";
+    errorEl.style.display = "block";
+    return true;
+  }
+
+  const userId = sessionData.session.user.id;
+
+  // Contributions must reference an existing target post. Re-verify it still
+  // exists right before saving so we never create an orphaned duplicate.
+  if (!context.targetId) {
+    errorEl.textContent = "This contribution has no valid target entry. Please reopen it from the entry page.";
+    errorEl.style.display = "block";
+    return true;
+  }
+  const { data: targetCheck } = await supabase
+    .from("posts")
+    .select("id, slug, deleted_at")
+    .eq("id", context.targetId)
+    .maybeSingle();
+  if (!targetCheck || targetCheck.deleted_at) {
+    errorEl.textContent = "The target wiki entry no longer exists. Contribution was not saved.";
+    errorEl.style.display = "block";
+    return true;
+  }
+
+  // Same target + same intent already pending from this user → no duplicate.
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.findPendingContributionDuplicate) {
+    const duplicate = await KnowledgeRelations.findPendingContributionDuplicate(supabase, {
+      authorId: userId,
+      targetPostId: context.targetId,
+      targetPostSlug: context.targetSlug,
+      intent: context.resolvedIntent,
+    });
+    if (duplicate) {
+      errorEl.textContent = "You already have a pending contribution of this type for this entry. Please wait for the review instead of submitting again.";
+      errorEl.style.display = "block";
+      return true;
+    }
+  }
+
+  const relations = ContributionFlow.buildRelations(context.resolvedIntent, collected.values, context);
+  const contributionMeta = ContributionFlow.buildContributionMeta(context, collected.values, relations);
+  const title = ContributionFlow.buildContributionTitle(context);
+  let content = ContributionFlow.buildContributionContent(context, collected.values);
+
+  const mediaInput = document.getElementById("contribMedia");
+  const files = mediaInput && mediaInput.files ? Array.from(mediaInput.files) : [];
+  const imageUrl = collected.values.image_url || "";
+  if (imageUrl && typeof isValidHttpUrl === "function" && !isValidHttpUrl(imageUrl)) {
+    errorEl.textContent = "Please provide a valid image URL (http/https).";
+    errorEl.style.display = "block";
+    return true;
+  }
+
+  if (files.length > 0) {
+    const uploadValidationError = validateDiscoveryFilesCP(files, context.entityType);
+    if (uploadValidationError) {
+      errorEl.textContent = uploadValidationError;
+      errorEl.style.display = "block";
+      return true;
+    }
+    const uploadResult = await uploadDiscoveryFiles(userId, files, {
+      category: context.entityType,
+      title: title,
+      meta: contributionMeta,
+    });
+    if (uploadResult.error) {
+      errorEl.textContent = uploadResult.error;
+      errorEl.style.display = "block";
+      return true;
+    }
+    const fileEvidence = buildDiscoveryEvidenceMetaCP({
+      supports: [context.field || context.resolvedIntent].filter(Boolean),
+      note: collected.values.evidence_notes || "",
+      hasExternalEvidence: true,
+    }, uploadResult.files, imageUrl, "");
+    contributionMeta.discovery_evidence = (contributionMeta.discovery_evidence || []).concat(fileEvidence);
+    content = buildPostContentWithAttachments(content, uploadResult.files, true);
+  } else {
+    contributionMeta.discovery_evidence = buildDiscoveryEvidenceMetaCP({
+      supports: [context.field || context.resolvedIntent].filter(Boolean),
+      note: collected.values.evidence_notes || "",
+      hasExternalEvidence: !!imageUrl,
+    }, [], imageUrl, "");
+  }
+
+  const payload = {
+    author_id: userId,
+    title: title,
+    content: content,
+    status: "pending",
+    post_type: "discovery",
+    category: context.entityType,
+    guide_subcategory: null,
+    is_discovery: true,
+  };
+
+  if (relations.length && typeof ensureKnowledgeRelationTargetsCP === "function"
+    && context.resolvedIntent !== "add_image") {
+    const knowledgeSourceContext = {
+      sourcePostId: context.targetId,
+      sourcePostSlug: context.targetSlug,
+      sourceTitle: context.displayName,
+      sourceCategory: context.entityType,
+      payload: contributionMeta.discovery_payload,
+    };
+    await ensureKnowledgeRelationTargetsCP(relations, userId, knowledgeSourceContext);
+    contributionMeta.discovery_relations = relations;
+  }
+
+  payload.content = injectPostMetaCP(payload.content, contributionMeta);
+
+  const { data: created, error } = await supabase
+    .from("posts")
+    .insert(payload)
+    .select("id, slug")
+    .single();
+
+  if (error) {
+    errorEl.textContent = error.message || "Failed to submit contribution.";
+    errorEl.style.display = "block";
+    return true;
+  }
+
+  // Admin/trusted shortcut: merge directly into the target entry.
+  // Regular users always stay pending for moderation.
+  if (createIsAdmin && created && typeof KnowledgeRelations !== "undefined"
+    && KnowledgeRelations.mergeContributionIntoTarget) {
+    try {
+      const contributionPost = {
+        id: created.id,
+        slug: created.slug,
+        author_id: userId,
+        content: payload.content,
+        created_at: new Date().toISOString(),
+        category: payload.category,
+        title: payload.title,
+      };
+      const mergeResult = await KnowledgeRelations.mergeContributionIntoTarget(supabase, contributionPost, {
+        meta: contributionMeta,
+        actorId: userId,
+      });
+      if (mergeResult.ok) {
+        contributionMeta.contribution.status = "approved";
+        contributionMeta.contribution.merged_at = new Date().toISOString();
+        contributionMeta.contribution.auto_merged_by_admin = true;
+        const approvedContent = injectPostMetaCP(content, contributionMeta);
+        await supabase.from("posts").update({
+          content: approvedContent,
+          deleted_at: new Date().toISOString(),
+        }).eq("id", created.id);
+        window.location.href = mergeResult.target && mergeResult.target.slug
+          ? "/wiki/post/?slug=" + encodeURIComponent(mergeResult.target.slug) + "&merged=contribution"
+          : "/wiki/account/";
+        return true;
+      }
+    } catch (mergeErr) {
+      console.warn("Admin auto-merge failed, contribution stays pending:", mergeErr);
+    }
+  }
+
+  window.location.href = context.targetSlug
+    ? "/wiki/post/?slug=" + encodeURIComponent(context.targetSlug) + "&submitted=contribution"
+    : "/wiki/account/";
+  return true;
+}
+
 function renderDiscoveryWizard() {
   const nav = document.getElementById("discoveryWizardNav");
   const step1 = document.getElementById("discoveryStep1Basics");
@@ -223,9 +533,12 @@ function renderDiscoveryWizard() {
   step4.style.display = discoveryWizardStep === maxStep ? "block" : "none";
 
   nav.innerHTML = "";
+  const stepLabels = structuredDiscoveryEnabled
+    ? ["Basics", "Facts", "Links", "Evidence"]
+    : ["Basics", "Notes"];
   const progress = document.createElement("p");
   progress.className = "field-hint";
-  progress.textContent = "Discovery step " + discoveryWizardStep + " of " + maxStep + ".";
+  progress.textContent = "Step " + discoveryWizardStep + " of " + maxStep + ": " + stepLabels[discoveryWizardStep - 1] + ".";
   nav.appendChild(progress);
 
   const controls = document.createElement("div");
@@ -400,11 +713,202 @@ function setPostType(type) {
   }
 }
 
+function mapRelationGroupToPlaceholderCategoryCP(groupKey, relation) {
+  if (groupKey === "items") return "items";
+  if (groupKey === "creatures") return "creatures";
+  if (groupKey === "locations") {
+    const targetType = String(relation && relation.target_entity_type || "").toLowerCase();
+    return targetType === "biome" ? "biomes" : "locations";
+  }
+  return "";
+}
+
+function buildKnowledgeSourceContextCP(payload, title, category) {
+  return {
+    payload: payload || {},
+    sourceTitle: getMeaningfulDiscoveryValueCP((payload && payload.entity_name) || title),
+    sourceCategory: category || "",
+    sourcePostId: null,
+    sourcePostSlug: null,
+    sourceDate: new Date().toISOString(),
+  };
+}
+
+async function updateKnowledgeStubSourcesCP(createdPost, relations) {
+  if (!createdPost || !createdPost.id) return;
+  const rels = Array.isArray(relations) ? relations : [];
+  for (const rel of rels) {
+    if (!rel || !rel.id) continue;
+    const { data: targetPost } = await supabase.from("posts").select("id, content").eq("id", rel.id).maybeSingle();
+    if (!targetPost) continue;
+    const meta = parsePostMetaCP(targetPost.content || "");
+    let changed = false;
+
+    if (meta.knowledge_entry) {
+      meta.knowledge_entry.source_post_id = createdPost.id;
+      meta.knowledge_entry.source_post_slug = createdPost.slug || null;
+      meta.knowledge_entry.source_post_title = createdPost.title || meta.knowledge_entry.source_post_title || null;
+      changed = true;
+    }
+
+    if (meta.knowledge_graph && Array.isArray(meta.knowledge_graph.relations)) {
+      meta.knowledge_graph.relations = meta.knowledge_graph.relations.map(function(item) {
+        return Object.assign({}, item, {
+          source_post_id: createdPost.id,
+          source_post_slug: createdPost.slug || null,
+          source_post_title: createdPost.title || item.source_post_title || null,
+        });
+      });
+      changed = true;
+    }
+
+    if (!changed) continue;
+    const updated = injectPostMetaCP(stripPostMetaCP(targetPost.content || ""), meta);
+    await supabase.from("posts").update({ content: updated }).eq("id", rel.id);
+  }
+}
+
+async function ensureKnowledgeRelationTargetsCP(relations, userId, sourceContext) {
+  const KR = window.KnowledgeRelations;
+  const items = Array.isArray(relations) ? relations : [];
+  const seen = new Set();
+  const ctx = sourceContext || {};
+
+  for (const rel of items) {
+    if (!rel || !rel.title) continue;
+    if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.shouldCreateKnowledgeStub
+      && !KnowledgeRelations.shouldCreateKnowledgeStub(rel)) {
+      continue;
+    }
+    const groupKey = String(rel.group || "").toLowerCase();
+    const category = KR
+      ? KR.mapGroupToCategory(groupKey, rel)
+      : mapRelationGroupToPlaceholderCategoryCP(groupKey, rel);
+    if (!category) continue;
+
+    const normalizedTitle = String(rel.title).trim();
+    const EC = window.EntityCore;
+    const canonicalTitle = EC
+      ? (EC.extractCanonicalIdentity(normalizedTitle, category).canonical_name || normalizedTitle)
+      : normalizedTitle;
+    const entityKey = EC ? EC.buildEntityKey(category, canonicalTitle) : null;
+    const dedupeKey = entityKey || (category + "|" + canonicalTitle.toLowerCase());
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    if (!rel.category) rel.category = category;
+    if (EC) {
+      rel.canonical_target_name = canonicalTitle;
+      rel.target_entity_key = entityKey;
+    }
+    if (!rel.target_entity_type && KR) {
+      rel.target_entity_type = KR.inferTargetEntityType(groupKey, rel.relation_type);
+    }
+
+    let existing = null;
+    if (KR && typeof KR.findExistingKnowledgePost === "function") {
+      existing = await KR.findExistingKnowledgePost(supabase, canonicalTitle, category);
+    } else {
+      const { data: fallbackExisting } = await supabase
+        .from("posts")
+        .select("id, slug, title, category, post_type, content")
+        .ilike("title", normalizedTitle)
+        .eq("category", category)
+        .limit(1)
+        .maybeSingle();
+      existing = fallbackExisting || null;
+    }
+
+    if (existing) {
+      rel.id = existing.id;
+      rel.slug = existing.slug || null;
+      rel.category = existing.category || category;
+      rel.post_type = existing.post_type || "wiki";
+      rel.resolved = true;
+      if (KR) {
+        const inverse = KR.createInverseRelation(rel, {
+          id: ctx.sourcePostId,
+          slug: ctx.sourcePostSlug,
+          title: ctx.sourceTitle,
+          category: ctx.sourceCategory,
+          post_type: "discovery",
+        });
+        if (inverse) await KR.appendInboundRelationToPost(supabase, existing.id, inverse);
+      }
+      continue;
+    }
+
+    if (rel.slug || rel.id) continue;
+
+    const stubMeta = KR ? KR.buildStubPostMeta(rel, ctx) : null;
+    const bodyHtml = KR
+      ? KR.buildStubPostContent(canonicalTitle, rel, ctx)
+      : ("<p>Knowledge node: " + escapeHtmlCP(canonicalTitle) + "</p>");
+    const content = stubMeta ? injectPostMetaCP(bodyHtml, stubMeta) : bodyHtml;
+
+    const placeholderPayload = {
+      author_id: userId,
+      title: canonicalTitle,
+      content: content,
+      status: "pending",
+      post_type: "wiki",
+      category: category,
+      guide_subcategory: null,
+      is_discovery: false,
+    };
+
+    const { data: created, error } = await supabase
+      .from("posts")
+      .insert(placeholderPayload)
+      .select("id, slug, title, category, post_type")
+      .single();
+
+    if (error) {
+      console.warn("Failed to create related knowledge entry:", error);
+      continue;
+    }
+
+    rel.id = created.id;
+    rel.slug = created.slug || null;
+    rel.category = created.category || category;
+    rel.post_type = created.post_type || "wiki";
+    rel.resolved = true;
+  }
+}
+
 async function handleSubmit(e) {
   e.preventDefault();
   const errorEl = document.getElementById("formError");
   errorEl.style.display = "none";
   const submitBtn = document.querySelector("#createPostForm button[type='submit']");
+
+  if (typeof WikiPatchMode !== "undefined") {
+    const submitGuard = await WikiPatchMode.assertCanSubmit();
+    if (!submitGuard.ok) {
+      errorEl.textContent = submitGuard.message;
+      errorEl.style.display = "block";
+      return;
+    }
+  } else if (window.__boundlorePatchMode && window.__boundlorePatchMode.blocked) {
+    errorEl.textContent = "The wiki is currently being updated. Submissions are temporarily disabled.";
+    errorEl.style.display = "block";
+    return;
+  }
+
+  if (window.__boundloreContributionContext && window.__boundloreContributionContext.active) {
+    const handled = await submitContributionCP(errorEl);
+    if (handled) return;
+  }
+
+  // Hard block: URLs with contribute_to must never create a standalone entity.
+  const routeGuard = typeof ContributionFlow !== "undefined"
+    ? ContributionFlow.parseRouteParams(window.location.search)
+    : null;
+  if (routeGuard && routeGuard.contributeTo) {
+    errorEl.textContent = "Contribution mode failed to initialize. Please reopen the link from the wiki entry page.";
+    errorEl.style.display = "block";
+    return;
+  }
 
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData.session) {
@@ -524,26 +1028,42 @@ async function handleSubmit(e) {
         return;
       }
 
-      if (!Array.isArray(structuredResult.relations) || (structuredResult.relations.length === 0 && discoveryRelationsSkipped !== true)) {
-        errorEl.textContent = "Please link at least one dependency/reference or enable 'Skip auto-relations' before submitting.";
-        errorEl.style.display = "block";
-        return;
+      const v2ActiveRelations = typeof DiscoveryWizard !== "undefined" && DiscoveryWizard.isActive();
+      const relPayload = structuredResult.payload || {};
+      const hasLootHint = !!(relPayload.dropped_items || relPayload.dropped_by || relPayload.resources_or_rewards);
+      const hasRelProof = files.length > 0 || hasLootHint;
+      const relCount = Array.isArray(structuredResult.relations) ? structuredResult.relations.length : 0;
+
+      if (relCount === 0 && discoveryRelationsSkipped !== true) {
+        if (!v2ActiveRelations) {
+          errorEl.textContent = "Please link at least one dependency/reference or enable 'Skip auto-relations' before submitting.";
+          errorEl.style.display = "block";
+          return;
+        }
+        if (!hasRelProof) {
+          errorEl.textContent = "Add a screenshot, loot/item name, or link a related entry.";
+          errorEl.style.display = "block";
+          return;
+        }
       }
 
       const dedupeTitle = title
         || String(structuredResult.payload && structuredResult.payload.entity_name ? structuredResult.payload.entity_name : "").trim()
         || buildDiscoveryAutoTitle(structuredResult.payload, cat);
 
-      const duplicateError = await detectDiscoveryDuplicateCP({
-        title: dedupeTitle,
-        category: cat,
-        subcategory: needsSubcategory ? discoverySubcat : "",
-        payload: structuredResult.payload,
-      });
-      if (duplicateError) {
-        errorEl.textContent = duplicateError;
-        errorEl.style.display = "block";
-        return;
+      const knowledgeGraphSubmitActive = typeof DiscoveryWizard !== "undefined" && DiscoveryWizard.isActive();
+      if (!knowledgeGraphSubmitActive && !window.__boundloreContributionContext) {
+        const duplicateError = await detectDiscoveryDuplicateCP({
+          title: dedupeTitle,
+          category: cat,
+          subcategory: needsSubcategory ? discoverySubcat : "",
+          payload: structuredResult.payload,
+        });
+        if (duplicateError) {
+          errorEl.textContent = duplicateError;
+          errorEl.style.display = "block";
+          return;
+        }
       }
 
       postMeta.discovery_payload = structuredResult.payload;
@@ -552,6 +1072,17 @@ async function handleSubmit(e) {
       postMeta.discovery_record_id = postMeta.discovery_record_id || generateDiscoveryRecordIdCP();
       postMeta.discovery_record_status = "unverified";
       postMeta.discovery_submitted_at = new Date().toISOString();
+      if (typeof DiscoveryCore !== "undefined" && DiscoveryCore.isKnowledgeGraphDiscoveryEnabled()) {
+        postMeta.discovery_form = "lean";
+      }
+      if (typeof BoundLoreTestData !== "undefined" && BoundLoreTestData.shouldMarkAsTestData()) {
+        postMeta.content_origin = BoundLoreTestData.ORIGIN_TEST;
+      }
+      if (window.__boundloreContributionContext) {
+        postMeta.contribution_target = window.__boundloreContributionContext.target || null;
+        postMeta.contribution_field = window.__boundloreContributionContext.field || null;
+        postMeta.contribution_intent = window.__boundloreContributionContext.intent || null;
+      }
       const evidenceInput = collectDiscoveryEvidenceInputCP({
         hasExternalEvidence: !!discoveryImageUrl || !!discoveryYoutubeUrl || files.length > 0,
       });
@@ -561,6 +1092,12 @@ async function handleSubmit(e) {
         return;
       }
       postMeta.discovery_evidence = buildDiscoveryEvidenceMetaCP(evidenceInput, [], discoveryImageUrl, discoveryYoutubeUrl);
+      const knowledgeSourceContext = buildKnowledgeSourceContextCP(
+        structuredResult.payload,
+        title,
+        cat
+      );
+      await ensureKnowledgeRelationTargetsCP(structuredResult.relations, userId, knowledgeSourceContext);
       payload.content = buildStructuredDiscoveryContent(
         title,
         cat,
@@ -640,7 +1177,11 @@ async function handleSubmit(e) {
       errorEl.style.display = "block";
       return;
     }
-    const uploadResult = await uploadDiscoveryFiles(userId, files);
+    const uploadResult = await uploadDiscoveryFiles(userId, files, {
+      category: currentPostType === "discovery" ? (payload.category || currentDiscoveryCategory || "") : "",
+      title: payload.title || title,
+      meta: postMeta,
+    });
     if (uploadResult.error) {
       errorEl.textContent = uploadResult.error;
       errorEl.style.display = "block";
@@ -659,6 +1200,58 @@ async function handleSubmit(e) {
 
   payload.content = injectPostMetaCP(payload.content, postMeta);
 
+  if (
+    currentPostType === "discovery"
+    && typeof DiscoveryWizard !== "undefined"
+    && DiscoveryWizard.isActive()
+    && structuredDiscoveryEnabled
+    && postMeta.discovery_payload
+  ) {
+    if (submitBtn) submitBtn.disabled = true;
+    try {
+      const relatedEntities = (Array.isArray(postMeta.discovery_relations) ? postMeta.discovery_relations : []).map(function(rel) {
+        return {
+          name: rel.title || "",
+          role: rel.group === "items" && payload.category === "creatures"
+            ? "loot"
+            : (rel.group === "locations" ? "location" : "related"),
+          entity_type: rel.target_entity_type || (
+            rel.group === "items" ? "item" :
+            rel.group === "creatures" ? "creature" :
+            rel.group === "locations" ? "location" :
+            rel.group === "guides" ? "guide" :
+            "entity"
+          ),
+          entity_id: rel.id || null,
+          canonical_key: rel.canonical_key || null,
+          match_type: rel.id ? "exact" : "new",
+          match_score: rel.id ? 100 : 0,
+        };
+      });
+      const obsResult = await DiscoveryWizard.submitDiscovery({
+        payload: postMeta.discovery_payload,
+        title: payload.title,
+        contentHtml: payload.content,
+        excerpt: String(payload.title || "").slice(0, 200),
+        relatedEntities: relatedEntities,
+      });
+      if (obsResult && obsResult.post_slug) {
+        window.location.href = "/wiki/post/?slug=" + encodeURIComponent(obsResult.post_slug);
+        return;
+      }
+      if (obsResult && obsResult.post_id) {
+        window.location.href = "/wiki/post/?id=" + encodeURIComponent(obsResult.post_id);
+        return;
+      }
+    } catch (v2Err) {
+      console.error("Knowledge graph discovery submit failed:", v2Err);
+      if (submitBtn) submitBtn.disabled = false;
+      errorEl.textContent = "Failed to submit discovery: " + v2Err.message;
+      errorEl.style.display = "block";
+      return;
+    }
+  }
+
   if (submitBtn) submitBtn.disabled = true;
 
   const { data, error } = await supabase.from("posts").insert(payload).select().single();
@@ -672,16 +1265,104 @@ async function handleSubmit(e) {
     return;
   }
 
+  if (currentPostType === "discovery" && structuredDiscoveryEnabled) {
+    await updateKnowledgeStubSourcesCP(data, postMeta.discovery_relations || []);
+  }
+
+  if (currentPostType === "discovery" && structuredDiscoveryEnabled && typeof KnowledgeRelations !== "undefined") {
+    const followUpTargets = KnowledgeRelations.collectFollowUpTargets(
+      postMeta.discovery_relations || [],
+      buildKnowledgeSourceContextCP(postMeta.discovery_payload, payload.title, payload.category)
+    );
+    if (followUpTargets.length) {
+      const completed = await showKnowledgeFollowUpModalCP(followUpTargets, data);
+      if (completed) {
+        redirectToCreatedPostCP(data);
+        return;
+      }
+    }
+  }
+
+  redirectToCreatedPostCP(data);
+}
+
+function redirectToCreatedPostCP(data) {
   if (data && data.slug) {
-    window.location.href = `/wiki/post/?slug=${data.slug}`;
+    window.location.href = "/wiki/post/?slug=" + encodeURIComponent(data.slug);
     return;
   }
-
   if (data && data.id) {
-    window.location.href = `/wiki/post/?id=${data.id}`;
-    return;
+    window.location.href = "/wiki/post/?id=" + encodeURIComponent(data.id);
   }
+}
 
+async function showKnowledgeFollowUpModalCP(targets, createdPost) {
+  return new Promise(function(resolve) {
+    const overlay = document.createElement("div");
+    overlay.className = "bl-kg-followup-overlay";
+    const sourceSlug = createdPost && createdPost.slug ? createdPost.slug : "";
+    let html = '<div class="bl-kg-followup-modal"><h3>Help complete linked entries</h3>';
+    html += '<p class="bl-kg-followup-intro">Your discovery created or updated related wiki entries. Optional answers improve the knowledge graph and can count toward future rewards.</p>';
+
+    targets.forEach(function(target, targetIndex) {
+      html += '<div class="bl-kg-followup-target" data-target-index="' + targetIndex + '">';
+      html += '<h4>' + escapeHtmlCP(target.title) + ' <span>(' + escapeHtmlCP(target.category || "entry") + ")</span></h4>";
+      target.questions.forEach(function(question) {
+        html += '<label class="bl-kg-followup-field">';
+        html += '<span>' + escapeHtmlCP(question.label) + (question.optional ? ' <em>(optional)</em>' : "") + "</span>";
+        if (question.reason) html += '<small>' + escapeHtmlCP(question.reason) + "</small>";
+        html += '<input type="text" data-target-index="' + targetIndex + '" data-question-key="' + escapeHtmlCP(question.key) + '" placeholder="Your answer..." />';
+        html += "</label>";
+      });
+      html += "</div>";
+    });
+
+    html += '<div class="bl-kg-followup-actions">';
+    html += '<button type="button" class="btn-secondary" data-action="skip-followup">Skip for now</button>';
+    html += '<button type="button" class="btn-contribute" data-action="save-followup">Save answers</button>';
+    html += "</div></div>";
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('[data-action="skip-followup"]').addEventListener("click", function() {
+      overlay.remove();
+      resolve(false);
+    });
+
+    overlay.querySelector('[data-action="save-followup"]').addEventListener("click", async function() {
+      const btn = this;
+      btn.disabled = true;
+      try {
+        for (let i = 0; i < targets.length; i++) {
+          const target = targets[i];
+          if (!target.id) continue;
+          const answers = {};
+          overlay.querySelectorAll('input[data-target-index="' + i + '"]').forEach(function(input) {
+            const key = input.getAttribute("data-question-key");
+            const value = String(input.value || "").trim();
+            if (key && value) answers[key] = value;
+          });
+          if (!Object.keys(answers).length) continue;
+
+          const { data: targetPost } = await supabase.from("posts").select("id, content").eq("id", target.id).maybeSingle();
+          if (!targetPost) continue;
+          const meta = parsePostMetaCP(targetPost.content || "");
+          meta.discovery_payload = KnowledgeRelations.applyFollowUpAnswersToPayload(meta.discovery_payload || {}, answers);
+          meta.knowledge_entry = meta.knowledge_entry || {};
+          meta.knowledge_entry.followup_answers = answers;
+          meta.knowledge_entry.followup_source_slug = sourceSlug || null;
+          meta.knowledge_entry.status = "partial";
+          meta.knowledge_entry.completeness = "partial";
+          const updated = injectPostMetaCP(stripPostMetaCP(targetPost.content || ""), meta);
+          await supabase.from("posts").update({ content: updated }).eq("id", target.id);
+        }
+      } catch (err) {
+        console.warn("Follow-up save failed:", err);
+      }
+      overlay.remove();
+      resolve(true);
+    });
+  });
 }
 
 
@@ -737,12 +1418,21 @@ function refreshWikiSubcategoryOptions(presetValue) {
   if (presetValue) select.value = presetValue;
 }
 
-async function uploadDiscoveryFiles(userId, files) {
+async function uploadDiscoveryFiles(userId, files, context) {
   const uploaded = [];
+  const uploadContext = context || {};
+  const discoveryPayload = uploadContext.meta && uploadContext.meta.discovery_payload
+    ? uploadContext.meta.discovery_payload
+    : {};
+  const entityName = discoveryPayload.entity_name || uploadContext.title || "discovery";
+  const category = uploadContext.category || "post";
+  const baseName = slugifyUploadNameCP(category + "-" + entityName);
 
-  for (const file of files) {
-    const cleanedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = userId + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "-" + cleanedName;
+  for (let idx = 0; idx < files.length; idx += 1) {
+    const file = files[idx];
+    const extMatch = String(file.name || "").match(/\.([a-z0-9]{2,8})$/i);
+    const ext = extMatch ? ("." + extMatch[1].toLowerCase()) : "";
+    const path = userId + "/" + baseName + "/" + Date.now() + "-" + String(idx + 1).padStart(2, "0") + "-" + Math.random().toString(36).slice(2, 8) + ext;
 
     const { error } = await supabase.storage
       .from(DISCOVERY_STORAGE_BUCKET)
@@ -758,7 +1448,8 @@ async function uploadDiscoveryFiles(userId, files) {
 
     const { data } = supabase.storage.from(DISCOVERY_STORAGE_BUCKET).getPublicUrl(path);
     uploaded.push({
-      name: file.name,
+      name: buildDisplayUploadNameCP(entityName, file.name, idx, ext),
+      original_name: file.name,
       path,
       type: file.type || "application/octet-stream",
       size: file.size,
@@ -767,6 +1458,20 @@ async function uploadDiscoveryFiles(userId, files) {
   }
 
   return { files: uploaded };
+}
+
+function slugifyUploadNameCP(value) {
+  return String(value || "discovery")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "discovery";
+}
+
+function buildDisplayUploadNameCP(entityName, originalName, index, ext) {
+  const fallbackExt = ((String(originalName || "").match(/\.([a-z0-9]{2,8})$/i) || [])[0] || "");
+  const cleanEntity = slugifyUploadNameCP(entityName).replace(/-/g, " ");
+  return cleanEntity + " evidence " + String(index + 1).padStart(2, "0") + (ext || fallbackExt);
 }
 
 function validateDiscoveryFilesCP(files, category) {
@@ -812,6 +1517,7 @@ async function detectDiscoveryDuplicateCP(input) {
     .select("id, title, category, guide_subcategory, content, status")
     .eq("is_discovery", true)
     .eq("category", category)
+    .is("deleted_at", null)
     .in("status", ["pending", "published", "approved"])
     .limit(40);
 
@@ -840,14 +1546,18 @@ function computeDiscoveryDuplicateScoreCP(input, candidate) {
   if (inputTitle && candidateTitle && inputTitle === candidateTitle) score += 5;
 
   const candidateMeta = parsePostMetaCP(candidate.content || "");
+  const candidatePayload = candidateMeta.discovery_payload && typeof candidateMeta.discovery_payload === "object" ? candidateMeta.discovery_payload : null;
+  const inputEntity = normalizeDiscoveryCompareCP(input.payload && input.payload.entity_name ? input.payload.entity_name : "");
+  const candidateEntity = normalizeDiscoveryCompareCP(candidatePayload && candidatePayload.entity_name ? candidatePayload.entity_name : candidate.title);
+  if (inputEntity && candidateEntity && inputEntity === candidateEntity) score += 7;
+
   const inputSub = normalizeDiscoveryCompareCP(input.subcategory || "");
   const candidateSub = normalizeDiscoveryCompareCP(candidateMeta.subcategory || candidate.guide_subcategory || "");
   if (inputSub && candidateSub && inputSub === candidateSub) score += 1;
 
-  const inputFoundIn = normalizeDiscoveryCompareCP(input.payload && input.payload.found_in ? input.payload.found_in : "");
-  const candidatePayload = candidateMeta.discovery_payload && typeof candidateMeta.discovery_payload === "object" ? candidateMeta.discovery_payload : null;
-  const candidateFoundIn = normalizeDiscoveryCompareCP(candidatePayload && candidatePayload.found_in ? candidatePayload.found_in : "");
-  if (inputFoundIn && candidateFoundIn && inputFoundIn === candidateFoundIn) score += 3;
+  const inputPlace = normalizeDiscoveryCompareCP(getDiscoveryPrimaryPlaceCP(input.payload || {}));
+  const candidatePlace = normalizeDiscoveryCompareCP(getDiscoveryPrimaryPlaceCP(candidatePayload || {}));
+  if (inputPlace && candidatePlace && inputPlace === candidatePlace) score += 3;
 
   score += Math.min(countSharedDiscoveryTermsCP(inputTitle, candidateTitle), 2);
   return score;
@@ -953,7 +1663,9 @@ function renderDiscoveryStructuredFields() {
     return;
   }
   const config = getDiscoveryConfig(category);
-  const fields = Array.isArray(config.fields) ? config.fields : [];
+  const fields = (Array.isArray(config.fields) ? config.fields : []).filter(function(item) {
+    return item.key !== "world_name";
+  });
   if (!fields.length) {
     wrap.innerHTML = "";
     return;
@@ -964,11 +1676,38 @@ function renderDiscoveryStructuredFields() {
 
   const field = fields[discoveryDataFieldIndex];
 
-  wrap.innerHTML = "<h3 style='margin:0 0 8px;'>Discovery Data</h3><p class='field-hint'>Question " + (discoveryDataFieldIndex + 1) + " of " + fields.length + ".</p>";
+  wrap.className = "form-group bl-discovery-question-shell";
+  wrap.innerHTML = "";
+
+  const head = document.createElement("div");
+  head.className = "bl-discovery-question-head";
+  head.innerHTML =
+    '<div><p class="bl-discovery-kicker">Discovery Data</p>' +
+    '<h3>Question ' + (discoveryDataFieldIndex + 1) + ' of ' + fields.length + '</h3></div>' +
+    '<span>' + Math.round(((discoveryDataFieldIndex + 1) / fields.length) * 100) + '%</span>';
+  wrap.appendChild(head);
+
+  const rail = document.createElement("div");
+  rail.className = "bl-discovery-question-rail";
+  fields.forEach(function(item, idx) {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = "bl-discovery-question-dot" +
+      (idx === discoveryDataFieldIndex ? " active" : "") +
+      (String(discoveryFieldState[item.key] || "").trim() ? " complete" : "");
+    dot.title = item.label;
+    dot.addEventListener("click", function() {
+      if (idx <= discoveryDataFieldIndex || canLeaveDiscoveryFieldCP(field, input, message)) {
+        discoveryDataFieldIndex = idx;
+        renderDiscoveryStructuredFields();
+      }
+    });
+    rail.appendChild(dot);
+  });
+  wrap.appendChild(rail);
 
   const group = document.createElement("div");
-  group.className = "form-group";
-  group.style.marginTop = "10px";
+  group.className = "form-group bl-discovery-question-card";
 
   const label = document.createElement("label");
   label.setAttribute("for", "discField_" + field.key);
@@ -986,7 +1725,7 @@ function renderDiscoveryStructuredFields() {
     input.value = current;
   } else if (field.type === "select") {
     input = document.createElement("select");
-    input.className = "form-input";
+    input.className = "form-input bl-discovery-hidden-select";
     const empty = document.createElement("option");
     empty.value = "";
     empty.textContent = "Select...";
@@ -1030,6 +1769,29 @@ function renderDiscoveryStructuredFields() {
 
   group.appendChild(input);
 
+  if (field.key === "entity_name" && typeof DiscoveryWizard !== "undefined") {
+    DiscoveryWizard.attachEntityNameField(input);
+  }
+
+  if (field.type === "select") {
+    const optionGrid = document.createElement("div");
+    optionGrid.className = "bl-discovery-option-grid";
+    (field.options || []).forEach(function(opt) {
+      const optionBtn = document.createElement("button");
+      optionBtn.type = "button";
+      optionBtn.className = "bl-discovery-option-card" + (String(current) === String(opt) ? " selected" : "");
+      optionBtn.textContent = humanizeDiscoveryValueCP(opt);
+      optionBtn.addEventListener("click", function() {
+        input.value = opt;
+        discoveryFieldState[field.key] = opt;
+        message.style.display = "none";
+        renderDiscoveryStructuredFields();
+      });
+      optionGrid.appendChild(optionBtn);
+    });
+    group.appendChild(optionGrid);
+  }
+
   const hint = document.createElement("p");
   hint.className = "field-hint";
   hint.textContent = field.placeholder || "Tip: keep this factual and reproducible.";
@@ -1042,7 +1804,12 @@ function renderDiscoveryStructuredFields() {
   message.style.display = "none";
   group.appendChild(message);
 
-  if (field.required && (field.type === "text" || field.type === "textarea")) {
+  if (!field.required && (field.type === "text" || field.type === "textarea")) {
+    const quickHelp = document.createElement("p");
+    quickHelp.className = "field-hint";
+    quickHelp.textContent = "Optional helper values. Required questions cannot be skipped.";
+    group.appendChild(quickHelp);
+
     const quickRow = document.createElement("div");
     quickRow.style.display = "flex";
     quickRow.style.flexWrap = "wrap";
@@ -1086,12 +1853,7 @@ function renderDiscoveryStructuredFields() {
     next.className = "btn-contribute";
     next.textContent = "Next question";
     next.addEventListener("click", function() {
-      const value = String(input.value || "").trim();
-      if (field.required && !value) {
-        message.textContent = "Please answer this required question or use a quick-skip option.";
-        message.style.display = "block";
-        return;
-      }
+      if (!canLeaveDiscoveryFieldCP(field, input, message)) return;
       discoveryDataFieldIndex += 1;
       renderDiscoveryStructuredFields();
     });
@@ -1105,6 +1867,24 @@ function renderDiscoveryStructuredFields() {
 
   group.appendChild(nav);
   wrap.appendChild(group);
+}
+
+function canLeaveDiscoveryFieldCP(field, input, message) {
+  const value = String(input && input.value || "").trim();
+  if (field.required && !value) {
+    message.textContent = "This is required. Choose an option or add a concrete answer before continuing.";
+    message.style.display = "block";
+    return false;
+  }
+  return true;
+}
+
+function humanizeDiscoveryValueCP(value) {
+  return String(value || "")
+    .replace(/^\d-/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, function(c) { return c.toUpperCase(); })
+    .trim();
 }
 
 function toggleFieldSuggestionHint(hintEl, inputEl) {
@@ -1399,7 +2179,8 @@ async function fetchGuideReferenceSuggestionsCP(term) {
   let query = supabase
     .from("posts")
     .select("id, slug, title, category, post_type, status")
-    .in("status", ["published", "approved"])
+    .eq("status", "published")
+    .is("deleted_at", null)
     .ilike("title", "%" + cleanTerm + "%")
     .limit(10);
 
@@ -1687,8 +2468,15 @@ function collectStructuredDiscoveryInput() {
   }
 
   const reproValue = String(payload.how_to_reproduce || "").trim().toLowerCase();
-  if (reproValue && !DISCOVERY_SKIP_VALUES.includes(reproValue) && String(payload.how_to_reproduce || "").length < 20) {
+  const v2Schema = typeof DiscoveryCore !== "undefined" && DiscoveryCore.isKnowledgeGraphDiscoveryEnabled();
+  if (!v2Schema && reproValue && !DISCOVERY_SKIP_VALUES.includes(reproValue) && String(payload.how_to_reproduce || "").length < 20) {
     return { error: "Please provide clearer reproduction steps (at least 20 characters)." };
+  }
+
+  if (v2Schema) {
+    if (!payload.confidence_level) payload.confidence_level = "2-single-observation";
+    if (!payload.impact_area) payload.impact_area = "gameplay";
+    if (!payload.world_name) payload.world_name = "Light No Fire";
   }
 
   const relations = [];
@@ -1709,7 +2497,48 @@ function collectStructuredDiscoveryInput() {
     });
   });
 
+  if (typeof KnowledgeRelations !== "undefined") {
+    KnowledgeRelations.appendAutoRelations(relations, payload, category, {
+      sourceTitle: getMeaningfulDiscoveryValueCP(payload.entity_name),
+      sourceCategory: category,
+    });
+  } else {
+    appendAutoDiscoveryRelationsCP(relations, payload, category);
+  }
+
   return { payload: payload, relations: relations };
+}
+
+function appendAutoDiscoveryRelationsCP(relations, payload, category) {
+  if (typeof KnowledgeRelations !== "undefined") {
+    return KnowledgeRelations.appendAutoRelations(relations, payload, category, { sourceCategory: category });
+  }
+  return relations;
+}
+
+function extractLikelyItemNamesCP(values) {
+  const out = [];
+  (values || []).forEach(function(value) {
+    const text = String(value || "");
+    const quoted = text.match(/"([^"]{3,80})"/g) || [];
+    quoted.forEach(function(match) {
+      out.push(match.replace(/^"|"$/g, ""));
+    });
+    const medallion = text.match(/\b([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){1,5}\s+(?:Medallion|Amulet|Key|Charm|Heart|Stone|Token|Relic|Compass|Crystal|Orb))\b/g) || [];
+    medallion.forEach(function(match) { out.push(match); });
+  });
+  return Array.from(new Set(out.map(function(item) { return item.trim(); }).filter(Boolean)));
+}
+
+function extractListLikeValuesCP(value) {
+  return String(value || "")
+    .split(/[,;\n]+/)
+    .map(function(item) { return item.trim().replace(/^\d+x?\s*/i, ""); })
+    .filter(function(item) {
+      const lower = item.toLowerCase();
+      return item.length >= 3 && !["unknown", "unclear", "none", "not observed"].includes(lower);
+    })
+    .slice(0, 8);
 }
 
 function validateDiscoveryTextQuality(field, value) {
@@ -1735,7 +2564,8 @@ function validateDiscoveryTextQuality(field, value) {
   }
 
   const words = clean.split(/\s+/).filter(Boolean);
-  if (field.required && field.type === "textarea" && words.length < 4) {
+  const v2Schema = typeof DiscoveryCore !== "undefined" && DiscoveryCore.isKnowledgeGraphDiscoveryEnabled();
+  if (!v2Schema && field.required && field.type === "textarea" && words.length < 4) {
     return field.label + ": please add at least 4 meaningful words.";
   }
 
@@ -1760,6 +2590,10 @@ function collectDiscoveryEvidenceInputCP(context) {
     : [];
   const note = String(discoveryEvidenceState.note || "").trim();
   if (context && context.hasExternalEvidence && supports.length === 0) {
+    const v2Schema = typeof DiscoveryCore !== "undefined" && DiscoveryCore.isKnowledgeGraphDiscoveryEnabled();
+    if (v2Schema) {
+      return { supports: ["entity_name"], note: note };
+    }
     return { error: "Please map your evidence to at least one structured discovery field." };
   }
   if (note && note.split(/\s+/).filter(Boolean).length < 3) {
@@ -1810,63 +2644,166 @@ function buildStructuredDiscoveryContent(title, category, payload, relations, im
   (config.fields || []).forEach(function(field) {
     fieldLookup[field.key] = field;
   });
+  const summary = buildDiscoverySummaryCP(payload, category);
 
   let html =
-    '<section class="discovery-entry-head" style="padding:14px 16px;border:1px solid rgba(255,215,0,0.35);border-radius:10px;background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,255,255,0.04));margin-bottom:12px;">' +
-      '<p style="margin:0 0 6px;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#d8b65d;">Community Discovery</p>' +
-      '<h2 style="margin:0;font-size:1.2rem;line-height:1.35;">' + escapeHtmlCP(title || "Discovery") + '</h2>' +
+    '<section class="bl-discovery-entry-head">' +
+      '<p class="bl-discovery-kicker">Community Discovery</p>' +
+      '<h2>' + escapeHtmlCP(title || "Discovery") + '</h2>' +
+      (summary ? '<p class="bl-discovery-summary">' + escapeHtmlCP(summary) + '</p>' : '') +
     '</section>';
 
-  html += '<h3>Structured Findings</h3><ul>';
-  Object.keys(payload || {}).forEach(function(key) {
-    const val = payload[key];
-    if (val == null || val === "") return;
-    const label = fieldLookup[key]?.label || key;
-    html += '<li><strong>' + escapeHtmlCP(label) + ':</strong> ' + escapeHtmlCP(String(val)) + '</li>';
+  const groups = buildDiscoveryFactGroupsCP(payload, fieldLookup);
+  html += '<section class="bl-discovery-fact-grid">';
+  groups.forEach(function(group) {
+    if (!group.items.length) return;
+    html += '<div class="bl-discovery-fact-card"><h3>' + escapeHtmlCP(group.title) + '</h3><dl>';
+    group.items.forEach(function(item) {
+      html += '<div><dt>' + escapeHtmlCP(item.label) + '</dt><dd>' + escapeHtmlCP(String(item.value)) + '</dd></div>';
+    });
+    html += '</dl></div>';
   });
-  html += '</ul>';
+  html += '</section>';
 
   if (Array.isArray(relations) && relations.length > 0) {
-    html += '<h3>Related Entries</h3><ul>';
+    html += '<section class="bl-discovery-links"><h3>Related Entries</h3><ul>';
     relations.forEach(function(rel) {
-      const relLabel = escapeHtmlCP(rel.relation_type || "related_to");
-      if (rel.slug) {
-        const safeSlug = encodeURIComponent(rel.slug);
-        html += '<li><strong>' + relLabel + ':</strong> <a href="/wiki/post/?slug=' + safeSlug + '">' + escapeHtmlCP(rel.title || "Entry") + '</a></li>';
+      const relLabel = escapeHtmlCP(humanizeDiscoveryKeyCP(rel.relation_type || "related_to"));
+      const href = rel.slug
+        ? ("/wiki/post/?slug=" + encodeURIComponent(rel.slug))
+        : (rel.id ? ("/wiki/post/?id=" + encodeURIComponent(rel.id)) : "");
+      if (href) {
+        html += '<li><strong>' + relLabel + ':</strong> <a href="' + href + '">' + escapeHtmlCP(rel.title || "Entry") + '</a></li>';
       } else {
         html += '<li><strong>' + relLabel + ':</strong> ' + escapeHtmlCP(rel.title || "Entry") + '</li>';
       }
     });
-    html += '</ul>';
+    html += '</ul></section>';
   }
 
   if (imageUrl) {
     const safeImage = escapeAttrCP(imageUrl);
-    html += '<h3>Discovery Image</h3><p><a href="' + safeImage + '" target="_blank" rel="noopener">Open image</a></p><p><img src="' + safeImage + '" alt="Discovery image" style="max-width:360px;border-radius:8px;" /></p>';
+    html += '<section class="bl-discovery-media"><h3>Discovery Image</h3><p><a href="' + safeImage + '" target="_blank" rel="noopener">Open image</a></p><p><img src="' + safeImage + '" alt="Discovery image" /></p></section>';
   }
   if (youtubeUrl) {
     const safeVideo = escapeAttrCP(youtubeUrl);
-    html += '<h3>Discovery Video</h3><p><a href="' + safeVideo + '" target="_blank" rel="noopener">Watch on YouTube</a></p>';
+    html += '<section class="bl-discovery-media"><h3>Discovery Video</h3><p><a href="' + safeVideo + '" target="_blank" rel="noopener">Watch on YouTube</a></p></section>';
   }
   return html;
+}
+
+function buildDiscoverySummaryCP(payload, category) {
+  const data = payload && typeof payload === "object" ? payload : {};
+  const name = String(data.entity_name || "This discovery").trim();
+  const place = getDiscoveryPrimaryPlaceCP(data);
+  const confidence = String(data.confidence_level || "").replace(/^\d-/, "").replace(/-/g, " ");
+  const loot = String(data.dropped_items || data.loot_or_rewards || data.resources_or_rewards || "").trim();
+  const parts = [];
+
+  parts.push(name + (place ? " was reported in " + place : " was reported by the community"));
+  if (loot) parts.push("The report includes loot or reward observations");
+  if (confidence) parts.push("confidence is marked as " + confidence);
+  return parts.join(", ") + ".";
+}
+
+function buildDiscoveryFactGroupsCP(payload, fieldLookup) {
+  const data = payload && typeof payload === "object" ? payload : {};
+  const used = new Set();
+  const groups = [
+    { title: "Identity", keys: ["discovery_type", "entity_name", "alt_names", "rarity", "confidence_level", "impact_area"], items: [] },
+    { title: "Location", keys: ["world_name", "region_name", "found_in", "coordinates", "climate"], items: [] },
+    { title: "Encounter", keys: ["time_of_day", "weather_condition", "biome_context", "spawn_conditions", "trigger_conditions", "requirements", "group_size", "combat_outcome", "mountable", "health_points", "taming_method", "key_item_used"], items: [] },
+    { title: "Loot & Rewards", keys: ["dropped_items", "loot_or_rewards", "resources_or_rewards", "dropped_by", "source_type", "drop_rate_observation", "drop_conditions", "loot_conditions"], items: [] },
+    { title: "Verification", keys: ["how_to_reproduce", "observed_result", "expected_result", "first_seen_version", "last_confirmed_version", "automation_tags", "notes"], items: [] },
+  ];
+
+  groups.forEach(function(group) {
+    group.keys.forEach(function(key) {
+      const value = data[key];
+      if (value == null || value === "") return;
+      used.add(key);
+      group.items.push({
+        label: fieldLookup[key]?.label || humanizeDiscoveryKeyCP(key),
+        value: value,
+      });
+    });
+  });
+
+  Object.keys(data).forEach(function(key) {
+    if (used.has(key) || data[key] == null || data[key] === "") return;
+    groups[groups.length - 1].items.push({
+      label: fieldLookup[key]?.label || humanizeDiscoveryKeyCP(key),
+      value: data[key],
+    });
+  });
+
+  return groups;
+}
+
+function humanizeDiscoveryKeyCP(value) {
+  return String(value || "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, function(c) { return c.toUpperCase(); })
+    .trim();
 }
 
 function buildDiscoveryAutoTitle(payload, category) {
   const safePayload = payload && typeof payload === "object" ? payload : {};
   const entityName = String(safePayload.entity_name || "").trim();
-  const foundIn = String(safePayload.found_in || "").trim();
+  const primaryPlace = getDiscoveryPrimaryPlaceCP(safePayload);
   const categoryLabel = category ? String(category).charAt(0).toUpperCase() + String(category).slice(1) : "Discovery";
 
-  if (entityName && foundIn) {
-    return entityName + " in " + foundIn;
+  if (entityName && primaryPlace) {
+    return entityName + " in " + primaryPlace;
   }
   if (entityName) {
-    return entityName + " (" + categoryLabel + ")";
+    return entityName;
   }
-  if (foundIn) {
-    return categoryLabel + " in " + foundIn;
+  if (primaryPlace) {
+    return categoryLabel + " in " + primaryPlace;
   }
   return categoryLabel + " Report " + new Date().toISOString().slice(0, 10);
+}
+
+function getDiscoveryPrimaryPlaceCP(payload) {
+  const data = payload && typeof payload === "object" ? payload : {};
+  const foundIn = getMeaningfulDiscoveryValueCP(data.found_in);
+  if (foundIn && !isGenericDiscoveryAreaCP(foundIn)) return foundIn;
+  const region = getMeaningfulDiscoveryValueCP(data.region_name);
+  if (region && !isGenericDiscoveryAreaCP(region)) return region;
+  const biome = getMeaningfulDiscoveryValueCP(data.biome_context);
+  if (biome && !isGenericDiscoveryAreaCP(biome)) return humanizeDiscoveryKeyCP(biome);
+  const inferred = inferPlaceFromDiscoveryTextCP([
+    data.how_to_reproduce,
+    data.spawn_conditions,
+    data.taming_method,
+    data.observed_result,
+  ]);
+  if (inferred) return inferred;
+  const world = getMeaningfulDiscoveryValueCP(data.world_name);
+  if (world && !isGenericDiscoveryAreaCP(world)) return world;
+  return "";
+}
+
+function isGenericDiscoveryAreaCP(value) {
+  const lower = String(value || "").trim().toLowerCase();
+  return ["central", "center", "north", "northern", "south", "southern", "east", "eastern", "west", "western", "middle", "upper", "lower", "inner", "outer"].includes(lower);
+}
+
+function inferPlaceFromDiscoveryTextCP(values) {
+  const text = (values || []).map(function(value) { return String(value || ""); }).join(" ");
+  const match = text.match(/\b(?:in|inside|within|around|near)\s+(?:the\s+)?([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){0,3})\b/);
+  if (!match) return "";
+  const place = getMeaningfulDiscoveryValueCP(match[1]);
+  return place && !isGenericDiscoveryAreaCP(place) ? place : "";
+}
+
+function getMeaningfulDiscoveryValueCP(value) {
+  const clean = String(value || "").trim();
+  const lower = clean.toLowerCase();
+  if (!clean) return "";
+  if (["unclear", "unknown", "not observed", "not sure", "n/a", "na", "none", "no"].includes(lower)) return "";
+  return clean;
 }
 
 function generateDiscoveryRecordIdCP() {
@@ -1945,6 +2882,8 @@ function normalizePostMetaCP(meta) {
   if (meta.patch_tag) out.patch_tag = String(meta.patch_tag).slice(0, 40);
   if (meta.source_url) out.source_url = String(meta.source_url).slice(0, 500);
   if (meta.subcategory) out.subcategory = String(meta.subcategory).slice(0, 60);
+  if (meta.discovery_form) out.discovery_form = String(meta.discovery_form).slice(0, 16);
+  if (meta.content_origin) out.content_origin = String(meta.content_origin).slice(0, 16);
   if (meta.discovery_payload && typeof meta.discovery_payload === "object") {
     const payload = {};
     Object.keys(meta.discovery_payload).forEach(function(key) {
@@ -1964,7 +2903,17 @@ function normalizePostMetaCP(meta) {
         title: String(rel.title || "").slice(0, 140),
         category: rel.category ? String(rel.category).slice(0, 60) : null,
         post_type: rel.post_type ? String(rel.post_type).slice(0, 40) : null,
+        target_entity_type: rel.target_entity_type ? String(rel.target_entity_type).slice(0, 40) : null,
+        confidence: Number.isFinite(Number(rel.confidence)) ? Math.max(0, Math.min(100, Number(rel.confidence))) : null,
+        auto_inferred: !!rel.auto_inferred,
         resolved: !!rel.resolved,
+        visibility: rel.visibility ? String(rel.visibility).slice(0, 20) : null,
+        source_post_id: rel.source_post_id || null,
+        source_post_slug: rel.source_post_slug ? String(rel.source_post_slug).slice(0, 160) : null,
+        source_post_title: rel.source_post_title ? String(rel.source_post_title).slice(0, 140) : null,
+        source_date: rel.source_date ? String(rel.source_date).slice(0, 40) : null,
+        report_count: Number.isFinite(Number(rel.report_count)) ? Math.max(1, Number(rel.report_count)) : null,
+        direction: rel.direction ? String(rel.direction).slice(0, 20) : null,
       };
     }).filter(function(rel) {
       return !!rel.title;
@@ -1975,6 +2924,8 @@ function normalizePostMetaCP(meta) {
   }
   if (meta.discovery_record_id) out.discovery_record_id = String(meta.discovery_record_id).slice(0, 64);
   if (meta.discovery_record_status) out.discovery_record_status = String(meta.discovery_record_status).slice(0, 40);
+  if (meta.discovery_form) out.discovery_form = String(meta.discovery_form).slice(0, 16);
+  if (meta.content_origin) out.content_origin = String(meta.content_origin).slice(0, 16);
   if (meta.discovery_submitted_at) out.discovery_submitted_at = String(meta.discovery_submitted_at).slice(0, 40);
   if (Array.isArray(meta.discovery_evidence)) {
     out.discovery_evidence = meta.discovery_evidence.slice(0, 20).map(function(item) {
@@ -1989,6 +2940,13 @@ function normalizePostMetaCP(meta) {
     }).filter(function(item) {
       return !!item.url || !!item.label;
     });
+  }
+  if (typeof KnowledgeRelations !== "undefined") {
+    const knowledgeMeta = KnowledgeRelations.normalizeKnowledgeMeta(meta);
+    if (knowledgeMeta) {
+      if (knowledgeMeta.knowledge_entry) out.knowledge_entry = knowledgeMeta.knowledge_entry;
+      if (knowledgeMeta.knowledge_graph) out.knowledge_graph = knowledgeMeta.knowledge_graph;
+    }
   }
   if (Array.isArray(meta.guide_references)) {
     out.guide_references = meta.guide_references.slice(0, 12).map(function(ref) {
@@ -2012,7 +2970,11 @@ function stripPostMetaCP(html) {
 
 function injectPostMetaCP(html, meta) {
   const cleaned = stripPostMetaCP(html);
-  const normalized = normalizePostMetaCP(meta);
+  let sourceMeta = meta && typeof meta === "object" ? meta : {};
+  if (typeof BoundLoreTestData !== "undefined") {
+    sourceMeta = BoundLoreTestData.markMeta(sourceMeta);
+  }
+  const normalized = normalizePostMetaCP(sourceMeta);
   if (!normalized) return cleaned;
   const json = JSON.stringify(normalized).replace(/-->/g, "--\\>");
   return cleaned + "\n<!--BLMETA " + json + " -->";

@@ -6,6 +6,7 @@ async function loadRecentTicker() {
     .from("posts")
     .select("id, slug, title, category, post_type, guide_subcategory, created_at, status")
     .in("status", ["published", "approved"])
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(6);
 

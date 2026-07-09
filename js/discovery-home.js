@@ -7,6 +7,7 @@ async function loadHomepageDiscoveries() {
     .select("id, slug, title, category, post_type, guide_subcategory, content, created_at")
     .eq("status", "published")
     .eq("is_discovery", true)
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(3);
 

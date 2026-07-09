@@ -96,6 +96,7 @@
     <button class="tab-btn" data-tab="allposts">All Posts</button>
     <button class="tab-btn" data-tab="users">Users</button>
     <button class="tab-btn" data-tab="reports">Reports (<span id="countReports">0</span>)</button>
+    <button class="tab-btn" data-tab="prerelease">Pre-Release Reset</button>
     <button class="tab-btn" data-tab="modlog">Moderation Log</button>
   </div>
 
@@ -108,6 +109,42 @@
       <div class="stat-card"><div class="num" id="statPendingDiscoveries">-</div><div class="label">Pending Discoveries</div></div>
       <div class="stat-card"><div class="num" id="statGuildApplications">-</div><div class="label">Guild Applications</div></div>
       <div class="stat-card"><div class="num" id="statReports">-</div><div class="label">Open Reports</div></div>
+    </div>
+    <div class="form-box" id="patchModePanel" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+        <div>
+          <h3 style="margin-top:0;">Wiki Patch Mode</h3>
+          <p style="color:var(--text-muted);margin:0 0 8px;">Temporarily show a maintenance page to normal visitors while admins continue working.</p>
+          <p id="patchModeStatusLine" style="margin:0;font-size:0.92rem;">Status: checking...</p>
+        </div>
+        <div id="patchModeBadge" class="badge" style="background:#666;color:#fff;">Unknown</div>
+      </div>
+      <div id="patchModeControls" style="margin-top:14px;display:grid;gap:10px;">
+        <label for="patchPublicMessage">Public message (optional)</label>
+        <textarea id="patchPublicMessage" class="form-input" rows="2" maxlength="500" placeholder="Wiki is currently being updated. Please check back later."></textarea>
+        <label for="patchReason">Internal reason (optional)</label>
+        <input id="patchReason" class="form-input" type="text" maxlength="240" placeholder="e.g. Entity data cleanup / layout QA" />
+        <label for="patchExpectedUntil">Expected until (optional)</label>
+        <input id="patchExpectedUntil" class="form-input" type="datetime-local" />
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button id="btnEnablePatchMode" class="btn-small" type="button" style="background:#c97c2d;">Enable Patch Mode</button>
+          <button id="btnDisablePatchMode" class="btn-small" type="button" style="background:#50c878;">Disable Patch Mode</button>
+        </div>
+        <p id="patchModeMsg" style="margin:0;color:var(--text-muted);font-size:0.88rem;"></p>
+      </div>
+    </div>
+    <div class="form-box" id="swampRepairPanel" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">Swamp Test Data Repair</h3>
+      <p style="color:var(--text-muted);margin:0 0 10px;">Normalize known Swamp/Swamplands test stubs in the database (category, title, BLMETA). Idempotent — safe to run multiple times.</p>
+      <p style="color:var(--text-muted);margin:0 0 10px;font-size:0.88rem;">SQL baseline: <code>supabase/repair_swamp_test_data.sql</code></p>
+      <button id="btnRepairSwampTestData" class="btn-small" type="button">Repair Swamp test data</button>
+      <p id="swampRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
+    </div>
+    <div class="form-box" id="contributionRepairPanel" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">Contribution Duplicate Repair</h3>
+      <p style="color:var(--text-muted);margin:0 0 10px;">Finds contribution posts that were published as standalone entries (old bug), merges their evidence/fields into the canonical target entry, and archives the duplicate. No hard deletes. Idempotent.</p>
+      <button id="btnRepairContributionDuplicates" class="btn-small" type="button">Repair contribution duplicates</button>
+      <p id="contributionRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
     </div>
     <div class="form-box">
       <h3>Posts by Category</h3>
@@ -197,6 +234,19 @@
     <p id="reportsEmpty" style="text-align:center;color:var(--text-muted);display:none;">No open reports.</p>
   </div>
 
+  <div id="tabPrerelease" class="tab-panel" style="display:none;">
+    <div class="form-box">
+      <h3 style="margin-top:0;">Pre-Release Test Data Reset</h3>
+      <p style="color:var(--text-muted);">Current wiki content is development/test data. Before launch, run the guarded SQL reset in Supabase to remove marked test posts without touching system configuration.</p>
+      <ul class="source-list">
+        <li>Marker: BLMETA <code>content_origin: "test"</code> (auto on localhost)</li>
+        <li>SQL file: <code>supabase/pre_release_test_data_reset.sql</code></li>
+        <li>Confirmation token required inside SQL session — no in-app delete button</li>
+      </ul>
+      <p id="preReleaseTestCount" style="margin-top:12px;color:var(--text-muted);">Loading test data stats...</p>
+    </div>
+  </div>
+
   <div id="tabModlog" class="tab-panel" style="display:none;">
     <div class="admin-tools">
       <button id="btnReloadModlog" class="btn-small" type="button" style="background:#2a8bdc;">Refresh Log</button>
@@ -223,7 +273,10 @@
 <footer class="footer"><div class="footer-bottom"><p>&copy; 2026 BoundLore Community &middot; <a href="/wiki/imprint/">Imprint</a> &middot; <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
 
 <script src="/js/supabase-config.js"></script>
-<script src="/js/categories-config.js?v=10"></script>
+<script src="/js/test-data.js?v=1"></script>
+<script src="/js/categories-config.js?v=17"></script>
+<script src="/js/knowledge-relations.js?v=12"></script>
+<script src="/js/entity-core.js?v=7"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notifications.js"></script>
@@ -383,6 +436,8 @@ async function detectDashboardFeatures() {
     .select("id, submission_status, submission_status_updated_at, submission_status_updated_by")
     .limit(1);
   canUseSubmissionLifecycle = !submissionProbe.error;
+
+  await probeWikiPatchModeA();
 }
 
 function initAdminControls() {
@@ -399,6 +454,193 @@ function initAdminControls() {
   document.getElementById("btnReloadUsers")?.addEventListener("click", loadUsers);
   document.getElementById("btnReloadPosts")?.addEventListener("click", loadAllPosts);
   document.getElementById("btnReloadModlog")?.addEventListener("click", loadModerationLog);
+  document.getElementById("btnEnablePatchMode")?.addEventListener("click", function() {
+    saveWikiPatchModeA(true);
+  });
+  document.getElementById("btnDisablePatchMode")?.addEventListener("click", function() {
+    saveWikiPatchModeA(false);
+  });
+  document.getElementById("btnRepairSwampTestData")?.addEventListener("click", repairSwampTestDataA);
+  document.getElementById("btnRepairContributionDuplicates")?.addEventListener("click", repairContributionDuplicatesA);
+}
+
+// Repairs contribution posts that leaked into public lists as standalone
+// entities: merges them into their target entry and archives the duplicate.
+async function repairContributionDuplicatesA() {
+  const msg = document.getElementById("contributionRepairMsg");
+  if (typeof KnowledgeRelations === "undefined" || !KnowledgeRelations.isContributionPost) {
+    if (msg) msg.textContent = "knowledge-relations.js helpers are not loaded.";
+    return;
+  }
+  if (!confirm("Repair contribution duplicates?\n\nMerges published contribution posts into their target entries and archives the duplicates. No hard deletes.")) {
+    return;
+  }
+  if (msg) msg.textContent = "Scanning...";
+
+  const { data: candidates, error } = await supabase
+    .from("posts")
+    .select("id, slug, title, category, post_type, content, status, author_id, created_at, deleted_at")
+    .is("deleted_at", null)
+    .or("slug.ilike.contribution-%,title.ilike.Contribution:%")
+    .limit(100);
+
+  if (error) {
+    if (msg) msg.textContent = "Scan failed: " + error.message;
+    return;
+  }
+
+  let merged = 0;
+  let archived = 0;
+  let skipped = 0;
+  const notes = [];
+
+  for (let i = 0; i < (candidates || []).length; i += 1) {
+    const post = candidates[i];
+    const meta = parsePostMetaA(post.content || "");
+    if (!isContributionPostA(post, meta)) { skipped += 1; continue; }
+
+    try {
+      const mergeResult = await KnowledgeRelations.mergeContributionIntoTarget(supabase, post, {
+        meta: meta,
+        actorId: currentAdminId,
+      });
+      if (!mergeResult.ok) {
+        skipped += 1;
+        notes.push(post.slug + ": " + (mergeResult.reason || "merge failed"));
+        continue;
+      }
+      if (!mergeResult.alreadyMerged) merged += 1;
+
+      if (meta.contribution && typeof meta.contribution === "object") {
+        meta.contribution.status = "approved";
+        meta.contribution.merged_at = meta.contribution.merged_at || new Date().toISOString();
+      } else {
+        meta.contribution = {
+          target_post_id: mergeResult.target ? mergeResult.target.id : null,
+          target_post_slug: mergeResult.target ? mergeResult.target.slug : null,
+          intent: (meta.discovery_payload && meta.discovery_payload.contribution_intent) || "add_info",
+          status: "approved",
+          merged_at: new Date().toISOString(),
+          repaired: true,
+        };
+      }
+      const content = injectPostMetaA(post.content || "", meta);
+      const { error: archiveError } = await supabase
+        .from("posts")
+        .update({
+          content: content,
+          deleted_at: new Date().toISOString(),
+          deleted_by: currentAdminId,
+        })
+        .eq("id", post.id);
+      if (!archiveError) archived += 1;
+      else notes.push(post.slug + ": archive failed (" + archiveError.message + ")");
+    } catch (err) {
+      skipped += 1;
+      notes.push(post.slug + ": " + (err && err.message ? err.message : "unknown error"));
+    }
+  }
+
+  if (msg) {
+    msg.textContent = "Merged " + merged + ", archived " + archived + ", skipped " + skipped + " contribution post(s)."
+      + (notes.length ? " Issues: " + notes.join(" | ") : "");
+  }
+  await logAdminAction("repair_contribution_duplicates", "system", null,
+    "Merged " + merged + ", archived " + archived + ", skipped " + skipped);
+}
+
+const SWAMP_REPAIR_SLUGS = [
+  "swamplands-94dadc07",
+  "swamplands-near-a-campfire-787bbd19",
+  "ogre-mage-in-swamplands-near-a-campfire-9651e6",
+];
+
+async function repairSwampTestDataA() {
+  const msg = document.getElementById("swampRepairMsg");
+  if (typeof EntityCore === "undefined") {
+    if (msg) msg.textContent = "EntityCore is not loaded.";
+    return;
+  }
+  if (!confirm("Repair known Swamp test stubs?\n\nUpdates category, title, and BLMETA for the fixed test slugs only.")) {
+    return;
+  }
+  if (msg) msg.textContent = "Repairing...";
+
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("id, slug, title, category, content, post_type")
+    .in("slug", SWAMP_REPAIR_SLUGS);
+
+  if (error || !Array.isArray(posts)) {
+    if (msg) msg.textContent = "Failed to load posts: " + (error && error.message ? error.message : "unknown error");
+    return;
+  }
+
+  let repaired = 0;
+  for (let i = 0; i < posts.length; i += 1) {
+    const post = posts[i];
+    const meta = parsePostMetaA(post.content || "");
+    const repair = EntityCore.normalizeEntityMeta(post, meta, { repairPayload: true });
+    const payload = repair.meta.discovery_payload && typeof repair.meta.discovery_payload === "object"
+      ? repair.meta.discovery_payload
+      : {};
+    const placeInfo = EntityCore.classifyPlaceEntry(post.title, post.category, payload);
+    let category = post.category;
+    let title = post.title;
+
+    if (placeInfo.effective_category === "biomes") {
+      category = "biomes";
+      title = placeInfo.canonical_name || "Swamp";
+      repair.meta.subcategory = "swamp";
+      if (!payload.discovery_type) payload.discovery_type = "biome";
+    } else if (placeInfo.effective_category === "location_hint") {
+      title = placeInfo.location_hint || placeInfo.canonical_name || title;
+      repair.meta.place_role = "location_hint";
+      if (!repair.meta.knowledge_entry) repair.meta.knowledge_entry = {};
+      repair.meta.knowledge_entry.status = "needs_details";
+      repair.meta.knowledge_entry.completeness = "stub";
+      if (placeInfo.biome_name) payload.region_name = placeInfo.biome_name;
+    } else if (post.slug === "ogre-mage-in-swamplands-near-a-campfire-9651e6") {
+      category = "creatures";
+      title = EntityCore.extractCanonicalIdentity(post.title, "creatures", { payload: payload }).canonical_name || "Ogre Mage";
+      if (!payload.discovery_type) payload.discovery_type = "monster";
+    }
+
+    repair.meta.discovery_payload = payload;
+    const content = injectPostMetaA(stripPostMetaA(post.content || ""), repair.meta);
+    const { error: updateError } = await supabase
+      .from("posts")
+      .update({ category: category, title: title, content: content })
+      .eq("id", post.id);
+    if (!updateError) repaired += 1;
+  }
+
+  if (msg) {
+    msg.textContent = "Repaired " + repaired + " of " + SWAMP_REPAIR_SLUGS.length + " known test post(s).";
+  }
+  await logAdminAction("repair_swamp_test_data", "system", null, "Repaired " + repaired + " swamp test stubs");
+}
+
+async function archivePostA(postId, reason) {
+  if (!postId) return { ok: false, reason: "Post id missing" };
+
+  if (canUseExtendedPostFields) {
+    const { error } = await supabase
+      .from("posts")
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: currentAdminId,
+      })
+      .eq("id", postId);
+    if (error) return { ok: false, reason: error.message || "Archive failed" };
+    await logAdminAction("archive_post", "post", postId, reason || "Archived from admin dashboard");
+    return { ok: true };
+  }
+
+  const { error } = await supabase.from("posts").update({ status: "pending" }).eq("id", postId);
+  if (error) return { ok: false, reason: error.message || "Fallback hide failed" };
+  await logAdminAction("hide_post_fallback", "post", postId, reason || "Hidden by setting status to pending because archive fields are missing");
+  return { ok: true };
 }
 
 async function transitionDiscoveryStatusA(postId, nextSubmissionStatus, note) {
@@ -420,6 +662,80 @@ async function transitionDiscoveryStatusA(postId, nextSubmissionStatus, note) {
     return { ok: false, reason: error.message || "Status transition failed" };
   }
   return { ok: true };
+}
+
+function isContributionPostA(post, meta) {
+  if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.isContributionPost) {
+    return KnowledgeRelations.isContributionPost(post, meta);
+  }
+  const m = meta || parsePostMetaA(post && post.content || "");
+  return !!(m.contribution || m.discovery_record_status === "contribution" || m.contribution_intent
+    || (m.discovery_payload && m.discovery_payload.contribution_intent));
+}
+
+// Contributions never go through the discovery RPC / schema validation.
+// They are merged directly into their existing target entry.
+async function approveContributionA(target, options) {
+  const opts = options || {};
+  if (!target || !target.id) throw new Error("Contribution target missing");
+  if (typeof KnowledgeRelations === "undefined" || !KnowledgeRelations.mergeContributionIntoTarget) {
+    throw new Error("Contribution merge helper not loaded (knowledge-relations.js)");
+  }
+
+  const meta = parsePostMetaA(target.content || "");
+  const info = KnowledgeRelations.getContributionInfo(target, meta);
+  const targetPost = await KnowledgeRelations.resolveContributionTargetPost(supabase, target, meta);
+  if (!targetPost) {
+    throw new Error("Target wiki entry for this contribution could not be resolved (" + (info.target_title || info.target_post_slug || "unknown") + ")");
+  }
+
+  const mergeResult = await KnowledgeRelations.mergeContributionIntoTarget(supabase, target, {
+    meta: meta,
+    targetPost: targetPost,
+    actorId: currentAdminId,
+  });
+  if (!mergeResult.ok) throw new Error(mergeResult.reason || "Contribution merge failed");
+
+  // Mark the contribution itself as approved and archive it so it never
+  // shows up as its own entity post.
+  if (meta.contribution && typeof meta.contribution === "object") {
+    meta.contribution.status = "approved";
+    meta.contribution.merged_at = new Date().toISOString();
+    meta.contribution.merged_by = currentAdminId;
+  } else {
+    meta.contribution = {
+      target_post_id: targetPost.id,
+      target_post_slug: targetPost.slug,
+      target_title: targetPost.title,
+      target_category: targetPost.category,
+      intent: info.intent,
+      status: "approved",
+      merged_at: new Date().toISOString(),
+      merged_by: currentAdminId,
+    };
+  }
+  const updatedContent = injectPostMetaA(target.content || "", meta);
+  const updatePayload = {
+    content: updatedContent,
+    deleted_at: new Date().toISOString(),
+    deleted_by: currentAdminId,
+  };
+  if (canUseSubmissionLifecycle) {
+    updatePayload.submission_status = "approved";
+    updatePayload.submission_status_updated_at = new Date().toISOString();
+    updatePayload.submission_status_updated_by = currentAdminId;
+    updatePayload.submission_review_note = opts.reviewNote || "Contribution merged into " + (targetPost.title || "target entry");
+  }
+  const { error: finalizeError } = await supabase.from("posts").update(updatePayload).eq("id", target.id);
+  if (finalizeError) throw new Error(finalizeError.message || "Contribution finalize failed");
+
+  await logAdminAction("approve_contribution", "post", target.id,
+    "Merged contribution (" + info.intent + ") into " + (targetPost.slug || targetPost.id)
+    + (mergeResult.conflicts && mergeResult.conflicts.length ? " with " + mergeResult.conflicts.length + " conflict(s) kept for review" : ""));
+  await notifyPostOwner(target, "contribution", "Contribution approved",
+    "Your contribution was approved and merged into \"" + (targetPost.title || "the wiki entry") + "\".", buildPostUrl(targetPost));
+
+  return mergeResult;
 }
 
 async function approveDiscoveryViaRpcA(target, options) {
@@ -477,33 +793,162 @@ function syncAdminSystemNotice() {
   const notice = document.getElementById("adminSystemNotice");
   if (!notice) return;
 
+  const parts = [];
+  if (window.__wikiPatchModeState && window.__wikiPatchModeState.enabled) {
+    parts.push('<p style="margin:0 0 8px;"><strong>Wiki Patch Mode is active.</strong> Normal visitors are seeing the maintenance page.</p>');
+  }
+
   const missing = [];
   if (!canUseEntityBackbone) missing.push("entity backbone tables");
   if (!canUseCategoryExtensions) missing.push("dynamic category extension tables");
   if (!canUseDiscoveryEvidenceTable) missing.push("discovery evidence table");
   if (!canUseDiscoverySyncRpc) missing.push("discovery sync log/RPC migration");
   if (!canUseSubmissionLifecycle) missing.push("submission lifecycle columns");
+  if (!canUseWikiPatchMode) missing.push("wiki_patch_mode table");
 
-  if (!missing.length) {
+  if (missing.length) {
+    parts.push(
+      '<h3 style="margin-top:0;">SQL Setup Required</h3>' +
+      '<p style="color:var(--text-muted);margin-bottom:10px;">The local discovery v1 code is ready, but Supabase is still missing: <strong>' + escapeHtmlA(missing.join(', ')) + '</strong>.</p>' +
+      '<p style="color:var(--text-muted);margin-bottom:0;">Run the SQL from <code>supabase/discovery_entity_backbone.sql</code> and <code>supabase/wiki_patch_mode.sql</code> in the Supabase SQL editor before testing patch mode and entity sync.</p>'
+    );
+  }
+
+  if (!parts.length) {
     notice.style.display = "none";
     notice.innerHTML = "";
     return;
   }
 
   notice.style.display = "block";
-  notice.innerHTML =
-    '<h3 style="margin-top:0;">SQL Setup Required</h3>' +
-    '<p style="color:var(--text-muted);margin-bottom:10px;">The local discovery v1 code is ready, but Supabase is still missing: <strong>' + escapeHtmlA(missing.join(', ')) + '</strong>.</p>' +
-    '<p style="color:var(--text-muted);margin-bottom:0;">Run the SQL from <code>supabase/discovery_entity_backbone.sql</code> in the Supabase SQL editor before testing entity sync, dynamic subcategory persistence, and evidence persistence.</p>';
+  notice.innerHTML = parts.join("");
+}
+
+let canUseWikiPatchMode = false;
+let wikiPatchModeState = null;
+
+async function probeWikiPatchModeA() {
+  try {
+    const { error } = await supabase.from("wiki_patch_mode").select("id").eq("id", 1).limit(1);
+    canUseWikiPatchMode = !error;
+  } catch (err) {
+    canUseWikiPatchMode = false;
+  }
+}
+
+async function loadWikiPatchModePanelA() {
+  const statusLine = document.getElementById("patchModeStatusLine");
+  const badge = document.getElementById("patchModeBadge");
+  const msg = document.getElementById("patchModeMsg");
+  const panel = document.getElementById("patchModePanel");
+  if (!panel) return;
+
+  if (!canUseWikiPatchMode) {
+    if (statusLine) statusLine.textContent = "Status: unavailable (run supabase/wiki_patch_mode.sql)";
+    if (badge) { badge.textContent = "Unavailable"; badge.style.background = "#666"; }
+    if (msg) msg.textContent = "Patch mode controls require the wiki_patch_mode table.";
+    document.getElementById("btnEnablePatchMode").disabled = true;
+    document.getElementById("btnDisablePatchMode").disabled = true;
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("wiki_patch_mode")
+    .select("enabled, public_message, reason, expected_until, updated_at")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (error || !data) {
+    if (statusLine) statusLine.textContent = "Status: could not load patch mode settings.";
+    if (badge) { badge.textContent = "Error"; badge.style.background = "#8b0000"; }
+    return;
+  }
+
+  wikiPatchModeState = data;
+  window.__wikiPatchModeState = data;
+  const enabled = !!data.enabled;
+  if (statusLine) {
+    statusLine.textContent = enabled
+      ? "Status: ACTIVE — public wiki access is blocked for non-admins."
+      : "Status: inactive — wiki is publicly available.";
+  }
+  if (badge) {
+    badge.textContent = enabled ? "Patch Mode ON" : "Patch Mode OFF";
+    badge.style.background = enabled ? "#c97c2d" : "#2f7d57";
+  }
+  document.getElementById("patchPublicMessage").value = data.public_message || "";
+  document.getElementById("patchReason").value = data.reason || "";
+  document.getElementById("patchExpectedUntil").value = data.expected_until
+    ? new Date(data.expected_until).toISOString().slice(0, 16)
+    : "";
+  syncAdminSystemNotice();
+}
+
+async function saveWikiPatchModeA(enabled) {
+  const msg = document.getElementById("patchModeMsg");
+  if (!canUseWikiPatchMode) {
+    if (msg) msg.textContent = "Patch mode table is not available.";
+    return;
+  }
+
+  const actionLabel = enabled ? "ENABLE" : "DISABLE";
+  const confirmText = enabled
+    ? "Enable Wiki Patch Mode?\n\nNormal users and guests will see a maintenance page instead of wiki content."
+    : "Disable Wiki Patch Mode?\n\nThe wiki will become publicly accessible again.";
+  if (!confirm(confirmText)) return;
+
+  const publicMessage = (document.getElementById("patchPublicMessage").value || "").trim();
+  const reason = (document.getElementById("patchReason").value || "").trim();
+  const expectedRaw = (document.getElementById("patchExpectedUntil").value || "").trim();
+  const expectedUntil = expectedRaw ? new Date(expectedRaw).toISOString() : null;
+
+  const { error } = await supabase
+    .from("wiki_patch_mode")
+    .update({
+      enabled: enabled,
+      public_message: publicMessage || null,
+      reason: reason || null,
+      expected_until: expectedUntil,
+      updated_at: new Date().toISOString(),
+      updated_by: currentAdminId,
+    })
+    .eq("id", 1);
+
+  if (error) {
+    if (msg) msg.textContent = "Patch mode update failed: " + error.message;
+    return;
+  }
+
+  await logAdminAction(
+    enabled ? "enable_wiki_patch_mode" : "disable_wiki_patch_mode",
+    "system",
+    "wiki_patch_mode",
+    (reason || publicMessage || "No note provided").slice(0, 240)
+  );
+
+  if (msg) msg.textContent = enabled ? "Patch mode enabled." : "Patch mode disabled.";
+  await loadWikiPatchModePanelA();
 }
 
 async function loadOverview() {
   const { count: userCount } = await supabase.from("profiles").select("*", { count: "exact", head: true });
-  const { count: publishedCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "published");
-  const { count: pendingCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending");
-  const { count: discoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("is_discovery", true);
-  const { count: pendingDiscoveryCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true);
-  const { count: guildApplicationCount } = await supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true).eq("category", "guilds");
+  let publishedQuery = supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "published");
+  let pendingQuery = supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending");
+  let discoveryQuery = supabase.from("posts").select("*", { count: "exact", head: true }).eq("is_discovery", true);
+  let pendingDiscoveryQuery = supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true);
+  let guildApplicationQuery = supabase.from("posts").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_discovery", true).eq("category", "guilds");
+  if (canUseExtendedPostFields) {
+    publishedQuery = publishedQuery.is("deleted_at", null);
+    pendingQuery = pendingQuery.is("deleted_at", null);
+    discoveryQuery = discoveryQuery.is("deleted_at", null);
+    pendingDiscoveryQuery = pendingDiscoveryQuery.is("deleted_at", null);
+    guildApplicationQuery = guildApplicationQuery.is("deleted_at", null);
+  }
+  const { count: publishedCount } = await publishedQuery;
+  const { count: pendingCount } = await pendingQuery;
+  const { count: discoveryCount } = await discoveryQuery;
+  const { count: pendingDiscoveryCount } = await pendingDiscoveryQuery;
+  const { count: guildApplicationCount } = await guildApplicationQuery;
   const { count: reportCount } = await supabase.from("reports").select("*", { count: "exact", head: true });
 
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -523,7 +968,9 @@ async function loadOverview() {
   document.getElementById("kpiReports24h").textContent = (reports24h || 0) + " reports submitted";
   document.getElementById("kpiPendingQueue").textContent = (pendingCount || 0) + " pending posts, " + (reportCount || 0) + " reports";
 
-  const { data: allPosts } = await supabase.from("posts").select("category").eq("status", "published");
+  let breakdownQuery = supabase.from("posts").select("category").eq("status", "published");
+  if (canUseExtendedPostFields) breakdownQuery = breakdownQuery.is("deleted_at", null);
+  const { data: allPosts } = await breakdownQuery;
   const breakdown = document.getElementById("categoryBreakdown");
   breakdown.innerHTML = "";
   if (allPosts && typeof BOUNDLORE_CATEGORIES !== "undefined") {
@@ -535,14 +982,17 @@ async function loadOverview() {
       breakdown.appendChild(row);
     });
   }
+  await loadWikiPatchModePanelA();
 }
 
 async function loadPending() {
-  const { data: posts, error } = await supabase
+  let query = supabase
     .from("posts")
     .select("id, title, category, post_type, guide_subcategory, content, is_discovery, created_at, author_id, profiles:author_id(username)")
     .eq("status", "pending")
     .order("created_at", { ascending: true });
+  if (canUseExtendedPostFields) query = query.is("deleted_at", null);
+  const { data: posts, error } = await query;
 
   const list = document.getElementById("pendingList");
   const empty = document.getElementById("pendingEmpty");
@@ -561,6 +1011,28 @@ async function loadPending() {
     const authorName = post.profiles ? post.profiles.username : "Unknown";
     const catLabel = getPostCategoryLabel(post);
     const discoveryBadge = post.is_discovery ? "<span class=\"badge badge-discovery\">\u2728 Discovery</span>" : "";
+    const postMeta = parsePostMetaA(post.content || "");
+    const testBadge = postMeta.content_origin === "test"
+      ? "<span class=\"badge\" style=\"background:#5a6a8a;color:#fff;\">Test data</span>"
+      : "";
+    const stubBadge = postMeta.knowledge_entry && postMeta.knowledge_entry.auto_created
+      ? "<span class=\"badge\" style=\"background:#8a6a2a;color:#111;\">Related stub</span>"
+      : "";
+    const isContributionPending = isContributionPostA(post, postMeta);
+    const pendingContributionInfo = isContributionPending && typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.getContributionInfo
+      ? KnowledgeRelations.getContributionInfo(post, postMeta)
+      : null;
+    const contributionBadge = isContributionPending
+      ? "<span class=\"badge\" style=\"background:#4a78b8;color:#fff;\">Contribution</span>"
+      : "";
+    const contributionLine = pendingContributionInfo
+      ? "<p style=\"color:#9cc4ef;font-size:0.85rem;margin-top:6px;\">Contribution to <strong>" +
+        escapeHtmlA(pendingContributionInfo.target_title || pendingContributionInfo.target_post_slug || "Entry") + "</strong> · Intent: " +
+        escapeHtmlA(pendingContributionInfo.intent) +
+        (pendingContributionInfo.missing_field ? " · Field: " + escapeHtmlA(pendingContributionInfo.missing_field) : "") +
+        (pendingContributionInfo.evidence.length ? " · " + pendingContributionInfo.evidence.length + " evidence item(s)" : "") +
+        " — approval merges into the existing entry.</p>"
+      : "";
 
     const div = document.createElement("div");
     div.className = "form-box";
@@ -569,13 +1041,14 @@ async function loadPending() {
       "<div style=\"display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;\">" +
       "<h3 style=\"margin:0;\">" + escapeHtmlA(post.title) + "</h3>" +
       "<span class=\"badge\" style=\"background:rgba(255,255,255,0.08);\">" + catLabel + "</span>" +
-      discoveryBadge +
+      discoveryBadge + testBadge + stubBadge + contributionBadge +
       "</div>" +
+      contributionLine +
       "<p style=\"color:var(--text-muted);font-size:0.85rem;margin-top:6px;\">By " + escapeHtmlA(authorName) + " &middot; " + new Date(post.created_at).toLocaleString() + "</p>" +
       "<div style=\"background:#fff;color:#111;padding:16px;border-radius:6px;margin:14px 0;max-height:320px;overflow-y:auto;\">" + post.content + "</div>" +
       "<div style=\"display:flex;gap:10px;\">" +
-      "<button class=\"btn-small\" style=\"background:#50c878;\" data-action=\"approve\" data-id=\"" + post.id + "\">Approve & Publish</button>" +
-      "<button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"reject\" data-id=\"" + post.id + "\">Reject & Delete</button>" +
+      "<button class=\"btn-small\" style=\"background:#50c878;\" data-action=\"approve\" data-id=\"" + post.id + "\">" + (isContributionPending ? "Approve & Merge Contribution" : "Approve & Publish") + "</button>" +
+      "<button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"reject\" data-id=\"" + post.id + "\">Reject & Archive</button>" +
       "</div>";
     list.appendChild(div);
   });
@@ -583,10 +1056,35 @@ async function loadPending() {
   list.querySelectorAll("[data-action=\"approve\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
       const target = posts.find(function(p) { return p.id === btn.dataset.id; });
+      if (target && isContributionPostA(target)) {
+        try {
+          const mergeResult = await approveContributionA(target, { reviewNote: "Contribution approved from pending queue" });
+          if (mergeResult.conflicts && mergeResult.conflicts.length) {
+            alert("Contribution merged. Note: " + mergeResult.conflicts.length + " field(s) had existing values and were kept unchanged:\n"
+              + mergeResult.conflicts.map(function(c) { return "- " + c.field + ": existing \"" + c.existing + "\" vs submitted \"" + c.submitted + "\""; }).join("\n"));
+          }
+        } catch (err) {
+          alert("Contribution approval failed: " + (err && err.message ? err.message : "Unknown error"));
+        }
+        loadPending(); loadDiscoveries(); loadAllPosts(); loadOverview();
+        return;
+      }
       if (target && target.is_discovery) {
         const review = evaluateDiscoveryForApprovalA(target);
         if (!review.ok) {
-          alert("Discovery cannot be approved yet:\n- " + review.issues.join("\n- "));
+          const extra = review.warnings && review.warnings.length ? ("\n\nNotes:\n- " + review.warnings.join("\n- ")) : "";
+          alert("Discovery cannot be approved yet:\n- " + review.issues.join("\n- ") + extra);
+          return;
+        }
+        if (review.mode === "knowledge_stub") {
+          try {
+            await publishKnowledgeStubA(target, review);
+            await logAdminAction("approve_knowledge_stub", "post", this.dataset.id, "Published knowledge stub from pending queue");
+          } catch (err) {
+            alert("Stub approval failed: " + (err && err.message ? err.message : "Unknown error"));
+            return;
+          }
+          loadPending(); loadDiscoveries(); loadAllPosts(); loadOverview();
           return;
         }
         try {
@@ -597,6 +1095,17 @@ async function loadPending() {
           alert("Discovery approval failed: " + (err && err.message ? err.message : "Unknown error"));
         }
         loadPending(); loadDiscoveries(); loadAllPosts(); loadOverview();
+        return;
+      }
+      if (target && target.post_type === "wiki") {
+        const wikiReview = evaluateWikiEntryForApprovalA(target);
+        if (!wikiReview.ok) {
+          alert("Entry cannot be approved yet:\n- " + wikiReview.issues.join("\n- "));
+          return;
+        }
+      }
+      if (target && isContributionPostA(target, parsePostMetaA(target.content || ""))) {
+        alert("This is a contribution and must be approved via \"Approve & Merge Contribution\", not published as a standalone post.");
         return;
       }
       await supabase.from("posts").update({ status: "published" }).eq("id", this.dataset.id);
@@ -611,23 +1120,31 @@ async function loadPending() {
 
   list.querySelectorAll("[data-action=\"reject\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      if (!confirm("Really reject and permanently delete this post?")) return;
+      if (!confirm("Reject and archive this post? It will be hidden from public pages but kept in the database.")) return;
       const target = posts.find(function(p) { return p.id === btn.dataset.id; });
-      await supabase.from("posts").delete().eq("id", this.dataset.id);
+      if (canUseSubmissionLifecycle) {
+        await transitionDiscoveryStatusA(this.dataset.id, "rejected", "Rejected from pending queue");
+      }
+      const archive = await archivePostA(this.dataset.id, "Rejected from pending queue");
+      if (!archive.ok) {
+        alert("Archive failed: " + archive.reason);
+        return;
+      }
       await notifyPostOwner(target, "post_status", "Your post was rejected", "An admin rejected and removed your pending post.", "/wiki/account/");
-      await logAdminAction("reject_post", "post", this.dataset.id, "Rejected and deleted pending post");
       loadPending(); loadDiscoveries(); loadAllPosts(); loadOverview();
     });
   });
 }
 
 async function loadDiscoveries() {
-  const { data: discoveries, error } = await supabase
+  let query = supabase
     .from("posts")
     .select("id, slug, title, category, content, created_at, author_id, profiles:author_id(username)")
     .eq("status", "pending")
     .eq("is_discovery", true)
     .order("created_at", { ascending: true });
+  if (canUseExtendedPostFields) query = query.is("deleted_at", null);
+  const { data: discoveries, error } = await query;
 
   const list = document.getElementById("discoveryQueueList");
   const empty = document.getElementById("discoveryQueueEmpty");
@@ -649,12 +1166,29 @@ async function loadDiscoveries() {
     const assets = extractDiscoveryAttachmentLinks(post.content);
     const meta = parsePostMetaA(post.content || "");
     const evidence = Array.isArray(meta.discovery_evidence) ? meta.discovery_evidence : [];
-    const review = evaluateDiscoveryForApprovalA(post);
-    const reviewBadge = review.ok
-      ? '<span class="badge badge-published" style="margin-left:8px;">Ready</span>'
-      : '<span class="badge badge-pending" style="margin-left:8px;">Needs fixes</span>';
-    const reviewSummary = review.ok
-      ? '<p style="font-size:0.82rem;color:#50c878;margin:6px 0 10px;">Structured data is complete enough for approval.</p>'
+    const isStub = isKnowledgeStubPostA(post, meta);
+    const isContribution = isContributionPostA(post, meta);
+    const contributionInfo = isContribution && typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.getContributionInfo
+      ? KnowledgeRelations.getContributionInfo(post, meta)
+      : null;
+    const review = isContribution
+      ? { ok: true, issues: [], warnings: [], mode: "contribution" }
+      : evaluateDiscoveryForApprovalA(post);
+    const reviewBadge = isContribution
+      ? '<span class="badge" style="margin-left:8px;background:#4a78b8;color:#fff;">Contribution</span>'
+      : (isStub
+        ? '<span class="badge" style="margin-left:8px;background:#8a6a2a;color:#111;">Knowledge stub</span>'
+        : (review.ok
+          ? '<span class="badge badge-published" style="margin-left:8px;">Ready</span>'
+          : '<span class="badge badge-pending" style="margin-left:8px;">Needs fixes</span>'));
+    const contributionSummary = contributionInfo
+      ? '<p style="font-size:0.82rem;color:#9cc4ef;margin:6px 0 10px;">Contribution to <strong>' + escapeHtmlA(contributionInfo.target_title || contributionInfo.target_post_slug || "entry") + '</strong>'
+        + ' · Intent: <strong>' + escapeHtmlA(contributionInfo.intent) + '</strong>'
+        + (contributionInfo.evidence.length ? ' · ' + contributionInfo.evidence.length + ' evidence item(s)' : '')
+        + '. Approval merges it into the existing entry — no new post is created.</p>'
+      : "";
+    const reviewSummary = contributionSummary ? contributionSummary : review.ok
+      ? '<p style="font-size:0.82rem;color:#50c878;margin:6px 0 10px;">' + (isStub ? 'Knowledge stub can be published as incomplete.' : 'Structured data is complete enough for approval.') + '</p>'
       : ('<div style="margin:8px 0 10px;padding:10px 12px;border-radius:8px;background:rgba(224,168,58,0.14);border:1px solid rgba(224,168,58,0.35);">' +
          '<p style="margin:0 0 6px;color:#f0d089;font-size:0.82rem;"><strong>Approval blocked until fixed:</strong></p>' +
          '<ul style="margin:0;padding-left:18px;color:#f4e7bb;font-size:0.81rem;">' +
@@ -697,9 +1231,9 @@ async function loadDiscoveries() {
         stripHeavyDiscoveryContent(post.content) +
       '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-      '<button class="btn-small" style="background:#50c878;" data-action="approve-discovery" data-id="' + post.id + '"' + (review.ok ? '' : ' disabled') + '>Approve Discovery</button>' +
-      '<button class="btn-small" style="background:#2a8bdc;" data-action="compose-from-discovery" data-id="' + post.id + '"' + (review.ok ? '' : ' disabled') + '>Build Category Post</button>' +
-      '<button class="btn-small" style="background:#e05555;" data-action="reject-discovery" data-id="' + post.id + '">Reject</button>' +
+      '<button class="btn-small" style="background:#50c878;" data-action="approve-discovery" data-id="' + post.id + '"' + (review.ok ? '' : ' disabled') + '>' + (isContribution ? 'Approve & Merge Contribution' : 'Approve Discovery') + '</button>' +
+      (isContribution ? '' : '<button class="btn-small" style="background:#2a8bdc;" data-action="compose-from-discovery" data-id="' + post.id + '"' + ((review.ok || isStub) ? '' : ' disabled') + '>Build Category Post</button>') +
+      '<button class="btn-small" style="background:#e05555;" data-action="reject-discovery" data-id="' + post.id + '">Reject & Archive</button>' +
       '</div>';
     list.appendChild(div);
   });
@@ -707,30 +1241,51 @@ async function loadDiscoveries() {
   list.querySelectorAll('[data-action="approve-discovery"]').forEach(function(btn) {
     btn.addEventListener("click", async function() {
       const target = discoveries.find(function(p) { return p.id === btn.dataset.id; });
+      if (target && isContributionPostA(target)) {
+        try {
+          await approveContributionA(target, { reviewNote: "Contribution approved from discovery queue" });
+        } catch (err) {
+          alert("Contribution approval failed: " + (err && err.message ? err.message : "Unknown error"));
+          return;
+        }
+        loadDiscoveries(); loadPending(); loadAllPosts(); loadOverview();
+        return;
+      }
       const review = evaluateDiscoveryForApprovalA(target);
       if (!review.ok) {
         alert("Discovery cannot be approved yet:\n- " + review.issues.join("\n- "));
         return;
       }
       try {
-        await approveDiscoveryViaRpcA(target, { reviewNote: "Approved from discovery queue" });
+        if (review.mode === "knowledge_stub") {
+          await publishKnowledgeStubA(target, review);
+          await logAdminAction("approve_knowledge_stub", "post", this.dataset.id, "Published knowledge stub from discovery queue");
+        } else {
+          await approveDiscoveryViaRpcA(target, { reviewNote: "Approved from discovery queue" });
+          await logAdminAction("approve_discovery", "post", this.dataset.id, "Approved discovery via RPC");
+        }
       } catch (err) {
         alert("Discovery approval failed: " + (err && err.message ? err.message : "Unknown error"));
         return;
       }
       await notifyPostOwner(target, "discovery", "Discovery approved", "Your discovery was approved and indexed for backbone processing.", buildPostUrl(target));
-      await logAdminAction("approve_discovery", "post", this.dataset.id, "Approved discovery via RPC");
       loadDiscoveries(); loadPending(); loadAllPosts(); loadOverview();
     });
   });
 
   list.querySelectorAll('[data-action="reject-discovery"]').forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      if (!confirm("Reject and delete this discovery?")) return;
+      if (!confirm("Reject and archive this discovery? It will be hidden from public pages but retained for audit/history.")) return;
       const target = discoveries.find(function(p) { return p.id === btn.dataset.id; });
-      await supabase.from("posts").delete().eq("id", this.dataset.id);
+      if (canUseSubmissionLifecycle) {
+        await transitionDiscoveryStatusA(this.dataset.id, "rejected", "Rejected from discovery queue");
+      }
+      const archive = await archivePostA(this.dataset.id, "Rejected from discovery queue");
+      if (!archive.ok) {
+        alert("Archive failed: " + archive.reason);
+        return;
+      }
       await notifyPostOwner(target, "discovery", "Discovery rejected", "Your discovery was rejected during moderation.", "/wiki/account/");
-      await logAdminAction("reject_discovery", "post", this.dataset.id, "Rejected discovery post");
       loadDiscoveries(); loadPending(); loadAllPosts(); loadOverview();
     });
   });
@@ -738,12 +1293,17 @@ async function loadDiscoveries() {
   list.querySelectorAll('[data-action="compose-from-discovery"]').forEach(function(btn) {
     btn.addEventListener("click", function() {
       const target = discoveries.find(function(p) { return p.id === btn.dataset.id; });
-      const review = evaluateDiscoveryForApprovalA(target);
-      if (!review.ok) {
-        alert("Discovery must be structurally valid before it can be curated:\n- " + review.issues.join("\n- "));
-        return;
+      if (!target) return;
+      if (isKnowledgeStubPostA(target, parsePostMetaA(target.content || ""))) {
+        openDiscoveryComposer(this.dataset.id);
+      } else {
+        const review = evaluateDiscoveryForApprovalA(target);
+        if (!review.ok) {
+          alert("Discovery must be structurally valid before it can be curated:\n- " + review.issues.join("\n- "));
+          return;
+        }
+        openDiscoveryComposer(this.dataset.id);
       }
-      openDiscoveryComposer(this.dataset.id);
       document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
       document.querySelector('[data-tab="discoveries"]').classList.add('active');
       document.querySelectorAll('.tab-panel').forEach(function(panel) { panel.style.display = 'none'; });
@@ -776,10 +1336,16 @@ async function loadDiscoveries() {
 
 function initDiscoveryComposer() {
   const categorySelect = document.getElementById("composeCategory");
-  if (categorySelect && typeof BOUNDLORE_CATEGORIES !== "undefined") {
+  const categories = (typeof getWikiMainCategorySlugs === "function")
+    ? getWikiMainCategorySlugs().map(function(slug) {
+        const cat = typeof getCategoryBySlug === "function" ? getCategoryBySlug(slug) : null;
+        return { slug: slug, label: cat ? cat.label : slug };
+      })
+    : (Array.isArray(window.BOUNDLORE_CATEGORIES) ? window.BOUNDLORE_CATEGORIES : []);
+  if (categorySelect && categories.length) {
     categorySelect.innerHTML = "";
-    BOUNDLORE_CATEGORIES.forEach(function(cat) {
-      if (cat.slug === "guides" || cat.slug === "guilds" || cat.slug === "community") {
+    categories.forEach(function(cat) {
+      if (cat.slug === "guides" || cat.slug === "guilds" || cat.slug === "community" || cat.slug === "news") {
         return;
       }
       const opt = document.createElement("option");
@@ -826,7 +1392,7 @@ function openDiscoveryComposer(discoveryId) {
   document.getElementById("discoveryComposerBox").style.display = "block";
   document.getElementById("composeSourceDiscoveryId").value = discovery.id;
   document.getElementById("composeTitle").value = discovery.title;
-  document.getElementById("composeCategory").value = discovery.category || "biomes";
+  document.getElementById("composeCategory").value = normalizeAdminCategorySlugA(discovery.category) || discovery.category || "biomes";
   refreshComposeSubcategoryOptions(sourceMeta.subcategory || "");
   document.getElementById("composeTags").value = "discovery,community";
   if (composeBodyEditor) {
@@ -856,12 +1422,14 @@ async function publishComposedCategoryPost() {
     return;
   }
 
-  const finalCategory = category;
-  const allowedCategorySlugs = (Array.isArray(window.BOUNDLORE_CATEGORIES) ? window.BOUNDLORE_CATEGORIES : [])
-    .map(function(cat) { return cat.slug; })
-    .filter(function(slug) {
-      return slug !== "guides" && slug !== "guilds" && slug !== "community";
-    });
+  const finalCategory = normalizeAdminCategorySlugA(category);
+  const allowedCategorySlugs = typeof getWikiMainCategorySlugs === "function"
+    ? getWikiMainCategorySlugs()
+    : (Array.isArray(window.BOUNDLORE_CATEGORIES) ? window.BOUNDLORE_CATEGORIES : [])
+      .map(function(cat) { return cat.slug; })
+      .filter(function(slug) {
+        return slug !== "guides" && slug !== "guilds" && slug !== "community" && slug !== "news";
+      });
   if (!finalCategory || !allowedCategorySlugs.includes(finalCategory)) {
     msg.textContent = "Please choose a valid main category.";
     msg.style.color = "#ff8b8b";
@@ -872,7 +1440,12 @@ async function publishComposedCategoryPost() {
   const needsSubcategory = typeof requiresSubcategoryForCategory === "function"
     ? requiresSubcategoryForCategory(finalCategory)
     : false;
-  if (needsSubcategory && !subcategory) {
+  let resolvedSubcategory = subcategory;
+  if (needsSubcategory && !resolvedSubcategory && typeof getCategorySubcategories === "function") {
+    const subOptions = getCategorySubcategories(finalCategory);
+    if (subOptions.length) resolvedSubcategory = subOptions[0].slug;
+  }
+  if (needsSubcategory && !resolvedSubcategory) {
     msg.textContent = "This category requires a subcategory.";
     msg.style.color = "#ff8b8b";
     composePublishInFlight = false;
@@ -892,8 +1465,8 @@ async function publishComposedCategoryPost() {
   }
 
   const composedMeta = {};
-  if (needsSubcategory) composedMeta.subcategory = subcategory;
-  composedContent = injectPostMetaA(composedContent, composedMeta);
+  if (needsSubcategory) composedMeta.subcategory = resolvedSubcategory;
+  composedContent = injectCuratedPostMetaA(composedContent, composedMeta);
 
   const baseInsert = {
     author_id: currentAdminId,
@@ -934,7 +1507,17 @@ async function publishComposedCategoryPost() {
   }
 
   try {
-    await approveDiscoveryViaRpcA(sourceDiscovery, { reviewNote: "Discovery approved after compose + RPC sync" });
+    const sourceReview = evaluateDiscoveryForApprovalA(sourceDiscovery);
+    if (sourceReview.mode === "knowledge_stub") {
+      if (canUseSubmissionLifecycle) {
+        await transitionDiscoveryStatusA(sourceId, "approved", "Absorbed into curated wiki post " + createdPost.id);
+      }
+      const archive = await archivePostA(sourceId, "Source knowledge stub converted into curated wiki post");
+      if (!archive.ok) throw new Error(archive.reason || "Could not archive source stub");
+      await logAdminAction("compose_from_discovery_stub", "post", sourceId, "Archived knowledge stub after curated publish");
+    } else {
+      await approveDiscoveryViaRpcA(sourceDiscovery, { reviewNote: "Discovery approved after compose + RPC sync" });
+    }
   } catch (err) {
     msg.textContent = "Category post published, but source discovery sync failed: " + (err && err.message ? err.message : "unknown error");
     msg.style.color = "#ff8b8b";
@@ -1055,10 +1638,238 @@ function parsePostMetaA(html) {
   }
 }
 
+const ADMIN_KNOWLEDGE_STUB_CATEGORIES = ["items", "creatures", "locations", "biomes"];
+
+function normalizeAdminCategorySlugA(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  const map = {
+    item: "items",
+    items: "items",
+    creature: "creatures",
+    creatures: "creatures",
+    monster: "creatures",
+    location: "locations",
+    locations: "locations",
+    biome: "biomes",
+    biomes: "biomes",
+  };
+  return map[raw] || raw;
+}
+
+function isKnowledgeStubPostA(post, meta) {
+  if (!post) return false;
+  const data = meta || parsePostMetaA(post.content || "");
+  if (data.knowledge_entry) return true;
+  if (data.discovery_record_status === "stub") return true;
+  if (post.post_type === "wiki" && ADMIN_KNOWLEDGE_STUB_CATEGORIES.includes(normalizeAdminCategorySlugA(post.category))) {
+    return true;
+  }
+
+  const content = String(post.content || "").toLowerCase();
+  const looksLikeKnowledgeNode = content.includes("knowledge node")
+    || content.includes("auto-created related entry")
+    || content.includes("prepared automatically from a discovery relation");
+  const category = normalizeAdminCategorySlugA(post.category);
+  const payload = data.discovery_payload && typeof data.discovery_payload === "object" ? data.discovery_payload : null;
+
+  if (!ADMIN_KNOWLEDGE_STUB_CATEGORIES.includes(category)) return false;
+
+  if (looksLikeKnowledgeNode) return true;
+
+  if (payload) {
+    const notes = String(payload.notes || "").toLowerCase();
+    if (notes.includes("auto-created")) return true;
+    if (payload.entity_name && String(payload.entity_name).trim() === String(post.title || "").trim()) {
+      if (!payload.how_to_reproduce && !payload.observed_result && !payload.expected_result) {
+        return true;
+      }
+    }
+  } else if (post.is_discovery && looksLikeKnowledgeNode) {
+    return true;
+  }
+
+  if (post.is_discovery && ADMIN_KNOWLEDGE_STUB_CATEGORIES.includes(category)) {
+    if (looksLikeKnowledgeNode) return true;
+    if (!payload || !Object.keys(payload).length) {
+      if (content.includes("related entry") || content.includes("knowledge node") || content.includes("needs more detail")) {
+        return true;
+      }
+    }
+    const filledKeys = payload ? Object.keys(payload).filter(function(k) {
+      const v = payload[k];
+      return v != null && String(v).trim() !== "";
+    }) : [];
+    if (filledKeys.length <= 4 && payload && String(payload.entity_name || "").trim() === String(post.title || "").trim()) {
+      if (!payload.how_to_reproduce && !payload.observed_result && !payload.expected_result) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function repairKnowledgeStubMetaA(post, meta) {
+  if (typeof EntityCore !== "undefined") {
+    const repaired = EntityCore.normalizeEntityMeta(post, meta || {}, { repairPayload: true });
+    const data = repaired.meta;
+    const category = normalizeAdminCategorySlugA(post.category);
+    if (!data.discovery_payload || typeof data.discovery_payload !== "object") {
+      data.discovery_payload = {};
+    }
+    const payload = data.discovery_payload;
+    if (!payload.discovery_type) {
+      if (category === "items") payload.discovery_type = "item";
+      else if (category === "creatures") payload.discovery_type = "monster";
+      else if (category === "biomes") payload.discovery_type = "biome";
+      else if (category === "locations") payload.discovery_type = "landmark";
+    }
+    if (!data.knowledge_entry || typeof data.knowledge_entry !== "object") {
+      data.knowledge_entry = {
+        auto_created: true,
+        status: "needs_details",
+        completeness: "stub",
+        source_relation_type: "related_discovery",
+      };
+    } else {
+      data.knowledge_entry.auto_created = true;
+      if (!data.knowledge_entry.status) data.knowledge_entry.status = "needs_details";
+      if (!data.knowledge_entry.completeness) data.knowledge_entry.completeness = "stub";
+    }
+    if (!data.knowledge_entry.source_post_id && Array.isArray(data.discovery_relations)) {
+      const relWithSource = data.discovery_relations.find(function(rel) {
+        return rel && (rel.source_post_id || rel.source_post_slug);
+      });
+      if (relWithSource) {
+        data.knowledge_entry.source_post_id = relWithSource.source_post_id || data.knowledge_entry.source_post_id;
+        data.knowledge_entry.source_post_slug = relWithSource.source_post_slug || data.knowledge_entry.source_post_slug;
+        data.knowledge_entry.source_post_title = relWithSource.source_post_title || data.knowledge_entry.source_post_title;
+      }
+    }
+    data.discovery_record_status = data.discovery_record_status || "stub";
+    return data;
+  }
+
+  const data = Object.assign({}, meta || {});
+  const category = normalizeAdminCategorySlugA(post.category);
+  if (!data.discovery_payload || typeof data.discovery_payload !== "object") {
+    data.discovery_payload = {};
+  }
+  const payload = data.discovery_payload;
+  if (!payload.entity_name) payload.entity_name = post.title || "";
+  if (!payload.discovery_type) {
+    if (category === "items") payload.discovery_type = "item";
+    else if (category === "creatures") payload.discovery_type = "monster";
+    else if (category === "biomes") payload.discovery_type = "biome";
+    else if (category === "locations") payload.discovery_type = "landmark";
+  }
+  if (!payload.region_name && payload.found_in) payload.region_name = payload.found_in;
+  if (!payload.found_in && payload.region_name) payload.found_in = payload.region_name;
+  if (!data.knowledge_entry || typeof data.knowledge_entry !== "object") {
+    data.knowledge_entry = {
+      auto_created: true,
+      status: "needs_details",
+      completeness: "stub",
+      source_relation_type: data.knowledge_entry && data.knowledge_entry.source_relation_type ? data.knowledge_entry.source_relation_type : "related_discovery",
+    };
+  } else {
+    data.knowledge_entry.auto_created = true;
+    if (!data.knowledge_entry.status) data.knowledge_entry.status = "needs_details";
+    if (!data.knowledge_entry.completeness) data.knowledge_entry.completeness = "stub";
+  }
+  if (!data.knowledge_entry.source_post_id && Array.isArray(data.discovery_relations)) {
+    const relWithSource = data.discovery_relations.find(function(rel) {
+      return rel && (rel.source_post_id || rel.source_post_slug);
+    });
+    if (relWithSource) {
+      data.knowledge_entry.source_post_id = relWithSource.source_post_id || data.knowledge_entry.source_post_id;
+      data.knowledge_entry.source_post_slug = relWithSource.source_post_slug || data.knowledge_entry.source_post_slug;
+      data.knowledge_entry.source_post_title = relWithSource.source_post_title || data.knowledge_entry.source_post_title;
+    }
+  }
+  data.discovery_record_status = data.discovery_record_status || "stub";
+  return data;
+}
+
+function injectPostMetaA(html, meta) {
+  const cleaned = String(html || "").replace(/<!--BLMETA\s+[\s\S]*?-->/gi, "").trim();
+  if (!meta || typeof meta !== "object") return cleaned;
+  const json = JSON.stringify(meta).replace(/-->/g, "--\\>");
+  return cleaned + "\n<!--BLMETA " + json + " -->";
+}
+
+function evaluateKnowledgeStubApprovalA(post, meta) {
+  const repaired = repairKnowledgeStubMetaA(post, meta || {});
+  const issues = [];
+  if (!post.title) issues.push("Missing entry title.");
+  const hasSource = !!(
+    (repaired.knowledge_entry && (repaired.knowledge_entry.source_post_id || repaired.knowledge_entry.source_post_slug))
+    || (Array.isArray(repaired.discovery_relations) && repaired.discovery_relations.some(function(rel) {
+      return rel && (rel.source_post_id || rel.source_post_slug);
+    }))
+    || (Array.isArray(repaired.knowledge_graph && repaired.knowledge_graph.relations) && repaired.knowledge_graph.relations.length)
+    || String(repaired.discovery_payload && repaired.discovery_payload.notes || "").toLowerCase().includes("auto-created")
+    || String(post.content || "").toLowerCase().includes("knowledge node")
+    || String(post.content || "").toLowerCase().includes("auto-created related entry")
+  );
+  if (!hasSource) {
+    issues.push("Missing source discovery reference.");
+  }
+  const warnings = [];
+  if (repaired.knowledge_entry && repaired.knowledge_entry.status === "needs_details") {
+    warnings.push("Incomplete stub — can be published as needs_details.");
+  }
+  return {
+    ok: issues.length === 0,
+    issues: issues,
+    warnings: warnings,
+    mode: "knowledge_stub",
+    repairedMeta: repaired,
+    allowIncomplete: true,
+  };
+}
+
+async function publishKnowledgeStubA(post, review) {
+  const repaired = review && review.repairedMeta
+    ? review.repairedMeta
+    : repairKnowledgeStubMetaA(post, parsePostMetaA(post.content || ""));
+  const category = normalizeAdminCategorySlugA(post.category);
+  const content = injectPostMetaA(stripPostMetaA(post.content || ""), repaired);
+  const update = {
+    status: "published",
+    post_type: "wiki",
+    is_discovery: false,
+    category: category || post.category,
+    content: content,
+  };
+  if (canUseSubmissionLifecycle) {
+    update.submission_status = "approved";
+    update.submission_status_updated_at = new Date().toISOString();
+    update.submission_status_updated_by = currentAdminId;
+    update.submission_review_note = "Knowledge stub published by admin";
+  }
+  const { error } = await supabase.from("posts").update(update).eq("id", post.id);
+  if (error) throw new Error(error.message || "Could not publish knowledge stub");
+}
+
 function evaluateDiscoveryForApprovalA(post) {
+  const meta = parsePostMetaA(post.content || "");
+
+  if (isContributionPostA(post, meta)) {
+    return { ok: true, issues: [], warnings: [], mode: "contribution" };
+  }
+
+  if (isKnowledgeStubPostA(post, meta)) {
+    return evaluateKnowledgeStubApprovalA(post, meta);
+  }
+
   const issues = [];
   if (!post || !post.is_discovery) {
     return { ok: true, issues: issues };
+  }
+
+  if (meta && meta.knowledge_entry && meta.knowledge_entry.auto_created) {
+    return evaluateKnowledgeStubApprovalA(post, meta);
   }
 
   const structuredEnabled = typeof isStructuredDiscoveryEnabled === "function"
@@ -1068,15 +1879,24 @@ function evaluateDiscoveryForApprovalA(post) {
     return { ok: true, issues: issues };
   }
 
-  const meta = parsePostMetaA(post.content || "");
   const payload = meta && typeof meta.discovery_payload === "object" ? meta.discovery_payload : null;
   const relations = Array.isArray(meta && meta.discovery_relations) ? meta.discovery_relations : [];
   const relationsSkipped = !!(meta && meta.discovery_relations_skipped === true);
   const evidence = Array.isArray(meta && meta.discovery_evidence) ? meta.discovery_evidence : [];
-  const schema = typeof getDiscoverySchemaForCategory === "function"
-    ? getDiscoverySchemaForCategory(post.category || "")
-    : null;
-  const requiredFields = Array.isArray(schema && schema.fields) ? schema.fields.filter(function(field) { return !!field.required; }) : [];
+  const leanForm = typeof usesLeanDiscoveryForm === "function"
+    ? usesLeanDiscoveryForm(meta)
+    : !!(payload && !payload.observed_result && !payload.expected_result && !payload.how_to_reproduce);
+  const schema = typeof getDiscoverySchemaForApproval === "function"
+    ? getDiscoverySchemaForApproval(post, meta)
+    : (typeof getDiscoverySchemaForCategory === "function"
+      ? getDiscoverySchemaForCategory(post.category || "", meta)
+      : null);
+  let requiredFields = Array.isArray(schema && schema.fields) ? schema.fields.filter(function(field) { return !!field.required; }) : [];
+  if (leanForm) {
+    requiredFields = requiredFields.filter(function(field) {
+      return !["world_name", "observed_result", "expected_result", "how_to_reproduce", "impact_area", "confidence_level", "spawn_conditions", "taming_method", "item_effect", "source_type", "how_to_obtain"].includes(field.key);
+    });
+  }
 
   if (!payload || !Object.keys(payload).length) {
     issues.push("Missing structured discovery payload.");
@@ -1105,16 +1925,33 @@ function evaluateDiscoveryForApprovalA(post) {
     issues.push("Reproduction steps are too short.");
   }
 
-  if (!relations.length && !relationsSkipped) {
+  const inferredRelations = typeof KnowledgeRelations !== "undefined"
+    ? KnowledgeRelations.inferRelationsFromPayloadForApproval(payload, post.category)
+    : [];
+  const hasRelations = relations.length > 0 || inferredRelations.length > 0 || relationsSkipped;
+  const hasKnowledgeSource = !!(meta && meta.knowledge_entry && (meta.knowledge_entry.source_post_id || meta.knowledge_entry.source_post_slug));
+  const hasEntityContext = !!(payload && (payload.entity_name || payload.found_in || payload.region_name || payload.dropped_items || payload.dropped_by));
+  if (!hasRelations && !hasKnowledgeSource && !hasEntityContext) {
     issues.push("No linked dependencies or references selected.");
   }
 
   const assets = extractDiscoveryAttachmentLinks(post.content || "");
-  if (assets.length > 0 && evidence.length === 0) {
+  if (assets.length > 0 && evidence.length === 0 && !leanForm) {
     issues.push("Attachments or media exist, but no evidence mapping was stored.");
   }
 
-  return { ok: issues.length === 0, issues: issues };
+  return { ok: issues.length === 0, issues: issues, warnings: [] };
+}
+
+function evaluateWikiEntryForApprovalA(post) {
+  const meta = parsePostMetaA(post.content || "");
+  if (meta && meta.knowledge_entry) {
+    if (typeof KnowledgeRelations !== "undefined") {
+      return KnowledgeRelations.evaluateKnowledgeEntryApproval(post, meta);
+    }
+    return { ok: true, issues: [], mode: "knowledge_stub", allowIncomplete: true };
+  }
+  return { ok: true, issues: [] };
 }
 
 function validateDiscoveryTextForAdminA(field, value) {
@@ -1150,7 +1987,9 @@ function normalizePostMetaA(meta) {
   return Object.keys(out).length ? out : null;
 }
 
-function injectPostMetaA(html, meta) {
+// Curated compose writer: intentionally keeps only whitelisted keys.
+// Do NOT reuse for entity/contribution meta — it would wipe the BLMETA.
+function injectCuratedPostMetaA(html, meta) {
   const cleaned = stripPostMetaA(html);
   const normalized = normalizePostMetaA(meta);
   if (!normalized) return cleaned;
@@ -1454,7 +2293,7 @@ function applyPostsFilter() {
     const catLabel = getPostCategoryLabel(post);
     const statusClass = post.status === "published" ? "badge-published" : "badge-pending";
     const discoveryMark = post.is_discovery ? " \u2728" : "";
-    const deletedMark = post.deleted_at ? " <span class=\"badge\" style=\"background:#5a5a5a;color:#fff;\">Deleted</span>" : "";
+    const deletedMark = post.deleted_at ? " <span class=\"badge\" style=\"background:#5a5a5a;color:#fff;\">Archived</span>" : "";
     const lockedMark = post.admin_locked ? " <span class=\"badge\" style=\"background:#8b0000;color:#fff;\">Locked</span>" : "";
     const statusText = post.status + deletedMark + lockedMark;
 
@@ -1468,7 +2307,7 @@ function applyPostsFilter() {
       "<td>" +
         "<a class=\"btn-small\" style=\"background:#2a8bdc;text-decoration:none;display:inline-block;\" href=\"" + buildPostUrl(post) + "\">View</a> " +
         "<a class=\"btn-small\" style=\"background:#666;text-decoration:none;display:inline-block;\" href=\"/wiki/edit-post/?" + (post.slug ? "slug=" + encodeURIComponent(post.slug) : "id=" + encodeURIComponent(post.id)) + "\">Edit</a> " +
-        "<button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"deleteany\" data-id=\"" + post.id + "\">Delete</button> " +
+        "<button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"deleteany\" data-id=\"" + post.id + "\"" + (post.deleted_at ? " disabled" : "") + ">Archive</button> " +
         (canUseExtendedPostFields ?
           "<button class=\"btn-small\" style=\"background:#7b5ce0;\" data-action=\"togglelock\" data-id=\"" + post.id + "\" data-locked=\"" + !!post.admin_locked + "\">" + (post.admin_locked ? "Unlock" : "Lock") + "</button> " +
           "<button class=\"btn-small\" style=\"background:#555;\" data-action=\"restore\" data-id=\"" + post.id + "\"" + (post.deleted_at ? "" : " disabled") + ">Restore</button>"
@@ -1479,22 +2318,14 @@ function applyPostsFilter() {
 
   tbody.querySelectorAll("[data-action=\"deleteany\"]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      if (!confirm("Permanently delete this post?")) return;
+      if (!confirm("Archive this post? It will disappear from normal wiki pages but stay available for admin review and database history.")) return;
       const post = allPostsCache.find(function(p) { return p.id === btn.dataset.id; });
-      if (canUseExtendedPostFields) {
-        const shouldHardDelete = !!(post && (post.deleted_at || post.deleted_by));
-        if (shouldHardDelete) {
-          await supabase.from("posts").delete().eq("id", this.dataset.id);
-          await logAdminAction("delete_post_hard", "post", this.dataset.id, "Hard deleted after previous delete cycle");
-        } else {
-          await supabase.from("posts").update({ deleted_at: new Date().toISOString(), deleted_by: currentAdminId }).eq("id", this.dataset.id);
-          await logAdminAction("delete_post", "post", this.dataset.id, "Soft deleted");
-        }
-      } else {
-        await supabase.from("posts").delete().eq("id", this.dataset.id);
-        await logAdminAction("delete_post", "post", this.dataset.id, "Hard deleted (no soft delete fields)");
+      const archive = await archivePostA(this.dataset.id, "Archived from all posts table");
+      if (!archive.ok) {
+        alert("Archive failed: " + archive.reason);
+        return;
       }
-      await notifyPostOwner(post, "post_status", "Your post was moderated", "An admin removed your post from public view.", "/wiki/account/");
+      await notifyPostOwner(post, "post_status", "Your post was archived", "An admin removed your post from public view while keeping it in the database.", "/wiki/account/");
       loadAllPosts(); loadPending(); loadDiscoveries(); loadOverview();
     });
   });
@@ -1515,7 +2346,7 @@ function applyPostsFilter() {
       await supabase.from("posts").update({ deleted_at: null, status: "pending" }).eq("id", this.dataset.id);
       const post = allPostsCache.find(function(p) { return p.id === btn.dataset.id; });
       await notifyPostOwner(post, "post_status", "Your post was restored", "An admin restored your post and set it to pending review.", "/wiki/account/");
-      await logAdminAction("restore_post", "post", this.dataset.id, "Restored soft-deleted post");
+      await logAdminAction("restore_post", "post", this.dataset.id, "Restored archived post");
       loadAllPosts(); loadPending(); loadOverview();
     });
   });
@@ -1783,7 +2614,7 @@ async function loadReports() {
 
     let actionsHtml = '<button class="btn-small" style="background:#666" data-action="dismiss" data-id="' + report.id + '">Dismiss</button>';
     if (report.category === "post" && report.post_id) {
-      actionsHtml += ' <button class="btn-small" style="background:#e05555" data-action="deletepost" data-id="' + report.id + '" data-postid="' + report.post_id + '">Delete Post</button>';
+      actionsHtml += ' <button class="btn-small" style="background:#e05555" data-action="deletepost" data-id="' + report.id + '" data-postid="' + report.post_id + '">Archive Post</button>';
     }
 
     const div = document.createElement("div");
@@ -1810,10 +2641,13 @@ async function loadReports() {
 
   list.querySelectorAll('[data-action="deletepost"]').forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      if (!confirm("Delete this post and dismiss the report?")) return;
-      await supabase.from("posts").delete().eq("id", this.dataset.postid);
+      if (!confirm("Archive this post and dismiss the report? The post remains in the database for audit/history.")) return;
+      const archive = await archivePostA(this.dataset.postid, "Archived from report workflow");
+      if (!archive.ok) {
+        alert("Archive failed: " + archive.reason);
+        return;
+      }
       await supabase.from("reports").delete().eq("id", this.dataset.id);
-      await logAdminAction("delete_reported_post", "post", this.dataset.postid, "Deleted post from report workflow");
       loadReports(); loadAllPosts(); loadOverview();
     });
   });
@@ -1886,6 +2720,22 @@ function escapeHtmlA(str) {
   return div.innerHTML;
 }
 
+async function loadPreReleaseStatsA() {
+  const el = document.getElementById("preReleaseTestCount");
+  if (!el) return;
+  const { data, error } = await supabase.from("posts").select("id, content").limit(1000);
+  if (error || !Array.isArray(data)) {
+    el.textContent = "Could not load test data stats.";
+    return;
+  }
+  let testCount = 0;
+  data.forEach(function(row) {
+    const meta = parsePostMetaA(row.content || "");
+    if (meta.content_origin === "test") testCount += 1;
+  });
+  el.textContent = "Marked test posts in sample: " + testCount + " / " + data.length + " scanned. Use SQL reset before launch.";
+}
+
 document.querySelectorAll(".tab-btn").forEach(function(btn) {
   btn.addEventListener("click", function() {
     document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
@@ -1894,6 +2744,7 @@ document.querySelectorAll(".tab-btn").forEach(function(btn) {
     const tabName = this.dataset.tab.charAt(0).toUpperCase() + this.dataset.tab.slice(1);
     const panel = document.getElementById("tab" + tabName);
     if (panel) panel.style.display = "block";
+    if (this.dataset.tab === "prerelease") loadPreReleaseStatsA();
   });
 });
 
