@@ -162,6 +162,39 @@ async function initCreatePermissions() {
   }
 }
 
+async function resolveTutorialGateCP(user, isAdmin) {
+  if (isAdmin) return { allowed: true };
+  if (!user || !user.id) {
+    return { allowed: false, message: "You must be logged in to submit." };
+  }
+  if (typeof TutorialAck === "undefined") {
+    return {
+      allowed: false,
+      message: "Tutorial acknowledgement module is not loaded. Please refresh the page.",
+    };
+  }
+  const ack = await TutorialAck.hasAcknowledgement(supabase, {
+    userId: user.id,
+    isAdmin: false,
+  });
+  if (ack.tableMissing) {
+    return { allowed: false, tableMissing: true, message: ack.message };
+  }
+  if (!ack.ok) {
+    return {
+      allowed: false,
+      message: "Could not verify tutorial acknowledgement. Please try again.",
+    };
+  }
+  if (!ack.hasAck) {
+    return {
+      allowed: false,
+      message: "Please read and confirm the submission tutorial once before submitting.",
+    };
+  }
+  return { allowed: true };
+}
+
 async function initTutorialGateCP() {
   const gateBox = document.getElementById("tutorialGateBox");
   const gateLink = document.getElementById("tutorialGateLink");
@@ -177,10 +210,37 @@ async function initTutorialGateCP() {
     return;
   }
 
-  createTutorialConfirmed = !!(user.user_metadata && user.user_metadata.submission_tutorial_v1_accepted === true);
+  if (createIsAdmin) {
+    createTutorialConfirmed = true;
+    gateBox.style.display = "none";
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.title = "";
+    }
+    return;
+  }
+
+  const gate = await resolveTutorialGateCP(user, false);
+  createTutorialConfirmed = gate.allowed;
   gateLink.href = "/wiki/submit-tutorial/?returnTo=" + encodeURIComponent(window.location.pathname + window.location.search);
 
-  gateBox.style.display = createTutorialConfirmed ? "none" : "block";
+  if (gate.tableMissing) {
+    gateBox.style.display = "block";
+    const hint = gateBox.querySelector(".tutorial-migration-hint");
+    if (hint) hint.textContent = gate.message || "Tutorial acknowledgement migration is not applied yet.";
+    else {
+      const p = document.createElement("p");
+      p.className = "tutorial-migration-hint";
+      p.style.color = "#e0a83a";
+      p.textContent = gate.message || "Tutorial acknowledgement migration is not applied yet.";
+      gateBox.appendChild(p);
+    }
+  } else {
+    gateBox.style.display = createTutorialConfirmed ? "none" : "block";
+    const hint = gateBox.querySelector(".tutorial-migration-hint");
+    if (hint) hint.remove();
+  }
+
   if (submitBtn) {
     submitBtn.disabled = !createTutorialConfirmed;
     submitBtn.title = createTutorialConfirmed
@@ -346,9 +406,10 @@ async function submitContributionCP(errorEl) {
   await supabase.auth.refreshSession();
   const { data: refreshedSession } = await supabase.auth.getSession();
   const refreshedUser = refreshedSession && refreshedSession.session ? refreshedSession.session.user : null;
-  createTutorialConfirmed = !!(refreshedUser && refreshedUser.user_metadata && refreshedUser.user_metadata.submission_tutorial_v1_accepted === true);
-  if (!createTutorialConfirmed) {
-    errorEl.textContent = "Please read and confirm the submission tutorial once before submitting.";
+  const tutorialGate = await resolveTutorialGateCP(refreshedUser, createIsAdmin);
+  createTutorialConfirmed = tutorialGate.allowed;
+  if (!tutorialGate.allowed) {
+    errorEl.textContent = tutorialGate.message || "Please read and confirm the submission tutorial once before submitting.";
     errorEl.style.display = "block";
     return true;
   }
@@ -445,16 +506,11 @@ async function submitContributionCP(errorEl) {
     is_discovery: true,
   };
 
-  if (relations.length && typeof ensureKnowledgeRelationTargetsCP === "function"
-    && context.resolvedIntent !== "add_image") {
-    const knowledgeSourceContext = {
-      sourcePostId: context.targetId,
-      sourcePostSlug: context.targetSlug,
-      sourceTitle: context.displayName,
-      sourceCategory: context.entityType,
-      payload: contributionMeta.discovery_payload,
-    };
-    await ensureKnowledgeRelationTargetsCP(relations, userId, knowledgeSourceContext);
+  // Contributions must never create new entity posts or write to other
+  // entries before approval. We only resolve relation targets against
+  // existing posts; the actual relation merge happens at admin approval.
+  if (relations.length && context.resolvedIntent !== "add_image") {
+    await resolveContributionRelationTargetsCP(relations);
     contributionMeta.discovery_relations = relations;
   }
 
@@ -472,9 +528,11 @@ async function submitContributionCP(errorEl) {
     return true;
   }
 
-  // Admin/trusted shortcut: merge directly into the target entry.
-  // Regular users always stay pending for moderation.
-  if (createIsAdmin && created && typeof KnowledgeRelations !== "undefined"
+  // All contributions stay pending until admin "Approve & Merge".
+  // Optional debug-only auto-merge: ?admin_auto_merge=1 (never default).
+  const autoMergeParam = new URLSearchParams(window.location.search).get("admin_auto_merge");
+  const allowAdminAutoMerge = createIsAdmin && autoMergeParam === "1";
+  if (allowAdminAutoMerge && created && typeof KnowledgeRelations !== "undefined"
     && KnowledgeRelations.mergeContributionIntoTarget) {
     try {
       const contributionPost = {
@@ -768,6 +826,38 @@ async function updateKnowledgeStubSourcesCP(createdPost, relations) {
   }
 }
 
+// Read-only variant for contributions: enrich relations with canonical
+// names/keys and link existing posts, but never create stubs or inverse
+// relations before the contribution is approved.
+async function resolveContributionRelationTargetsCP(relations) {
+  const KR = window.KnowledgeRelations;
+  const EC = window.EntityCore;
+  const items = Array.isArray(relations) ? relations : [];
+  for (const rel of items) {
+    if (!rel || !rel.title) continue;
+    const groupKey = String(rel.group || "").toLowerCase();
+    const category = KR ? KR.mapGroupToCategory(groupKey, rel) : (rel.category || groupKey);
+    if (category && !rel.category) rel.category = category;
+    const canonicalTitle = EC
+      ? (EC.extractCanonicalIdentity(String(rel.title).trim(), category).canonical_name || String(rel.title).trim())
+      : String(rel.title).trim();
+    if (EC) {
+      rel.canonical_target_name = canonicalTitle;
+      rel.target_entity_key = EC.buildEntityKey(category, canonicalTitle);
+    }
+    if (KR && typeof KR.findExistingKnowledgePost === "function") {
+      const existing = await KR.findExistingKnowledgePost(supabase, canonicalTitle, category);
+      if (existing) {
+        rel.id = existing.id;
+        rel.slug = existing.slug || null;
+        rel.category = existing.category || category;
+        rel.post_type = existing.post_type || "wiki";
+        rel.resolved = true;
+      }
+    }
+  }
+}
+
 async function ensureKnowledgeRelationTargetsCP(relations, userId, sourceContext) {
   const KR = window.KnowledgeRelations;
   const items = Array.isArray(relations) ? relations : [];
@@ -920,10 +1010,10 @@ async function handleSubmit(e) {
   await supabase.auth.refreshSession();
   const { data: refreshedSession } = await supabase.auth.getSession();
   const refreshedUser = refreshedSession && refreshedSession.session ? refreshedSession.session.user : null;
-  createTutorialConfirmed = !!(refreshedUser && refreshedUser.user_metadata && refreshedUser.user_metadata.submission_tutorial_v1_accepted === true);
-
-  if (!createTutorialConfirmed) {
-    errorEl.textContent = "Please read and confirm the submission tutorial once before submitting posts.";
+  const tutorialGate = await resolveTutorialGateCP(refreshedUser, createIsAdmin);
+  createTutorialConfirmed = tutorialGate.allowed;
+  if (!tutorialGate.allowed) {
+    errorEl.textContent = tutorialGate.message || "Please read and confirm the submission tutorial once before submitting posts.";
     errorEl.style.display = "block";
     return;
   }

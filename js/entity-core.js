@@ -598,6 +598,16 @@ window.EntityCore = (function() {
       stats: factUnknown(),
     };
 
+    const statParts = [];
+    if (meaningful(payload.damage)) statParts.push("Damage: " + payload.damage);
+    if (meaningful(payload.scaling_power)) statParts.push("Scaling: " + payload.scaling_power);
+    if (meaningful(payload.durability)) statParts.push("Durability: " + payload.durability);
+    if (statParts.length) {
+      let statValue = statParts.join(" · ");
+      if (meaningful(payload.stat_conditions)) statValue += " (" + payload.stat_conditions + ")";
+      facts.stats = factExplicit(statValue, "payload");
+    }
+
     if (facts.dropped_by.status !== "unknown") {
       facts.how_obtain = factDerived("Dropped by " + facts.dropped_by.value, "derived", "dropped_by");
     } else if (meaningful(payload.source_type)) {
@@ -628,6 +638,7 @@ window.EntityCore = (function() {
       observed_at: factUnknown(),
       drops: factUnknown(),
       spawn: meaningful(payload.spawn_conditions) ? factExplicit(payload.spawn_conditions, "payload") : factUnknown(),
+      behavior: factUnknown(),
       time_weather: factUnknown(),
       confidence: meaningful(payload.confidence_level) ? factExplicit(formatLabel(payload.confidence_level), "payload") : factUnknown(),
       rarity: meaningful(payload.rarity) ? factExplicit(formatLabel(payload.rarity), "payload") : factUnknown(),
@@ -656,9 +667,16 @@ window.EntityCore = (function() {
       facts.drops.relations = dropRels.map(relationRef);
     }
 
+    if (meaningful(payload.behavior)) {
+      let behaviorValue = payload.behavior;
+      if (meaningful(payload.behavior_conditions)) behaviorValue += " (" + payload.behavior_conditions + ")";
+      facts.behavior = factExplicit(behaviorValue, "payload");
+    }
+
     const time = meaningful(payload.time_of_day);
     const weather = meaningful(payload.weather_condition);
     if (time || weather) facts.time_weather = factExplicit([time, weather].filter(Boolean).join(" · "), "payload");
+    else if (meaningful(payload.time_weather)) facts.time_weather = factExplicit(payload.time_weather, "payload");
 
     return { identity: identity, taxonomy: null, facts: facts };
   }

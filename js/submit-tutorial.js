@@ -30,7 +30,18 @@
       return;
     }
 
-    const accepted = !!(user.user_metadata && user.user_metadata.submission_tutorial_v1_accepted === true);
+    let accepted = false;
+    if (typeof TutorialAck !== "undefined") {
+      const ack = await TutorialAck.hasAcknowledgement(supabase, { userId: user.id, isAdmin: false });
+      if (ack.tableMissing) {
+        status.textContent = ack.message || "Tutorial acknowledgement migration is not applied yet.";
+        button.disabled = true;
+        checkbox.disabled = true;
+        return;
+      }
+      accepted = !!(ack.ok && ack.hasAck);
+    }
+
     if (accepted) {
       status.textContent = "Status: already confirmed for this account.";
       checkbox.checked = true;
@@ -62,18 +73,25 @@
       return;
     }
 
-    const nextMeta = Object.assign({}, user.user_metadata || {}, {
-      submission_tutorial_v1_accepted: true,
-      submission_tutorial_v1_accepted_at: new Date().toISOString(),
-    });
-
-    const { error } = await supabase.auth.updateUser({ data: nextMeta });
-    if (error) {
-      status.textContent = "Could not save confirmation: " + error.message;
+    if (typeof TutorialAck === "undefined") {
+      status.textContent = "Tutorial acknowledgement module is not loaded. Please refresh.";
       button.disabled = false;
       return;
     }
 
+    const saved = await TutorialAck.saveAcknowledgement(supabase, user.id);
+    if (!saved.ok) {
+      status.textContent = saved.message || ("Could not save confirmation: " + (saved.reason || "unknown error"));
+      button.disabled = false;
+      return;
+    }
+
+    // UX cache only — not used for RLS/security decisions.
+    const nextMeta = Object.assign({}, user.user_metadata || {}, {
+      submission_tutorial_v1_accepted: true,
+      submission_tutorial_v1_accepted_at: new Date().toISOString(),
+    });
+    await supabase.auth.updateUser({ data: nextMeta });
     await supabase.auth.refreshSession();
 
     status.textContent = "Confirmed. Redirecting to submit page...";

@@ -133,25 +133,34 @@
         <p id="patchModeMsg" style="margin:0;color:var(--text-muted);font-size:0.88rem;"></p>
       </div>
     </div>
-    <div class="form-box" id="swampRepairPanel" style="margin-bottom:16px;">
-      <h3 style="margin-top:0;">Swamp Test Data Repair</h3>
-      <p style="color:var(--text-muted);margin:0 0 10px;">Normalize known Swamp/Swamplands test stubs in the database (category, title, BLMETA). Idempotent — safe to run multiple times.</p>
-      <p style="color:var(--text-muted);margin:0 0 10px;font-size:0.88rem;">SQL baseline: <code>supabase/repair_swamp_test_data.sql</code></p>
-      <button id="btnRepairSwampTestData" class="btn-small" type="button">Repair Swamp test data</button>
-      <p id="swampRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
-    </div>
-    <div class="form-box" id="structuredMetaRepairPanel" style="margin-bottom:16px;">
-      <h3 style="margin-top:0;">Structured BLMETA Repair</h3>
-      <p style="color:var(--text-muted);margin:0 0 10px;">Finds posts with missing <code>discovery_payload</code> / <code>discovery_relations</code> in BLMETA and persists data reconstructed from legacy Structured Findings HTML. Idempotent — skips posts that already have full structured data.</p>
-      <button id="btnRepairStructuredMeta" class="btn-small" type="button">Repair structured BLMETA</button>
-      <p id="structuredMetaRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
-    </div>
-    <div class="form-box" id="contributionRepairPanel" style="margin-bottom:16px;">
-      <h3 style="margin-top:0;">Contribution Duplicate Repair</h3>
-      <p style="color:var(--text-muted);margin:0 0 10px;">Finds contribution posts that were published as standalone entries (old bug), merges their evidence/fields into the canonical target entry, and archives the duplicate. No hard deletes. Idempotent.</p>
-      <button id="btnRepairContributionDuplicates" class="btn-small" type="button">Repair contribution duplicates</button>
-      <p id="contributionRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
-    </div>
+    <details id="maintenanceDangerZone" class="form-box bl-admin-danger-zone" style="margin-bottom:16px;">
+      <summary style="cursor:pointer;font-weight:600;color:#e0a83a;">Maintenance / Danger Zone</summary>
+      <p style="color:#e0a83a;margin:10px 0 14px;font-size:0.9rem;border:1px solid rgba(224,168,58,0.35);padding:10px 12px;border-radius:6px;background:rgba(224,168,58,0.08);">
+        These actions modify database content. Use only for maintenance.
+      </p>
+      <!-- Lifecycle: PRE-RELEASE ONLY — remove before deploy -->
+      <div class="form-box" id="swampRepairPanel" style="margin-bottom:16px;border-color:rgba(224,168,58,0.25);">
+        <h3 style="margin-top:0;">Swamp Test Data Repair</h3>
+        <p style="color:var(--text-muted);margin:0 0 10px;">Normalize known Swamp/Swamplands test stubs (category, title, BLMETA). <strong>Pre-release only.</strong></p>
+        <p style="color:var(--text-muted);margin:0 0 10px;font-size:0.88rem;">SQL baseline: <code>supabase/repair_swamp_test_data.sql</code></p>
+        <button id="btnRepairSwampTestData" class="btn-small" type="button" style="background:#c97c2d;">Run Swamp repair (preview → confirm)</button>
+        <p id="swampRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
+      </div>
+      <!-- Lifecycle: LEGACY MIGRATION — remove when all posts have structured BLMETA -->
+      <div class="form-box" id="structuredMetaRepairPanel" style="margin-bottom:16px;border-color:rgba(224,168,58,0.25);">
+        <h3 style="margin-top:0;">Structured BLMETA Repair</h3>
+        <p style="color:var(--text-muted);margin:0 0 10px;">Reconstructs missing <code>discovery_payload</code> / <code>discovery_relations</code> from legacy HTML. Idempotent.</p>
+        <button id="btnRepairStructuredMeta" class="btn-small" type="button" style="background:#c97c2d;">Run BLMETA repair (preview → confirm)</button>
+        <p id="structuredMetaRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
+      </div>
+      <!-- Lifecycle: MAINTENANCE — may remain in production, danger zone only -->
+      <div class="form-box" id="contributionRepairPanel" style="margin-bottom:0;border-color:rgba(224,168,58,0.25);">
+        <h3 style="margin-top:0;">Contribution Duplicate Repair</h3>
+        <p style="color:var(--text-muted);margin:0 0 10px;">Merges published contribution duplicates into target entries and archives duplicates. No hard deletes.</p>
+        <button id="btnRepairContributionDuplicates" class="btn-small" type="button" style="background:#c97c2d;">Run contribution repair (preview → confirm)</button>
+        <p id="contributionRepairMsg" style="margin:10px 0 0;color:var(--text-muted);font-size:0.88rem;"></p>
+      </div>
+    </details>
     <div class="form-box">
       <h3>Posts by Category</h3>
       <div id="categoryBreakdown"></div>
@@ -281,8 +290,8 @@
 <script src="/js/supabase-config.js"></script>
 <script src="/js/test-data.js?v=1"></script>
 <script src="/js/categories-config.js?v=17"></script>
-<script src="/js/knowledge-relations.js?v=14"></script>
-<script src="/js/entity-core.js?v=7"></script>
+<script src="/js/knowledge-relations.js?v=16"></script>
+<script src="/js/entity-core.js?v=8"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notifications.js"></script>
@@ -466,22 +475,167 @@ function initAdminControls() {
   document.getElementById("btnDisablePatchMode")?.addEventListener("click", function() {
     saveWikiPatchModeA(false);
   });
-  document.getElementById("btnRepairSwampTestData")?.addEventListener("click", repairSwampTestDataA);
-  document.getElementById("btnRepairStructuredMeta")?.addEventListener("click", repairStructuredMetaA);
-  document.getElementById("btnRepairContributionDuplicates")?.addEventListener("click", repairContributionDuplicatesA);
+  document.getElementById("btnRepairSwampTestData")?.addEventListener("click", runSwampRepairWithDangerZoneA);
+  document.getElementById("btnRepairStructuredMeta")?.addEventListener("click", runStructuredMetaRepairWithDangerZoneA);
+  document.getElementById("btnRepairContributionDuplicates")?.addEventListener("click", runContributionRepairWithDangerZoneA);
+}
+
+function requireDangerZoneTypedConfirmationA(expectedPhrase, actionLabel) {
+  const typed = window.prompt(
+    "DANGER ZONE\n\nType exactly:\n" + expectedPhrase + "\n\nTo confirm: " + actionLabel
+  );
+  return String(typed || "").trim() === expectedPhrase;
+}
+
+async function previewSwampRepairA() {
+  if (typeof EntityCore === "undefined") return { ok: false, reason: "EntityCore missing" };
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("id, slug, title, category, content, post_type")
+    .in("slug", SWAMP_REPAIR_SLUGS);
+  if (error || !Array.isArray(posts)) {
+    return { ok: false, reason: error && error.message ? error.message : "load failed" };
+  }
+  let wouldRepair = 0;
+  let skipped = 0;
+  for (let i = 0; i < posts.length; i += 1) {
+    const post = posts[i];
+    const meta = parsePostMetaA(post.content || "");
+    const repair = EntityCore.normalizeEntityMeta(post, meta, { repairPayload: true });
+    const payload = repair.meta.discovery_payload && typeof repair.meta.discovery_payload === "object"
+      ? repair.meta.discovery_payload
+      : {};
+    const placeInfo = EntityCore.classifyPlaceEntry(post.title, post.category, payload);
+    let category = post.category;
+    let title = post.title;
+    if (placeInfo.effective_category === "biomes") {
+      category = "biomes";
+      title = placeInfo.canonical_name || "Swamp";
+    } else if (placeInfo.effective_category === "location_hint") {
+      title = placeInfo.location_hint || placeInfo.canonical_name || title;
+    } else if (post.slug === "ogre-mage-in-swamplands-near-a-campfire-9651e6") {
+      category = "creatures";
+      title = EntityCore.extractCanonicalIdentity(post.title, "creatures", { payload: payload }).canonical_name || "Ogre Mage";
+    }
+    const content = injectPostMetaA(stripPostMetaA(post.content || ""), repair.meta);
+    if (category !== post.category || title !== post.title || content !== (post.content || "")) {
+      wouldRepair += 1;
+    } else {
+      skipped += 1;
+    }
+  }
+  return { ok: true, inspected: posts.length, wouldRepair: wouldRepair, skipped: skipped };
+}
+
+async function runSwampRepairWithDangerZoneA() {
+  const msg = document.getElementById("swampRepairMsg");
+  if (typeof EntityCore === "undefined") {
+    if (msg) msg.textContent = "EntityCore is not loaded.";
+    return;
+  }
+  if (msg) msg.textContent = "Running preview...";
+  const preview = await previewSwampRepairA();
+  if (!preview.ok) {
+    if (msg) msg.textContent = "Preview failed: " + (preview.reason || "unknown error");
+    return;
+  }
+  if (msg) {
+    msg.textContent = "Preview: inspected " + preview.inspected + ", would repair " + preview.wouldRepair
+      + ", would skip " + preview.skipped + ". Type REPAIR SWAMP to continue.";
+  }
+  if (!requireDangerZoneTypedConfirmationA("REPAIR SWAMP", "Swamp test data repair")) {
+    if (msg) msg.textContent = (msg.textContent || "") + " Cancelled.";
+    return;
+  }
+  await repairSwampTestDataA(true);
 }
 
 // Repairs contribution posts that leaked into public lists as standalone
 // entities: merges them into their target entry and archives the duplicate.
-async function repairStructuredMetaA() {
+async function previewContributionDuplicatesRepairA() {
+  const { data: candidates, error } = await supabase
+    .from("posts")
+    .select("id, slug, title, category, post_type, content, status, author_id, created_at, deleted_at")
+    .is("deleted_at", null)
+    .or("slug.ilike.contribution-%,title.ilike.Contribution:%")
+    .limit(100);
+  if (error) return { ok: false, reason: error.message };
+  let wouldMerge = 0;
+  let skipped = 0;
+  for (let i = 0; i < (candidates || []).length; i += 1) {
+    const post = candidates[i];
+    const meta = parsePostMetaA(post.content || "");
+    if (!isContributionPostA(post, meta)) { skipped += 1; continue; }
+    if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.resolveContributionTargetPost) {
+      const target = await KnowledgeRelations.resolveContributionTargetPost(supabase, post, meta);
+      if (target) wouldMerge += 1;
+      else skipped += 1;
+    } else {
+      skipped += 1;
+    }
+  }
+  return { ok: true, inspected: (candidates || []).length, wouldMerge: wouldMerge, skipped: skipped };
+}
+
+async function runContributionRepairWithDangerZoneA() {
+  const msg = document.getElementById("contributionRepairMsg");
+  if (typeof KnowledgeRelations === "undefined" || !KnowledgeRelations.isContributionPost) {
+    if (msg) msg.textContent = "knowledge-relations.js helpers are not loaded.";
+    return;
+  }
+  if (msg) msg.textContent = "Running preview...";
+  const preview = await previewContributionDuplicatesRepairA();
+  if (!preview.ok) {
+    if (msg) msg.textContent = "Preview failed: " + (preview.reason || "unknown error");
+    return;
+  }
+  if (msg) {
+    msg.textContent = "Preview: inspected " + preview.inspected + ", would merge " + preview.wouldMerge
+      + ", would skip " + preview.skipped + ". Type REPAIR CONTRIBUTIONS to continue.";
+  }
+  if (!requireDangerZoneTypedConfirmationA("REPAIR CONTRIBUTIONS", "Contribution duplicate repair")) {
+    if (msg) msg.textContent = (msg.textContent || "") + " Cancelled.";
+    return;
+  }
+  await repairContributionDuplicatesA(true);
+}
+
+async function runStructuredMetaRepairWithDangerZoneA() {
   const msg = document.getElementById("structuredMetaRepairMsg");
   if (typeof KnowledgeRelations === "undefined" || !KnowledgeRelations.repairStructuredMetaForPosts) {
     if (msg) msg.textContent = "knowledge-relations.js repair helper not loaded.";
     return;
   }
-  if (!confirm("Repair structured BLMETA for legacy posts?\n\nPersists discovery_payload and discovery_relations from HTML fallback where missing. No deletes.")) {
+  if (msg) msg.textContent = "Running preview...";
+  const preview = await KnowledgeRelations.repairStructuredMetaForPosts(supabase, { limit: 200, dryRun: true });
+  if (!preview.ok) {
+    if (msg) msg.textContent = "Preview failed: " + (preview.reason || "unknown error");
     return;
   }
+  let slugPreview = { inspected: 0, repaired: 0, skipped: 0 };
+  if (KnowledgeRelations.repairCanonicalEntitySlugsForPosts) {
+    slugPreview = await KnowledgeRelations.repairCanonicalEntitySlugsForPosts(supabase, { limit: 200, dryRun: true });
+  }
+  if (msg) {
+    msg.textContent = "Preview: meta inspected " + preview.inspected + ", would repair " + preview.repaired
+      + ", would skip " + preview.skipped
+      + ". Slugs: inspected " + slugPreview.inspected + ", would repair " + slugPreview.repaired
+      + ", would skip " + slugPreview.skipped + ". Type REPAIR BLMETA to continue.";
+  }
+  if (!requireDangerZoneTypedConfirmationA("REPAIR BLMETA", "Structured BLMETA repair")) {
+    if (msg) msg.textContent = (msg.textContent || "") + " Cancelled.";
+    return;
+  }
+  await repairStructuredMetaA(true);
+}
+
+async function repairStructuredMetaA(fromDangerZone) {
+  const msg = document.getElementById("structuredMetaRepairMsg");
+  if (typeof KnowledgeRelations === "undefined" || !KnowledgeRelations.repairStructuredMetaForPosts) {
+    if (msg) msg.textContent = "knowledge-relations.js repair helper not loaded.";
+    return;
+  }
+  if (!fromDangerZone) return;
   if (msg) msg.textContent = "Scanning and repairing...";
 
   const result = await KnowledgeRelations.repairStructuredMetaForPosts(supabase, { limit: 200 });
@@ -506,15 +660,13 @@ async function repairStructuredMetaA() {
   await logAdminAction("repair_structured_meta", "system", null, text);
 }
 
-async function repairContributionDuplicatesA() {
+async function repairContributionDuplicatesA(fromDangerZone) {
   const msg = document.getElementById("contributionRepairMsg");
   if (typeof KnowledgeRelations === "undefined" || !KnowledgeRelations.isContributionPost) {
     if (msg) msg.textContent = "knowledge-relations.js helpers are not loaded.";
     return;
   }
-  if (!confirm("Repair contribution duplicates?\n\nMerges published contribution posts into their target entries and archives the duplicates. No hard deletes.")) {
-    return;
-  }
+  if (!fromDangerZone) return;
   if (msg) msg.textContent = "Scanning...";
 
   const { data: candidates, error } = await supabase
@@ -595,15 +747,13 @@ const SWAMP_REPAIR_SLUGS = [
   "ogre-mage-in-swamplands-near-a-campfire-9651e6",
 ];
 
-async function repairSwampTestDataA() {
+async function repairSwampTestDataA(fromDangerZone) {
   const msg = document.getElementById("swampRepairMsg");
   if (typeof EntityCore === "undefined") {
     if (msg) msg.textContent = "EntityCore is not loaded.";
     return;
   }
-  if (!confirm("Repair known Swamp test stubs?\n\nUpdates category, title, and BLMETA for the fixed test slugs only.")) {
-    return;
-  }
+  if (!fromDangerZone) return;
   if (msg) msg.textContent = "Repairing...";
 
   const { data: posts, error } = await supabase
@@ -722,6 +872,26 @@ function isContributionPostA(post, meta) {
     || (m.discovery_payload && m.discovery_payload.contribution_intent));
 }
 
+// Compact list of what the contributor actually submitted, so admins can
+// review contributions without opening the raw HTML dump.
+function renderContributionSubmittedFieldsA(info) {
+  const fields = info && info.submitted_fields && typeof info.submitted_fields === "object"
+    ? info.submitted_fields
+    : {};
+  const keys = Object.keys(fields).filter(function(key) {
+    return key !== "image_url" && String(fields[key] || "").trim();
+  });
+  if (!keys.length) return "";
+  let html = "<dl style=\"margin:6px 0 0;padding:8px 10px;background:rgba(74,120,184,0.12);border-radius:6px;font-size:0.82rem;\">";
+  keys.forEach(function(key) {
+    const label = key.replace(/_/g, " ").replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+    html += "<div style=\"display:flex;gap:8px;\"><dt style=\"color:#9cc4ef;min-width:130px;\">" + escapeHtmlA(label) +
+      "</dt><dd style=\"margin:0;color:var(--text-muted);\">" + escapeHtmlA(String(fields[key]).slice(0, 200)) + "</dd></div>";
+  });
+  html += "</dl>";
+  return html;
+}
+
 // Contributions never go through the discovery RPC / schema validation.
 // They are merged directly into their existing target entry.
 async function approveContributionA(target, options) {
@@ -736,6 +906,48 @@ async function approveContributionA(target, options) {
   const targetPost = await KnowledgeRelations.resolveContributionTargetPost(supabase, target, meta);
   if (!targetPost) {
     throw new Error("Target wiki entry for this contribution could not be resolved (" + (info.target_title || info.target_post_slug || "unknown") + ")");
+  }
+
+  // Show the admin exactly what this merge will change before writing.
+  if (!opts.skipPreviewConfirm && KnowledgeRelations.previewContributionMerge) {
+    const preview = KnowledgeRelations.previewContributionMerge(target, meta, targetPost);
+    const lines = [];
+    lines.push("Merge contribution into: " + (targetPost.title || targetPost.slug));
+    lines.push("Entity type: " + (targetPost.category || "?") + " · Intent: " + preview.info.intent);
+    if (preview.info.payload && preview.info.payload.confidence_level) {
+      lines.push("Confidence: " + preview.info.payload.confidence_level);
+    }
+    if (preview.willAdd.length) {
+      lines.push("");
+      lines.push("Will ADD (target field is empty):");
+      preview.willAdd.forEach(function(f) { lines.push("  + " + f.field + " = " + String(f.value).slice(0, 80)); });
+    }
+    if (preview.relationsNew.length) {
+      lines.push("New relations: " + preview.relationsNew.join(", "));
+    }
+    if (preview.relationsConfirm.length) {
+      lines.push("Confirms existing relations (no duplicate): " + preview.relationsConfirm.join(", "));
+    }
+    if (preview.evidenceCount) {
+      lines.push("Evidence items: " + preview.evidenceCount);
+    }
+    if (preview.willConflict.length) {
+      lines.push("");
+      lines.push("CONFLICTS (existing value is KEPT, submission saved for review):");
+      preview.willConflict.forEach(function(c) {
+        lines.push("  ! " + c.field + ": existing \"" + String(c.existing).slice(0, 60) + "\" vs submitted \"" + String(c.submitted).slice(0, 60) + "\"");
+      });
+    }
+    if (!preview.willAdd.length && !preview.relationsNew.length && !preview.relationsConfirm.length
+      && !preview.evidenceCount && !preview.willConflict.length) {
+      lines.push("");
+      lines.push("Note: nothing mergeable detected — approval will only archive the contribution.");
+    }
+    lines.push("");
+    lines.push("Existing confirmed values are never overwritten. Continue?");
+    if (!confirm(lines.join("\n"))) {
+      throw new Error("Contribution approval cancelled by admin");
+    }
   }
 
   const mergeResult = await KnowledgeRelations.mergeContributionIntoTarget(supabase, target, {
@@ -1092,11 +1304,13 @@ async function loadPending() {
       : "";
     const contributionLine = pendingContributionInfo
       ? "<p style=\"color:#9cc4ef;font-size:0.85rem;margin-top:6px;\">Contribution to <strong>" +
-        escapeHtmlA(pendingContributionInfo.target_title || pendingContributionInfo.target_post_slug || "Entry") + "</strong> · Intent: " +
-        escapeHtmlA(pendingContributionInfo.intent) +
+        escapeHtmlA(pendingContributionInfo.target_title || pendingContributionInfo.target_post_slug || "Entry") + "</strong>" +
+        " (" + escapeHtmlA(pendingContributionInfo.target_category || "entry") + ")" +
+        " · Intent: " + escapeHtmlA(pendingContributionInfo.intent) +
         (pendingContributionInfo.missing_field ? " · Field: " + escapeHtmlA(pendingContributionInfo.missing_field) : "") +
         (pendingContributionInfo.evidence.length ? " · " + pendingContributionInfo.evidence.length + " evidence item(s)" : "") +
-        " — approval merges into the existing entry.</p>"
+        " — approval merges into the existing entry.</p>" +
+        renderContributionSubmittedFieldsA(pendingContributionInfo)
       : "";
 
     const div = document.createElement("div");
@@ -1248,9 +1462,11 @@ async function loadDiscoveries() {
           : '<span class="badge badge-pending" style="margin-left:8px;">Needs fixes</span>'));
     const contributionSummary = contributionInfo
       ? '<p style="font-size:0.82rem;color:#9cc4ef;margin:6px 0 10px;">Contribution to <strong>' + escapeHtmlA(contributionInfo.target_title || contributionInfo.target_post_slug || "entry") + '</strong>'
+        + ' (' + escapeHtmlA(contributionInfo.target_category || "entry") + ')'
         + ' · Intent: <strong>' + escapeHtmlA(contributionInfo.intent) + '</strong>'
         + (contributionInfo.evidence.length ? ' · ' + contributionInfo.evidence.length + ' evidence item(s)' : '')
         + '. Approval merges it into the existing entry — no new post is created.</p>'
+        + renderContributionSubmittedFieldsA(contributionInfo)
       : "";
     const reviewSummary = contributionSummary ? contributionSummary : review.ok
       ? '<p style="font-size:0.82rem;color:#50c878;margin:6px 0 10px;">' + (isStub ? 'Knowledge stub can be published as incomplete.' : 'Structured data is complete enough for approval.') + '</p>'

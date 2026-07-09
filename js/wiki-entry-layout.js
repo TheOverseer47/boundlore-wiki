@@ -376,11 +376,16 @@ window.WikiEntryLayout = (function() {
           (isFactKnown("found_in") || isFactKnown("biome") || isFactKnown("area"))) return true;
         if ((key === "how_obtain" || key === "how_to_obtain" || key === "source_type") &&
           (isFactKnown("how_obtain") || isFactKnown("dropped_by"))) return true;
+        if ((key === "stats" || key === "damage") && isFactKnown("stats")) return true;
+        if ((key === "item_effect" || key === "effect") && isFactKnown("effect")) return true;
+        if (key === "rarity" && isFactKnown("rarity")) return true;
       }
       if (cat === "creatures") {
         if (key === "dropped_items" && isFactKnown("drops")) return true;
         if ((key === "found_in" || key === "observed_at") && isFactKnown("observed_at")) return true;
         if ((key === "biome" || key === "region_name") && isFactKnown("biome")) return true;
+        if ((key === "spawn_conditions" || key === "spawn") && isFactKnown("spawn")) return true;
+        if (key === "behavior" && isFactKnown("behavior")) return true;
       }
       if ((cat === "biomes" || cat === "locations") && (key === "known_creature" || key === "known_item")) {
         const counts = countRelationBuckets(relations, cat);
@@ -931,6 +936,7 @@ window.WikiEntryLayout = (function() {
       pushRelations("drops", "Known Drops", filterRelationsByTypes(relations, ["drops"]));
       pushRelations("biomes", "Observed Biomes", filterBiomeRelations(relations));
       pushRelations("locations", "Observed Locations", filterLocationRelations(relations));
+      if (f.behavior && f.behavior.status !== "unknown") pushFact("behavior", "Behavior", f.behavior);
       if (f.spawn && f.spawn.status !== "unknown") pushFact("spawn", "Spawn Conditions", f.spawn);
       if (f.time_weather && f.time_weather.status !== "unknown") pushFact("time_weather", "Time / Weather", f.time_weather);
     } else if (category === "biomes" || category === "locations") {

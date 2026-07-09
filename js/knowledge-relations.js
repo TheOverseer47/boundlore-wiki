@@ -1688,8 +1688,9 @@ window.KnowledgeRelations = (function() {
   // Fields that a contribution may fill on the target payload if still unknown.
   const CONTRIBUTION_MERGE_FIELDS = [
     "damage", "scaling_power", "durability", "stat_conditions",
-    "item_effect", "how_tested", "dropped_by", "found_in", "region_name",
+    "item_effect", "how_tested", "dropped_by", "dropped_items", "found_in", "region_name",
     "behavior", "behavior_conditions", "time_weather", "spawn_conditions",
+    "time_of_day", "weather_condition",
   ];
 
   async function mergeContributionIntoTarget(client, contributionPost, options) {
@@ -1717,6 +1718,13 @@ window.KnowledgeRelations = (function() {
     const mergedFields = [];
 
     const sourceValues = Object.assign({}, info.payload, info.submitted_fields);
+    // Map contribution form aliases onto canonical payload keys.
+    if (meaningfulValue(sourceValues.scaling) && !meaningfulValue(sourceValues.scaling_power)) {
+      sourceValues.scaling_power = sourceValues.scaling;
+    }
+    if (meaningfulValue(sourceValues.dropped_item) && !meaningfulValue(sourceValues.dropped_items)) {
+      sourceValues.dropped_items = sourceValues.dropped_item;
+    }
     CONTRIBUTION_MERGE_FIELDS.forEach(function(key) {
       const value = meaningfulValue(sourceValues[key]);
       if (!value) return;
@@ -1725,6 +1733,8 @@ window.KnowledgeRelations = (function() {
         targetPayload[key] = value;
         mergedFields.push(key);
       } else if (normalizeTitleKey(existing) !== normalizeTitleKey(value)) {
+        // Never overwrite silently: keep the confirmed value, record the
+        // submitted value as a reviewable conflict source.
         conflicts.push({ field: key, existing: existing, submitted: value });
       }
     });
@@ -1759,9 +1769,78 @@ window.KnowledgeRelations = (function() {
       targetMeta.discovery_evidence = targetEvidence;
     }
 
+    let relationsConfirmed = 0;
+    let relationsAdded = 0;
     if (info.relations.length) {
       const existingRelations = Array.isArray(targetMeta.discovery_relations) ? targetMeta.discovery_relations : [];
-      targetMeta.discovery_relations = mergeRelations(existingRelations, info.relations).map(sanitizeRelationForMeta);
+      // Entity posts keep their relations in knowledge_graph.relations —
+      // match against those too so a confirmation never adds a duplicate row.
+      const graphRelations = targetMeta.knowledge_graph && Array.isArray(targetMeta.knowledge_graph.relations)
+        ? targetMeta.knowledge_graph.relations
+        : [];
+      // Relations may also exist only on the other entity's side (e.g. the
+      // item stores located_in:Swamp). Treat those as already-linked too, so
+      // a "known item" confirmation never creates a second relation path.
+      let inboundKeys = new Set();
+      try {
+        const inbound = await fetchInboundRelations(client, targetPost, targetMeta);
+        inboundKeys = new Set((inbound || []).map(function(rel) {
+          return relationEntityDedupeKey(rel);
+        }).filter(Boolean));
+      } catch (inboundErr) { /* best effort — fall back to local matching */ }
+      info.relations.forEach(function(incoming) {
+        if (!incoming || !incoming.title) return;
+        const incomingKey = relationEntityDedupeKey(incoming);
+        const match = existingRelations.find(function(rel) {
+          return rel && relationEntityDedupeKey(rel) === incomingKey;
+        }) || graphRelations.find(function(rel) {
+          return rel && relationEntityDedupeKey(rel) === incomingKey;
+        });
+        if (match) {
+          // Same entity already linked: confirm it (extra source), never a
+          // duplicate row.
+          match.report_count = (Number(match.report_count) || 1) + 1;
+          match.confidence = Math.max(Number(match.confidence) || 0, Number(incoming.confidence) || 0);
+          match.last_confirmed_at = new Date().toISOString();
+          match.last_confirmed_by_post = contributionPost.id;
+          relationsConfirmed += 1;
+        } else if (inboundKeys.has(incomingKey)) {
+          // Already linked from the other entity's side — record the
+          // confirmation on this entry without duplicating the relation.
+          existingRelations.push(Object.assign({}, incoming, {
+            report_count: 2,
+            confirmed_existing_link: true,
+            last_confirmed_at: new Date().toISOString(),
+            last_confirmed_by_post: contributionPost.id,
+          }));
+          relationsConfirmed += 1;
+        } else {
+          existingRelations.push(incoming);
+          relationsAdded += 1;
+        }
+      });
+      targetMeta.discovery_relations = existingRelations.map(sanitizeRelationForMeta);
+    }
+
+    // Persist conflicts on the target itself so they stay reviewable even if
+    // the contribution post is archived.
+    if (conflicts.length) {
+      const conflictLog = Array.isArray(targetMeta.contribution_conflicts) ? targetMeta.contribution_conflicts : [];
+      conflicts.forEach(function(conflict) {
+        conflictLog.push({
+          field: conflict.field,
+          existing: conflict.existing,
+          submitted: conflict.submitted,
+          status: "needs_review",
+          contribution_post_id: contributionPost.id,
+          contribution_post_slug: contributionPost.slug || null,
+          intent: info.intent,
+          confidence_level: info.payload.confidence_level || null,
+          submitted_by: contributionPost.author_id || null,
+          recorded_at: new Date().toISOString(),
+        });
+      });
+      targetMeta.contribution_conflicts = conflictLog.slice(-20);
     }
 
     log.push({
@@ -1770,7 +1849,11 @@ window.KnowledgeRelations = (function() {
       intent: info.intent,
       merged_fields: mergedFields,
       evidence_added: evidenceAdded,
+      relations_added: relationsAdded,
+      relations_confirmed: relationsConfirmed,
       conflicts: conflicts,
+      confidence_level: info.payload.confidence_level || null,
+      submitted_by: contributionPost.author_id || null,
       merged_at: new Date().toISOString(),
       merged_by: opts.actorId || null,
     });
@@ -1785,7 +1868,65 @@ window.KnowledgeRelations = (function() {
       target: targetPost,
       mergedFields: mergedFields,
       evidenceAdded: evidenceAdded,
+      relationsAdded: relationsAdded,
+      relationsConfirmed: relationsConfirmed,
       conflicts: conflicts,
+    };
+  }
+
+  // Dry-run preview of a contribution merge for the admin review UI.
+  // Computes what would be added, confirmed, or conflicted without writing.
+  function previewContributionMerge(contributionPost, contributionMeta, targetPost) {
+    const meta = contributionMeta || parseMetaFromHtml(contributionPost && contributionPost.content || "");
+    const info = getContributionInfo(contributionPost, meta);
+    const targetMeta = targetPost ? parseMetaFromHtml(targetPost.content || "") : {};
+    const targetPayload = targetMeta.discovery_payload && typeof targetMeta.discovery_payload === "object"
+      ? targetMeta.discovery_payload
+      : {};
+
+    const sourceValues = Object.assign({}, info.payload, info.submitted_fields);
+    if (meaningfulValue(sourceValues.scaling) && !meaningfulValue(sourceValues.scaling_power)) {
+      sourceValues.scaling_power = sourceValues.scaling;
+    }
+    if (meaningfulValue(sourceValues.dropped_item) && !meaningfulValue(sourceValues.dropped_items)) {
+      sourceValues.dropped_items = sourceValues.dropped_item;
+    }
+
+    const willAdd = [];
+    const willConflict = [];
+    CONTRIBUTION_MERGE_FIELDS.forEach(function(key) {
+      const value = meaningfulValue(sourceValues[key]);
+      if (!value) return;
+      const existing = meaningfulValue(targetPayload[key]);
+      if (!existing) {
+        willAdd.push({ field: key, value: value });
+      } else if (normalizeTitleKey(existing) !== normalizeTitleKey(value)) {
+        willConflict.push({ field: key, existing: existing, submitted: value });
+      }
+    });
+
+    const existingRelations = (Array.isArray(targetMeta.discovery_relations) ? targetMeta.discovery_relations : [])
+      .concat(targetMeta.knowledge_graph && Array.isArray(targetMeta.knowledge_graph.relations)
+        ? targetMeta.knowledge_graph.relations
+        : []);
+    const relationsNew = [];
+    const relationsConfirm = [];
+    (info.relations || []).forEach(function(incoming) {
+      if (!incoming || !incoming.title) return;
+      const key = relationEntityDedupeKey(incoming);
+      const exists = existingRelations.some(function(rel) {
+        return rel && relationEntityDedupeKey(rel) === key;
+      });
+      (exists ? relationsConfirm : relationsNew).push(incoming.title);
+    });
+
+    return {
+      info: info,
+      willAdd: willAdd,
+      willConflict: willConflict,
+      relationsNew: relationsNew,
+      relationsConfirm: relationsConfirm,
+      evidenceCount: info.evidence.length,
     };
   }
 
@@ -1926,6 +2067,10 @@ window.KnowledgeRelations = (function() {
       out.contribution_log = meta.contribution_log.slice(0, 30);
     }
 
+    if (Array.isArray(meta.contribution_conflicts)) {
+      out.contribution_conflicts = meta.contribution_conflicts.slice(0, 20);
+    }
+
     const knowledgeMeta = normalizeKnowledgeMeta(meta);
     if (knowledgeMeta) {
       if (knowledgeMeta.knowledge_entry) out.knowledge_entry = knowledgeMeta.knowledge_entry;
@@ -2037,6 +2182,10 @@ window.KnowledgeRelations = (function() {
       }
 
       const content = injectMetaIntoHtml(post.content || "", serialized);
+      if (opts.dryRun) {
+        repaired += 1;
+        continue;
+      }
       const { error: updateError } = await client.from("posts").update({ content: content }).eq("id", post.id);
       if (updateError) {
         skipped += 1;
@@ -2177,6 +2326,11 @@ window.KnowledgeRelations = (function() {
       if (repair.title) update.title = repair.title;
       if (repair.slug) update.slug = repair.slug;
 
+      if (opts.dryRun) {
+        repaired += 1;
+        continue;
+      }
+
       const { error: updateError } = await client.from("posts").update(update).eq("id", post.id);
       if (updateError) {
         skipped += 1;
@@ -2234,6 +2388,7 @@ window.KnowledgeRelations = (function() {
     getContributionInfo: getContributionInfo,
     resolveContributionTargetPost: resolveContributionTargetPost,
     mergeContributionIntoTarget: mergeContributionIntoTarget,
+    previewContributionMerge: previewContributionMerge,
     findPendingContributionDuplicate: findPendingContributionDuplicate,
     serializePostMetaForStorage: serializePostMetaForStorage,
     repairStructuredMetaForPosts: repairStructuredMetaForPosts,

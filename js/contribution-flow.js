@@ -20,6 +20,7 @@ window.ContributionFlow = (function() {
     image_caption: { key: "image_caption", label: "Caption", type: "text", placeholder: "What does the image show?", max: 200 },
     image_context: { key: "image_context", label: "Source / context", type: "text", placeholder: "Where / when was this captured?", max: 200 },
     dropped_by: { key: "dropped_by", label: "Dropped by", type: "text", placeholder: "Creature, boss, or NPC name", max: 120, required: true },
+    dropped_item: { key: "dropped_item", label: "Dropped item", type: "text", placeholder: "Item name that this creature drops", max: 120, required: true },
     found_in: { key: "found_in", label: "Location", type: "text", placeholder: "Specific place or landmark", max: 160 },
     region_name: { key: "region_name", label: "Biome / Region", type: "text", placeholder: "e.g. Swamp", max: 120 },
     behavior: { key: "behavior", label: "Behavior", type: "textarea", placeholder: "How does it act?", max: 800, required: true },
@@ -53,6 +54,10 @@ window.ContributionFlow = (function() {
     report_drop: {
       label: "Confirm drop source",
       fields: ["dropped_by", "relation_notes", "confidence_level", "evidence_notes"],
+    },
+    report_drop_creature: {
+      label: "Report drop",
+      fields: ["dropped_item", "relation_notes", "confidence_level", "evidence_notes"],
     },
     confirm_location: {
       label: "Confirm location",
@@ -110,6 +115,8 @@ window.ContributionFlow = (function() {
       dropped_items: "report_drop",
       dropped_by: "report_drop",
       found_in: "confirm_location",
+      known_creature: "add_known_creature",
+      known_item: "add_known_item",
       rarity: "add_info",
       resources_or_rewards: "add_info",
       notes: "add_info",
@@ -119,9 +126,13 @@ window.ContributionFlow = (function() {
 
   function getMask(intent, field, entityType) {
     const key = resolveIntent(intent, field);
-    if (key === "add_info" && entityType === "biomes") {
-      if (field === "resources_or_rewards" || intent === "add_known_item") return MASKS.add_known_item;
-      if (intent === "add_known_creature") return MASKS.add_known_creature;
+    const type = String(entityType || "").toLowerCase();
+    // On creature pages "report_drop" means "this creature drops item X",
+    // on item pages it means "this item is dropped by creature Y".
+    if (key === "report_drop" && type === "creatures") return MASKS.report_drop_creature;
+    if (key === "add_info" && (type === "biomes" || type === "locations")) {
+      if (field === "resources_or_rewards" || intent === "add_known_item" || field === "known_item") return MASKS.add_known_item;
+      if (intent === "add_known_creature" || field === "known_creature") return MASKS.add_known_creature;
     }
     return MASKS[key] || MASKS.add_info;
   }
@@ -276,6 +287,7 @@ window.ContributionFlow = (function() {
     if (values.item_effect) payload.item_effect = values.item_effect;
     if (values.how_tested) payload.how_tested = values.how_tested;
     if (values.dropped_by) payload.dropped_by = values.dropped_by;
+    if (values.dropped_item) payload.dropped_items = values.dropped_item;
     if (values.found_in) payload.found_in = values.found_in;
     if (values.region_name) payload.region_name = values.region_name;
     if (values.behavior) payload.behavior = values.behavior;
@@ -291,6 +303,16 @@ window.ContributionFlow = (function() {
     return payload;
   }
 
+  function confidenceLevelToScore(level) {
+    const map = {
+      "1-rumor": 40,
+      "2-single-observation": 60,
+      "3-repeated": 80,
+      "4-confirmed": 95,
+    };
+    return map[String(level || "")] || 60;
+  }
+
   function buildRelations(intent, values, targetContext) {
     const relations = [];
     const relBase = {
@@ -298,8 +320,17 @@ window.ContributionFlow = (function() {
       source_post_id: targetContext.targetId,
       source_post_title: targetContext.displayName,
       auto_inferred: false,
-      confidence: 80,
+      confidence: confidenceLevelToScore(values.confidence_level),
     };
+    if (intent === "report_drop" && values.dropped_item) {
+      relations.push(Object.assign({}, relBase, {
+        relation_type: "drops",
+        title: values.dropped_item,
+        group: "items",
+        category: "items",
+        target_entity_type: "item",
+      }));
+    }
     if (intent === "report_drop" && values.dropped_by) {
       relations.push(Object.assign({}, relBase, {
         relation_type: "dropped_by",
@@ -329,24 +360,24 @@ window.ContributionFlow = (function() {
         }));
       }
     }
+    // Known-entity relations are stored on the biome/location entry itself,
+    // matching how approved discoveries link entities ("contains").
     if (intent === "add_known_creature" && values.entity_name) {
       relations.push(Object.assign({}, relBase, {
-        relation_type: "observed_in",
+        relation_type: "contains",
         title: values.entity_name,
         group: "creatures",
         category: "creatures",
         target_entity_type: "creature",
-        direction: "inbound",
       }));
     }
     if (intent === "add_known_item" && values.entity_name) {
       relations.push(Object.assign({}, relBase, {
-        relation_type: "drops",
+        relation_type: "contains",
         title: values.entity_name,
         group: "items",
         category: "items",
         target_entity_type: "item",
-        direction: "inbound",
       }));
     }
     if (targetContext.relationTarget && intent === "report_drop" && !relations.length) {
