@@ -514,6 +514,15 @@ async function submitContributionCP(errorEl) {
     contributionMeta.discovery_relations = relations;
   }
 
+  if (typeof EntityCore !== "undefined" && EntityCore.normalizeEntityClassification) {
+    contributionMeta = EntityCore.normalizeEntityClassification(contributionMeta, {
+      title: title,
+      category: context.entityType,
+    });
+    if (!contributionMeta.entity_domain) contributionMeta.entity_domain = "META";
+    if (!contributionMeta.entity_subtype) contributionMeta.entity_subtype = "contribution";
+  }
+
   payload.content = injectPostMetaCP(payload.content, contributionMeta);
 
   const { data: created, error } = await supabase
@@ -1182,6 +1191,9 @@ async function handleSubmit(e) {
       if (typeof BoundLoreTestData !== "undefined" && BoundLoreTestData.shouldMarkAsTestData()) {
         postMeta.content_origin = BoundLoreTestData.ORIGIN_TEST;
       }
+      if (typeof EntityCore !== "undefined" && EntityCore.normalizeEntityClassification) {
+        postMeta = EntityCore.normalizeEntityClassification(postMeta, { title: dedupeTitle || title, category: cat });
+      }
       if (window.__boundloreContributionContext) {
         postMeta.contribution_target = window.__boundloreContributionContext.target || null;
         postMeta.contribution_field = window.__boundloreContributionContext.field || null;
@@ -1300,6 +1312,13 @@ async function handleSubmit(e) {
       postMeta.discovery_evidence = existingEvidence.concat(fileEvidence);
     }
     payload.content = buildPostContentWithAttachments(payload.content, uploadResult.files, currentPostType === "discovery");
+  }
+
+  if (typeof EntityCore !== "undefined" && EntityCore.normalizeEntityClassification) {
+    postMeta = EntityCore.normalizeEntityClassification(postMeta, {
+      title: payload.title || title,
+      category: payload.category || currentDiscoveryCategory || "",
+    });
   }
 
   payload.content = injectPostMetaCP(payload.content, postMeta);

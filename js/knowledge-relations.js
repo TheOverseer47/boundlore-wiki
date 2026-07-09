@@ -120,9 +120,17 @@ window.KnowledgeRelations = (function() {
     default: ["observed_in", "located_in", "found_in", "drops", "dropped_by", "related_discovery"],
   };
 
+  function getRelationsRegistry() {
+    return typeof window !== "undefined" && window.BoundLoreRelationsRegistry
+      ? window.BoundLoreRelationsRegistry
+      : null;
+  }
+
   function normalizeRelationType(type) {
     const raw = String(type || "related_discovery").toLowerCase().replace(/[\s-]+/g, "_");
     if (RELATION_TYPES[raw]) return raw;
+    const reg = getRelationsRegistry();
+    if (reg && reg.isKnownRelationType(raw)) return raw;
     if (raw === "found_in" || raw === "location") return "found_in";
     if (raw === "loot" || raw === "drop") return "drops";
     if (raw === "source" || raw === "drop_source") return "dropped_by";
@@ -160,6 +168,24 @@ window.KnowledgeRelations = (function() {
 
   function getRelationLabel(type, rel, viewerCategory) {
     const key = normalizeRelationType(type);
+    const reg = getRelationsRegistry();
+    if (reg) {
+      const def = reg.getRelationDefinition(key);
+      if (def && def.label) {
+        const viewer = String(viewerCategory || "").toLowerCase();
+        if (viewer === "biomes" || viewer === "locations") {
+          const entityCat = rel && typeof EntityCore !== "undefined" && EntityCore.resolveRelationCategory
+            ? EntityCore.resolveRelationCategory(rel)
+            : "";
+          if (entityCat === "creatures") return "Known creature";
+          if (entityCat === "items") return "Known item";
+          if (entityCat === "discoveries") return "Related discovery";
+          if (key === "observed_in" || key === "found_near") return "Observed in";
+          if (key === "located_in" || key === "found_in" || key === "part_of") return "Found in biome";
+        }
+        return def.label;
+      }
+    }
     const viewer = String(viewerCategory || "").toLowerCase();
     if (viewer === "biomes" || viewer === "locations") {
       const entityCat = rel && typeof EntityCore !== "undefined" && EntityCore.resolveRelationCategory
@@ -1968,6 +1994,8 @@ window.KnowledgeRelations = (function() {
     setStr("subcategory", meta.subcategory, 60);
     setStr("discovery_form", meta.discovery_form, 16);
     setStr("content_origin", meta.content_origin, 16);
+    setStr("entity_domain", meta.entity_domain, 16);
+    setStr("entity_subtype", meta.entity_subtype, 40);
     setStr("discovery_record_id", meta.discovery_record_id, 64);
     setStr("discovery_record_status", meta.discovery_record_status, 40);
     setStr("discovery_submitted_at", meta.discovery_submitted_at, 40);

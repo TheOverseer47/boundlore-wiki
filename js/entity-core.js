@@ -884,9 +884,164 @@ window.EntityCore = (function() {
     });
   }
 
+  const ENTITY_DOMAINS = {
+    PLACE: "PLACE",
+    BEING: "BEING",
+    OBJECT: "OBJECT",
+    SYSTEM: "SYSTEM",
+    KNOWLEDGE: "KNOWLEDGE",
+    EVENT: "EVENT",
+    COMMUNITY: "COMMUNITY",
+    META: "META",
+  };
+
+  const T3_RESERVED_SLUG_PREFIXES = ["quest-", "class-", "talent-", "event-", "faction-"];
+
+  function inferEntityDomainFromCategory(category) {
+    const cat = String(category || "").toLowerCase();
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.getDomainForCategory) {
+      const fromRegistry = BoundLoreRelationsRegistry.getDomainForCategory(cat);
+      if (fromRegistry) return fromRegistry;
+    }
+    const map = {
+      biomes: ENTITY_DOMAINS.PLACE,
+      locations: ENTITY_DOMAINS.PLACE,
+      dungeons: ENTITY_DOMAINS.PLACE,
+      creatures: ENTITY_DOMAINS.BEING,
+      items: ENTITY_DOMAINS.OBJECT,
+      crafting: ENTITY_DOMAINS.SYSTEM,
+      classes: ENTITY_DOMAINS.SYSTEM,
+      lore: ENTITY_DOMAINS.KNOWLEDGE,
+      guides: ENTITY_DOMAINS.META,
+      news: ENTITY_DOMAINS.META,
+      guilds: ENTITY_DOMAINS.COMMUNITY,
+      community: ENTITY_DOMAINS.COMMUNITY,
+    };
+    return map[cat] || "";
+  }
+
+  function inferEntitySubtypeFromCategoryAndPayload(category, payload, meta, post) {
+    const cat = String(category || "").toLowerCase();
+    const data = payload && typeof payload === "object" ? payload : {};
+    const m = meta && typeof meta === "object" ? meta : {};
+    if (m.entity_subtype) return String(m.entity_subtype).slice(0, 40);
+
+    if (cat === "biomes") return "biome";
+
+    if (cat === "creatures") {
+      const dtype = String(data.discovery_type || "").toLowerCase();
+      if (dtype === "boss" || m.place_role === "boss") return "boss";
+      if (dtype === "elite") return "elite";
+      if (dtype === "mount" || m.mount_rideable) return "mount";
+      const sub = String(m.subcategory || "").toLowerCase();
+      if (sub === "mounts") return "mount";
+      if (sub === "npcs") return "npc";
+      if (sub === "monsters" || dtype === "monster") return "creature";
+      return "creature";
+    }
+
+    if (cat === "items") {
+      const sub = String(m.subcategory || "").toLowerCase();
+      if (sub === "weapons") return "weapon";
+      if (sub === "armor") return "armor";
+      const itemType = String(data.item_type || data.discovery_type || "").toLowerCase();
+      if (itemType === "resource" || itemType === "material") return "resource";
+      if (itemType === "tool") return "tool";
+      if (itemType === "consumable") return "consumable";
+      if (itemType === "building_part") return "building_part";
+      if (itemType === "vehicle_boat" || itemType === "boat") return "vehicle_boat";
+      return "item_generic";
+    }
+
+    if (cat === "locations" || cat === "dungeons") {
+      const placeInfo = classifyPlaceEntry(post && post.title, category, data);
+      if (placeInfo.effective_category === "location_hint") return "location_hint";
+      if (placeInfo.effective_category === "biomes") return "biome";
+      const placeType = String(data.discovery_type || data.place_type || m.place_role || "").toLowerCase();
+      if (["dungeon", "ruin", "cave", "temple", "landmark", "settlement", "waterbody"].indexOf(placeType) >= 0) {
+        return placeType;
+      }
+      if (cat === "dungeons") return "dungeon";
+      return "landmark";
+    }
+
+    if (cat === "lore") return "lore_book";
+    if (cat === "crafting") return "recipe";
+    if (cat === "guilds") return "guild";
+    if (cat === "guides") return "guide";
+    if (cat === "news") return "news";
+    if (cat === "community") return "community";
+    return "";
+  }
+
+  function resolveEntityDomain(metaOrPost, maybePost) {
+    let meta = null;
+    let post = null;
+    if (maybePost) {
+      meta = metaOrPost && typeof metaOrPost === "object" ? metaOrPost : {};
+      post = maybePost;
+    } else if (metaOrPost && metaOrPost.category != null && metaOrPost.title != null && !metaOrPost.discovery_payload) {
+      post = metaOrPost;
+      meta = {};
+    } else {
+      meta = metaOrPost && typeof metaOrPost === "object" ? metaOrPost : {};
+    }
+    if (meta.entity_domain) return String(meta.entity_domain);
+    const category = (post && post.category) || meta.category || "";
+    return inferEntityDomainFromCategory(category) || "";
+  }
+
+  function resolveEntitySubtype(metaOrPost, maybePost) {
+    let meta = null;
+    let post = null;
+    if (maybePost) {
+      meta = metaOrPost && typeof metaOrPost === "object" ? metaOrPost : {};
+      post = maybePost;
+    } else if (metaOrPost && metaOrPost.category != null && metaOrPost.title != null && !metaOrPost.discovery_payload) {
+      post = metaOrPost;
+      meta = {};
+    } else {
+      meta = metaOrPost && typeof metaOrPost === "object" ? metaOrPost : {};
+    }
+    if (meta.entity_subtype) return String(meta.entity_subtype);
+    const category = (post && post.category) || meta.category || "";
+    const payload = meta.discovery_payload || {};
+    return inferEntitySubtypeFromCategoryAndPayload(category, payload, meta, post) || "";
+  }
+
+  function normalizeEntityClassification(meta, post) {
+    const out = Object.assign({}, meta || {});
+    const p = post || {};
+    const category = p.category || out.category || "";
+    const payload = out.discovery_payload && typeof out.discovery_payload === "object"
+      ? out.discovery_payload
+      : {};
+
+    if (!out.entity_domain) {
+      const domain = inferEntityDomainFromCategory(category);
+      if (domain) out.entity_domain = domain;
+    }
+    if (!out.entity_subtype) {
+      const subtype = inferEntitySubtypeFromCategoryAndPayload(category, payload, out, p);
+      if (subtype) out.entity_subtype = subtype;
+    }
+    return out;
+  }
+
+  function isReservedT3Slug(slug) {
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.isReservedT3Slug) {
+      return BoundLoreRelationsRegistry.isReservedT3Slug(slug);
+    }
+    const s = String(slug || "").trim().toLowerCase();
+    return T3_RESERVED_SLUG_PREFIXES.some(function(prefix) {
+      return s.indexOf(prefix) === 0;
+    });
+  }
+
   function normalizeEntityMeta(post, meta, options) {
     const opts = Object.assign({ repairTitle: false, repairPayload: true }, options || {});
-    const out = Object.assign({}, meta || {});
+    let out = Object.assign({}, meta || {});
+    out = normalizeEntityClassification(out, post);
     const payload = out.discovery_payload && typeof out.discovery_payload === "object"
       ? Object.assign({}, out.discovery_payload)
       : {};
@@ -1122,6 +1277,14 @@ window.EntityCore = (function() {
     splitPlaceContext: splitPlaceContext,
     classifyPlaceEntry: classifyPlaceEntry,
     getEffectiveCategory: getEffectiveCategory,
+    ENTITY_DOMAINS: ENTITY_DOMAINS,
+    T3_RESERVED_SLUG_PREFIXES: T3_RESERVED_SLUG_PREFIXES,
+    inferEntityDomainFromCategory: inferEntityDomainFromCategory,
+    inferEntitySubtypeFromCategoryAndPayload: inferEntitySubtypeFromCategoryAndPayload,
+    resolveEntityDomain: resolveEntityDomain,
+    resolveEntitySubtype: resolveEntitySubtype,
+    normalizeEntityClassification: normalizeEntityClassification,
+    isReservedT3Slug: isReservedT3Slug,
     shouldExcludeFromLocationList: shouldExcludeFromLocationList,
     shouldIncludeInBiomeList: shouldIncludeInBiomeList,
     getBiomeAliases: getBiomeAliases,

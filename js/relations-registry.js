@@ -3,8 +3,9 @@
 // Single source of truth for canonical relation types,
 // families, controlled vocabularies, and merge/conflict rules.
 //
-// NOT YET INTEGRATED into discovery/contribution flows.
-// See docs/architecture/current-code-gap-notes.md for integration plan.
+// Integrated at runtime on discovery/detail/admin pages (see wiki/*/index.html).
+// Optional bridge in knowledge-relations.js — flows work without this file loaded.
+// See docs/architecture/current-code-gap-notes.md
 // ============================================
 
 window.BoundLoreRelationsRegistry = (function() {
@@ -76,7 +77,6 @@ window.BoundLoreRelationsRegistry = (function() {
     location: "found_in",
     loot: "drops",
     drop: "drops",
-    dropped_by: "drops",
     uses_item: "requires",
     related_creature: "related_to",
     reference_guide: "related_to",
@@ -517,6 +517,9 @@ window.BoundLoreRelationsRegistry = (function() {
     news: ENTITY_DOMAINS.META,
   };
 
+  // T3 namespace slug prefixes — reserved, no auto-entity creation (docs only for now).
+  const T3_RESERVED_SLUG_PREFIXES = ["quest-", "class-", "talent-", "event-", "faction-"];
+
   // -------------------------------------------------------------------------
   // Helpers
   // -------------------------------------------------------------------------
@@ -525,6 +528,24 @@ window.BoundLoreRelationsRegistry = (function() {
     if (RELATION_DEFINITIONS[key]) return key;
     if (LEGACY_ALIASES[key]) return LEGACY_ALIASES[key];
     return key;
+  }
+
+  function normalizeRelationType(type) {
+    const raw = String(type || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+    if (!raw) return "";
+    // Preserve legacy/inverse types that have their own definitions.
+    if (RELATION_DEFINITIONS[raw]) return raw;
+    if (LEGACY_ALIASES[raw]) return LEGACY_ALIASES[raw];
+    return raw;
+  }
+
+  function isReservedT3Slug(slug) {
+    const s = String(slug || "").trim().toLowerCase();
+    if (!s) return false;
+    for (let i = 0; i < T3_RESERVED_SLUG_PREFIXES.length; i += 1) {
+      if (s.indexOf(T3_RESERVED_SLUG_PREFIXES[i]) === 0) return true;
+    }
+    return false;
   }
 
   function getRelationDefinition(key) {
@@ -585,6 +606,7 @@ window.BoundLoreRelationsRegistry = (function() {
     CONTROLLED_VOCABULARIES: CONTROLLED_VOCABULARIES,
     LEGACY_ALIASES: LEGACY_ALIASES,
     CATEGORY_DOMAIN_MAP: CATEGORY_DOMAIN_MAP,
+    T3_RESERVED_SLUG_PREFIXES: T3_RESERVED_SLUG_PREFIXES,
     getRelationDefinition: getRelationDefinition,
     isKnownRelationType: isKnownRelationType,
     isLegacyRelationType: isLegacyRelationType,
@@ -595,5 +617,7 @@ window.BoundLoreRelationsRegistry = (function() {
     getDomainForCategory: getDomainForCategory,
     resolveCanonicalKey: resolveCanonicalKey,
     normalizeKey: normalizeKey,
+    normalizeRelationType: normalizeRelationType,
+    isReservedT3Slug: isReservedT3Slug,
   };
 })();
