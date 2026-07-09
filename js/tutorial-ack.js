@@ -58,13 +58,14 @@ window.TutorialAck = (function() {
   async function saveAcknowledgement(client, userId) {
     if (!client || !userId) return { ok: false, reason: "missing_client_or_user" };
 
+    // Insert only — ignoreDuplicates => ON CONFLICT DO NOTHING (no UPDATE grant).
     const { error } = await client
       .from(TABLE)
       .upsert({
         user_id: userId,
         tutorial_version: VERSION,
         accepted_at: new Date().toISOString(),
-      }, { onConflict: "user_id", ignoreDuplicates: false });
+      }, { onConflict: "user_id", ignoreDuplicates: true });
 
     if (error) {
       if (isMissingTableError(error)) {

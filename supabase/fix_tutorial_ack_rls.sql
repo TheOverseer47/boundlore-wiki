@@ -49,6 +49,11 @@ create policy user_submission_acks_select_admin
     )
   );
 
+-- Table grants: authenticated may read/insert own ack only (RLS enforces row scope).
+-- No update/delete for regular users — re-ack uses insert with on conflict do nothing.
+grant select, insert on public.user_submission_acks to authenticated;
+revoke update, delete on public.user_submission_acks from authenticated;
+
 -- ---------------------------------------------------------------------------
 -- 2. Backfill from legacy user_metadata (one-time migration aid)
 --    Uses auth.users — not referenced by any active RLS policy.
