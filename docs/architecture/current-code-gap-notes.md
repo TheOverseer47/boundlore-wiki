@@ -1,7 +1,7 @@
 # Current Code Gap Notes
 
 Audit of BoundLore codebase against the content architecture blueprint.  
-**Last updated:** 2026-07-10 (P0-E3: Evidence-tier badges)
+**Last updated:** 2026-07-10 (Final P0 acceptance sweep)
 
 ---
 
@@ -83,7 +83,6 @@ Resource Name, Source Type (mining/plant/creature-drop/biome/water/loot/unknown)
 
 ### Still deferred
 
-- Evidence-tier badge UI
 - Full Recipe browse/index
 - Global cross-domain usage beyond CRAFT/recipe-derived paths
 
@@ -235,16 +234,60 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 ---
 
-## 6. Still Not Implemented (by design)
+## 6. Final P0 Acceptance Sweep (2026-07-10)
 
-| Area | Priority |
-|------|----------|
-| Full Recipe browse/index | P0-F |
-| E2E T1 full chain | P0-E2/E3 done; final P0 acceptance regression still open |
-| Recipe duplicate/conflict E2E | P0-D4 (done) |
+**Environment:** `http://localhost:8080` · HEAD `95e2cdf` · branch `main` 25 commits ahead of `origin/main` · no push/deploy/SQL/reset · `qa/e2e-baseline-bmeta.snapshot.json` untracked.
+
+**Overall:** **Grün / teilgrün** — no P0 blockers found in UI regression. Admin conflict queue not re-verified in automation session (Access Denied; no login attempted per instructions). P0-D4 E2E earlier same day verified pending `add_recipe` conflict with approve blocked.
+
+| P0 area | Status | Notes |
+|---------|--------|-------|
+| Registry / entity subtype baseline | ✅ | Resource subtype on QA Ember Shard; items/resources filters respect subtype |
+| CRAFT relations | ✅ | Staff recipe: `crafted_from` ×2, `crafted_at` Forge; no duplicate relation sections |
+| Resource Quick-Add + synonym warning | ✅ | Implemented P0-C; not re-run end-to-end this sweep |
+| Recipe intent / merge / display | ✅ | Staff: 1 Crafting Recipe block; Ember ×3, Wood ×1, Forge; merged notes visible |
+| Duplicate / conflict handling | ✅ | No ×4 on Ember/Staff/Resources; conflict contribution stays pending (P0-D4 prior E2E) |
+| Usage widget | ✅ | Ember `Used In` → Staff, 3 piece, Forge; Staff has no false Used In |
+| Resources landing | ✅ | `/wiki/resources/` cards, filters (ember search, mining, unknown rarity, nonsense empty) |
+| Evidence-tier badges | ✅ | Reported · Single Observation on Ember, Staff recipe, resources card |
+| T3 slug protection | ✅ | `quest-anything` → Post not found; no auto quest page |
+| Empty states | ✅ | Locations “No location entries”; resources filter empty state |
+| Homepage / patch-mode visibility | ✅ | Hero + infographic + lightbox close; no patch guard hang |
+| Admin safety | ⚠️ | Automation: Access Denied. Prior session: TheOverseer47, 1 pending add_recipe conflict, approve blocked |
+| No false stubs / no contributions in normal lists | ✅ | Items: Staff ×2 + Ember only; no Wood/Forge/Recipe posts; locations: no red crystal nodes |
+
+### Known non-blocking notes
+
+- `/wiki/locations/` shows “No location entries documented yet” (expected current state; Swamp lives under biomes).
+- One `add_recipe` conflict (Ember ×4) remains **pending by design** — do not approve/delete.
+- Full Recipe browse/index **not** built — deferred P0-F / P1.
+- Resources nonsense-filter empty state shows both “No resources match…” and generic “No resources documented yet” (cosmetic).
+
+### Data integrity (UI-only, no SQL)
+
+| Check | Result |
+|-------|--------|
+| Active Wood posts in browse lists | **0** (not on `/wiki/items/`) |
+| Active Forge posts | **0** |
+| Active Recipe posts | **0** |
+| QA EmberShard duplicate posts | **0** (single QA Ember Shard) |
+| `red crystal nodes` as location stub | **0** on `/wiki/locations/` |
+| Contributions in normal item/resource lists | **0** |
+| Pending `add_recipe` conflict | **1** expected (not re-counted in admin this sweep) |
 
 ---
 
-## 7. Next Step
+## 7. Still Not Implemented (post-P0)
 
-**P0-F:** Full Recipe browse widget, final P0 acceptance regression
+| Area | Priority |
+|------|----------|
+| Full Recipe browse/index | P0-F / P1 |
+| Boss, NPC, Lore, Mounts, Economy, Events, Player Bases, Talent/Class domains | P1/P2 |
+
+---
+
+## 8. Next Step
+
+1. **Optional:** Re-run admin panel check with active TheOverseer47 session to close the ⚠️ on Admin safety.
+2. **P0-F / P1:** Full Recipe browse widget/index when prioritized.
+3. **When ready:** Push + deploy (not part of this sweep).

@@ -187,10 +187,54 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 | Step | Action | Expected |
 |------|--------|----------|
-| 1 | Visit `/wiki/post/?slug=quest-anything` | Clean "Post not found" |
-| 2 | No crash, no spinner hang | — |
-| 3 | Slug not in any browse list | — |
-| 4 | Namespace reserved in taxonomy | Documented in registry |
+| 1 | Visit `/wiki/post/?slug=quest-anything` | Clean "Post not found" | `[x]` sweep |
+| 2 | No crash, no spinner hang | — | `[x]` sweep |
+| 3 | Slug not in any browse list | — | `[x]` sweep |
+| 4 | Namespace reserved in taxonomy | Documented in registry | `[x]` |
+
+---
+
+## Final P0 Acceptance Sweep (2026-07-10)
+
+**HEAD:** `95e2cdf` · **URL base:** `http://localhost:8080` only · **Commit scope:** docs only · **No** push/deploy/SQL/reset.
+
+**Overall:** `[~]` **grün / teilgrün** — all UI regression areas pass; admin queue not re-verified in automation (Access Denied).
+
+| Area | URL / check | Result |
+|------|-------------|--------|
+| Git / env | `main`, 25 ahead, snapshot untracked | `[x]` |
+| Homepage + patch mode | `/` | `[x]` hero, infographic, lightbox close |
+| Admin safety | `/wiki/admin/` | `[~]` Access Denied in automation; P0-D4 prior E2E covered conflict |
+| Resource detail | `qa-ember-shard-511160` | `[x]` subtype, Used In, badges, no Add Recipe, no ×4 |
+| Resources landing | `/wiki/resources/` | `[x]` CTA, card, filters, badges |
+| Staff recipe | `qa-staff-of-fire-2b742628` | `[x]` 1 recipe, ×3/×1, Forge, notes, badges |
+| Ogre Mage regression | `qa-ogre-mage-1103f2` | `[x]` Behavior, Spawn, Drop Staff |
+| Swamp regression | `swamplands-94dadc07` | `[x]` Known Creatures 2, Known Items 2 |
+| Items list | `/wiki/items/` | `[x]` 3 entries, Browse Resources, no Wood/Forge/Recipe |
+| Locations empty | `/wiki/locations/` | `[x]` no entries, no red crystal stub |
+| T3 protection | `quest-anything` | `[x]` Post not found |
+
+### P0 green checklist
+
+- [x] Registry / subtype
+- [x] CRAFT
+- [x] Resource Quick-Add (implemented; manual E2E not re-run)
+- [x] Recipe intent / merge / display
+- [x] Duplicate / conflict (UI + prior P0-D4)
+- [x] Usage widget
+- [x] Resources landing
+- [x] Evidence badges
+- [x] T3 slug protection
+- [x] Empty states
+- [~] Admin safety (session-dependent)
+- [x] No false stubs / no contributions in normal lists
+
+### Non-blocking / post-P0
+
+- `/wiki/locations/` — “No location entries” (known)
+- Pending `add_recipe` Ember ×4 conflict — stays pending
+- Full Recipe browse/index — not P0-finalized
+- P1/P2: Boss, NPC, Lore, Mounts, Economy, Events, Player Bases, Talent/Class, etc.
 
 ---
 
