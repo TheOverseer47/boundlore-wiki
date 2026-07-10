@@ -285,7 +285,7 @@
 <script src="/js/test-data.js?v=1"></script>
 <script src="/js/categories-config.js?v=18"></script>
 <script src="/js/relations-registry.js?v=1"></script>
-<script src="/js/knowledge-relations.js?v=19"></script>
+<script src="/js/knowledge-relations.js?v=20"></script>
 <script src="/js/entity-core.js?v=9"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
@@ -783,6 +783,8 @@ function renderRecipeContributionSummaryA(info) {
     html += '<p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 10px;">CRAFT relations: ' +
       escapeHtmlA(craftLines.join(", ")) + "</p>";
   }
+  html += '<p style="font-size:0.78rem;color:#7fb0d8;margin:0;">Approve merges this recipe into the target item. ' +
+    "No recipe page is created. <code>ingredient_of</code> is not persisted.</p>";
   return html;
 }
 
@@ -866,6 +868,24 @@ async function approveContributionA(target, options) {
     }
     if (preview.evidenceCount) {
       lines.push("Evidence items: " + preview.evidenceCount);
+    }
+    if (info.intent === "add_recipe") {
+      lines.push("");
+      lines.push("Recipe merge policy:");
+      lines.push("  · Merges into target item only — no recipe/wiki post is created.");
+      lines.push("  · Persists crafted_from + crafted_at on the target.");
+      lines.push("  · ingredient_of is NOT persisted (derived/inverse only).");
+      lines.push("  · Wood/Forge stay unresolved relation targets unless already published.");
+      const recipe = info.payload && info.payload.recipe;
+      if (recipe) {
+        const ing = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+        if (ing.length) {
+          lines.push("  · Ingredients: " + ing.map(function(row) {
+            return (row.name || "?") + " x" + (row.quantity != null ? row.quantity : "?") + " " + (row.unit || "piece");
+          }).join(", "));
+        }
+        if (recipe.station) lines.push("  · Station: " + recipe.station);
+      }
     }
     if (preview.willConflict.length) {
       lines.push("");

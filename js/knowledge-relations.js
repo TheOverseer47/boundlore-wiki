@@ -417,6 +417,16 @@ window.KnowledgeRelations = (function() {
     if (!existingFp && incomingFp) {
       existingRecipe.ingredients = sourceRecipe.ingredients;
       mergedFields.push("recipe_ingredients");
+    } else if (existingFp && incomingFp && existingFp === incomingFp) {
+      mergedFields.push("recipe_confirmed");
+      if (meaningfulValue(sourceRecipe.notes) && !meaningfulValue(existingRecipe.notes)) {
+        existingRecipe.notes = sourceRecipe.notes;
+        mergedFields.push("recipe_notes");
+      } else if (meaningfulValue(sourceRecipe.notes) && meaningfulValue(existingRecipe.notes)
+        && existingRecipe.notes.indexOf(sourceRecipe.notes) === -1) {
+        existingRecipe.notes = existingRecipe.notes + "\n\nCommunity addition: " + sourceRecipe.notes;
+        mergedFields.push("recipe_notes");
+      }
     } else if (existingFp && incomingFp && existingFp !== incomingFp) {
       conflicts.push({
         field: "recipe_ingredients",
@@ -432,6 +442,10 @@ window.KnowledgeRelations = (function() {
     if (meaningfulValue(sourceRecipe.unlock_condition) && !meaningfulValue(existingRecipe.unlock_condition)) {
       existingRecipe.unlock_condition = sourceRecipe.unlock_condition;
       mergedFields.push("recipe_unlock_condition");
+    }
+    if (meaningfulValue(sourceRecipe.notes) && !meaningfulValue(existingRecipe.notes)) {
+      existingRecipe.notes = sourceRecipe.notes;
+      mergedFields.push("recipe_notes");
     }
     targetPayload.recipe = sanitizeRecipeFactForMeta(existingRecipe);
   }

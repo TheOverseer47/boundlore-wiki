@@ -80,7 +80,8 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | Relations persisted | `crafted_from` (per ingredient), `crafted_at` (station) |
 | `ingredient_of` | **Not** persisted (derived/inverse for later widgets) |
 | Duplicate guard | Same user + target + matching recipe fingerprint blocks re-submit |
-| Admin preview | Compact Add Recipe summary + CRAFT relation lines |
+| Admin preview | Compact Add Recipe summary + CRAFT relation lines + merge policy note |
+| Admin approve & merge | Recipe block + CRAFT relations merged into target item (P0-D2) |
 
 ### Files
 
@@ -89,22 +90,21 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | `js/contribution-flow.js` | `add_recipe` mask, recipe form, payload + relations builder |
 | `js/wiki-entry-layout.js` | Item-page `Add Recipe` CTA |
 | `js/create-post.js` | Recipe form init, duplicate params on submit |
-| `js/knowledge-relations.js` | `buildCraftRelationsFromRecipe`, `compareRecipeContributionDuplicates` (existing) |
-| `wiki/admin/index.html` | `renderRecipeContributionSummaryA` |
+| `js/knowledge-relations.js` | `mergeRecipePayloadBlock`, `mergeContributionIntoTarget`, craft relation dedupe |
+| `wiki/admin/index.html` | `renderRecipeContributionSummaryA`, approve merge preview |
 
-### Still deferred (P0-D2+)
+### Still deferred (P0-D3+)
 
-- Approve & merge recipe into target item
 - Recipe live widget on item pages
 - Usage widget on resource pages
-- Recipe conflict / duplicate E2E beyond pending fingerprint
+- Recipe conflict / duplicate E2E beyond pending fingerprint (P0-D4)
 - `/wiki/resources/` landing
 
 ---
 
 ## 4. CRAFT Relations (P0-B, unchanged)
 
-`crafted_from`, `crafted_at`, `ingredient_of`, `unlocks` — prepared in merge/serializer/SQL. Add Recipe UI writes payload/relations at submit (P0-D1); merge on approve is P0-D2.
+`crafted_from`, `crafted_at`, `ingredient_of`, `unlocks` — prepared in merge/serializer/SQL. Add Recipe UI writes payload/relations at submit (P0-D1); merge on approve implemented (P0-D2).
 
 ---
 
@@ -125,13 +125,13 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 |------|----------|
 | `/wiki/resources/` landing | P0-E |
 | Usage / Recipe widgets (live) | P0-F |
-| Recipe approve/merge | P0-D2 |
 | Evidence-tier badge UI | P0-G |
 | `ingredient_of` auto-persist on resource pages | P0-F |
-| E2E T1 full chain (usage step) | After P0-D2/F |
+| E2E T1 full chain (usage step) | After P0-F |
+| Recipe duplicate/conflict E2E | P0-D4 |
 
 ---
 
 ## 7. Next Step
 
-**P0-D2:** Admin Preview/Merge for Add Recipe
+**P0-D3/D4/F:** Live recipe display follow-up, duplicate/conflict E2E, Usage/Recipe widgets

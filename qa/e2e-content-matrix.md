@@ -29,16 +29,17 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Milestone:** P0  
 **Target:** existing `qa-staff-of-fire-*`  
-**P0-D1 status:** Steps 1–2 implemented (Add Recipe intent + pending payload). Steps 3–6 deferred (merge, widgets, conflict).
+**P0-D1 status:** Steps 1–2 implemented (Add Recipe intent + pending payload).  
+**P0-D2 status:** Step 3 merge implemented (admin approve merges recipe + CRAFT relations into target). Steps 4–6 deferred (widgets, conflict).
 
-| Step | Action | Expected | P0-D1 |
-|------|--------|----------|-------|
-| 1 | On Staff page, click "Add Recipe" intent | Form: ingredients, quantities, station | `[~]` manual |
-| 2 | Submit: Ember Shard ×3, Wood ×1, Station "Forge" | Goes to review queue, NOT auto-published | `[~]` manual |
-| 3 | Admin approves | Recipe widget on Staff page | `[ ]` P0-D2 |
+| Step | Action | Expected | Status |
+|------|--------|----------|--------|
+| 1 | On Staff page, click "Add Recipe" intent | Form: ingredients, quantities, station | `[x]` P0-D1 |
+| 2 | Submit: Ember Shard ×3, Wood ×1, Station "Forge" | Goes to review queue, NOT auto-published | `[x]` P0-D1 |
+| 3 | Admin approves | Recipe block + relations merged into Staff BLMETA | `[x]` P0-D2 |
 | 4 | View Ember Shard page | Usage entry pointing to Staff | `[ ]` P0-F |
 | 5 | Recipes browse (virtual list) | Staff recipe visible | `[ ]` P1 |
-| 6 | Submit conflicting second recipe | Coexists as `reported`, not overwritten | `[ ]` P0-D2 |
+| 6 | Submit conflicting second recipe | Coexists as `reported`, not overwritten | `[ ]` P0-D4 |
 
 **Relations expected on submit:** `crafted_from` ×2, `crafted_at` → Forge (no stubs pre-approval)
 
