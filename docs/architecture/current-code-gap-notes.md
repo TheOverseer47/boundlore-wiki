@@ -1,7 +1,7 @@
 # Current Code Gap Notes
 
 Audit of BoundLore codebase against the content architecture blueprint.  
-**Last updated:** 2026-07-10 (P0-D3: Live Recipe Display on item pages)
+**Last updated:** 2026-07-10 (P0-D4: Recipe duplicate/conflict handling)
 
 ---
 
@@ -83,6 +83,8 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | Admin preview | Compact Add Recipe summary + CRAFT relation lines + merge policy note |
 | Admin approve & merge | Recipe block + CRAFT relations merged into target item (P0-D2) |
 | Live item display | `Crafting Recipe` section on item pages with payload + relation fallback (P0-D3) |
+| Duplicate handling | Same fingerprint → `recipe_confirmed` no-op; relations `report_count` bump (P0-D4) |
+| Conflict handling | Qty/ingredient mismatch → `needs_review`; admin approve blocked (P0-D4) |
 
 ### Files
 
@@ -92,12 +94,21 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | `js/wiki-entry-layout.js` | Item-page `Add Recipe` CTA; `Crafting Recipe` display section |
 | `js/create-post.js` | Recipe form init, duplicate params on submit |
 | `js/knowledge-relations.js` | `mergeRecipePayloadBlock`, `mergeContributionIntoTarget`, craft relation dedupe |
-| `wiki/admin/index.html` | `renderRecipeContributionSummaryA`, approve merge preview |
+| `wiki/admin/index.html` | Recipe preview, duplicate/conflict badges, blocked conflict approve |
 
-### Still deferred (P0-D4+)
+### Duplicate behavior (P0-D4)
+
+- Submit is **not** blocked against an already-merged target (only same-user pending duplicate).
+- Approve runs `recipe_confirmed` — no second recipe block, no duplicate CRAFT rows.
+
+### Conflict behavior (P0-D4)
+
+- `recipe_ingredients` / CRAFT quantity mismatch → conflicts logged, existing recipe kept.
+- Admin approve **blocked** when preview detects recipe conflicts.
+
+### Still deferred (P0-E+)
 
 - Usage widget on resource pages
-- Recipe conflict / duplicate E2E beyond pending fingerprint (P0-D4)
 - `/wiki/resources/` landing
 - Full Recipe browse widget / index (P0-F)
 
@@ -129,10 +140,10 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | Evidence-tier badge UI | P0-G |
 | `ingredient_of` auto-persist on resource pages | P0-F |
 | E2E T1 full chain (usage step) | After P0-F |
-| Recipe duplicate/conflict E2E | P0-D4 |
+| Recipe duplicate/conflict E2E | P0-D4 (done) |
 
 ---
 
 ## 7. Next Step
 
-**P0-D4/F:** Duplicate/conflict E2E, Usage widget, full Recipe browse widget
+**P0-E/F:** Usage widget, `/wiki/resources/`, full Recipe browse widget

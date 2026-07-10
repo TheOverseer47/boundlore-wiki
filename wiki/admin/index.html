@@ -726,6 +726,39 @@ function isContributionPostA(post, meta) {
 
 // Compact list of what the contributor actually submitted, so admins can
 // review contributions without opening the raw HTML dump.
+function recipeMergePreviewStatusA(preview) {
+  if (!preview) return { isDuplicate: false, hasConflict: false };
+  const isDuplicate = (preview.willAdd || []).some(function(item) {
+    return item && item.field === "recipe_confirmed";
+  });
+  const hasConflict = !!(preview.willConflict && preview.willConflict.length)
+    || !!(preview.relationsConflict && preview.relationsConflict.length);
+  return { isDuplicate: isDuplicate, hasConflict: hasConflict };
+}
+
+function renderRecipeMergeStatusHtmlA(status) {
+  if (!status) return "";
+  if (status.hasConflict) {
+    return '<p style="font-size:0.8rem;color:#f0b27a;margin:8px 0 0;padding:8px 10px;background:rgba(240,178,122,0.12);border:1px solid rgba(240,178,122,0.35);border-radius:6px;">' +
+      "<strong>Recipe conflict</strong> — existing target recipe differs. Approve is blocked; reject or resolve manually.</p>";
+  }
+  if (status.isDuplicate) {
+    return '<p style="font-size:0.8rem;color:#9fd89f;margin:8px 0 0;padding:8px 10px;background:rgba(159,216,159,0.1);border:1px solid rgba(159,216,159,0.3);border-radius:6px;">' +
+      "<strong>Duplicate recipe</strong> — matches the target recipe. Approve confirms existing data (no second recipe block).</p>";
+  }
+  return "";
+}
+
+async function loadRecipeMergeStatusA(post, meta) {
+  if (!post || !meta || typeof KnowledgeRelations === "undefined") return null;
+  const info = KnowledgeRelations.getContributionInfo(post, meta);
+  if (!info || info.intent !== "add_recipe") return null;
+  const targetPost = await KnowledgeRelations.resolveContributionTargetPost(supabase, post, meta);
+  if (!targetPost) return null;
+  const preview = KnowledgeRelations.previewContributionMerge(post, meta, targetPost);
+  return { preview: preview, status: recipeMergePreviewStatusA(preview), targetPost: targetPost };
+}
+
 function renderContributionSubmittedFieldsA(info) {
   if (info && info.intent === "add_recipe") {
     return renderRecipeContributionSummaryA(info);
@@ -842,6 +875,19 @@ async function approveContributionA(target, options) {
   // Show the admin exactly what this merge will change before writing.
   if (!opts.skipPreviewConfirm && KnowledgeRelations.previewContributionMerge) {
     const preview = KnowledgeRelations.previewContributionMerge(target, meta, targetPost);
+    const recipeStatus = info.intent === "add_recipe" ? recipeMergePreviewStatusA(preview) : null;
+    if (recipeStatus && recipeStatus.hasConflict) {
+      const conflictLines = [];
+      (preview.willConflict || []).forEach(function(c) {
+        conflictLines.push(c.field + ": existing \"" + String(c.existing).slice(0, 80) + "\" vs submitted \"" + String(c.submitted).slice(0, 80) + "\"");
+      });
+      (preview.relationsConflict || []).forEach(function(c) {
+        conflictLines.push((c.label || c.relation_type || "relation") + ": existing \"" + String(c.existing).slice(0, 80) + "\" vs submitted \"" + String(c.submitted).slice(0, 80) + "\"");
+      });
+      throw new Error("Recipe conflict detected. Existing target recipe is kept unchanged.\n"
+        + "Reject this contribution or resolve manually before approving.\n\n"
+        + conflictLines.join("\n"));
+    }
     const lines = [];
     lines.push("Merge contribution into: " + (targetPost.title || targetPost.slug));
     lines.push("Entity type: " + (targetPost.category || "?") + " · Intent: " + preview.info.intent);
@@ -876,6 +922,9 @@ async function approveContributionA(target, options) {
       lines.push("  · Persists crafted_from + crafted_at on the target.");
       lines.push("  · ingredient_of is NOT persisted (derived/inverse only).");
       lines.push("  · Wood/Forge stay unresolved relation targets unless already published.");
+      if (recipeStatus && recipeStatus.isDuplicate) {
+        lines.push("  · DUPLICATE: matches existing target recipe — confirms data, no second recipe block.");
+      }
       const recipe = info.payload && info.payload.recipe;
       if (recipe) {
         const ing = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
@@ -1280,6 +1329,7 @@ async function loadPending() {
       discoveryBadge + testBadge + stubBadge + contributionBadge +
       "</div>" +
       contributionLine +
+      "<div class=\"bl-recipe-merge-status\" data-post-id=\"" + escapeHtmlA(post.id) + "\"></div>" +
       "<p style=\"color:var(--text-muted);font-size:0.85rem;margin-top:6px;\">By " + escapeHtmlA(authorName) + " &middot; " + new Date(post.created_at).toLocaleString() + "</p>" +
       "<div style=\"background:#fff;color:#111;padding:16px;border-radius:6px;margin:14px 0;max-height:320px;overflow-y:auto;\">" + post.content + "</div>" +
       "<div style=\"display:flex;gap:10px;\">" +
@@ -1287,6 +1337,22 @@ async function loadPending() {
       "<button class=\"btn-small\" style=\"background:#e05555;\" data-action=\"reject\" data-id=\"" + post.id + "\">Reject & Archive</button>" +
       "</div>";
     list.appendChild(div);
+
+    if (pendingContributionInfo && pendingContributionInfo.intent === "add_recipe") {
+      const statusSlot = div.querySelector(".bl-recipe-merge-status");
+      loadRecipeMergeStatusA(post, postMeta).then(function(result) {
+        if (!statusSlot || !result) return;
+        statusSlot.innerHTML = renderRecipeMergeStatusHtmlA(result.status);
+        if (result.status && result.status.hasConflict) {
+          const approveBtn = div.querySelector('[data-action="approve"]');
+          if (approveBtn) {
+            approveBtn.disabled = true;
+            approveBtn.title = "Recipe conflict — existing target values are kept unchanged";
+            approveBtn.style.opacity = "0.55";
+          }
+        }
+      }).catch(function() { /* best effort */ });
+    }
   });
 
   list.querySelectorAll("[data-action=\"approve\"]").forEach(function(btn) {
