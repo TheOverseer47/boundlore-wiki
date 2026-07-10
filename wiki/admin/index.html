@@ -294,6 +294,7 @@
 <script src="/js/facet-registry.js?v=2"></script>
 <script src="/js/knowledge-relations.js?v=20"></script>
 <script src="/js/entity-core.js?v=10"></script>
+<script src="/js/versioning-model.js?v=1"></script>
 <script src="/js/unresolved-targets.js?v=3"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
@@ -820,6 +821,13 @@ function renderRecipeContributionSummaryA(info) {
       '</dt><dd style="margin:0;color:var(--text-muted);">' + escapeHtmlA(String(row[1]).slice(0, 240)) + '</dd></div>';
   });
   html += "</dl>";
+  if (typeof BoundLoreVersioning !== "undefined") {
+    const versionHtml = BoundLoreVersioning.renderVersionBadgeGroup(
+      (recipe.version || recipe),
+      { groupClassName: "bl-version-badges-admin-preview" }
+    );
+    if (versionHtml) html += versionHtml;
+  }
   if (craftLines.length) {
     html += '<p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 10px;">CRAFT relations: ' +
       escapeHtmlA(craftLines.join(", ")) + "</p>";

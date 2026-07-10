@@ -96,6 +96,23 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P0.5-F — Versioning Metadata Baseline
+
+**Milestone:** P0.5-F (version metadata helpers + tolerant readers; no DB, no history UI, no backfill)
+
+| Test | URL / target | Expected | Result |
+|------|--------------|----------|--------|
+| QA Staff no version badge | `qa-staff-of-fire-2b742628` | Recipe ok; Wood/Forge Entry needed; no version badge | `[x]` |
+| QA Ember no version badge | `qa-ember-shard-511160` | Resource + facets + Used In; no version badge | `[x]` |
+| Search title / mining / wood / forge | `/wiki/search/?q=...` | P0.5-E results unchanged | `[x]` |
+| Create prefill Wood / Forge | create-post prefill URLs | Prefill loads; not submitted | `[x]` |
+| Resources / Browse / Items / Homepage | regression URLs | No regressions | `[x]` |
+| Admin optional | `/wiki/admin/` | Queue read-only; conflict pending | `[~]` Access Denied in automation |
+
+**Not built in P0.5-F:** Version History widget, patch management UI, DB migration, backfill, fake game versions.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

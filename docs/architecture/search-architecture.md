@@ -8,6 +8,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P0.5-E code baseline:** `js/search-signals.js` builds in-memory search documents from published post BLMETA (title, aliases, domain/subtype, facets, resource/recipe payload, relations) plus derived missing-entry suggestions (Wood, Forge). `js/search.js` ranks client-side over fetched published posts; `/wiki/search/?q=` provides full results page. **No** Postgres `search_documents` table, **no** FTS/pg_trgm, **no** embeddings, **no** compound-intent parser yet.
 
+**P0.5-F addition:** When version metadata exists on facts/relations/recipes/facets, low-weight version signals (`game_version`, validity range, superseded/historical) are indexed client-side. No ranking change when version fields are absent.
+
 ---
 
 ## Goals

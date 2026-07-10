@@ -384,7 +384,7 @@ window.BoundLoreFacetRegistry = (function() {
 
     if (!value) return null;
 
-    return {
+    const entry = {
       groupKey: normalizedGroup,
       value: value,
       source: entrySource,
@@ -392,6 +392,13 @@ window.BoundLoreFacetRegistry = (function() {
       label: formatFacetValueLabel(normalizedGroup, value),
       groupLabel: formatFacetGroupLabel(normalizedGroup),
     };
+    if (typeof BoundLoreVersioning !== "undefined") {
+      const version = BoundLoreVersioning.extractVersionMetadata(rawEntry);
+      if (version) entry.version = version;
+    } else if (rawEntry && rawEntry.version) {
+      entry.version = rawEntry.version;
+    }
+    return entry;
   }
 
   function normalizeFacets(input) {

@@ -1244,7 +1244,7 @@ window.EntityCore = (function() {
 
   function sanitizeRelationForStorage(rel) {
     const built = enrichRelation(rel);
-    return {
+    const sanitized = {
       group: String(built.group || "").slice(0, 40),
       relation_type: String(built.relation_type || "related_discovery").slice(0, 40),
       title: String(built.title || "").slice(0, 140),
@@ -1265,6 +1265,12 @@ window.EntityCore = (function() {
       report_count: Number.isFinite(Number(built.report_count)) ? Math.max(1, Number(built.report_count)) : 1,
       direction: built.direction ? String(built.direction).slice(0, 20) : "outbound",
     };
+    if (typeof BoundLoreVersioning !== "undefined") {
+      return BoundLoreVersioning.preserveVersionFieldsOnRecord(sanitized, built);
+    }
+    if (built.version) sanitized.version = built.version;
+    if (built.qualifiers) sanitized.qualifiers = built.qualifiers;
+    return sanitized;
   }
 
   function getCanonicalName(meta, post) {

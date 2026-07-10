@@ -274,6 +274,41 @@ window.BoundLoreSearchSignals = (function() {
     return bucket.signals;
   }
 
+  function collectVersionSearchSignalsForPost(post, meta) {
+    const bucket = { signals: [], _seen: new Set() };
+    if (typeof BoundLoreVersioning === "undefined") return bucket.signals;
+
+    const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+      ? meta.discovery_payload
+      : {};
+    const recipe = payload.recipe && typeof payload.recipe === "object" ? payload.recipe : null;
+
+    BoundLoreVersioning.collectVersionSearchSignals(recipe).forEach(function(value) {
+      pushSignal(bucket, value, { group: "version", label: "Version" });
+    });
+    BoundLoreVersioning.collectVersionSearchSignals(meta).forEach(function(value) {
+      pushSignal(bucket, value, { group: "version", label: "Version" });
+    });
+
+    const relations = Array.isArray(meta.discovery_relations) ? meta.discovery_relations : [];
+    relations.forEach(function(rel) {
+      BoundLoreVersioning.collectVersionSearchSignals(rel).forEach(function(value) {
+        pushSignal(bucket, value, { group: "version", label: "Version" });
+      });
+    });
+
+    if (typeof BoundLoreFacetRegistry !== "undefined") {
+      const facets = BoundLoreFacetRegistry.collectFacetSignals(meta, post) || [];
+      facets.forEach(function(entry) {
+        BoundLoreVersioning.collectVersionSearchSignals(entry).forEach(function(value) {
+          pushSignal(bucket, value, { group: "version", label: "Version" });
+        });
+      });
+    }
+
+    return bucket.signals;
+  }
+
   function buildDisplayLabels(post, meta, signalGroups) {
     const labels = [];
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {
@@ -304,6 +339,7 @@ window.BoundLoreSearchSignals = (function() {
       resource: collectResourceSearchSignals(safePost, meta),
       recipe: collectRecipeSearchSignals(safePost, meta),
       relations: collectRelationSearchSignals(safePost, meta),
+      version: collectVersionSearchSignalsForPost(safePost, meta),
       text: collectTextSignals(safePost),
     };
 
@@ -473,6 +509,7 @@ window.BoundLoreSearchSignals = (function() {
     if (group === "resource") return WEIGHTS.resource;
     if (group === "recipe") return WEIGHTS.recipe;
     if (group === "relations") return WEIGHTS.relation;
+    if (group === "version") return WEIGHTS.weak;
     return WEIGHTS.text;
   }
 
@@ -584,6 +621,7 @@ window.BoundLoreSearchSignals = (function() {
     collectResourceSearchSignals: collectResourceSearchSignals,
     collectRecipeSearchSignals: collectRecipeSearchSignals,
     collectRelationSearchSignals: collectRelationSearchSignals,
+    collectVersionSearchSignalsForPost: collectVersionSearchSignalsForPost,
     collectAliasSearchSignals: collectAliasSearchSignals,
     collectUnresolvedSearchSignals: collectUnresolvedSearchSignals,
     buildSearchDocument: buildSearchDocument,

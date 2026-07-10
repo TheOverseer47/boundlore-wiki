@@ -1049,6 +1049,9 @@ window.WikiEntryLayout = (function() {
         unlockCondition: unlock,
         evidenceTier: meaningful(recipe.evidence_tier),
         confidence: meaningful(recipe.confidence),
+        version: typeof BoundLoreVersioning !== "undefined"
+          ? BoundLoreVersioning.extractVersionMetadata(recipe)
+          : (recipe.version || null),
       };
     }
 
@@ -1144,14 +1147,20 @@ window.WikiEntryLayout = (function() {
   }
 
   function renderRecipeEvidenceMeta(recipeDisplay) {
-    if (!recipeDisplay) return "";
+    let html = "";
     const badgeHtml = renderEvidenceBadgeGroupSafe(
       recipeDisplay.evidenceTier,
       recipeDisplay.confidence,
       { groupClassName: "bl-evidence-badges-recipe" }
     );
-    if (badgeHtml) return badgeHtml;
-    return "";
+    if (badgeHtml) html += badgeHtml;
+    if (typeof BoundLoreVersioning !== "undefined" && recipeDisplay && recipeDisplay.version) {
+      const versionHtml = BoundLoreVersioning.renderVersionBadgeGroup(recipeDisplay.version, {
+        groupClassName: "bl-version-badges-recipe",
+      });
+      if (versionHtml) html += versionHtml;
+    }
+    return html;
   }
 
   function renderRecipeSectionBody(recipeDisplay) {

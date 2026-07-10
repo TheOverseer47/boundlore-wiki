@@ -309,7 +309,7 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | 3 | **Search title/excerpt only** | Client-side structured search signals + ranking (P0.5-E) | Postgres `search_documents` + FTS/pg_trgm | **P0.5** (partial: client baseline) |
 | 4 | **No station_type** | `station_type` registered in entity-core + safe create prefill (P0.5-D); Forge still unresolved text | SYSTEM/station_type entity via manual submit; no auto-promotion | **P0.5** (partial: baseline + prefill) |
 | 5 | **Resource Classification Display** | ~~Detail shows Category/Subcategory/Type as generic Item~~ | P0.5-A: resource detail shows Type/Source/Rarity; sidebar Type Resource | **Done (P0.5-A)** |
-| 6 | **No versioned statements** | Merge overwrites recipe/facts | valid_from/until/superseded_by; history widget | **P0.5** schema / **P2** UX |
+| 6 | **No versioned statements** | Version metadata helpers + tolerant readers (P0.5-F) | valid_from/until/superseded_by; history widget | **P0.5** (partial: metadata baseline) |
 | 7 | **No variant/instance model** | variant_of exists but no formal policy | Variant blocks + promotion rules | **P1** |
 | 8 | **Browse patch-mode visibility** | ~~`/wiki/browse/` hidden/blank like prior homepage issue~~ | P0.5-A: sync patch-mode script order fix | **Done (P0.5-A)** |
 | 9 | **No relation qualifiers spec in code** | quantity/unit ad hoc in recipe payload | Typed qualifiers object on all relations | **P1** |
@@ -432,3 +432,20 @@ Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started a
 | Not built | Persistent `search_documents` table, Postgres FTS/pg_trgm, compound query parser, semantic search, facet browse filters | Deferred |
 
 **Files touched:** `js/search-signals.js` (new), `js/search.js`, `wiki/search/index.html` (new), `css/style.css`, `index.html`, `wiki/post/index.html`, `wiki/browse/index.html`, `wiki/resources/index.html`, `wiki/items/index.html`.
+
+---
+
+## 7. P0.5-F — Versioning Metadata Baseline
+
+**Status:** Complete (code helpers + tolerant readers; no DB schema, no history UI, no backfill).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| Versioning module | `js/versioning-model.js` → `window.BoundLoreVersioning` | normalize/extract/attach, current/historical/superseded checks, optional badges |
+| Facts / relations / recipes / facets | Readers preserve `version` + relation `qualifiers`; sanitize no longer strips version fields | Old posts without version data unchanged |
+| Recipe merge | `sanitizeRecipeFactForMeta` + merge preserve incoming `version` when present | QA Staff recipe untouched; no approve run |
+| Search signals | Low-weight version signals when metadata present | No change when version absent |
+| Display | Optional version badges on recipe/admin preview only when data exists | QA Staff / Ember show no version badges |
+| Not built | Version History widget, patch UI, DB migration, backfill, fake game versions | Deferred P2 |
+
+**Files touched:** `js/versioning-model.js` (new), `js/knowledge-relations.js`, `js/entity-core.js`, `js/facet-registry.js`, `js/wiki-entry-layout.js`, `js/search-signals.js`, `css/style.css`, `wiki/post/index.html`, `wiki/search/index.html`, `wiki/admin/index.html`, `wiki/resources/index.html`.

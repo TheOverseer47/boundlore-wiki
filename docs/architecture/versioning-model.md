@@ -133,8 +133,9 @@ Intent: **Add Version Change**
 
 ## P0.5 Scope
 
-- Add nullable `game_version`, `valid_from`, `valid_until`, `superseded_by` to BLMETA schema documentation and example JSON
-- No merge-engine behavior change yet
+- **P0.5-F (done):** `js/versioning-model.js` helpers; nullable `game_version`, `valid_from`, `valid_until`, `superseded_by` tolerated on facts, relations, recipes, facets; sanitize/merge preserve version metadata when present; optional badges only when data exists
+- Add nullable version fields to BLMETA schema documentation and example JSON (docs)
+- No merge-engine rank/deprecation behavior change yet
 - No Version History widget
 
 **P2:** Full UX, historical search toggle, patch diff views.

@@ -374,15 +374,24 @@ window.KnowledgeRelations = (function() {
     if (meaningfulValue(recipe.notes)) out.notes = String(recipe.notes).slice(0, 500);
     if (Array.isArray(recipe.ingredients)) {
       out.ingredients = recipe.ingredients.slice(0, 24).map(function(row) {
-        return {
+        const ingredient = {
           name: String((row && (row.name || row.title || row.target_name)) || "").slice(0, 140),
           quantity: row && row.quantity != null && Number.isFinite(Number(row.quantity)) ? Number(row.quantity) : null,
           unit: row && row.unit ? String(row.unit).slice(0, 24) : null,
           target_entity_key: row && row.target_entity_key ? String(row.target_entity_key).slice(0, 160) : null,
           evidence_tier: row && row.evidence_tier ? String(row.evidence_tier).slice(0, 16) : null,
         };
+        if (typeof BoundLoreVersioning !== "undefined") {
+          return BoundLoreVersioning.preserveVersionFieldsOnRecord(ingredient, row);
+        }
+        if (row && row.version) ingredient.version = row.version;
+        return ingredient;
       }).filter(function(row) { return !!row.name; });
     }
+    if (typeof BoundLoreVersioning !== "undefined") {
+      return BoundLoreVersioning.preserveVersionFieldsOnRecord(out, recipe);
+    }
+    if (recipe.version) out.version = recipe.version;
     return Object.keys(out).length ? out : null;
   }
 
@@ -446,6 +455,10 @@ window.KnowledgeRelations = (function() {
     if (meaningfulValue(sourceRecipe.notes) && !meaningfulValue(existingRecipe.notes)) {
       existingRecipe.notes = sourceRecipe.notes;
       mergedFields.push("recipe_notes");
+    }
+    if (!existingRecipe.version && sourceRecipe.version) {
+      existingRecipe.version = sourceRecipe.version;
+      mergedFields.push("recipe_version");
     }
     targetPayload.recipe = sanitizeRecipeFactForMeta(existingRecipe);
   }
@@ -1472,7 +1485,7 @@ window.KnowledgeRelations = (function() {
       canonical = EntityCore.extractCanonicalIdentity(built.title, category).canonical_name || built.title;
       entityKey = EntityCore.buildEntityKey(category, canonical);
     }
-    return {
+    const sanitized = {
       group: String(built.group || "").slice(0, 40),
       relation_type: String(built.relation_type || "related_discovery").slice(0, 40),
       title: String(built.title || "").slice(0, 140),
@@ -1503,6 +1516,12 @@ window.KnowledgeRelations = (function() {
       evidence_tier: built.evidence_tier ? String(built.evidence_tier).slice(0, 16) : null,
       notes: built.notes ? String(built.notes).slice(0, 400) : null,
     };
+    if (typeof BoundLoreVersioning !== "undefined") {
+      return BoundLoreVersioning.preserveVersionFieldsOnRecord(sanitized, built);
+    }
+    if (built.version) sanitized.version = built.version;
+    if (built.qualifiers) sanitized.qualifiers = built.qualifiers;
+    return sanitized;
   }
 
   function getFollowUpQuestions(entry) {
