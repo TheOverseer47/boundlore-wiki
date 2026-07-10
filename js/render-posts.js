@@ -875,3 +875,488 @@ function escapeHtmlRP(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+// ---------------------------------------------------------
+// Resources landing (/wiki/resources/)
+// ---------------------------------------------------------
+
+function isResourcePostRP(post, meta) {
+  const m = meta || parsePostMetaRP(post && post.content);
+  if (typeof isResourceDiscoveryMeta === "function") {
+    return isResourceDiscoveryMeta(m);
+  }
+  if (m.entity_subtype === "resource" || m.discovery_form === "resource_quick") return true;
+  const payload = m.discovery_payload;
+  return !!(payload && (payload.discovery_type === "resource" || payload.resource));
+}
+
+function getResourceFactsRP(meta) {
+  const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+    ? meta.discovery_payload
+    : {};
+  const resource = payload.resource && typeof payload.resource === "object" ? payload.resource : {};
+  const sourceType = resource.source_type || payload.source_type || "";
+  const sourceDetail = resource.source_detail || payload.source_detail || "";
+  const rarity = resource.rarity || payload.rarity || "";
+  const biomeName = resource.biome || payload.region_name || payload.found_in || "";
+  return {
+    sourceType: sourceType,
+    sourceDetail: sourceDetail,
+    rarity: rarity,
+    biomeName: biomeName,
+  };
+}
+
+function normalizeResourceNameKeyRP(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function getResourceBiomeHtmlRP(meta, biomeName) {
+  const name = String(biomeName || "").trim();
+  if (!name) return "";
+  const rels = meta && Array.isArray(meta.discovery_relations) ? meta.discovery_relations : [];
+  let match = null;
+  rels.forEach(function(rel) {
+    if (match || !rel || !rel.title) return;
+    const type = String(rel.relation_type || "").toLowerCase();
+    if (type !== "found_in" && type !== "located_in") return;
+    if (normalizeResourceNameKeyRP(rel.title) !== normalizeResourceNameKeyRP(name)) return;
+    if (rel.slug || rel.id) match = rel;
+  });
+  if (match && typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.buildRelationHref) {
+    const href = KnowledgeRelations.buildRelationHref(match);
+    if (href) {
+      return '<a class="bl-resource-card-link" href="' + escapeHtmlRP(href) + '">' + escapeHtmlRP(name) + "</a>";
+    }
+  }
+  return escapeHtmlRP(name);
+}
+
+function formatResourceQuantityRP(quantity, unit) {
+  const cleanUnit = unit ? String(unit).trim() : "";
+  if (quantity != null && Number.isFinite(Number(quantity))) {
+    const qty = Number(quantity);
+    return cleanUnit ? (qty + " " + cleanUnit) : String(qty);
+  }
+  return cleanUnit || "";
+}
+
+function extractResourceUsagesRP(relations) {
+  const list = Array.isArray(relations) ? relations : [];
+  const seen = new Set();
+  const usages = [];
+  list.forEach(function(rel) {
+    if (!rel) return;
+    const type = String(rel.relation_type || "").toLowerCase();
+    if (type !== "ingredient_of") return;
+    if (rel.direction !== "inbound" && !rel.auto_inferred) return;
+    const title = typeof EntityCore !== "undefined"
+      ? EntityCore.getRelationDisplayName(rel)
+      : (rel.title || "Entry");
+    const key = (rel.slug || title || "").toLowerCase();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    const href = typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.buildRelationHref
+      ? KnowledgeRelations.buildRelationHref(rel)
+      : (rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : "");
+    usages.push({
+      title: title,
+      href: href,
+      quantityLabel: formatResourceQuantityRP(rel.quantity, rel.unit),
+      station: rel.crafting_station || rel.station || "",
+    });
+  });
+  return usages;
+}
+
+async function attachResourceUsagesRP(posts) {
+  if (!Array.isArray(posts) || !posts.length) return [];
+  const enriched = [];
+  for (let i = 0; i < posts.length; i += 1) {
+    const post = posts[i];
+    const meta = parsePostMetaRP(post.content || "");
+    let usages = [];
+    try {
+      if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.fetchInboundRelations) {
+        const inbound = await KnowledgeRelations.fetchInboundRelations(supabase, post, meta);
+        usages = extractResourceUsagesRP(inbound);
+      }
+    } catch (err) {
+      console.warn("Resource usage lookup failed:", err);
+    }
+    enriched.push(Object.assign({}, post, { _resourceUsages: usages }));
+  }
+  return enriched;
+}
+
+function getResourceFilterFromUrlRP(key) {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    return (params.get(key) || "").trim().toLowerCase();
+  } catch (err) {
+    return "";
+  }
+}
+
+function getResourceSearchFromUrlRP() {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    return (params.get("q") || "").trim().toLowerCase();
+  } catch (err) {
+    return "";
+  }
+}
+
+function getResourceSortFromUrlRP() {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    const sort = (params.get("sort") || "name").toLowerCase().trim();
+    if (["name", "newest", "oldest"].includes(sort)) return sort;
+    return "name";
+  } catch (err) {
+    return "name";
+  }
+}
+
+function setResourceFilterUrlParam(key, value) {
+  const url = new URL(window.location.href);
+  if (!value) url.searchParams.delete(key);
+  else url.searchParams.set(key, value);
+  window.history.replaceState({}, "", url.toString());
+}
+
+function matchesResourceSearchRP(post, meta, query) {
+  if (!query) return true;
+  const facts = getResourceFactsRP(meta);
+  const displayName = typeof EntityCore !== "undefined"
+    ? EntityCore.getDisplayName(meta, post)
+    : (post.title || "");
+  const haystack = [
+    displayName,
+    post.title || "",
+    facts.sourceType,
+    facts.sourceDetail,
+    facts.rarity,
+    facts.biomeName,
+    String(post.content || "").replace(/<[^>]*>/g, " "),
+  ].join(" ").toLowerCase();
+  return query.split(/\s+/).filter(Boolean).every(function(term) {
+    return haystack.includes(term);
+  });
+}
+
+function sortResourcePostsRP(posts, sortMode) {
+  const copy = posts.slice();
+  if (sortMode === "newest") {
+    return copy.sort(function(a, b) {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  }
+  if (sortMode === "oldest") {
+    return copy.sort(function(a, b) {
+      return new Date(a.created_at) - new Date(b.created_at);
+    });
+  }
+  return copy.sort(function(a, b) {
+    const metaA = parsePostMetaRP(a.content || "");
+    const metaB = parsePostMetaRP(b.content || "");
+    const nameA = (typeof EntityCore !== "undefined"
+      ? EntityCore.getDisplayName(metaA, a)
+      : a.title) || "";
+    const nameB = (typeof EntityCore !== "undefined"
+      ? EntityCore.getDisplayName(metaB, b)
+      : b.title) || "";
+    return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+  });
+}
+
+function renderResourceUsageBlockRP(usages) {
+  if (!usages || !usages.length) {
+    return '<p class="bl-resource-card-empty">No known usage yet</p>';
+  }
+  let html = '<div class="bl-resource-card-usage-list">';
+  usages.forEach(function(usage) {
+    html += '<div class="bl-resource-card-usage-item">';
+    html += '<span class="bl-resource-card-usage-label">Used in</span> ';
+    if (usage.href) {
+      html += '<a class="bl-resource-card-link" href="' + escapeHtmlRP(usage.href) + '">' +
+        escapeHtmlRP(usage.title) + "</a>";
+    } else {
+      html += '<span>' + escapeHtmlRP(usage.title) + "</span>";
+    }
+    if (usage.quantityLabel) {
+      html += '<span class="bl-resource-card-usage-meta">Quantity: ' + escapeHtmlRP(usage.quantityLabel) + "</span>";
+    }
+    if (usage.station) {
+      html += '<span class="bl-resource-card-usage-meta">Station: ' + escapeHtmlRP(usage.station) + "</span>";
+    }
+    html += "</div>";
+  });
+  html += "</div>";
+  return html;
+}
+
+function renderResourceCardRP(post) {
+  const meta = parsePostMetaRP(post.content || "");
+  const facts = getResourceFactsRP(meta);
+  const displayName = typeof EntityCore !== "undefined"
+    ? EntityCore.getDisplayName(meta, post)
+    : (post.title || "Untitled");
+  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const sourceTypeLabel = facts.sourceType
+    ? humanizeCompactValueRP(facts.sourceType)
+    : "Unknown source";
+  const sourceDetailLabel = facts.sourceDetail || "";
+  const rarityLabel = facts.rarity ? humanizeCompactValueRP(facts.rarity) : "Unknown";
+  const biomeHtml = facts.biomeName
+    ? getResourceBiomeHtmlRP(meta, facts.biomeName)
+    : "";
+  const usages = post._resourceUsages || [];
+
+  const card = document.createElement("article");
+  card.className = "bl-resource-card";
+  card.innerHTML =
+    '<div class="bl-resource-card-head">' +
+      '<div class="bl-resource-card-title-wrap">' +
+        '<h3 class="bl-resource-card-title"><a href="' + escapeHtmlRP(postUrl) + '">' +
+          escapeHtmlRP(displayName) + "</a></h3>" +
+        '<div class="bl-resource-card-tags">' +
+          '<span class="bl-tag bl-tag-type">Resource</span>' +
+        "</div>" +
+      "</div>" +
+    "</div>" +
+    '<dl class="bl-resource-card-facts">' +
+      '<div class="bl-resource-card-fact"><dt>Source Type</dt><dd>' + escapeHtmlRP(sourceTypeLabel) + "</dd></div>" +
+      (sourceDetailLabel
+        ? '<div class="bl-resource-card-fact"><dt>Source Detail</dt><dd>' + escapeHtmlRP(sourceDetailLabel) + "</dd></div>"
+        : "") +
+      '<div class="bl-resource-card-fact"><dt>Rarity</dt><dd>' + escapeHtmlRP(rarityLabel) + "</dd></div>" +
+      '<div class="bl-resource-card-fact"><dt>Found In</dt><dd>' +
+        (biomeHtml || '<span class="bl-resource-card-empty">No biome documented yet</span>') +
+      "</dd></div>" +
+    "</dl>" +
+    '<div class="bl-resource-card-usage">' +
+      renderResourceUsageBlockRP(usages) +
+    "</div>";
+
+  return card;
+}
+
+function renderResourcesFilterControls(container, state) {
+  const host = container.parentElement;
+  if (!host) return;
+
+  const controlsId = "resourcesFilterControls";
+  let controls = host.querySelector("#" + controlsId);
+  if (!controls) {
+    controls = document.createElement("div");
+    controls.id = controlsId;
+    controls.className = "bl-category-filters bl-resources-filters";
+    controls.innerHTML =
+      '<div class="bl-category-filters-row">' +
+        '<div class="bl-category-filter-item bl-category-filter-search">' +
+          '<label for="blResourceSearchFilter">Search</label>' +
+          '<input id="blResourceSearchFilter" class="form-input" type="search" placeholder="Search resources..." />' +
+        "</div>" +
+        '<div class="bl-category-filter-item">' +
+          '<label for="blResourceSourceFilter">Source Type</label>' +
+          '<select id="blResourceSourceFilter" class="form-input">' +
+            '<option value="">All source types</option>' +
+            '<option value="mining">Mining</option>' +
+            '<option value="plant">Plant</option>' +
+            '<option value="creature-drop">Creature Drop</option>' +
+            '<option value="biome">Biome</option>' +
+            '<option value="water">Water</option>' +
+            '<option value="loot">Loot</option>' +
+            '<option value="unknown">Unknown</option>' +
+          "</select>" +
+        "</div>" +
+        '<div class="bl-category-filter-item">' +
+          '<label for="blResourceRarityFilter">Rarity</label>' +
+          '<select id="blResourceRarityFilter" class="form-input">' +
+            '<option value="">All rarities</option>' +
+            '<option value="common">Common</option>' +
+            '<option value="uncommon">Uncommon</option>' +
+            '<option value="rare">Rare</option>' +
+            '<option value="very-rare">Very Rare</option>' +
+            '<option value="epic">Epic</option>' +
+            '<option value="legendary">Legendary</option>' +
+            '<option value="unique">Unique</option>' +
+            '<option value="unknown">Unknown</option>' +
+          "</select>" +
+        "</div>" +
+        '<div class="bl-category-filter-item">' +
+          '<label for="blResourceSortFilter">Sort</label>' +
+          '<select id="blResourceSortFilter" class="form-input">' +
+            '<option value="name">Name (A–Z)</option>' +
+            '<option value="newest">Newest</option>' +
+            '<option value="oldest">Oldest</option>' +
+          "</select>" +
+        "</div>" +
+        '<button type="button" id="blResourceFilterReset" class="btn-small" style="background:#666;align-self:flex-end;">Reset</button>' +
+      "</div>" +
+      '<p id="blResourceFilterSummary" class="bl-category-filter-summary"></p>';
+    host.insertBefore(controls, container);
+  }
+
+  const searchFilter = controls.querySelector("#blResourceSearchFilter");
+  const sourceFilter = controls.querySelector("#blResourceSourceFilter");
+  const rarityFilter = controls.querySelector("#blResourceRarityFilter");
+  const sortFilter = controls.querySelector("#blResourceSortFilter");
+  const resetBtn = controls.querySelector("#blResourceFilterReset");
+  const summary = controls.querySelector("#blResourceFilterSummary");
+  if (!searchFilter || !sourceFilter || !rarityFilter || !sortFilter || !resetBtn || !summary) return;
+
+  searchFilter.value = state.searchQuery || "";
+  sourceFilter.value = state.sourceType || "";
+  rarityFilter.value = state.rarity || "";
+  sortFilter.value = state.sortMode || "name";
+
+  const searchLabel = state.searchQuery ? (' · Search: "' + state.searchQuery + '"') : "";
+  summary.textContent = "Showing " + state.visibleCount + " of " + state.totalCount + " resources" + searchLabel;
+
+  if (!searchFilter.dataset.bound) {
+    let searchTimer = null;
+    searchFilter.addEventListener("input", function() {
+      window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(function() {
+        setResourceFilterUrlParam("q", searchFilter.value.trim());
+        renderResourcesLanding();
+      }, 180);
+    });
+    searchFilter.dataset.bound = "1";
+  }
+
+  if (!sourceFilter.dataset.bound) {
+    sourceFilter.addEventListener("change", function() {
+      setResourceFilterUrlParam("source_type", sourceFilter.value);
+      renderResourcesLanding();
+    });
+    sourceFilter.dataset.bound = "1";
+  }
+
+  if (!rarityFilter.dataset.bound) {
+    rarityFilter.addEventListener("change", function() {
+      setResourceFilterUrlParam("rarity", rarityFilter.value);
+      renderResourcesLanding();
+    });
+    rarityFilter.dataset.bound = "1";
+  }
+
+  if (!sortFilter.dataset.bound) {
+    sortFilter.addEventListener("change", function() {
+      setResourceFilterUrlParam("sort", sortFilter.value === "name" ? "" : sortFilter.value);
+      renderResourcesLanding();
+    });
+    sortFilter.dataset.bound = "1";
+  }
+
+  if (!resetBtn.dataset.bound) {
+    resetBtn.addEventListener("click", function() {
+      setResourceFilterUrlParam("q", "");
+      setResourceFilterUrlParam("source_type", "");
+      setResourceFilterUrlParam("rarity", "");
+      setResourceFilterUrlParam("sort", "");
+      renderResourcesLanding();
+    });
+    resetBtn.dataset.bound = "1";
+  }
+}
+
+async function renderResourcesLanding() {
+  const container = document.getElementById("resourcesPostsList");
+  const emptyMsg = document.getElementById("resourcesPostsEmpty");
+  if (!container) return;
+
+  if (typeof ensureCategoryExtensionsLoaded === "function") {
+    await ensureCategoryExtensionsLoaded();
+  }
+
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("id, slug, title, category, content, is_discovery, post_type, created_at, updated_at")
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .eq("category", "items")
+    .order("created_at", { ascending: false });
+
+  container.innerHTML = "";
+
+  const resourcePosts = (Array.isArray(posts) ? posts : []).filter(function(post) {
+    const meta = parsePostMetaRP(post.content || "");
+    if (isContributionPostRP(post, meta)) return false;
+    return isResourcePostRP(post, meta);
+  });
+
+  const searchQuery = getResourceSearchFromUrlRP();
+  const sourceTypeFilter = getResourceFilterFromUrlRP("source_type");
+  const rarityFilter = getResourceFilterFromUrlRP("rarity");
+  const sortMode = getResourceSortFromUrlRP();
+
+  renderResourcesFilterControls(container, {
+    searchQuery: searchQuery,
+    sourceType: sourceTypeFilter,
+    rarity: rarityFilter,
+    sortMode: sortMode,
+    visibleCount: 0,
+    totalCount: resourcePosts.length,
+  });
+
+  if (error || !resourcePosts.length) {
+    if (emptyMsg) emptyMsg.style.display = "block";
+    renderResourcesFilterControls(container, {
+      searchQuery: searchQuery,
+      sourceType: sourceTypeFilter,
+      rarity: rarityFilter,
+      sortMode: sortMode,
+      visibleCount: 0,
+      totalCount: 0,
+    });
+    return { posts: [] };
+  }
+
+  const filtered = resourcePosts.filter(function(post) {
+    const meta = parsePostMetaRP(post.content || "");
+    const facts = getResourceFactsRP(meta);
+    if (searchQuery && !matchesResourceSearchRP(post, meta, searchQuery)) return false;
+    if (sourceTypeFilter && normalizeResourceNameKeyRP(facts.sourceType) !== sourceTypeFilter) return false;
+    if (rarityFilter) {
+      const rarityKey = normalizeResourceNameKeyRP(facts.rarity || "unknown");
+      if (rarityKey !== rarityFilter) return false;
+    }
+    return true;
+  });
+
+  renderResourcesFilterControls(container, {
+    searchQuery: searchQuery,
+    sourceType: sourceTypeFilter,
+    rarity: rarityFilter,
+    sortMode: sortMode,
+    visibleCount: filtered.length,
+    totalCount: resourcePosts.length,
+  });
+
+  if (!filtered.length) {
+    if (resourcePosts.length) {
+      container.innerHTML = '<p class="bl-resource-card-empty" style="padding:16px 0;">No resources match the current filters.</p>';
+      if (emptyMsg) emptyMsg.style.display = "none";
+    } else if (emptyMsg) {
+      emptyMsg.style.display = "block";
+    }
+    return { posts: [] };
+  }
+
+  if (emptyMsg) emptyMsg.style.display = "none";
+
+  const withUsages = await attachResourceUsagesRP(filtered);
+  const sorted = sortResourcePostsRP(withUsages, sortMode);
+
+  const grid = document.createElement("div");
+  grid.className = "bl-resource-card-grid";
+  sorted.forEach(function(post) {
+    grid.appendChild(renderResourceCardRP(post));
+  });
+  container.appendChild(grid);
+
+  return { posts: sorted };
+}

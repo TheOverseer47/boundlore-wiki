@@ -10,15 +10,16 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Milestone:** P0  
 **Slug idea:** `qa-ember-shard`  
-**P0-C status:** Steps 1, 2, 5 implemented (resource quick-add + synonym warning). Step 4 deferred (`/wiki/resources/`).  
-**P0-E1 status:** Step 3 usage display implemented (derived from merged Staff recipe / `crafted_from`). Step 6 deferred (no `ingredient_of` contribution path).
+**P0-C status:** Steps 1, 2, 5 implemented (resource quick-add + synonym warning).  
+**P0-E1 status:** Step 3 usage display on resource detail (derived from merged Staff recipe / `crafted_from`).  
+**P0-E2 status:** Step 4 Resources landing implemented (`/wiki/resources/`). Step 6 deferred (no `ingredient_of` contribution path).
 
 | Step | Action | Expected | P0-C |
 |------|--------|----------|------|
 | 1 | Resource Quick-Add: `QA Ember Shard`, mining, `QA Volcanic`, detail `red crystal nodes` | `entity_subtype: resource`, `discovery_payload.resource` | `[~]` manual |
 | 2 | Approve discovery | Published resource page | `[~]` needs admin session |
 | 3 | View resource detail page | `Used In` shows Staff link, 3 piece, Forge; no Add Recipe CTA | `[x]` P0-E1 |
-| 4 | View `/wiki/resources/` | Resource appears; filter "mining" works | `[ ]` P0-E |
+| 4 | View `/wiki/resources/` | QA Ember Shard visible; Mining filter works; Used In → Staff | `[x]` P0-E2 |
 | 5 | Second submit `QA EmberShard` | Synonym warning → `QA Ember Shard` | `[~]` manual |
 | 6 | Add Usage via contribution (`ingredient_of`) | Not required — usage derived from recipe merge; `ingredient_of` not persisted | `[~]` P0-E1 |
 
@@ -171,8 +172,9 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Visit empty resources page | Clean empty state, no spinner hang |
-| 2 | CTA visible | "Report a resource" or equivalent |
+| 2 | CTA visible | "Add Resource" links to `/wiki/create-post/?type=resource` |
 | 3 | No console errors | — |
+| 4 | With QA data | QA Ember Shard card visible with source + usage | `[x]` P0-E2 |
 
 ---
 

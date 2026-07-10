@@ -1,7 +1,7 @@
 # Current Code Gap Notes
 
 Audit of BoundLore codebase against the content architecture blueprint.  
-**Last updated:** 2026-07-10 (P0-E1: Usage widget from CRAFT relations/recipe data)
+**Last updated:** 2026-07-10 (P0-E2: `/wiki/resources/` landing page)
 
 ---
 
@@ -12,6 +12,7 @@ Audit of BoundLore codebase against the content architecture blueprint.
 | Route / path | Behavior |
 |--------------|----------|
 | `/wiki/create-post/?type=resource` | Discovery mode, category locked to `items`, Resource Quick-Add panel |
+| `/wiki/resources/` | Resource landing — filters published `items` with resource subtype/payload |
 | Items lean form → Item type `resource` | Switches to same Resource Quick-Add panel |
 
 ### Form fields (required: Resource Name + Source Type)
@@ -82,10 +83,47 @@ Resource Name, Source Type (mining/plant/creature-drop/biome/water/loot/unknown)
 
 ### Still deferred
 
-- `/wiki/resources/` landing
 - Evidence-tier badge UI
 - Full Recipe browse/index
 - Global cross-domain usage beyond CRAFT/recipe-derived paths
+
+---
+
+## 1c. Resources Landing (P0-E2)
+
+| Behavior | Status |
+|----------|--------|
+| Route | `/wiki/resources/` |
+| Data pool | Published `items` posts filtered by `isResourceDiscoveryMeta` |
+| Excludes | Contributions, deleted/archived, normal non-resource items |
+| Card fields | Name, Resource badge, source type/detail, rarity, found in, derived Used In |
+| Usage source | Inbound `ingredient_of` from P0-E1 (recipe / `crafted_from`); not pending conflict |
+| Filters | Search, source type, rarity; sort default A–Z by name |
+| CTA | `Add Resource` → `/wiki/create-post/?type=resource` |
+| Navigation | `Browse Resources` link on `/wiki/items/` (no global nav rework) |
+| `ingredient_of` persist | **No** |
+| Location stubs | `source_detail` (e.g. red crystal nodes) never linked as location |
+
+### QA verified
+
+- `qa-ember-shard-511160` visible on Resources landing with Mining, red crystal nodes, Unknown rarity, QA Volcanic, Used In → Staff (3 piece, Forge)
+
+### Files
+
+| File | Role |
+|------|------|
+| `wiki/resources/index.html` | Resources landing page |
+| `js/render-posts.js` | `renderResourcesLanding()`, resource cards + filters |
+| `wiki/items/index.html` | Browse Resources link |
+| `css/style.css` | Resource card styles |
+
+### Still deferred
+
+- Evidence-tier badge UI on resource cards
+- Full Recipe browse/index
+- Global economy / cross-domain usage index
+
+---
 
 ## 2. Synonym / Duplicate Warning (P0-C)
 
@@ -140,9 +178,8 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 - `recipe_ingredients` / CRAFT quantity mismatch → conflicts logged, existing recipe kept.
 - Admin approve **blocked** when preview detects recipe conflicts.
 
-### Still deferred (post P0-E1)
+### Still deferred (post P0-E2)
 
-- `/wiki/resources/` landing
 - Evidence-tier badge UI
 - Full Recipe browse widget / index (P0-F)
 
@@ -169,15 +206,13 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 | Area | Priority |
 |------|----------|
-| `/wiki/resources/` landing | P0-E |
 | Evidence-tier badge UI | P0-G |
 | Full Recipe browse/index | P0-F |
-| E2E T1 full chain (usage step) | P0-E1 done; `/wiki/resources/` still open |
+| E2E T1 full chain | P0-E2 done; final P0 acceptance regression still open |
 | Recipe duplicate/conflict E2E | P0-D4 (done) |
 
 ---
 
 ## 7. Next Step
 
-**P0-E:** `/wiki/resources/` landing  
-**P0-F/G:** Full Recipe browse widget, Evidence-tier badges
+**P0-F/G:** Full Recipe browse widget, Evidence-tier badges, final P0 acceptance regression
