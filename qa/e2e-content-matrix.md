@@ -12,14 +12,15 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 **Slug idea:** `qa-ember-shard`  
 **P0-C status:** Steps 1, 2, 5 implemented (resource quick-add + synonym warning).  
 **P0-E1 status:** Step 3 usage display on resource detail (derived from merged Staff recipe / `crafted_from`).  
-**P0-E2 status:** Step 4 Resources landing implemented (`/wiki/resources/`). Step 6 deferred (no `ingredient_of` contribution path).
+**P0-E2 status:** Step 4 Resources landing implemented (`/wiki/resources/`).  
+**P0-E3 status:** Evidence-tier badges on resource detail, recipe section, resources landing.
 
 | Step | Action | Expected | P0-C |
 |------|--------|----------|------|
 | 1 | Resource Quick-Add: `QA Ember Shard`, mining, `QA Volcanic`, detail `red crystal nodes` | `entity_subtype: resource`, `discovery_payload.resource` | `[~]` manual |
 | 2 | Approve discovery | Published resource page | `[~]` needs admin session |
-| 3 | View resource detail page | `Used In` shows Staff link, 3 piece, Forge; no Add Recipe CTA | `[x]` P0-E1 |
-| 4 | View `/wiki/resources/` | QA Ember Shard visible; Mining filter works; Used In → Staff | `[x]` P0-E2 |
+| 3 | View resource detail page | `Used In` shows Staff link, 3 piece, Forge; Evidence badges if present | `[x]` P0-E1/E3 |
+| 4 | View `/wiki/resources/` | QA Ember Shard visible; Mining filter; Used In → Staff; Evidence badges | `[x]` P0-E2/E3 |
 | 5 | Second submit `QA EmberShard` | Synonym warning → `QA Ember Shard` | `[~]` manual |
 | 6 | Add Usage via contribution (`ingredient_of`) | Not required — usage derived from recipe merge; `ingredient_of` not persisted | `[~]` P0-E1 |
 
@@ -43,6 +44,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | 2 | Submit: Ember Shard ×3, Wood ×1, Station "Forge" | Goes to review queue, NOT auto-published | `[x]` P0-D1 |
 | 3 | Admin approves | Recipe block + relations merged into Staff BLMETA | `[x]` P0-D2 |
 | 3b | View Staff item page | Crafting Recipe section visible (ingredients, station, notes) | `[x]` P0-D3 |
+| 3c | View Staff recipe evidence | Evidence/Confidence badges in recipe block | `[x]` P0-E3 |
 | 6 | Submit duplicate recipe (same ingredients) | No second recipe block; no-op merge / confirm only | `[x]` P0-D4 |
 | 6b | Submit conflicting recipe (Ember ×4) | Conflict detected; existing recipe not overwritten | `[x]` P0-D4 |
 | 4 | View Ember Shard page | `Used In` → Staff, 3 piece, Forge; no ×4 conflict | `[x]` P0-E1 |

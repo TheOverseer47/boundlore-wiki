@@ -904,7 +904,28 @@ function getResourceFactsRP(meta) {
     sourceDetail: sourceDetail,
     rarity: rarity,
     biomeName: biomeName,
+    evidenceTier: resource.evidence_tier || payload.evidence_tier || null,
+    confidence: resource.confidence || payload.confidence_level || payload.confidence || null,
   };
+}
+
+function renderResourceEvidenceBadgesRP(meta) {
+  const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+    ? meta.discovery_payload
+    : {};
+  if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.renderEvidenceBadgeGroup) {
+    const signals = BoundLoreRelationsRegistry.resolveEvidenceSignals
+      ? BoundLoreRelationsRegistry.resolveEvidenceSignals({ meta: meta, payload: payload })
+      : null;
+    if (signals) {
+      return BoundLoreRelationsRegistry.renderEvidenceBadgeGroup(
+        signals.evidenceTier,
+        signals.confidence,
+        { groupClassName: "bl-evidence-badges-resource-card" }
+      );
+    }
+  }
+  return "";
 }
 
 function normalizeResourceNameKeyRP(value) {
@@ -1112,6 +1133,7 @@ function renderResourceCardRP(post) {
     ? getResourceBiomeHtmlRP(meta, facts.biomeName)
     : "";
   const usages = post._resourceUsages || [];
+  const evidenceBadges = renderResourceEvidenceBadgesRP(meta);
 
   const card = document.createElement("article");
   card.className = "bl-resource-card";
@@ -1123,6 +1145,7 @@ function renderResourceCardRP(post) {
         '<div class="bl-resource-card-tags">' +
           '<span class="bl-tag bl-tag-type">Resource</span>' +
         "</div>" +
+        (evidenceBadges || "") +
       "</div>" +
     "</div>" +
     '<dl class="bl-resource-card-facts">' +

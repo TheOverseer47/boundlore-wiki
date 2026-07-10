@@ -331,7 +331,35 @@ window.WikiEntryLayout = (function() {
   }
 
   function formatConfidence(value) {
-    return String(value || "").replace(/^\d-/, "").replace(/-/g, " ");
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.formatConfidenceLabel) {
+      const label = BoundLoreRelationsRegistry.formatConfidenceLabel(value);
+      if (label) return label;
+    }
+    return String(value || "").replace(/^\d-/, "").replace(/-/g, " ").replace(/\b\w/g, function(c) { return c.toUpperCase(); }).trim();
+  }
+
+  function renderEvidenceBadgeGroupSafe(evidenceTier, confidence, options) {
+    if (typeof BoundLoreRelationsRegistry === "undefined" || !BoundLoreRelationsRegistry.renderEvidenceBadgeGroup) {
+      return "";
+    }
+    return BoundLoreRelationsRegistry.renderEvidenceBadgeGroup(evidenceTier, confidence, options || {});
+  }
+
+  function resolveEntryEvidenceSignals(meta, payload) {
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.resolveEvidenceSignals) {
+      return BoundLoreRelationsRegistry.resolveEvidenceSignals({ meta: meta, payload: payload });
+    }
+    return {
+      evidenceTier: payload && payload.evidence_tier,
+      confidence: payload && (payload.confidence_level || payload.confidence),
+      tierLabel: null,
+      confidenceLabel: null,
+    };
+  }
+
+  function renderEntryEvidenceBadges(meta, payload, options) {
+    const signals = resolveEntryEvidenceSignals(meta, payload);
+    return renderEvidenceBadgeGroupSafe(signals.evidenceTier, signals.confidence, options);
   }
 
   function enrichPayloadFromRelations(payload, relations, knowledgeEntry) {
@@ -1076,14 +1104,13 @@ window.WikiEntryLayout = (function() {
 
   function renderRecipeEvidenceMeta(recipeDisplay) {
     if (!recipeDisplay) return "";
-    const parts = [];
-    if (recipeDisplay.evidenceTier) parts.push(formatLabel(recipeDisplay.evidenceTier));
-    if (recipeDisplay.confidence) {
-      const conf = recipeDisplay.confidence;
-      parts.push(/^\d+$/.test(String(conf)) ? (conf + "% confidence") : formatLabel(conf));
-    }
-    if (!parts.length) return "";
-    return '<p class="bl-wiki-recipe-meta">' + escapeHtml(parts.join(" · ")) + "</p>";
+    const badgeHtml = renderEvidenceBadgeGroupSafe(
+      recipeDisplay.evidenceTier,
+      recipeDisplay.confidence,
+      { groupClassName: "bl-evidence-badges-recipe" }
+    );
+    if (badgeHtml) return badgeHtml;
+    return "";
   }
 
   function renderRecipeSectionBody(recipeDisplay) {
@@ -1505,6 +1532,13 @@ window.WikiEntryLayout = (function() {
     html += '<div class="bl-wiki-hero-copy">';
     html += '<p class="bl-wiki-kicker">' + escapeHtml(categoryLabel) + " Entry</p>";
     html += '<h2 class="bl-wiki-title">' + escapeHtml(model.displayName || "Untitled") + "</h2>";
+    const itemSubtypeForEvidence = typeof EntityCore !== "undefined"
+      ? EntityCore.resolveEntitySubtype(model.meta, { category: model.category, title: post && post.title })
+      : (model.meta && model.meta.entity_subtype) || "";
+    if (String(model.category || "").toLowerCase() === "items" && itemSubtypeForEvidence === "resource") {
+      const evidenceBadges = renderEntryEvidenceBadges(model.meta, model.payload, { groupClassName: "bl-evidence-badges-hero" });
+      if (evidenceBadges) html += evidenceBadges;
+    }
     html += renderHeroFactsGrid(model.heroFacts);
     html += '<div class="bl-wiki-hero-actions">';
     html += '<a class="bl-wiki-primary-cta" href="' +

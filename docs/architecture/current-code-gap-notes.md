@@ -1,7 +1,7 @@
 # Current Code Gap Notes
 
 Audit of BoundLore codebase against the content architecture blueprint.  
-**Last updated:** 2026-07-10 (P0-E2: `/wiki/resources/` landing page)
+**Last updated:** 2026-07-10 (P0-E3: Evidence-tier badges)
 
 ---
 
@@ -119,9 +119,43 @@ Resource Name, Source Type (mining/plant/creature-drop/biome/water/loot/unknown)
 
 ### Still deferred
 
-- Evidence-tier badge UI on resource cards
 - Full Recipe browse/index
 - Global economy / cross-domain usage index
+
+---
+
+## 1d. Evidence-Tier Badges (P0-E3)
+
+| Behavior | Status |
+|----------|--------|
+| Tiers displayed | Confirmed, Observed, Reported, Speculative |
+| Confidence labels | Single Observation, Corroborated, Verified (+ Repeated Observation, Rumor when present) |
+| Data sources | `discovery_payload.resource`, `discovery_payload.recipe`, `confidence_level`, relation props |
+| Resource detail hero | Badges when resource subtype + data present |
+| Recipe section | Badges in Crafting Recipe block (no raw `2-single-observation`) |
+| Resources landing | Badges on resource cards when data present |
+| Missing data | No badge forced — null-safe, no `undefined` |
+
+### Files
+
+| File | Role |
+|------|------|
+| `js/relations-registry.js` | `formatEvidenceTierLabel`, `formatConfidenceLabel`, `renderEvidenceBadgeGroup`, `resolveEvidenceSignals` |
+| `js/wiki-entry-layout.js` | Resource hero badges; recipe evidence badges |
+| `js/render-posts.js` | Resource landing card badges |
+| `css/style.css` | `.bl-evidence-badge`, tier classes |
+
+### QA verified
+
+- `qa-ember-shard-511160` → Reported · Single Observation
+- `qa-staff-of-fire-2b742628` → Reported · Single Observation in Crafting Recipe
+- `/wiki/resources/` → same badges on Ember card
+
+### Still deferred
+
+- Full reputation/trust system
+- Evidence moderation automation
+- Global source-review UI
 
 ---
 
@@ -178,9 +212,8 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 - `recipe_ingredients` / CRAFT quantity mismatch → conflicts logged, existing recipe kept.
 - Admin approve **blocked** when preview detects recipe conflicts.
 
-### Still deferred (post P0-E2)
+### Still deferred (post P0-E3)
 
-- Evidence-tier badge UI
 - Full Recipe browse widget / index (P0-F)
 
 ---
@@ -206,13 +239,12 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 | Area | Priority |
 |------|----------|
-| Evidence-tier badge UI | P0-G |
 | Full Recipe browse/index | P0-F |
-| E2E T1 full chain | P0-E2 done; final P0 acceptance regression still open |
+| E2E T1 full chain | P0-E2/E3 done; final P0 acceptance regression still open |
 | Recipe duplicate/conflict E2E | P0-D4 (done) |
 
 ---
 
 ## 7. Next Step
 
-**P0-F/G:** Full Recipe browse widget, Evidence-tier badges, final P0 acceptance regression
+**P0-F:** Full Recipe browse widget, final P0 acceptance regression

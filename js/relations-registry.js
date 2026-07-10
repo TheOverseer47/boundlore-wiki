@@ -590,6 +590,119 @@ window.BoundLoreRelationsRegistry = (function() {
     return CONTROLLED_VOCABULARIES.confidence.indexOf(v) >= 0 ? v : "single_observation";
   }
 
+  function escapeRegistryHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function parseEvidenceTierValue(value) {
+    if (value == null || value === "") return null;
+    const v = String(value).trim().toLowerCase();
+    if (!v) return null;
+    return CONTROLLED_VOCABULARIES.evidence_tier.indexOf(v) >= 0 ? v : null;
+  }
+
+  function coerceConfidenceKey(value) {
+    if (value == null || value === "") return null;
+    let raw = String(value).trim().toLowerCase();
+    if (!raw) return null;
+    raw = raw.replace(/^\d+-/, "");
+    const underscored = raw.replace(/-/g, "_");
+    if (CONTROLLED_VOCABULARIES.confidence.indexOf(underscored) >= 0) return underscored;
+    const aliases = {
+      rumor: "rumor",
+      repeated_observation: "repeated_observation",
+      confirmed: "verified",
+    };
+    if (aliases[underscored]) return aliases[underscored];
+    if (underscored === "rumor" || underscored === "repeated_observation") return underscored;
+    return null;
+  }
+
+  const EVIDENCE_TIER_LABELS = {
+    confirmed: "Confirmed",
+    observed: "Observed",
+    reported: "Reported",
+    speculative: "Speculative",
+  };
+
+  const CONFIDENCE_LABELS = {
+    single_observation: "Single Observation",
+    corroborated: "Corroborated",
+    verified: "Verified",
+    repeated_observation: "Repeated Observation",
+    rumor: "Rumor",
+  };
+
+  function formatEvidenceTierLabel(value) {
+    const key = parseEvidenceTierValue(value);
+    if (!key) return null;
+    return EVIDENCE_TIER_LABELS[key] || null;
+  }
+
+  function formatConfidenceLabel(value) {
+    const key = coerceConfidenceKey(value);
+    if (!key) return null;
+    return CONFIDENCE_LABELS[key] || null;
+  }
+
+  function resolveEvidenceSignals(sources) {
+    const src = sources && typeof sources === "object" ? sources : {};
+    const meta = src.meta && typeof src.meta === "object" ? src.meta : {};
+    const payload = src.payload && typeof src.payload === "object" ? src.payload : {};
+    const resource = payload.resource && typeof payload.resource === "object" ? payload.resource : null;
+    const recipe = payload.recipe && typeof payload.recipe === "object" ? payload.recipe : null;
+    let evidenceTier = src.evidence_tier || src.evidenceTier || null;
+    let confidence = src.confidence || src.confidence_level || null;
+    if (resource) {
+      evidenceTier = evidenceTier || resource.evidence_tier || payload.evidence_tier || null;
+      confidence = confidence || resource.confidence || payload.confidence_level || payload.confidence || null;
+    } else if (recipe) {
+      evidenceTier = evidenceTier || recipe.evidence_tier || null;
+      confidence = confidence || recipe.confidence || null;
+    } else {
+      evidenceTier = evidenceTier || payload.evidence_tier || meta.evidence_tier || null;
+      confidence = confidence || payload.confidence_level || payload.confidence || meta.confidence_level || null;
+    }
+    return {
+      evidenceTier: evidenceTier,
+      confidence: confidence,
+      tierLabel: formatEvidenceTierLabel(evidenceTier),
+      confidenceLabel: formatConfidenceLabel(confidence),
+    };
+  }
+
+  function renderEvidenceBadge(evidenceTier, options) {
+    const opts = options || {};
+    const key = parseEvidenceTierValue(evidenceTier);
+    const label = formatEvidenceTierLabel(evidenceTier);
+    if (!key || !label) return "";
+    return '<span class="bl-evidence-badge evidence-' + escapeRegistryHtml(key) + (opts.className ? " " + escapeRegistryHtml(opts.className) : "") + '">' +
+      escapeRegistryHtml(label) + "</span>";
+  }
+
+  function renderConfidenceBadge(confidence, options) {
+    const opts = options || {};
+    const key = coerceConfidenceKey(confidence);
+    const label = formatConfidenceLabel(confidence);
+    if (!key || !label) return "";
+    return '<span class="bl-evidence-badge bl-confidence-badge confidence-' + escapeRegistryHtml(key.replace(/_/g, "-")) +
+      (opts.className ? " " + escapeRegistryHtml(opts.className) : "") + '">' +
+      escapeRegistryHtml(label) + "</span>";
+  }
+
+  function renderEvidenceBadgeGroup(evidenceTier, confidence, options) {
+    const opts = options || {};
+    const tierHtml = renderEvidenceBadge(evidenceTier, opts);
+    const confidenceHtml = renderConfidenceBadge(confidence, opts);
+    if (!tierHtml && !confidenceHtml) return "";
+    return '<div class="bl-evidence-badges' + (opts.groupClassName ? " " + escapeRegistryHtml(opts.groupClassName) : "") + '">' +
+      tierHtml + confidenceHtml + "</div>";
+  }
+
   function getDomainForCategory(categorySlug) {
     return CATEGORY_DOMAIN_MAP[String(categorySlug || "").toLowerCase()] || null;
   }
@@ -614,6 +727,14 @@ window.BoundLoreRelationsRegistry = (function() {
     getAllowedRelationTypesForDomains: getAllowedRelationTypesForDomains,
     normalizeEvidenceTier: normalizeEvidenceTier,
     normalizeConfidence: normalizeConfidence,
+    parseEvidenceTierValue: parseEvidenceTierValue,
+    coerceConfidenceKey: coerceConfidenceKey,
+    formatEvidenceTierLabel: formatEvidenceTierLabel,
+    formatConfidenceLabel: formatConfidenceLabel,
+    resolveEvidenceSignals: resolveEvidenceSignals,
+    renderEvidenceBadge: renderEvidenceBadge,
+    renderConfidenceBadge: renderConfidenceBadge,
+    renderEvidenceBadgeGroup: renderEvidenceBadgeGroup,
     getDomainForCategory: getDomainForCategory,
     resolveCanonicalKey: resolveCanonicalKey,
     normalizeKey: normalizeKey,
