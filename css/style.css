@@ -3097,6 +3097,21 @@ details.bl-kg-section > summary.bl-kg-section-title::-webkit-details-marker {
   font-size: 0.9rem;
 }
 
+.bl-wiki-entry-needed {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #c87828;
+  background: rgba(200, 120, 40, 0.14);
+  border: 1px solid rgba(200, 120, 40, 0.35);
+  vertical-align: middle;
+}
+
 .bl-wiki-recipe-meta {
   margin: 10px 0 0;
   font-size: 0.78rem;

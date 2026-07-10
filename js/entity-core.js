@@ -558,9 +558,69 @@ window.EntityCore = (function() {
     };
   }
 
+  function isResourceEntry(meta, post) {
+    const cat = String(post && post.category || "").toLowerCase();
+    if (cat !== "items") return false;
+    const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+      ? meta.discovery_payload
+      : {};
+    if (meta && meta.entity_subtype === "resource") return true;
+    if (meta && meta.discovery_form === "resource_quick") return true;
+    if (payload.discovery_type === "resource") return true;
+    if (payload.resource && typeof payload.resource === "object") return true;
+    return resolveEntitySubtype(meta, post) === "resource";
+  }
+
+  function getResourcePayloadBlock(meta) {
+    const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+      ? meta.discovery_payload
+      : {};
+    if (payload.resource && typeof payload.resource === "object") return payload.resource;
+    return payload;
+  }
+
   function resolveItemFacts(post, meta, relations) {
     const payload = meta && meta.discovery_payload ? meta.discovery_payload : {};
     const identity = extractCanonicalIdentity(post && post.title, post && post.category, { payload: payload });
+
+    if (isResourceEntry(meta, post)) {
+      const resource = getResourcePayloadBlock(meta);
+      const place = extractBiomeContext(relations, payload);
+      const sourceType = meaningful(resource.source_type) || meaningful(payload.source_type);
+      const sourceDetail = meaningful(resource.source_detail) || meaningful(payload.source_detail);
+      const rarityRaw = meaningful(resource.rarity) || meaningful(payload.rarity);
+
+      const facts = {
+        item_type: factExplicit("Resource", "entity_subtype"),
+        subtype: sourceType ? factExplicit(formatLabel(sourceType), "payload") : factUnknown(),
+        source_type: sourceType ? factExplicit(formatLabel(sourceType), "payload") : factUnknown(),
+        source_detail: sourceDetail ? factExplicit(sourceDetail, "payload") : factUnknown(),
+        rarity: rarityRaw ? factExplicit(formatLabel(rarityRaw), "payload") : factExplicit("Unknown", "default"),
+        dropped_by: factUnknown(),
+        how_obtain: sourceType ? factExplicit(formatLabel(sourceType), "payload") : factUnknown(),
+        biome: place.biome ? factDerived(place.biome, place.biome_relation ? "relation" : "payload", null) : factUnknown(),
+        location: place.location_hint
+          ? factDerived(place.location_hint, "context", null)
+          : (place.location && normalizeTitleKey(place.location) !== normalizeTitleKey(place.biome)
+            ? factDerived(place.location, place.location_relation ? "relation" : "payload", null)
+            : factUnknown()),
+        effect: factUnknown(),
+        stats: factUnknown(),
+      };
+
+      if (facts.biome.relation_ref) facts.biome.relation_ref = relationRef(place.biome_relation);
+      if (facts.location.relation_ref) facts.location.relation_ref = relationRef(place.location_relation);
+
+      return {
+        identity: identity,
+        taxonomy: {
+          item_type: { value: "resource", confidence: "explicit" },
+          subtype: { values: sourceType ? [sourceType] : [], confidence: sourceType ? "explicit" : "unknown" },
+        },
+        facts: facts,
+      };
+    }
+
     const taxonomy = mergeTaxonomy(
       meta && meta.entity_taxonomy,
       inferItemTaxonomy(identity.canonical_name, payload)
@@ -1283,6 +1343,7 @@ window.EntityCore = (function() {
     inferEntitySubtypeFromCategoryAndPayload: inferEntitySubtypeFromCategoryAndPayload,
     resolveEntityDomain: resolveEntityDomain,
     resolveEntitySubtype: resolveEntitySubtype,
+    isResourceEntry: isResourceEntry,
     normalizeEntityClassification: normalizeEntityClassification,
     isReservedT3Slug: isReservedT3Slug,
     shouldExcludeFromLocationList: shouldExcludeFromLocationList,

@@ -6,6 +6,23 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P0.5-A — Browse, Resource Display, Entry Needed Badges
+
+**Milestone:** P0.5-A (consistency fixes; no facet system, Missing Entry Queue, search baseline, or station promotion)
+
+| Test | URL / target | Expected | Result |
+|------|--------------|----------|--------|
+| Browse visibility | `/wiki/browse/` | Loads visible; no blank/dark screen after 10s | `[x]` |
+| Resource detail | `qa-ember-shard-511160` | Type Resource, Source Type Mining, Source Detail, Rarity Unknown, Used In, evidence badges; no Add Recipe; no pending ×4 | `[x]` |
+| Staff recipe unresolved | `qa-staff-of-fire-2b742628` | Ember linked; Wood + Forge show Entry needed; single recipe block | `[x]` |
+| Resources landing regression | `/wiki/resources/` | QA Ember Shard card; source/usage/badges intact | `[x]` |
+| Items regression | `/wiki/items/` | Loads; Browse Resources link; no Wood/Forge/Recipe posts | `[x]` |
+| Homepage regression | `/` | Visible; hero video; zoomable infographic | `[x]` |
+
+**Not built in P0.5-A:** Missing Entry Queue, facet system, search baseline, station_type promotion, auto Wood/Forge stubs.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  
@@ -267,7 +284,7 @@ Architecture validation tests from Master Blueprint 2.0. Status: **planned** unt
 | T-RESOURCE-02 | Same resource from mining + loot + vendor | P1 | `[ ]` planned |
 | T-STATION-01 | Generic Forge as station_type without location | P0.5 | `[ ]` planned |
 | T-STATION-02 | Concrete Forge as located_at observation only | P0.5 | `[ ]` planned |
-| T-CRAFT-01 | Recipe with unresolved ingredient + station | P0.5 | `[ ]` planned |
+| T-CRAFT-01 | Recipe with unresolved ingredient + station | P0.5 | `[x]` P0.5-A — Wood/Forge Entry needed badges; no stubs |
 | T-CRAFT-02 | Multiple alternative recipes for same item | P1 | `[ ]` planned |
 | T-CRAFT-03 | Recipe changes between two versions | P2 | `[ ]` planned |
 | T-MOUNT-01 | Creature is Dragon + Flying + Rideable Mount (one page) | P0.5 | `[ ]` planned |

@@ -594,10 +594,15 @@ function getPostDisplayTitlePD(post, postMeta) {
 
 function getPostTypeLabelPD(post, postMeta, useWikiLayout) {
   if (post.post_type === "guide") return "Guide";
+  const category = typeof EntityCore !== "undefined"
+    ? EntityCore.getEffectiveCategory(post, postMeta)
+    : String(post.category || "").toLowerCase();
+  if (category === "items" &&
+      typeof EntityCore !== "undefined" &&
+      EntityCore.isResourceEntry(postMeta, post)) {
+    return "Resource";
+  }
   if (useWikiLayout) {
-    const category = typeof EntityCore !== "undefined"
-      ? EntityCore.getEffectiveCategory(post, postMeta)
-      : String(post.category || "").toLowerCase();
     if (category === "creatures") return "Creature Entry";
     if (category === "items") return "Item Entry";
     if (category === "biomes") return "Biome Entry";
@@ -1194,6 +1199,11 @@ function getSeeAlsoLabelPD(post) {
 }
 
 function getPostSubcategoryLabelPD(post, postMeta) {
+  if (String(post.category || "").toLowerCase() === "items" &&
+      typeof EntityCore !== "undefined" &&
+      EntityCore.isResourceEntry(postMeta, post)) {
+    return "Resource";
+  }
   const subcategory = (postMeta && postMeta.subcategory) || post.guide_subcategory || "";
   if (!subcategory) return "";
   if (typeof getAnySubcategoryLabel === "function") {

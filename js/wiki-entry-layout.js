@@ -59,6 +59,7 @@ window.WikiEntryLayout = (function() {
       ? KnowledgeRelations.safeParseMeta(post.content || "")
       : {};
     const payload = meta.discovery_payload || {};
+    if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry(meta, post)) return true;
     const canonical = EntityCore.extractCanonicalIdentity(post.title, category, { payload: payload }).canonical_name;
     return !!canonical;
   }
@@ -868,7 +869,7 @@ window.WikiEntryLayout = (function() {
     if (fact.relation_ref && fact.relation_ref.title) {
       return escapeHtml(fact.value);
     }
-    if (fact.status === "unknown" || !meaningful(fact.value)) {
+    if (fact.status === "unknown" || (!meaningful(fact.value) && !(fact.status === "explicit" && fact.value))) {
       return '<span class="bl-wiki-empty">' + escapeHtml(opts.placeholder) + "</span>";
     }
     let html = '<span class="bl-wiki-value">' + escapeHtml(fact.value) + "</span>";
@@ -893,15 +894,24 @@ window.WikiEntryLayout = (function() {
     }
 
     if (category === "items") {
-      add("Item Type", f.item_type, true);
-      add("Subtype", f.subtype, true);
-      add("Rarity", f.rarity, true);
-      if (f.how_obtain && f.how_obtain.status !== "unknown") {
-        add("How to Obtain", f.how_obtain, false);
+      const isResource = f.item_type && f.item_type.value === "Resource";
+      if (isResource) {
+        add("Type", f.item_type, false);
+        add("Source Type", f.source_type, false);
+        add("Source Detail", f.source_detail, false);
+        add("Rarity", f.rarity, false);
+        add("Biome / Region", f.biome, true);
       } else {
-        add("Dropped By", f.dropped_by, true);
+        add("Item Type", f.item_type, true);
+        add("Subtype", f.subtype, true);
+        add("Rarity", f.rarity, true);
+        if (f.how_obtain && f.how_obtain.status !== "unknown") {
+          add("How to Obtain", f.how_obtain, false);
+        } else {
+          add("Dropped By", f.dropped_by, true);
+        }
+        add("Biome / Region", f.biome, true);
       }
-      add("Biome / Region", f.biome, true);
     } else if (category === "creatures") {
       add("Type", f.creature_type, true);
       add("Biome / Region", f.biome, true);
@@ -961,8 +971,15 @@ window.WikiEntryLayout = (function() {
   function renderRecipeIngredientName(name, relIndex) {
     const key = String(name || "").trim().toLowerCase();
     const rel = key ? relIndex[key] : null;
-    if (rel) return renderRelationLink(rel);
-    return '<span class="bl-wiki-recipe-ingredient-name">' + escapeHtml(name) + "</span>";
+    const href = rel && typeof KnowledgeRelations !== "undefined"
+      ? KnowledgeRelations.buildRelationHref(rel)
+      : (rel && rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : "");
+    if (href && rel) return renderRelationLink(rel);
+    let html = '<span class="bl-wiki-recipe-ingredient-name">' + escapeHtml(name) + "</span>";
+    if (meaningful(name)) {
+      html += ' <span class="bl-wiki-entry-needed">Entry needed</span>';
+    }
+    return html;
   }
 
   function resolveRecipeDisplay(meta, relations, post) {
@@ -1029,11 +1046,11 @@ window.WikiEntryLayout = (function() {
           name: name,
           quantity: rel.quantity != null ? rel.quantity : null,
           unit: rel.unit || null,
-          nameHtml: renderRelationLink(rel),
+          nameHtml: renderRecipeIngredientName(name, relIndex),
         };
       }).filter(Boolean),
       station: stationName,
-      stationHtml: stationRel ? renderRelationLink(stationRel) : (stationName ? escapeHtml(stationName) : ""),
+      stationHtml: stationName ? renderRecipeIngredientName(stationName, relIndex) : "",
       notes: "",
       unlockCondition: stationRel && meaningful(stationRel.unlock_condition) ? stationRel.unlock_condition : "",
       evidenceTier: "",
@@ -1400,17 +1417,26 @@ window.WikiEntryLayout = (function() {
       if (resolved.taxonomy) meta.entity_taxonomy = resolved.taxonomy;
 
       if (category === "items") {
-        facts.item_type = { label: "Item Type", _html: renderCoreFact(resolved.facts.item_type, post) };
-        facts.subtype = { label: "Subtype", _html: renderCoreFact(resolved.facts.subtype, post) };
-        facts.rarity = { label: "Rarity", _html: renderCoreFact(resolved.facts.rarity, post) };
-        facts.how_obtain = { label: "How to Obtain", _html: renderCoreFact(resolved.facts.how_obtain, post) };
-        facts.dropped_by = { label: "Dropped By", _html: renderCoreFact(resolved.facts.dropped_by, post) };
-        facts.biome = { label: "Biome / Region", _html: renderCoreFact(resolved.facts.biome, post) };
-        if (resolved.facts.location && resolved.facts.location.status !== "unknown") {
-          facts.location = { label: "Location Context", _html: renderCoreFact(resolved.facts.location, post) };
+        const isResource = resolved.facts.item_type && resolved.facts.item_type.value === "Resource";
+        if (isResource) {
+          facts.item_type = { label: "Type", _html: renderCoreFact(resolved.facts.item_type, post) };
+          facts.source_type = { label: "Source Type", _html: renderCoreFact(resolved.facts.source_type, post) };
+          facts.source_detail = { label: "Source Detail", _html: renderCoreFact(resolved.facts.source_detail, post) };
+          facts.rarity = { label: "Rarity", _html: renderCoreFact(resolved.facts.rarity, post) };
+          facts.biome = { label: "Biome / Region", _html: renderCoreFact(resolved.facts.biome, post) };
+        } else {
+          facts.item_type = { label: "Item Type", _html: renderCoreFact(resolved.facts.item_type, post) };
+          facts.subtype = { label: "Subtype", _html: renderCoreFact(resolved.facts.subtype, post) };
+          facts.rarity = { label: "Rarity", _html: renderCoreFact(resolved.facts.rarity, post) };
+          facts.how_obtain = { label: "How to Obtain", _html: renderCoreFact(resolved.facts.how_obtain, post) };
+          facts.dropped_by = { label: "Dropped By", _html: renderCoreFact(resolved.facts.dropped_by, post) };
+          facts.biome = { label: "Biome / Region", _html: renderCoreFact(resolved.facts.biome, post) };
+          if (resolved.facts.location && resolved.facts.location.status !== "unknown") {
+            facts.location = { label: "Location Context", _html: renderCoreFact(resolved.facts.location, post) };
+          }
+          facts.effect = { label: "Effect / Use", _html: renderCoreFact(resolved.facts.effect, post) };
+          facts.stats = { label: "Damage / Stats", _html: renderCoreFact(resolved.facts.stats, post) };
         }
-        facts.effect = { label: "Effect / Use", _html: renderCoreFact(resolved.facts.effect, post) };
-        facts.stats = { label: "Damage / Stats", _html: renderCoreFact(resolved.facts.stats, post) };
         missingSource = resolved.facts;
       } else if (category === "creatures") {
         facts.creature_type = { label: "Type", _html: renderCoreFact(resolved.facts.creature_type, post) };
@@ -1510,7 +1536,11 @@ window.WikiEntryLayout = (function() {
   function render(model) {
     if (!model) return "";
     const post = model.post;
-    const categoryLabel = formatLabel(model.category);
+    const itemSubtype = typeof EntityCore !== "undefined"
+      ? EntityCore.resolveEntitySubtype(model.meta, post)
+      : (model.meta && model.meta.entity_subtype) || "";
+    const isResourceItem = String(model.category || "").toLowerCase() === "items" && itemSubtype === "resource";
+    const categoryLabel = isResourceItem ? "Resource" : formatLabel(model.category);
     let html = '<article class="bl-wiki-entry">';
 
     html += '<section class="bl-wiki-hero">';
@@ -1544,9 +1574,6 @@ window.WikiEntryLayout = (function() {
     html += '<a class="bl-wiki-primary-cta" href="' +
       escapeHtml(buildContributionUrl(post, { intent: "add_info", meta: model.meta })) +
       '">Add information</a>';
-    const itemSubtype = typeof EntityCore !== "undefined"
-      ? EntityCore.resolveEntitySubtype(model.meta, { category: model.category, title: post && post.title })
-      : (model.meta && model.meta.entity_subtype) || "";
     if (String(model.category || "").toLowerCase() === "items" && itemSubtype !== "resource") {
       html += '<a class="bl-wiki-cta-quiet" href="' +
         escapeHtml(buildContributionUrl(post, { intent: "add_recipe", meta: model.meta })) +

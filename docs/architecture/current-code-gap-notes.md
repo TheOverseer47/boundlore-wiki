@@ -305,17 +305,17 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | # | Blind spot | Current code | Target state | Priority |
 |---|------------|--------------|--------------|----------|
 | 1 | **No Facet Layer** | Only `entity_domain` + `entity_subtype` | Facets for role, capability, taxonomy, acquisition, etc. | **P0.5** |
-| 2 | **No Unresolved Target Lifecycle** | Wood/Forge plain text in merged recipe | mentioned → unresolved → candidate → stub via Missing Entry Queue | **P0.5** |
+| 2 | **No Unresolved Target Lifecycle** | Wood/Forge show `Entry needed` badge in recipe UI (P0.5-A); no queue/promotion yet | mentioned → unresolved → candidate → stub via Missing Entry Queue | **P0.5** (partial: display only) |
 | 3 | **Search title/excerpt only** | `js/search.js` ilike on posts.title, excerpt | search_documents index with facets, aliases, relations | **P0.5** baseline |
 | 4 | **No station_type** | `crafted_at` → string "Forge" | SYSTEM/station_type entity; Forge promotable | **P0.5** |
-| 5 | **Resource Classification Display** | Detail shows Category/Subcategory/Type as generic Item | Show domain/subtype/resource labels | **P0.5** |
+| 5 | **Resource Classification Display** | ~~Detail shows Category/Subcategory/Type as generic Item~~ | P0.5-A: resource detail shows Type/Source/Rarity; sidebar Type Resource | **Done (P0.5-A)** |
 | 6 | **No versioned statements** | Merge overwrites recipe/facts | valid_from/until/superseded_by; history widget | **P0.5** schema / **P2** UX |
 | 7 | **No variant/instance model** | variant_of exists but no formal policy | Variant blocks + promotion rules | **P1** |
-| 8 | **Browse patch-mode visibility** | `/wiki/browse/` hidden/blank like prior homepage issue | Script order fix | **P0.5** |
+| 8 | **Browse patch-mode visibility** | ~~`/wiki/browse/` hidden/blank like prior homepage issue~~ | P0.5-A: sync patch-mode script order fix | **Done (P0.5-A)** |
 | 9 | **No relation qualifiers spec in code** | quantity/unit ad hoc in recipe payload | Typed qualifiers object on all relations | **P1** |
 | 10 | **Symmetric relation double-write** | hostile_to/allied_to may store both directions | Single-write + derived mirror | **P1** |
 | 11 | **Mount = subtype assumption** | Docs v1 listed mount as BEING subtype | creature + role/capability facets | **P1** |
-| 12 | **No Missing Entry Queue UI** | Unresolved invisible except plain text | Admin queue + Entry Needed badges | **P0.5** |
+| 12 | **No Missing Entry Queue UI** | Unresolved targets show `Entry needed` badge in recipe (P0.5-A) | Admin queue + Entry Needed badges | **P0.5** (partial: recipe badge only) |
 | 13 | **No compound search queries** | Cannot answer "items using X" | Query parser + inbound index | **P1** |
 | 14 | **Discovery auto-stub path** | `buildStubPostMeta` on discovery submit | Align with promotion policy (no blind stubs) | **P0.5** investigate |
 
@@ -342,3 +342,21 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 ### Next implementation step (when authorized)
 
 Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started as part of docs-only materialization.
+
+---
+
+## 2. P0.5-A — Browse Visibility, Resource Classification, Entry Needed Badges
+
+**Status:** Complete (display/resolver fixes only; no DB, SQL, or stub creation).
+
+| Item | Fix | Result |
+|------|-----|--------|
+| `/wiki/browse/` visibility | Sync `patch-mode.js` after `supabase-config.js` with `data-bl-patch-mode="1"` (same as homepage/post) | Page loads visible; no blank/dark overlay |
+| Resource classification display | `EntityCore.isResourceEntry()`, resource branch in `resolveItemFacts()`, wiki hero facts + sidebar Type/Subcategory | QA Ember Shard shows Type Resource, Source Type Mining, Source Detail, Rarity Unknown; no Add Recipe CTA |
+| Unresolved recipe targets | `renderRecipeIngredientName()` adds `Entry needed` badge when target has no resolvable slug/id | QA Staff recipe: Ember Shard linked; Wood ×1 and Forge marked Entry needed |
+| Missing Entry Queue | **Not implemented** | Badges only; no auto-stubs, no promotion policy, no admin queue |
+| Facet system / search baseline / station_type | **Not implemented** | Deferred per Blueprint 2.0 P0.5 roadmap |
+
+**Files touched:** `wiki/browse/index.html`, `js/entity-core.js`, `js/post-detail.js`, `js/wiki-entry-layout.js`, `css/style.css`, `wiki/post/index.html` (cache bust).
+
+**Known follow-ups (not P0.5-A):** Missing Entry Queue UI, station_type promotion, search baseline, facet layer, versioned statements.
