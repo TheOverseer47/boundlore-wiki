@@ -104,7 +104,19 @@
       <div class="hero-icon-wrap">
         <span class="hero-orb hero-orb-a"></span>
         <span class="hero-orb hero-orb-b"></span>
-        <img src="/public/images/icon.jpg" alt="BoundLore" class="hero-icon" />
+        <video
+          class="hero-emblem-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster="/public/images/icon.jpg"
+          aria-label="Animated BoundLore emblem"
+        >
+          <source src="/assets/home/boundlore-core-loop.mp4" type="video/mp4" />
+        </video>
+        <img src="/public/images/icon.jpg" alt="BoundLore" class="hero-icon hero-icon-fallback" />
       </div>
       <p class="hero-eyebrow">Fan-Powered Wiki</p>
       <h1 class="hero-title"><span class="hero-title-main">Bound</span><span class="accent hero-title-accent">Lore</span></h1>
@@ -153,27 +165,22 @@
     </div>
   </main>
 
-  <section class="bl-why-section" aria-labelledby="whyBoundLoreTitle">
-    <div class="bl-why-wrap">
-      <div class="bl-why-head">
-        <p class="bl-why-kicker">Why Players Prefer BoundLore</p>
-        <h2 id="whyBoundLoreTitle" class="section-title" style="margin-bottom:8px;">Why This Wiki Feels Better</h2>
-        <p class="section-subtitle" style="max-width:760px;margin:0 auto;">We focus on readable structure, fair moderation, and fast discovery-to-guide workflows instead of bloated layouts and gatekept knowledge.</p>
+  <section class="bl-home-how-section" aria-labelledby="howBoundLoreTitle">
+    <div class="bl-home-how-wrap">
+      <div class="bl-home-how-head">
+        <p class="bl-home-how-kicker">Player-powered knowledge</p>
+        <h2 id="howBoundLoreTitle" class="section-title" style="margin-bottom:8px;">How BoundLore Works</h2>
+        <p class="section-subtitle bl-home-how-subtitle">From discovery to verified knowledge — every finding becomes part of the living wiki.</p>
       </div>
-      <div class="bl-why-grid">
-        <article class="bl-why-card">
-          <h3>Readable by Design</h3>
-          <p>Clear category paths, modern formatting, and mobile-first readability so players find information quickly instead of fighting outdated page structures.</p>
-        </article>
-        <article class="bl-why-card">
-          <h3>Community First, Not Gatekeeping</h3>
-          <p>Contributions are reviewed through transparent queues, with constructive moderation and no closed-club publishing model.</p>
-        </article>
-        <article class="bl-why-card">
-          <h3>Built for Active Players</h3>
-          <p>Discovery reports, guild onboarding, and guide improvements connect directly with community activity, so useful findings reach everyone faster.</p>
-        </article>
-      </div>
+      <figure class="bl-home-how-frame">
+        <img
+          src="/assets/home/how-boundlore-works.png"
+          alt="Illustrated overview of how BoundLore turns player discoveries into verified wiki knowledge."
+          loading="lazy"
+          width="1024"
+          height="1024"
+        />
+      </figure>
     </div>
   </section>
 
@@ -242,6 +249,24 @@
   <script src="/js/search.js"></script>
   <script src="/js/auth-nav.js"></script>
   <script src="js/main.js?v=3"></script>
+  <script>
+  (function() {
+    var video = document.querySelector(".hero-emblem-video");
+    if (!video) return;
+    var motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    function applyMotionPreference() {
+      if (motionQuery.matches) {
+        video.pause();
+        video.removeAttribute("autoplay");
+      } else if (video.paused) {
+        video.play().catch(function() {});
+      }
+    }
+    applyMotionPreference();
+    if (motionQuery.addEventListener) motionQuery.addEventListener("change", applyMotionPreference);
+    else if (motionQuery.addListener) motionQuery.addListener(applyMotionPreference);
+  })();
+  </script>
 </body>
 </html>
 
