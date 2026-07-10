@@ -338,6 +338,32 @@ a:hover { color: var(--gold-light); }
   object-fit: contain;
 }
 
+.bl-home-how-zoom-trigger {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  border-radius: 12px;
+  transition: box-shadow 0.2s ease;
+}
+
+.bl-home-how-zoom-trigger:hover,
+.bl-home-how-zoom-trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(201,168,76,0.45);
+}
+
+.bl-home-how-zoom-hint {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
 /* RECENT */
 .recent-section { background: rgba(17,17,24,0.78); backdrop-filter: none;
   border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 80px 24px; }

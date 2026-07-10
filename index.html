@@ -173,13 +173,20 @@
         <p class="section-subtitle bl-home-how-subtitle">From discovery to verified knowledge — every finding becomes part of the living wiki.</p>
       </div>
       <figure class="bl-home-how-frame">
-        <img
-          src="/assets/home/how-boundlore-works.png"
-          alt="Illustrated overview of how BoundLore turns player discoveries into verified wiki knowledge."
-          loading="lazy"
-          width="1024"
-          height="576"
-        />
+        <button
+          type="button"
+          class="bl-home-how-zoom-trigger"
+          aria-label="Open How BoundLore Works infographic in full size"
+        >
+          <img
+            src="/assets/home/how-boundlore-works.png"
+            alt="Illustrated overview of how BoundLore turns player discoveries into verified wiki knowledge."
+            loading="lazy"
+            width="1024"
+            height="576"
+          />
+        </button>
+        <figcaption class="bl-home-how-zoom-hint">Click to enlarge</figcaption>
       </figure>
     </div>
   </section>
@@ -266,6 +273,52 @@
     applyMotionPreference();
     if (motionQuery.addEventListener) motionQuery.addEventListener("change", applyMotionPreference);
     else if (motionQuery.addListener) motionQuery.addListener(applyMotionPreference);
+  })();
+  </script>
+  <script>
+  (function() {
+    var trigger = document.querySelector(".bl-home-how-zoom-trigger");
+    if (!trigger) return;
+
+    var overlay = document.createElement("div");
+    overlay.className = "bl-image-lightbox";
+    overlay.innerHTML =
+      '<button type="button" class="bl-image-lightbox-close" aria-label="Close image preview">Close</button>' +
+      '<img alt="How BoundLore Works infographic" />';
+
+    var closeBtn = overlay.querySelector(".bl-image-lightbox-close");
+    var img = overlay.querySelector("img");
+    var sourceImg = trigger.querySelector("img");
+
+    function closeViewer() {
+      overlay.classList.remove("open");
+      img.classList.remove("zoomed");
+      img.removeAttribute("src");
+      document.body.style.overflow = "";
+    }
+
+    function openViewer() {
+      if (!sourceImg) return;
+      img.setAttribute("src", sourceImg.getAttribute("src") || "");
+      img.setAttribute("alt", sourceImg.getAttribute("alt") || "How BoundLore Works infographic");
+      img.classList.remove("zoomed");
+      overlay.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    closeBtn.addEventListener("click", closeViewer);
+    overlay.addEventListener("click", function(e) {
+      if (e.target === overlay) closeViewer();
+    });
+    img.addEventListener("click", function() {
+      img.classList.toggle("zoomed");
+    });
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape" && overlay.classList.contains("open")) closeViewer();
+    });
+    trigger.addEventListener("click", openViewer);
+
+    document.body.appendChild(overlay);
   })();
   </script>
 </body>
