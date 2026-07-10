@@ -3047,6 +3047,36 @@ details.bl-kg-section > summary.bl-kg-section-title::-webkit-details-marker {
   line-height: 1.5;
 }
 
+.bl-wiki-recipe-facts {
+  margin: 0;
+}
+
+.bl-wiki-recipe-ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.bl-wiki-recipe-ingredients li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.bl-wiki-recipe-qty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.bl-wiki-recipe-meta {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .bl-wiki-rel-card-grid {
   display: grid;
   gap: 10px;

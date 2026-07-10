@@ -910,7 +910,175 @@ window.WikiEntryLayout = (function() {
     return facts;
   }
 
-  function buildDetailSections(category, resolved, relations, missing, meta) {
+  function buildRelationTitleIndex(relations) {
+    const index = {};
+    (Array.isArray(relations) ? relations : []).forEach(function(rel) {
+      if (!rel || !rel.title) return;
+      const key = String(rel.title).trim().toLowerCase();
+      if (!key) return;
+      if (!index[key] || rel.slug || rel.id) index[key] = rel;
+    });
+    return index;
+  }
+
+  function formatRecipeQuantity(quantity, unit) {
+    const cleanUnit = meaningful(unit);
+    if (quantity != null && Number.isFinite(Number(quantity))) {
+      const qty = Number(quantity);
+      return cleanUnit ? (qty + " " + cleanUnit) : String(qty);
+    }
+    return cleanUnit || "";
+  }
+
+  function renderRecipeIngredientName(name, relIndex) {
+    const key = String(name || "").trim().toLowerCase();
+    const rel = key ? relIndex[key] : null;
+    if (rel) return renderRelationLink(rel);
+    return '<span class="bl-wiki-recipe-ingredient-name">' + escapeHtml(name) + "</span>";
+  }
+
+  function resolveRecipeDisplay(meta, relations, post) {
+    const payload = meta && meta.discovery_payload ? meta.discovery_payload : {};
+    const recipe = payload.recipe && typeof payload.recipe === "object" ? payload.recipe : null;
+    const relIndex = buildRelationTitleIndex(relations);
+    const craftedFrom = filterRelationsByTypes(relations, ["crafted_from"]);
+    const craftedAt = filterRelationsByTypes(relations, ["crafted_at"]);
+    const displayName = typeof EntityCore !== "undefined"
+      ? EntityCore.getDisplayName(meta, post)
+      : (post && post.title ? post.title : "Item");
+
+    if (recipe) {
+      const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+      const station = meaningful(recipe.station || recipe.crafting_station);
+      const notes = meaningful(recipe.notes);
+      const unlock = meaningful(recipe.unlock_condition);
+      const hasIngredients = ingredients.some(function(row) {
+        return meaningful(row && (row.name || row.title || row.target_name));
+      });
+      if (!hasIngredients && !station && !notes) return null;
+
+      const outputQty = recipe.output_quantity != null && Number.isFinite(Number(recipe.output_quantity))
+        ? Number(recipe.output_quantity)
+        : 1;
+
+      return {
+        outputName: displayName,
+        outputQuantity: outputQty,
+        ingredients: ingredients.map(function(row) {
+          const name = meaningful(row && (row.name || row.title || row.target_name));
+          if (!name) return null;
+          return {
+            name: name,
+            quantity: row && row.quantity != null ? row.quantity : null,
+            unit: row && row.unit ? row.unit : null,
+            nameHtml: renderRecipeIngredientName(name, relIndex),
+          };
+        }).filter(Boolean),
+        station: station,
+        stationHtml: station ? renderRecipeIngredientName(station, relIndex) : "",
+        notes: notes,
+        unlockCondition: unlock,
+        evidenceTier: meaningful(recipe.evidence_tier),
+        confidence: meaningful(recipe.confidence),
+      };
+    }
+
+    if (!craftedFrom.length && !craftedAt.length) return null;
+
+    const stationRel = craftedAt[0] || null;
+    const stationName = stationRel ? meaningful(stationRel.title) : "";
+    const outputQty = stationRel && stationRel.output_quantity != null && Number.isFinite(Number(stationRel.output_quantity))
+      ? Number(stationRel.output_quantity)
+      : 1;
+
+    return {
+      outputName: displayName,
+      outputQuantity: outputQty,
+      ingredients: craftedFrom.map(function(rel) {
+        const name = meaningful(rel.title);
+        if (!name) return null;
+        return {
+          name: name,
+          quantity: rel.quantity != null ? rel.quantity : null,
+          unit: rel.unit || null,
+          nameHtml: renderRelationLink(rel),
+        };
+      }).filter(Boolean),
+      station: stationName,
+      stationHtml: stationRel ? renderRelationLink(stationRel) : (stationName ? escapeHtml(stationName) : ""),
+      notes: "",
+      unlockCondition: stationRel && meaningful(stationRel.unlock_condition) ? stationRel.unlock_condition : "",
+      evidenceTier: "",
+      confidence: stationRel && meaningful(stationRel.confidence) ? String(stationRel.confidence) : "",
+    };
+  }
+
+  function renderRecipeEvidenceMeta(recipeDisplay) {
+    if (!recipeDisplay) return "";
+    const parts = [];
+    if (recipeDisplay.evidenceTier) parts.push(formatLabel(recipeDisplay.evidenceTier));
+    if (recipeDisplay.confidence) {
+      const conf = recipeDisplay.confidence;
+      parts.push(/^\d+$/.test(String(conf)) ? (conf + "% confidence") : formatLabel(conf));
+    }
+    if (!parts.length) return "";
+    return '<p class="bl-wiki-recipe-meta">' + escapeHtml(parts.join(" · ")) + "</p>";
+  }
+
+  function renderRecipeSectionBody(recipeDisplay) {
+    if (!recipeDisplay) return "";
+    let html = '<dl class="bl-wiki-facts bl-wiki-recipe-facts">';
+
+    if (recipeDisplay.outputName) {
+      const qty = recipeDisplay.outputQuantity != null ? recipeDisplay.outputQuantity : 1;
+      html += '<div class="bl-wiki-fact">';
+      html += "<dt>Output</dt>";
+      html += "<dd><span class=\"bl-wiki-value\">" + escapeHtml(recipeDisplay.outputName) +
+        " ×" + escapeHtml(String(qty)) + "</span></dd>";
+      html += "</div>";
+    }
+
+    if (recipeDisplay.ingredients && recipeDisplay.ingredients.length) {
+      html += '<div class="bl-wiki-fact">';
+      html += "<dt>Ingredients</dt>";
+      html += "<dd><ul class=\"bl-wiki-recipe-ingredients\">";
+      recipeDisplay.ingredients.forEach(function(row) {
+        const qtyLabel = formatRecipeQuantity(row.quantity, row.unit);
+        html += "<li>";
+        html += row.nameHtml || escapeHtml(row.name);
+        if (qtyLabel) html += ' <span class="bl-wiki-recipe-qty">×' + escapeHtml(qtyLabel) + "</span>";
+        html += "</li>";
+      });
+      html += "</ul></dd></div>";
+    }
+
+    if (recipeDisplay.station) {
+      html += '<div class="bl-wiki-fact">';
+      html += "<dt>Crafting Station</dt>";
+      html += "<dd>" + (recipeDisplay.stationHtml || escapeHtml(recipeDisplay.station)) + "</dd>";
+      html += "</div>";
+    }
+
+    if (recipeDisplay.unlockCondition) {
+      html += '<div class="bl-wiki-fact">';
+      html += "<dt>Unlock Condition</dt>";
+      html += "<dd><span class=\"bl-wiki-value\">" + escapeHtml(recipeDisplay.unlockCondition) + "</span></dd>";
+      html += "</div>";
+    }
+
+    if (recipeDisplay.notes) {
+      html += '<div class="bl-wiki-fact">';
+      html += "<dt>Notes</dt>";
+      html += "<dd><span class=\"bl-wiki-value\">" + escapeHtml(recipeDisplay.notes) + "</span></dd>";
+      html += "</div>";
+    }
+
+    html += "</dl>";
+    html += renderRecipeEvidenceMeta(recipeDisplay);
+    return html;
+  }
+
+  function buildDetailSections(category, resolved, relations, missing, meta, post) {
     const sections = [];
     const f = resolved && resolved.facts ? resolved.facts : {};
     const usedKeys = new Set();
@@ -945,6 +1113,17 @@ window.WikiEntryLayout = (function() {
       pushRelations("locations", "Found at Locations", filterLocationRelations(relations));
       pushFact("stats", "Stats", f.stats);
       pushFact("effect", "Effects / Use", f.effect);
+      const recipeDisplay = resolveRecipeDisplay(meta, relations, post);
+      if (recipeDisplay) {
+        usedKeys.add("crafted_from");
+        usedKeys.add("crafted_at");
+        sections.push({
+          key: "crafting_recipe",
+          title: "Crafting Recipe",
+          type: "recipe",
+          recipe: recipeDisplay,
+        });
+      }
     } else if (category === "creatures") {
       pushRelations("drops", "Known Drops", filterRelationsByTypes(relations, ["drops"]));
       pushRelations("biomes", "Observed Biomes", filterBiomeRelations(relations));
@@ -1026,6 +1205,9 @@ window.WikiEntryLayout = (function() {
         html += '<li class="bl-wiki-context-item">' + escapeHtml(item) + "</li>";
       });
       html += "</ul>";
+    } else if (section.type === "recipe") {
+      html += '<div class="bl-wiki-detail-card-body bl-wiki-recipe-body">' +
+        renderRecipeSectionBody(section.recipe) + "</div>";
     } else if (section.type === "missing") {
       html += '<ul class="bl-wiki-missing-list bl-wiki-missing-list-compact">';
       section.items.forEach(function(item) {
@@ -1180,7 +1362,7 @@ window.WikiEntryLayout = (function() {
       resolved = EntityCore.resolveEntityFacts(post, meta, relations);
     }
     const heroFacts = buildHeroFacts(category, resolved, relations, stub);
-    const detailBuilt = buildDetailSections(category, resolved, relations, missing, meta);
+    const detailBuilt = buildDetailSections(category, resolved, relations, missing, meta, post);
     const displayName = typeof EntityCore !== "undefined"
       ? EntityCore.getDisplayName(meta, post)
       : (post.title || "Untitled");

@@ -1,7 +1,7 @@
 # Current Code Gap Notes
 
 Audit of BoundLore codebase against the content architecture blueprint.  
-**Last updated:** 2026-07-10 (P0-D1: Add Recipe Intent UI + Payload)
+**Last updated:** 2026-07-10 (P0-D3: Live Recipe Display on item pages)
 
 ---
 
@@ -82,23 +82,24 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | Duplicate guard | Same user + target + matching recipe fingerprint blocks re-submit |
 | Admin preview | Compact Add Recipe summary + CRAFT relation lines + merge policy note |
 | Admin approve & merge | Recipe block + CRAFT relations merged into target item (P0-D2) |
+| Live item display | `Crafting Recipe` section on item pages with payload + relation fallback (P0-D3) |
 
 ### Files
 
 | File | Role |
 |------|------|
 | `js/contribution-flow.js` | `add_recipe` mask, recipe form, payload + relations builder |
-| `js/wiki-entry-layout.js` | Item-page `Add Recipe` CTA |
+| `js/wiki-entry-layout.js` | Item-page `Add Recipe` CTA; `Crafting Recipe` display section |
 | `js/create-post.js` | Recipe form init, duplicate params on submit |
 | `js/knowledge-relations.js` | `mergeRecipePayloadBlock`, `mergeContributionIntoTarget`, craft relation dedupe |
 | `wiki/admin/index.html` | `renderRecipeContributionSummaryA`, approve merge preview |
 
-### Still deferred (P0-D3+)
+### Still deferred (P0-D4+)
 
-- Recipe live widget on item pages
 - Usage widget on resource pages
 - Recipe conflict / duplicate E2E beyond pending fingerprint (P0-D4)
 - `/wiki/resources/` landing
+- Full Recipe browse widget / index (P0-F)
 
 ---
 
@@ -124,7 +125,7 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | Area | Priority |
 |------|----------|
 | `/wiki/resources/` landing | P0-E |
-| Usage / Recipe widgets (live) | P0-F |
+| Usage / Recipe widgets (live) | P0-F (basic item-page recipe section done in P0-D3) |
 | Evidence-tier badge UI | P0-G |
 | `ingredient_of` auto-persist on resource pages | P0-F |
 | E2E T1 full chain (usage step) | After P0-F |
@@ -134,4 +135,4 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 ## 7. Next Step
 
-**P0-D3/D4/F:** Live recipe display follow-up, duplicate/conflict E2E, Usage/Recipe widgets
+**P0-D4/F:** Duplicate/conflict E2E, Usage widget, full Recipe browse widget
