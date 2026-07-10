@@ -3278,6 +3278,39 @@ details.bl-kg-section > summary.bl-kg-section-title::-webkit-details-marker {
   margin-top: 8px;
 }
 
+.bl-facet-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.bl-facet-badges-hero {
+  margin: 0.5rem 0 0.75rem;
+}
+
+.bl-facet-badges-resource-card {
+  margin-left: 0.25rem;
+}
+
+.bl-facet-badge {
+  display: inline-block;
+  padding: 0.14rem 0.48rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #6a9ec4;
+  background: rgba(90, 140, 180, 0.12);
+  border: 1px solid rgba(90, 140, 180, 0.22);
+}
+
+.bl-facet-badge[data-facet-derived="1"] {
+  color: #7a8ea8;
+  border-style: dashed;
+}
+
 .bl-evidence-badge {
   display: inline-flex;
   align-items: center;

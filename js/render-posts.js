@@ -909,6 +909,16 @@ function getResourceFactsRP(meta) {
   };
 }
 
+function renderResourceFacetBadgesRP(meta, post) {
+  if (typeof BoundLoreFacetRegistry === "undefined" || !BoundLoreFacetRegistry.renderFacetSignalsFromMeta) {
+    return "";
+  }
+  return BoundLoreFacetRegistry.renderFacetSignalsFromMeta(meta, post, {
+    maxBadges: 4,
+    groupClassName: "bl-facet-badges-resource-card",
+  });
+}
+
 function renderResourceEvidenceBadgesRP(meta) {
   const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
     ? meta.discovery_payload
@@ -1134,6 +1144,7 @@ function renderResourceCardRP(post) {
     : "";
   const usages = post._resourceUsages || [];
   const evidenceBadges = renderResourceEvidenceBadgesRP(meta);
+  const facetBadges = renderResourceFacetBadgesRP(meta, post);
 
   const card = document.createElement("article");
   card.className = "bl-resource-card";
@@ -1144,6 +1155,7 @@ function renderResourceCardRP(post) {
           escapeHtmlRP(displayName) + "</a></h3>" +
         '<div class="bl-resource-card-tags">' +
           '<span class="bl-tag bl-tag-type">Resource</span>' +
+          (facetBadges || "") +
         "</div>" +
         (evidenceBadges || "") +
       "</div>" +

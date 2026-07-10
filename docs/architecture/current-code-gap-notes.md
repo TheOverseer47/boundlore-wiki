@@ -304,7 +304,7 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 | # | Blind spot | Current code | Target state | Priority |
 |---|------------|--------------|--------------|----------|
-| 1 | **No Facet Layer** | Only `entity_domain` + `entity_subtype` | Facets for role, capability, taxonomy, acquisition, etc. | **P0.5** |
+| 1 | **No Facet Layer** | `js/facet-registry.js` baseline + derived resource badges (P0.5-B) | Full BLMETA `facets` editing, search index, filters | **P0.5** (partial: registry + display) |
 | 2 | **No Unresolved Target Lifecycle** | Wood/Forge show `Entry needed` badge in recipe UI (P0.5-A); no queue/promotion yet | mentioned → unresolved → candidate → stub via Missing Entry Queue | **P0.5** (partial: display only) |
 | 3 | **Search title/excerpt only** | `js/search.js` ilike on posts.title, excerpt | search_documents index with facets, aliases, relations | **P0.5** baseline |
 | 4 | **No station_type** | `crafted_at` → string "Forge" | SYSTEM/station_type entity; Forge promotable | **P0.5** |
@@ -360,3 +360,22 @@ Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started a
 **Files touched:** `wiki/browse/index.html`, `js/entity-core.js`, `js/post-detail.js`, `js/wiki-entry-layout.js`, `css/style.css`, `wiki/post/index.html` (cache bust).
 
 **Known follow-ups (not P0.5-A):** Missing Entry Queue UI, station_type promotion, search baseline, facet layer, versioned statements.
+
+---
+
+## 3. P0.5-B — Facet Registry Baseline
+
+**Status:** Complete (code registry + derivation + minimal badges; no DB migration, search, filters, or admin UI).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| Central registry | `js/facet-registry.js` → `window.BoundLoreFacetRegistry` | 16 facet groups with controlled values, labels, domain/subtype applicability |
+| Helpers | normalize, format, collect, derive, render badge/group | Null-safe; old posts without `facets` return empty arrays |
+| Resource derivation | `deriveFacetsFromMeta()` from structured payload | QA Ember Shard → acquisition_method mining, rarity unknown, processing_stage raw |
+| Detail display | `wiki-entry-layout.js` resource hero | Facet badges separate from evidence badges (max 4) |
+| Resources landing | `render-posts.js` resource cards | Facet badges on card tags row |
+| Not built | Facet editing, search index, filters, Missing Entry Queue, station promotion | Deferred |
+
+**Derivation rules (conservative):** Only structured fields (`source_type`, `rarity`); no speculative element/taxonomy from names; `processing_stage: raw` only for resource entries without refined/component hints.
+
+**Files touched:** `js/facet-registry.js` (new), `js/wiki-entry-layout.js`, `js/render-posts.js`, `css/style.css`, `wiki/post/index.html`, `wiki/resources/index.html`, `wiki/items/index.html`, `wiki/browse/index.html`.

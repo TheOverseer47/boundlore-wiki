@@ -23,6 +23,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P0.5-B — Facet Registry Baseline
+
+**Milestone:** P0.5-B (registry + derivation + minimal badges; no search/filter/admin UI)
+
+| Test | URL / target | Expected | Result |
+|------|--------------|----------|--------|
+| Resource detail facets | `qa-ember-shard-511160` | Facet badges Mining, Unknown, Raw; hero facts + evidence badges intact | `[x]` |
+| Resources landing facets | `/wiki/resources/` | QA Ember Shard card with facet badges; usage Staff/Forge/3 piece | `[x]` |
+| Staff regression | `qa-staff-of-fire-2b742628` | Recipe + Entry needed unchanged; no facet spam | `[x]` |
+| Browse regression | `/wiki/browse/` | Visible after load; registry script loaded | `[x]` |
+| Items regression | `/wiki/items/` | Browse Resources link; no Wood/Forge/Recipe posts | `[x]` |
+| Homepage regression | `/` | Visible; hero + infographic | `[x]` |
+| Admin conflict queue | `/wiki/admin/` | 1 pending add_recipe remains | `[~]` Access Denied in automation session |
+
+**Not built in P0.5-B:** Facet editing, facet search, facet filters, Missing Entry Queue, station promotion, search baseline, Dragon-Mount query tests.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

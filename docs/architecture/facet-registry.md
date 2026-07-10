@@ -1,6 +1,8 @@
 # Facet Registry
 
-**Version 2.0 — binding architecture (documentation only until P0.5 implementation)**
+**Version 2.0 — binding architecture**
+
+> **Code baseline (P0.5-B):** Runtime registry lives in [`js/facet-registry.js`](../../js/facet-registry.js) as `window.BoundLoreFacetRegistry`. Supports normalization, conservative derivation from existing BLMETA/payload, and minimal facet badges on resource detail + resources landing. Search indexing, filters, and facet editing are **not** implemented yet.
 
 Controlled multi-valued classification layer for BoundLore. Facets complement — never replace — `entity_domain` and `entity_subtype`.
 
@@ -318,9 +320,9 @@ Plain-string values are allowed for low-risk groups (taxonomy, locomotion) when 
 
 ## P0.5 Implementation Scope
 
-Documentation and schema preparation only in this commit. Implementation gates:
+Documentation and schema preparation in Blueprint 2.0. **P0.5-B code baseline shipped** in `js/facet-registry.js`. Remaining gates:
 
-1. Facet group registry in `js/relations-registry.js` (or companion module)
-2. BLMETA `facets` field (additive, backward compatible)
-3. Display badges in `wiki-entry-layout.js`
-4. Index facets in search baseline (see [search-architecture.md](./search-architecture.md))
+1. ~~Facet group registry in code~~ — **done (P0.5-B)** via `js/facet-registry.js`
+2. BLMETA `facets` field (additive, backward compatible) — explicit authoring not yet in forms
+3. ~~Display badges in `wiki-entry-layout.js`~~ — **partial (P0.5-B)** resource hero + resource cards
+4. Index facets in search baseline (see [search-architecture.md](./search-architecture.md)) — **not started**

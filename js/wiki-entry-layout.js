@@ -363,6 +363,13 @@ window.WikiEntryLayout = (function() {
     return renderEvidenceBadgeGroupSafe(signals.evidenceTier, signals.confidence, options);
   }
 
+  function renderEntryFacetBadges(meta, post, options) {
+    if (typeof BoundLoreFacetRegistry === "undefined" || !BoundLoreFacetRegistry.renderFacetSignalsFromMeta) {
+      return "";
+    }
+    return BoundLoreFacetRegistry.renderFacetSignalsFromMeta(meta, post, options || { maxBadges: 4, groupClassName: "bl-facet-badges-hero" });
+  }
+
   function enrichPayloadFromRelations(payload, relations, knowledgeEntry) {
     if (typeof EntityCore !== "undefined") {
       return EntityCore.enrichPayloadFromRelations(payload, relations, knowledgeEntry);
@@ -1568,6 +1575,8 @@ window.WikiEntryLayout = (function() {
     if (String(model.category || "").toLowerCase() === "items" && itemSubtypeForEvidence === "resource") {
       const evidenceBadges = renderEntryEvidenceBadges(model.meta, model.payload, { groupClassName: "bl-evidence-badges-hero" });
       if (evidenceBadges) html += evidenceBadges;
+      const facetBadges = renderEntryFacetBadges(model.meta, post, { maxBadges: 4, groupClassName: "bl-facet-badges-hero" });
+      if (facetBadges) html += facetBadges;
     }
     html += renderHeroFactsGrid(model.heroFacts);
     html += '<div class="bl-wiki-hero-actions">';
