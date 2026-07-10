@@ -341,7 +341,7 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 ### Next implementation step (when authorized)
 
-Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started as part of docs-only materialization.
+P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-G acceptance sweep). Next authorized work is **push/deploy decision** or **P1** — not automatic.
 
 ---
 
@@ -354,12 +354,12 @@ Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started a
 | `/wiki/browse/` visibility | Sync `patch-mode.js` after `supabase-config.js` with `data-bl-patch-mode="1"` (same as homepage/post) | Page loads visible; no blank/dark overlay |
 | Resource classification display | `EntityCore.isResourceEntry()`, resource branch in `resolveItemFacts()`, wiki hero facts + sidebar Type/Subcategory | QA Ember Shard shows Type Resource, Source Type Mining, Source Detail, Rarity Unknown; no Add Recipe CTA |
 | Unresolved recipe targets | `renderRecipeIngredientName()` adds `Entry needed` badge when target has no resolvable slug/id | QA Staff recipe: Ember Shard linked; Wood ×1 and Forge marked Entry needed |
-| Missing Entry Queue | **Not implemented** | Badges only; no auto-stubs, no promotion policy, no admin queue |
-| Facet system / search baseline / station_type | **Not implemented** | Deferred per Blueprint 2.0 P0.5 roadmap |
+| Missing Entry Queue | **Not in P0.5-A** | Added in P0.5-C (derived read-only queue) |
+| Facet system / search baseline / station_type | **Not in P0.5-A** | Added in P0.5-B/D/E/F |
 
 **Files touched:** `wiki/browse/index.html`, `js/entity-core.js`, `js/post-detail.js`, `js/wiki-entry-layout.js`, `css/style.css`, `wiki/post/index.html` (cache bust).
 
-**Known follow-ups (not P0.5-A):** Missing Entry Queue UI, station_type promotion, search baseline, facet layer, versioned statements.
+**Follow-ups (post-P0.5):** Persistent queue, real promotion, Postgres search index, version history UI — see P1/P2 roadmap.
 
 ---
 
@@ -449,3 +449,24 @@ Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started a
 | Not built | Version History widget, patch UI, DB migration, backfill, fake game versions | Deferred P2 |
 
 **Files touched:** `js/versioning-model.js` (new), `js/knowledge-relations.js`, `js/entity-core.js`, `js/facet-registry.js`, `js/wiki-entry-layout.js`, `js/search-signals.js`, `css/style.css`, `wiki/post/index.html`, `wiki/search/index.html`, `wiki/admin/index.html`, `wiki/resources/index.html`.
+
+---
+
+## 8. P0.5-G — Acceptance Sweep & Pre-Push Readiness
+
+**Status:** Complete (regression + docs alignment; no push, deploy, SQL, or feature work).
+
+| Check | Result |
+|-------|--------|
+| Git @ `014e1cd`; `qa/e2e-baseline-bmeta.snapshot.json` untracked | Confirmed |
+| Core modules exist: facet-registry, unresolved-targets, station-type-quick-add, search-signals, versioning-model | Confirmed |
+| Global APIs on wiki pages: `BoundLoreFacetRegistry`, `BoundLoreUnresolvedTargets`, `BoundLoreSearchSignals`, `BoundLoreVersioning` | Confirmed |
+| Station type prefill API | `window.StationTypeQuickAdd` on create-post (not `BoundLoreStationTypeQuickAdd`) |
+| Versioning smoke | Equivalent checks pass via `extractVersionMetadata` / `isCurrentStatement` / `isHistoricalStatement` |
+| Regression URLs (home, browse, resources, items, staff, ember, ogre, swamp, search, prefill) | Green on `http://localhost:8080` |
+| Wood / Forge posts | None — missing-entry suggestions only |
+| Pending add_recipe conflict | Untouched |
+| Admin UI | Login redirect — not visually verified; no auth/repair actions |
+| Docs | `roadmap.md`, `current-code-gap-notes.md`, `e2e-content-matrix.md` updated for P0.5 completion |
+
+**Outcome:** P0.5-A–F accepted as pre-push foundation. P1 awaits explicit authorization.

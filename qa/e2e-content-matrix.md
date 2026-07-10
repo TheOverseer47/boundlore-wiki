@@ -113,6 +113,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P0.5-G — Acceptance Sweep & Pre-Push Readiness
+
+**Milestone:** P0.5-G (full regression of P0.5-A–F; docs alignment; no push/deploy/SQL)
+
+| Test | URL / target | Expected | Result |
+|------|--------------|----------|--------|
+| Git baseline | `main` @ `014e1cd` | Snapshot untracked; no unexpected changes | `[x]` |
+| Homepage | `/` | Renders; hero; recent posts | `[x]` |
+| Browse | `/wiki/browse/` | Renders category hubs | `[x]` |
+| Resources landing | `/wiki/resources/` | QA Ember Shard card + facets | `[x]` |
+| Items landing | `/wiki/items/` | Renders; no Wood/Forge posts | `[x]` |
+| QA Staff | `qa-staff-of-fire-2b742628` | Recipe; Ember linked; Wood/Forge Entry needed + prefill links; no version badges | `[x]` |
+| QA Ember Shard | `qa-ember-shard-511160` | Resource; Mining/Unknown/Raw facets; Used In; no aggressive inferencing | `[x]` |
+| QA Ogre Mage | `qa-ogre-mage-1103f2` | Creature detail renders | `[x]` |
+| Swamp | `swamplands-94dadc07` | Biome detail renders | `[x]` |
+| Wood prefill | create-post resource prefill URL | Loads; Wood prefilled; no auto-submit | `[x]` |
+| Forge prefill | create-post station_type prefill URL | Station Type flow; Forge prefilled; no auto-submit | `[x]` |
+| Search title | `?q=qa ember shard` | QA Ember Shard + Staff recipe match | `[x]` |
+| Search resource / mining / source detail | `resource`, `mining`, `red crystal nodes` | QA Ember Shard | `[x]` |
+| Search wood / forge | `wood`, `forge` | Staff + Missing Entry suggestions; no Wood/Forge posts | `[x]` |
+| Global APIs | loaded wiki page console | FacetRegistry, UnresolvedTargets, SearchSignals, Versioning = object; StationTypeQuickAdd on create-post | `[x]` |
+| Versioning smoke | `BoundLoreVersioning` helpers | All tolerant checks pass (via `extractVersionMetadata` / `isCurrentStatement`) | `[x]` |
+| Admin optional | `/wiki/admin/` | Read-only queue/conflict if authed | `[~]` Login redirect / Access Denied — not visually verified |
+| Pending add_recipe conflict | admin queue | Unchanged; not approved/deleted | `[x]` not touched |
+
+**Sweep outcome:** P0.5-A through P0.5-F **green** as connected foundation. Persistent backend (search_documents, unresolved_targets DB, version backfill) remains later scope. **P1 does not start automatically.**
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

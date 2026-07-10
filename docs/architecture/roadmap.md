@@ -40,25 +40,28 @@ Binding sequence from master blueprint v2.0. Each milestone ends with E2E cases 
 
 **Goal:** Close structural gaps identified in Blueprint 2.0 audit. Small, reversible commits.
 
-**Not in scope:** NPC/Quest/Event models, full versioning UX, semantic search.
+**Status (P0.5-G acceptance sweep):** **P0.5-A through P0.5-F complete** as a connected client-side foundation. Persistent backend structures (search index, unresolved_targets table, version backfill) remain **separate later scope**. **P1 does not start automatically.**
+
+**Not in scope:** NPC/Quest/Event models, full versioning UX, semantic search, persistent search_documents, pg_trgm, embeddings.
 
 ### Sequence (binding order)
 
-| # | Item | Type | Acceptance |
-|---|------|------|------------|
-| 1 | Browse Patch-Mode Visibility Fix | UI fix | `/wiki/browse/` renders with patch mode on/off |
-| 2 | Resource Classification Display Fix | UI fix | QA Ember Shard shows Resource, not "Item Entry" |
-| 3 | Unresolved Recipe Targets as Entry Needed | UI + data | Wood/Forge show Entry Needed on Staff recipe |
-| 4 | Facet Baseline | Schema + registry | BLMETA `facets` field; facet-registry in code |
-| 5 | Unresolved Target Records + Missing Entry Queue | Admin | Wood/Forge in queue; no auto-stubs |
-| 6 | station_type + Forge Promotion Path | Model + admin | Forge promotable to SYSTEM/station_type stub |
-| 7 | Search Baseline | Index + query | T-SEARCH-01, T-SEARCH-02 pass |
-| 8 | Version Fields / nullable prep | Schema only | valid_from/until/superseded_by in docs + BLMETA shape |
-| 9 | Blueprint 2.0 Docs materialized | Docs | This commit set |
+| # | Item | Type | Status |
+|---|------|------|--------|
+| 1 | Browse Patch-Mode Visibility Fix (P0.5-A) | UI fix | **Done** — `/wiki/browse/` renders |
+| 2 | Resource Classification Display Fix (P0.5-A) | UI fix | **Done** — QA Ember Shard shows Resource |
+| 3 | Unresolved Recipe Targets as Entry Needed (P0.5-A) | UI + data | **Done** — Wood/Forge Entry needed on Staff |
+| 4 | Facet Baseline (P0.5-B) | Registry + display | **Done** — `js/facet-registry.js`; derived badges |
+| 5 | Derived Missing Entry Queue (P0.5-C) | Admin read-only | **Done** — in-memory; Wood/Forge; no auto-stubs |
+| 6 | station_type + Safe Promotion Path (P0.5-D) | Model + prefill | **Done** — safe create prefill only; no auto-promotion |
+| 7 | Structured Search Signal Baseline (P0.5-E) | Client search | **Done** — client-side signals + missing-entry suggestions |
+| 8 | Versioning Metadata Baseline (P0.5-F) | Code helpers | **Done** — tolerant/read-only; no history UI |
+| 9 | Blueprint 2.0 Docs materialized | Docs | **Done** |
+| 10 | P0.5-G Acceptance Sweep | QA + docs | **Done** — regression green on localhost:8080 |
 
-### E2E archetypes (planned, not passed until implementation)
+### E2E archetypes (client baseline covered; full archetypes deferred to P1+)
 
-T-SEARCH-01, T-SEARCH-02, T-MOUNT-01, T-PROMOTION-01, T-PROMOTION-02, T-STATION-01, T-CRAFT-01
+T-SEARCH-01, T-SEARCH-02 covered by P0.5-E/G client search checks. T-MOUNT-01, T-PROMOTION-01, T-PROMOTION-02, T-STATION-01, T-CRAFT-01 remain **P1+** when promotion/persistence exists.
 
 ### Stop conditions
 
