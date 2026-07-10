@@ -1013,6 +1013,67 @@ window.WikiEntryLayout = (function() {
     };
   }
 
+  function resolveRecipeUsages(relations) {
+    const inbound = filterRelationsByTypes(relations, ["ingredient_of"]).filter(function(rel) {
+      return rel.direction === "inbound" || rel.auto_inferred;
+    });
+    const seen = new Set();
+    return inbound.map(function(rel) {
+      const href = typeof KnowledgeRelations !== "undefined"
+        ? KnowledgeRelations.buildRelationHref(rel)
+        : (rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : "");
+      return {
+        title: typeof EntityCore !== "undefined"
+          ? EntityCore.getRelationDisplayName(rel)
+          : (rel.title || "Entry"),
+        slug: rel.slug || null,
+        href: href,
+        quantity: rel.quantity != null ? rel.quantity : null,
+        unit: rel.unit || null,
+        station: meaningful(rel.crafting_station || rel.station) || null,
+        context: "Crafting Recipe",
+      };
+    }).filter(function(row) {
+      const key = (row.slug || row.title || "").toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function renderRecipeUsageCard(usage) {
+    let html = '<div class="bl-wiki-usage-card">';
+    html += '<div class="bl-wiki-usage-card-head">';
+    if (usage.href) {
+      html += '<a class="bl-wiki-rel-link" href="' + escapeHtml(usage.href) + '">' +
+        escapeHtml(usage.title) + "</a>";
+    } else {
+      html += '<span class="bl-wiki-rel-link">' + escapeHtml(usage.title) + "</span>";
+    }
+    html += "</div>";
+    html += '<div class="bl-wiki-usage-card-meta">';
+    html += '<span class="bl-wiki-usage-context">Used for: ' + escapeHtml(usage.context || "Crafting Recipe") + "</span>";
+    const qtyLabel = formatRecipeQuantity(usage.quantity, usage.unit);
+    if (qtyLabel) {
+      html += '<span class="bl-wiki-usage-qty">Quantity: ' + escapeHtml(qtyLabel) + "</span>";
+    }
+    if (usage.station) {
+      html += '<span class="bl-wiki-usage-station">Station: ' + escapeHtml(usage.station) + "</span>";
+    }
+    html += "</div>";
+    html += "</div>";
+    return html;
+  }
+
+  function renderRecipeUsageSectionBody(items) {
+    let html = '<div class="bl-wiki-usage-list">';
+    items.forEach(function(usage) {
+      html += renderRecipeUsageCard(usage);
+    });
+    html += "</div>";
+    return html;
+  }
+
   function renderRecipeEvidenceMeta(recipeDisplay) {
     if (!recipeDisplay) return "";
     const parts = [];
@@ -1124,6 +1185,16 @@ window.WikiEntryLayout = (function() {
           recipe: recipeDisplay,
         });
       }
+      const recipeUsages = resolveRecipeUsages(relations);
+      if (recipeUsages.length) {
+        usedKeys.add("ingredient_of");
+        sections.push({
+          key: "recipe_usage",
+          title: "Used In",
+          type: "recipe_usage",
+          items: recipeUsages,
+        });
+      }
     } else if (category === "creatures") {
       pushRelations("drops", "Known Drops", filterRelationsByTypes(relations, ["drops"]));
       pushRelations("biomes", "Observed Biomes", filterBiomeRelations(relations));
@@ -1208,6 +1279,9 @@ window.WikiEntryLayout = (function() {
     } else if (section.type === "recipe") {
       html += '<div class="bl-wiki-detail-card-body bl-wiki-recipe-body">' +
         renderRecipeSectionBody(section.recipe) + "</div>";
+    } else if (section.type === "recipe_usage") {
+      html += '<div class="bl-wiki-detail-card-body bl-wiki-usage-body">' +
+        renderRecipeUsageSectionBody(section.items) + "</div>";
     } else if (section.type === "missing") {
       html += '<ul class="bl-wiki-missing-list bl-wiki-missing-list-compact">';
       section.items.forEach(function(item) {

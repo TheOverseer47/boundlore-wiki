@@ -548,11 +548,36 @@ window.KnowledgeRelations = (function() {
     return normalizeTitleKey(relCanonical) === normalizeTitleKey(canonicalName);
   }
 
-  function buildInboundRelationFromSource(rel, sourcePost, targetPost) {
+  function resolveCraftStationFromSource(sourceMeta, sourceRels) {
+    const payload = sourceMeta && sourceMeta.discovery_payload ? sourceMeta.discovery_payload : {};
+    const recipe = payload.recipe && typeof payload.recipe === "object" ? payload.recipe : null;
+    if (recipe) {
+      const station = meaningfulValue(recipe.station || recipe.crafting_station);
+      if (station) return station;
+    }
+    const list = Array.isArray(sourceRels) ? sourceRels : [];
+    for (let i = 0; i < list.length; i++) {
+      const craftedAt = list[i];
+      if (normalizeRelationType(craftedAt.relation_type) === "crafted_at" && meaningfulValue(craftedAt.title)) {
+        return craftedAt.title;
+      }
+    }
+    return null;
+  }
+
+  function buildInboundRelationFromSource(rel, sourcePost, targetPost, sourceRels, sourceMeta) {
+    const meta = sourceMeta || (sourcePost ? parseMetaFromHtml(sourcePost.content || "") : {});
     const inverse = createInverseRelation(rel, sourcePost);
     if (inverse) {
       inverse.direction = "inbound";
       inverse.visibility = getTargetProminence(inverse.relation_type, targetPost.category);
+      if (normalizeRelationType(rel.relation_type) === "crafted_from") {
+        const qty = craftRelationQuantity(rel);
+        if (qty != null) inverse.quantity = qty;
+        if (rel.unit) inverse.unit = rel.unit;
+        const station = resolveCraftStationFromSource(meta, sourceRels);
+        if (station) inverse.crafting_station = station;
+      }
       if (typeof EntityCore !== "undefined") {
         Object.assign(inverse, EntityCore.enrichRelation(inverse, sourcePost));
       }
@@ -631,7 +656,7 @@ window.KnowledgeRelations = (function() {
       sourceRels.forEach(function(rel) {
         if (!relationTargetsEntity(rel, canonical, entityKey, aliases)) return;
         linkedToTarget = true;
-        pushInbound(buildInboundRelationFromSource(rel, sourcePost, post));
+        pushInbound(buildInboundRelationFromSource(rel, sourcePost, post, sourceRels, sourceMeta));
       });
 
       if (linkedToTarget && (String(post.category || "").toLowerCase() === "biomes"
@@ -1842,7 +1867,13 @@ window.KnowledgeRelations = (function() {
       });
     }
 
-    return dedupeRelationsForDisplay(mergeRelations(mergeRelations(graph, stored), fromPayload).map(function(rel) {
+    let merged = mergeRelations(mergeRelations(graph, stored), fromPayload);
+    if (payload.recipe && typeof payload.recipe === "object") {
+      merged = mergeRelations(merged, buildCraftRelationsFromRecipe(payload.recipe).map(function(craftRel) {
+        return buildRelation(craftRel);
+      }));
+    }
+    return dedupeRelationsForDisplay(merged.map(function(rel) {
       return buildRelation(rel);
     }));
   }

@@ -3103,6 +3103,39 @@ details.bl-kg-section > summary.bl-kg-section-title::-webkit-details-marker {
   color: var(--text-muted);
 }
 
+.bl-wiki-usage-list {
+  display: grid;
+  gap: 10px;
+}
+
+.bl-wiki-usage-card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.bl-wiki-usage-card-head .bl-wiki-rel-link {
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.bl-wiki-usage-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.bl-wiki-usage-context,
+.bl-wiki-usage-qty,
+.bl-wiki-usage-station {
+  display: block;
+  word-break: break-word;
+}
+
 .bl-wiki-rel-card-grid {
   display: grid;
   gap: 10px;

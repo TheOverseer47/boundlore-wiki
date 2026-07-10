@@ -1,7 +1,7 @@
 # Current Code Gap Notes
 
 Audit of BoundLore codebase against the content architecture blueprint.  
-**Last updated:** 2026-07-10 (P0-D4: Recipe duplicate/conflict handling)
+**Last updated:** 2026-07-10 (P0-E1: Usage widget from CRAFT relations/recipe data)
 
 ---
 
@@ -49,9 +49,43 @@ Resource Name, Source Type (mining/plant/creature-drop/biome/water/loot/unknown)
 | Explicit source entity + creature-drop/plant/mining | `harvested_from` → entity |
 | Generic source detail only | Stored as fact — **no location stub** |
 
-`ingredient_of` not auto-created (P0-F Usage widget).
+`ingredient_of` not auto-created or persisted — derived at display time from inbound `crafted_from` / merged recipe payloads (P0-E1 Usage widget).
 
 ---
+
+## 1b. Resource / Item Usage Widget (P0-E1)
+
+| Behavior | Status |
+|----------|--------|
+| Data source | Inbound `ingredient_of` derived from published items' `crafted_from` relations + `discovery_payload.recipe` |
+| Section title | `Used In` on item/resource detail pages |
+| Visibility | Only when at least one usage match exists |
+| Display | Target item link, quantity + unit, station, context "Crafting Recipe" |
+| Pending contributions | Excluded (`isContributionPost` filter in inbound scan) |
+| Pending conflict ×4 | Not shown (conflict contribution never merged into Staff recipe) |
+| `ingredient_of` persist | **No** — inverse/derived only |
+| Duplicate supplemental | Generic `Ingredient Of` relation group suppressed when Usage section active |
+
+### QA verified
+
+- `qa-ember-shard-511160` → Used In → QA Staff of Fire, 3 piece, Forge
+- `qa-staff-of-fire-2b742628` → Crafting Recipe unchanged; no false Used In
+
+### Files
+
+| File | Role |
+|------|------|
+| `js/knowledge-relations.js` | Recipe craft relations in `collectEntityRelations`; inbound enrichment (qty/unit/station) |
+| `js/wiki-entry-layout.js` | `Used In` section rendering |
+| `css/style.css` | Usage card styles |
+| `wiki/post/index.html` | Script cache bust |
+
+### Still deferred
+
+- `/wiki/resources/` landing
+- Evidence-tier badge UI
+- Full Recipe browse/index
+- Global cross-domain usage beyond CRAFT/recipe-derived paths
 
 ## 2. Synonym / Duplicate Warning (P0-C)
 
@@ -106,10 +140,10 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 - `recipe_ingredients` / CRAFT quantity mismatch → conflicts logged, existing recipe kept.
 - Admin approve **blocked** when preview detects recipe conflicts.
 
-### Still deferred (P0-E+)
+### Still deferred (post P0-E1)
 
-- Usage widget on resource pages
 - `/wiki/resources/` landing
+- Evidence-tier badge UI
 - Full Recipe browse widget / index (P0-F)
 
 ---
@@ -136,14 +170,14 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | Area | Priority |
 |------|----------|
 | `/wiki/resources/` landing | P0-E |
-| Usage / Recipe widgets (live) | P0-F (basic item-page recipe section done in P0-D3) |
 | Evidence-tier badge UI | P0-G |
-| `ingredient_of` auto-persist on resource pages | P0-F |
-| E2E T1 full chain (usage step) | After P0-F |
+| Full Recipe browse/index | P0-F |
+| E2E T1 full chain (usage step) | P0-E1 done; `/wiki/resources/` still open |
 | Recipe duplicate/conflict E2E | P0-D4 (done) |
 
 ---
 
 ## 7. Next Step
 
-**P0-E/F:** Usage widget, `/wiki/resources/`, full Recipe browse widget
+**P0-E:** `/wiki/resources/` landing  
+**P0-F/G:** Full Recipe browse widget, Evidence-tier badges

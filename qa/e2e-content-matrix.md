@@ -10,16 +10,17 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Milestone:** P0  
 **Slug idea:** `qa-ember-shard`  
-**P0-C status:** Steps 1, 2, 5 implemented (resource quick-add + synonym warning). Steps 3–4, 6 deferred (Usage widget, `/wiki/resources/`).
+**P0-C status:** Steps 1, 2, 5 implemented (resource quick-add + synonym warning). Step 4 deferred (`/wiki/resources/`).  
+**P0-E1 status:** Step 3 usage display implemented (derived from merged Staff recipe / `crafted_from`). Step 6 deferred (no `ingredient_of` contribution path).
 
 | Step | Action | Expected | P0-C |
 |------|--------|----------|------|
 | 1 | Resource Quick-Add: `QA Ember Shard`, mining, `QA Volcanic`, detail `red crystal nodes` | `entity_subtype: resource`, `discovery_payload.resource` | `[~]` manual |
 | 2 | Approve discovery | Published resource page | `[~]` needs admin session |
-| 3 | View resource detail page | Usage section empty with prominent CTA | `[ ]` P0-F |
+| 3 | View resource detail page | `Used In` shows Staff link, 3 piece, Forge; no Add Recipe CTA | `[x]` P0-E1 |
 | 4 | View `/wiki/resources/` | Resource appears; filter "mining" works | `[ ]` P0-E |
 | 5 | Second submit `QA EmberShard` | Synonym warning → `QA Ember Shard` | `[~]` manual |
-| 6 | Add Usage via contribution (`ingredient_of`) | Usage populated after merge | `[ ]` P0-D/F |
+| 6 | Add Usage via contribution (`ingredient_of`) | Not required — usage derived from recipe merge; `ingredient_of` not persisted | `[~]` P0-E1 |
 
 **Relations expected:** `harvested_from` → Volcanic biome stub
 
@@ -32,7 +33,8 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 **P0-D1 status:** Steps 1–2 implemented (Add Recipe intent + pending payload).  
 **P0-D2 status:** Step 3 merge implemented (admin approve merges recipe + CRAFT relations into target).  
 **P0-D3 status:** Item detail shows `Crafting Recipe` section from merged payload (QA Staff verified).  
-**P0-D4 status:** Duplicate recipe → no-op merge (`recipe_confirmed`); conflict recipe (Ember ×4) → blocked approve, stays pending. Steps 4–6 deferred (usage widget, browse).
+**P0-D4 status:** Duplicate recipe → no-op merge (`recipe_confirmed`); conflict recipe (Ember ×4) → blocked approve, stays pending.  
+**P0-E1 status:** Ember Shard `Used In` widget from merged Staff recipe (not pending conflict). Recipe browse still deferred.
 
 | Step | Action | Expected | Status |
 |------|--------|----------|--------|
@@ -42,7 +44,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | 3b | View Staff item page | Crafting Recipe section visible (ingredients, station, notes) | `[x]` P0-D3 |
 | 6 | Submit duplicate recipe (same ingredients) | No second recipe block; no-op merge / confirm only | `[x]` P0-D4 |
 | 6b | Submit conflicting recipe (Ember ×4) | Conflict detected; existing recipe not overwritten | `[x]` P0-D4 |
-| 4 | View Ember Shard page | Usage entry pointing to Staff | `[ ]` P0-F |
+| 4 | View Ember Shard page | `Used In` → Staff, 3 piece, Forge; no ×4 conflict | `[x]` P0-E1 |
 | 5 | Recipes browse (virtual list) | Staff recipe visible | `[ ]` P1 |
 | 6 | Submit conflicting second recipe | Coexists as `reported`, not overwritten; approve blocked | `[x]` P0-D4 |
 
