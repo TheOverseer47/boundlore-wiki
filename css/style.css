@@ -3112,6 +3112,32 @@ details.bl-kg-section > summary.bl-kg-section-title::-webkit-details-marker {
   vertical-align: middle;
 }
 
+.bl-wiki-entry-needed-link {
+  display: inline-block;
+  margin-left: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #6eb5ff;
+  text-decoration: none;
+}
+
+.bl-wiki-entry-needed-link:hover {
+  text-decoration: underline;
+  color: #9ecbff;
+}
+
+.bl-missing-entry-prefill-banner {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: #d4a843;
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px solid rgba(201, 168, 76, 0.28);
+}
+
 .bl-wiki-recipe-meta {
   margin: 10px 0 0;
   font-size: 0.78rem;
@@ -3334,6 +3360,10 @@ details.bl-kg-section > summary.bl-kg-section-title::-webkit-details-marker {
 .bl-missing-entry-actions .btn-small[disabled] {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.bl-missing-entry-start {
+  margin-right: 6px;
 }
 
 .bl-missing-entry-empty {

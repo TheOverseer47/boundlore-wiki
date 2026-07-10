@@ -571,6 +571,45 @@ window.EntityCore = (function() {
     return resolveEntitySubtype(meta, post) === "resource";
   }
 
+  function isStationTypeEntry(meta, post) {
+    const cat = String(post && post.category || "").toLowerCase();
+    const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+      ? meta.discovery_payload
+      : {};
+    if (meta && meta.entity_subtype === "station_type") return true;
+    if (meta && meta.discovery_form === "station_type_quick") return true;
+    if (payload.discovery_type === "station_type") return true;
+    if (payload.station_type && typeof payload.station_type === "object") return true;
+    return cat === "crafting" && resolveEntitySubtype(meta, post) === "station_type";
+  }
+
+  function getEntitySubtypeDisplayLabel(subtype, options) {
+    const opts = options || {};
+    const key = String(subtype || "").toLowerCase();
+    const map = {
+      resource: "Resource",
+      station_type: opts.stationContext ? "Crafting Station" : "Station Type",
+      weapon: "Weapon",
+      item_generic: "Item",
+      creature: "Creature",
+      biome: "Biome",
+      recipe: "Recipe",
+    };
+    return map[key] || formatLabel(key);
+  }
+
+  function getEntityDomainDisplayLabel(domain) {
+    const key = String(domain || "").toUpperCase();
+    const map = {
+      OBJECT: "Object",
+      BEING: "Being",
+      PLACE: "Place",
+      SYSTEM: "System",
+      KNOWLEDGE: "Knowledge",
+    };
+    return map[key] || key;
+  }
+
   function getResourcePayloadBlock(meta) {
     const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
       ? meta.discovery_payload
@@ -1026,7 +1065,11 @@ window.EntityCore = (function() {
     }
 
     if (cat === "lore") return "lore_book";
-    if (cat === "crafting") return "recipe";
+    if (cat === "crafting") {
+      if (m.discovery_form === "station_type_quick") return "station_type";
+      if (String(data.discovery_type || "").toLowerCase() === "station_type") return "station_type";
+      return "recipe";
+    }
     if (cat === "guilds") return "guild";
     if (cat === "guides") return "guide";
     if (cat === "news") return "news";
@@ -1344,6 +1387,9 @@ window.EntityCore = (function() {
     resolveEntityDomain: resolveEntityDomain,
     resolveEntitySubtype: resolveEntitySubtype,
     isResourceEntry: isResourceEntry,
+    isStationTypeEntry: isStationTypeEntry,
+    getEntitySubtypeDisplayLabel: getEntitySubtypeDisplayLabel,
+    getEntityDomainDisplayLabel: getEntityDomainDisplayLabel,
     normalizeEntityClassification: normalizeEntityClassification,
     isReservedT3Slug: isReservedT3Slug,
     shouldExcludeFromLocationList: shouldExcludeFromLocationList,

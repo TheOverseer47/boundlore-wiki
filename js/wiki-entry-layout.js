@@ -53,13 +53,14 @@ window.WikiEntryLayout = (function() {
   function representsCanonicalEntity(post) {
     if (!post) return false;
     const category = String(post.category || "").toLowerCase();
-    if (!["items", "creatures", "biomes", "locations"].includes(category)) return false;
+    if (!["items", "creatures", "biomes", "locations", "crafting"].includes(category)) return false;
     if (typeof EntityCore === "undefined") return false;
     const meta = typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.safeParseMeta
       ? KnowledgeRelations.safeParseMeta(post.content || "")
       : {};
     const payload = meta.discovery_payload || {};
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry(meta, post)) return true;
+    if (typeof EntityCore !== "undefined" && EntityCore.isStationTypeEntry(meta, post)) return true;
     const canonical = EntityCore.extractCanonicalIdentity(post.title, category, { payload: payload }).canonical_name;
     return !!canonical;
   }
@@ -975,18 +976,34 @@ window.WikiEntryLayout = (function() {
     return cleanUnit || "";
   }
 
-  function renderRecipeIngredientName(name, relIndex) {
+  function renderUnresolvedRecipeTarget(name, relIndex, context) {
     const key = String(name || "").trim().toLowerCase();
     const rel = key ? relIndex[key] : null;
     const href = rel && typeof KnowledgeRelations !== "undefined"
       ? KnowledgeRelations.buildRelationHref(rel)
       : (rel && rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : "");
     if (href && rel) return renderRelationLink(rel);
+
+    const kind = context && context.kind === "station" ? "station" : "ingredient";
+    const suggestion = kind === "station" ? "Station Type" : "Resource";
+    const linkLabel = kind === "station" ? "Add station entry" : "Add resource entry";
+    const prefillUrl = typeof BoundLoreUnresolvedTargets !== "undefined" && BoundLoreUnresolvedTargets.buildRecipeTargetPrefillUrl
+      ? BoundLoreUnresolvedTargets.buildRecipeTargetPrefillUrl(name, kind)
+      : (kind === "station"
+        ? "/wiki/create-post/?type=station_type&name=" + encodeURIComponent(name) + "&source=missing-entry"
+        : "/wiki/create-post/?type=resource&name=" + encodeURIComponent(name) + "&source=missing-entry");
+
     let html = '<span class="bl-wiki-recipe-ingredient-name">' + escapeHtml(name) + "</span>";
     if (meaningful(name)) {
-      html += ' <span class="bl-wiki-entry-needed" title="Tracked as unresolved target">Entry needed</span>';
+      html += ' <span class="bl-wiki-entry-needed" title="Suggested entry: ' + escapeHtml(suggestion) + '. Tracked as unresolved target.">Entry needed</span>';
+      html += ' <a class="bl-wiki-entry-needed-link" href="' + escapeHtml(prefillUrl) + '" title="Open create form prefilled for ' + escapeHtml(suggestion) + '">' +
+        escapeHtml(linkLabel) + "</a>";
     }
     return html;
+  }
+
+  function renderRecipeIngredientName(name, relIndex, context) {
+    return renderUnresolvedRecipeTarget(name, relIndex, context || { kind: "ingredient" });
   }
 
   function resolveRecipeDisplay(meta, relations, post) {
@@ -1023,11 +1040,11 @@ window.WikiEntryLayout = (function() {
             name: name,
             quantity: row && row.quantity != null ? row.quantity : null,
             unit: row && row.unit ? row.unit : null,
-            nameHtml: renderRecipeIngredientName(name, relIndex),
+            nameHtml: renderRecipeIngredientName(name, relIndex, { kind: "ingredient" }),
           };
         }).filter(Boolean),
         station: station,
-        stationHtml: station ? renderRecipeIngredientName(station, relIndex) : "",
+        stationHtml: station ? renderRecipeIngredientName(station, relIndex, { kind: "station" }) : "",
         notes: notes,
         unlockCondition: unlock,
         evidenceTier: meaningful(recipe.evidence_tier),
@@ -1053,11 +1070,11 @@ window.WikiEntryLayout = (function() {
           name: name,
           quantity: rel.quantity != null ? rel.quantity : null,
           unit: rel.unit || null,
-          nameHtml: renderRecipeIngredientName(name, relIndex),
+          nameHtml: renderRecipeIngredientName(name, relIndex, { kind: "ingredient" }),
         };
       }).filter(Boolean),
       station: stationName,
-      stationHtml: stationName ? renderRecipeIngredientName(stationName, relIndex) : "",
+      stationHtml: stationName ? renderRecipeIngredientName(stationName, relIndex, { kind: "station" }) : "",
       notes: "",
       unlockCondition: stationRel && meaningful(stationRel.unlock_condition) ? stationRel.unlock_condition : "",
       evidenceTier: "",
@@ -1495,7 +1512,13 @@ window.WikiEntryLayout = (function() {
     if (typeof EntityCore !== "undefined") {
       resolved = EntityCore.resolveEntityFacts(post, meta, relations);
     }
-    const heroFacts = buildHeroFacts(category, resolved, relations, stub);
+    let heroFacts = buildHeroFacts(category, resolved, relations, stub);
+    if (category === "crafting" && typeof EntityCore !== "undefined" && EntityCore.isStationTypeEntry(meta, post)) {
+      heroFacts = [
+        { label: "Type", html: '<span class="bl-wiki-value">Station Type</span>' },
+        { label: "Domain", html: '<span class="bl-wiki-value">System</span>' },
+      ];
+    }
     const detailBuilt = buildDetailSections(category, resolved, relations, missing, meta, post);
     const displayName = typeof EntityCore !== "undefined"
       ? EntityCore.getDisplayName(meta, post)
@@ -1547,7 +1570,8 @@ window.WikiEntryLayout = (function() {
       ? EntityCore.resolveEntitySubtype(model.meta, post)
       : (model.meta && model.meta.entity_subtype) || "";
     const isResourceItem = String(model.category || "").toLowerCase() === "items" && itemSubtype === "resource";
-    const categoryLabel = isResourceItem ? "Resource" : formatLabel(model.category);
+    const isStationTypeItem = String(model.category || "").toLowerCase() === "crafting" && itemSubtype === "station_type";
+    const categoryLabel = isResourceItem ? "Resource" : (isStationTypeItem ? "Station Type" : formatLabel(model.category));
     let html = '<article class="bl-wiki-entry">';
 
     html += '<section class="bl-wiki-hero">';

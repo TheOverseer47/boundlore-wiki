@@ -57,6 +57,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P0.5-D — Station Type Baseline + Safe Promotion Path
+
+**Milestone:** P0.5-D (station_type code baseline + safe create prefill; no auto-promotion, no stubs, no DB persistence)
+
+| Test | URL / target | Expected | Result |
+|------|--------------|----------|--------|
+| Staff recipe hints | `qa-staff-of-fire-2b742628` | Wood Entry needed + Resource hint/link; Forge Entry needed + Station Type hint/link; Ember linked | `[x]` |
+| Create prefill Wood | `/wiki/create-post/?type=resource&name=Wood&source=missing-entry` | Loads; name prefilled; no auto-submit | `[x]` |
+| Create prefill Forge | `/wiki/create-post/?type=station_type&name=Forge&source=missing-entry` | Loads; name prefilled; Station Type flow; no auto-submit | `[x]` |
+| Ember detail regression | `qa-ember-shard-511160` | Resource + facet badges + Used In | `[x]` |
+| Resources landing regression | `/wiki/resources/` | QA Ember Shard card intact | `[x]` |
+| Admin Missing Entry Queue | `/wiki/admin/` | Wood (Resource) + Forge (Station Type) with Start Entry links; Promote/Merge/Dismiss disabled | `[~]` Access Denied in automation |
+| Browse / Items / Homepage | regression URLs | No regressions | `[x]` |
+
+**Not built in P0.5-D:** Real station_type promotion, Forge/Wood posts, persistent queue, search baseline, backlink reconciliation, auto-stubs.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

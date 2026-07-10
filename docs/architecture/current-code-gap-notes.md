@@ -307,7 +307,7 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | 1 | **No Facet Layer** | `js/facet-registry.js` baseline + derived resource badges (P0.5-B) | Full BLMETA `facets` editing, search index, filters | **P0.5** (partial: registry + display) |
 | 2 | **No Unresolved Target Lifecycle** | Derived records + read-only Missing Entry Queue (P0.5-C); Entry needed badges on recipes | mentioned → unresolved → candidate → stub via promotion actions | **P0.5** (partial: derived view only) |
 | 3 | **Search title/excerpt only** | `js/search.js` ilike on posts.title, excerpt | search_documents index with facets, aliases, relations | **P0.5** baseline |
-| 4 | **No station_type** | `crafted_at` → string "Forge" | SYSTEM/station_type entity; Forge promotable | **P0.5** |
+| 4 | **No station_type** | `station_type` registered in entity-core + safe create prefill (P0.5-D); Forge still unresolved text | SYSTEM/station_type entity via manual submit; no auto-promotion | **P0.5** (partial: baseline + prefill) |
 | 5 | **Resource Classification Display** | ~~Detail shows Category/Subcategory/Type as generic Item~~ | P0.5-A: resource detail shows Type/Source/Rarity; sidebar Type Resource | **Done (P0.5-A)** |
 | 6 | **No versioned statements** | Merge overwrites recipe/facts | valid_from/until/superseded_by; history widget | **P0.5** schema / **P2** UX |
 | 7 | **No variant/instance model** | variant_of exists but no formal policy | Variant blocks + promotion rules | **P1** |
@@ -398,3 +398,22 @@ Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started a
 **QA expectation:** Wood (OBJECT/resource, recipe ingredient) and Forge (SYSTEM/station_type, crafting station) from QA Staff merged recipe.
 
 **Files touched:** `js/unresolved-targets.js` (new), `wiki/admin/index.html`, `js/wiki-entry-layout.js`, `css/style.css`, `wiki/post/index.html` (cache bust).
+
+---
+
+## 5. P0.5-D — Station Type Baseline + Safe Promotion Path
+
+**Status:** Complete (code baseline + safe create prefill; no DB, no auto-promotion, no stub creation, no real Promote/Merge/Dismiss).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| `station_type` subtype | `EntityCore.isStationTypeEntry()`, display labels, crafting category inference | SYSTEM / station_type recognized; labels Station Type / Crafting Station |
+| `crafted_at` semantics | `relations-registry.js` documents SYSTEM/station_type target | Compatible; inverse remains derived |
+| Missing Entry Queue links | `buildStartEntryUrl()` + Start Resource/Station Entry buttons | Opens create-post prefill only; no DB write |
+| Recipe Entry needed UX | `renderUnresolvedRecipeTarget()` ingredient vs station context | Wood → Resource hint/link; Forge → Station Type hint/link |
+| Create prefill Wood | `/wiki/create-post/?type=resource&name=Wood&source=missing-entry` | Resource Quick-Add prefilled; manual submit required |
+| Create prefill Forge | `/wiki/create-post/?type=station_type&name=Forge&source=missing-entry` | Station Type Quick-Add prefilled; manual submit required |
+| Station detail support | `wiki-entry-layout.js` + `post-detail.js` defensive branch | No false item display; kicker Type Station Type when entry exists |
+| Not built | Real promotion, persistent queue, search baseline, Forge/Wood posts, backlink reconciliation | Deferred |
+
+**Files touched:** `js/entity-core.js`, `js/station-type-quick-add.js` (new), `js/unresolved-targets.js`, `js/wiki-entry-layout.js`, `js/post-detail.js`, `js/create-post.js`, `js/resource-quick-add.js`, `js/relations-registry.js`, `css/style.css`, `wiki/create-post/index.html`, `wiki/post/index.html` (cache bust).

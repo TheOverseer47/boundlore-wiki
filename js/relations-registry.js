@@ -204,6 +204,7 @@ window.BoundLoreRelationsRegistry = (function() {
       direction: "source → target (Item crafted at station)",
       allowedSourceDomains: [ENTITY_DOMAINS.OBJECT],
       allowedTargetDomains: [ENTITY_DOMAINS.SYSTEM],
+      // Target subtype: station_type (generic crafting station archetype, e.g. Forge — not a PLACE)
       inverse: null,
       mergeBehavior: "review_required",
       conflictBehavior: "coexist_as_reported",

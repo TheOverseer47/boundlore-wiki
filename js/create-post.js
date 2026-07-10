@@ -45,6 +45,14 @@ function isResourceQuickAddModeCP() {
   return typeof ResourceQuickAdd !== "undefined" && ResourceQuickAdd.isActive();
 }
 
+function isStationTypeQuickAddModeCP() {
+  return typeof StationTypeQuickAdd !== "undefined" && StationTypeQuickAdd.isActive();
+}
+
+function isQuickAddDiscoveryModeCP() {
+  return isResourceQuickAddModeCP() || isStationTypeQuickAddModeCP();
+}
+
 function initResourceQuickAddModeCP() {
   if (typeof ResourceQuickAdd === "undefined") return;
   ResourceQuickAdd.activate();
@@ -64,6 +72,57 @@ function initResourceQuickAddModeCP() {
   renderDiscoveryStructuredFields();
   renderDiscoveryRelationFields();
   renderDiscoveryWizard();
+}
+
+function initStationTypeQuickAddModeCP() {
+  if (typeof StationTypeQuickAdd === "undefined") return;
+  StationTypeQuickAdd.activate();
+  discoveryRelationsSkipped = true;
+  const discoveryCategorySelect = document.getElementById("discoveryCategory");
+  if (discoveryCategorySelect) {
+    discoveryCategorySelect.value = "crafting";
+    currentDiscoveryCategory = "crafting";
+    discoveryCategorySelect.disabled = true;
+  }
+  const modeHint = document.getElementById("discoveryModeHint");
+  if (modeHint) {
+    modeHint.style.display = "block";
+    modeHint.textContent = "Station Type Quick-Add — generic crafting stations are saved as SYSTEM / station_type under Crafting.";
+  }
+  discoveryWizardStep = 1;
+  renderDiscoveryStructuredFields();
+  renderDiscoveryRelationFields();
+  renderDiscoveryWizard();
+}
+
+function applyMissingEntryPrefillCP(params) {
+  const name = (params.get("name") || params.get("entity") || "").trim();
+  const source = (params.get("source") || "").trim();
+  if (!name) return;
+
+  const titleInput = document.getElementById("postTitle");
+  if (titleInput && !titleInput.value.trim()) titleInput.value = name;
+
+  if (source === "missing-entry") {
+    let banner = document.getElementById("missingEntryPrefillBanner");
+    if (!banner) {
+      banner = document.createElement("p");
+      banner.id = "missingEntryPrefillBanner";
+      banner.className = "bl-missing-entry-prefill-banner";
+      banner.textContent = "Prefilled from a missing-entry reference. Nothing is saved until you submit for review.";
+      const form = document.getElementById("createPostForm");
+      if (form && form.firstChild) form.insertBefore(banner, form.firstChild);
+    }
+  }
+
+  if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
+    ResourceQuickAdd.applyPrefill({ name: name, source: source });
+    renderDiscoveryStructuredFields();
+  }
+  if (isStationTypeQuickAddModeCP() && typeof StationTypeQuickAdd !== "undefined") {
+    StationTypeQuickAdd.applyPrefill({ name: name, source: source });
+    renderDiscoveryStructuredFields();
+  }
 }
 const DISCOVERY_PLACEHOLDER_VALUES = [
   "asdf", "qwerty", "test", "todo", "none", "n/a", "na", "unknown", "idk", "???", "12345"
@@ -171,7 +230,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (typeParam === "resource") {
     setPostType("discovery");
     initResourceQuickAddModeCP();
+  } else if (typeParam === "station_type") {
+    setPostType("discovery");
+    initStationTypeQuickAddModeCP();
   }
+
+  applyMissingEntryPrefillCP(params);
 });
 
 async function initCreatePermissions() {
@@ -632,12 +696,14 @@ function renderDiscoveryWizard() {
   if (!nav || !step1 || !step2 || !step3 || !step4) return;
 
   const resourceMode = isResourceQuickAddModeCP();
-  const maxStep = resourceMode ? 3 : (structuredDiscoveryEnabled ? 4 : 2);
+  const stationMode = isStationTypeQuickAddModeCP();
+  const quickAddMode = resourceMode || stationMode;
+  const maxStep = quickAddMode ? 3 : (structuredDiscoveryEnabled ? 4 : 2);
   if (discoveryWizardStep < 1) discoveryWizardStep = 1;
   if (discoveryWizardStep > maxStep) discoveryWizardStep = maxStep;
 
   step1.style.display = discoveryWizardStep === 1 ? "block" : "none";
-  if (resourceMode) {
+  if (resourceMode || stationMode) {
     step2.style.display = discoveryWizardStep === 2 ? "block" : "none";
     step3.style.display = "none";
     step4.style.display = discoveryWizardStep === 3 ? "block" : "none";
@@ -650,9 +716,11 @@ function renderDiscoveryWizard() {
   nav.innerHTML = "";
   const stepLabels = resourceMode
     ? ["Basics", "Resource", "Evidence"]
-    : (structuredDiscoveryEnabled
+    : (stationMode
+      ? ["Basics", "Station Type", "Evidence"]
+      : (structuredDiscoveryEnabled
       ? ["Basics", "Facts", "Links", "Evidence"]
-      : ["Basics", "Notes"]);
+      : ["Basics", "Notes"]));
   const progress = document.createElement("p");
   progress.className = "field-hint";
   progress.textContent = "Step " + discoveryWizardStep + " of " + maxStep + ": " + stepLabels[discoveryWizardStep - 1] + ".";
@@ -722,6 +790,10 @@ function showDiscoveryWizardError(message) {
 function hasRequiredDiscoveryFieldsFilledCP() {
   if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
     const collected = ResourceQuickAdd.collectPayload();
+    return !collected.error;
+  }
+  if (isStationTypeQuickAddModeCP() && typeof StationTypeQuickAdd !== "undefined") {
+    const collected = StationTypeQuickAdd.collectPayload();
     return !collected.error;
   }
   const category = document.getElementById("discoveryCategory")?.value || currentDiscoveryCategory || "";
@@ -1199,7 +1271,9 @@ async function handleSubmit(e) {
       const relCount = Array.isArray(structuredResult.relations) ? structuredResult.relations.length : 0;
 
       const resourceMode = isResourceQuickAddModeCP();
-      if (!resourceMode && relCount === 0 && discoveryRelationsSkipped !== true) {
+      const stationMode = isStationTypeQuickAddModeCP();
+      const quickAddMode = resourceMode || stationMode;
+      if (!quickAddMode && relCount === 0 && discoveryRelationsSkipped !== true) {
         if (!v2ActiveRelations) {
           errorEl.textContent = "Please link at least one dependency/reference or enable 'Skip auto-relations' before submitting.";
           errorEl.style.display = "block";
@@ -1217,7 +1291,7 @@ async function handleSubmit(e) {
         || buildDiscoveryAutoTitle(structuredResult.payload, cat);
 
       const knowledgeGraphSubmitActive = typeof DiscoveryWizard !== "undefined" && DiscoveryWizard.isActive();
-      if (!knowledgeGraphSubmitActive && !window.__boundloreContributionContext && !isResourceQuickAddModeCP()) {
+      if (!knowledgeGraphSubmitActive && !window.__boundloreContributionContext && !isQuickAddDiscoveryModeCP()) {
         const duplicateError = await detectDiscoveryDuplicateCP({
           title: dedupeTitle,
           category: cat,
@@ -1262,6 +1336,9 @@ async function handleSubmit(e) {
       }
       if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
         postMeta = ResourceQuickAdd.applyMetaDefaults(postMeta);
+      }
+      if (isStationTypeQuickAddModeCP() && typeof StationTypeQuickAdd !== "undefined") {
+        postMeta = StationTypeQuickAdd.applyMetaDefaults(postMeta);
       }
       if (window.__boundloreContributionContext) {
         postMeta.contribution_target = window.__boundloreContributionContext.target || null;
@@ -1396,7 +1473,7 @@ async function handleSubmit(e) {
     currentPostType === "discovery"
     && typeof DiscoveryWizard !== "undefined"
     && DiscoveryWizard.isActive()
-    && !isResourceQuickAddModeCP()
+    && !isQuickAddDiscoveryModeCP()
     && structuredDiscoveryEnabled
     && postMeta.discovery_payload
   ) {
@@ -1818,6 +1895,9 @@ function getDiscoveryConfig(category) {
   if (isResourceQuickAddModeCP() && typeof getResourceQuickAddSchema === "function") {
     return getResourceQuickAddSchema();
   }
+  if (isStationTypeQuickAddModeCP() && typeof StationTypeQuickAdd !== "undefined") {
+    return StationTypeQuickAdd.getSchema();
+  }
   if (typeof getDiscoverySchemaForCategory === "function") {
     return getDiscoverySchemaForCategory(category);
   }
@@ -1861,6 +1941,12 @@ function renderDiscoveryStructuredFields() {
   if (isResourceQuickAddModeCP() && typeof ResourceQuickAdd !== "undefined") {
     wrap.style.display = "block";
     ResourceQuickAdd.renderPanel(wrap, typeof supabase !== "undefined" ? supabase : null);
+    return;
+  }
+
+  if (isStationTypeQuickAddModeCP() && typeof StationTypeQuickAdd !== "undefined") {
+    wrap.style.display = "block";
+    StationTypeQuickAdd.renderPanel(wrap);
     return;
   }
 
@@ -2125,6 +2211,14 @@ function renderDiscoveryRelationFields() {
     const note = document.createElement("p");
     note.className = "field-hint";
     note.textContent = "Resource relations (found_in / harvested_from) are inferred automatically from biome and optional source entity. Generic source details stay as facts only.";
+    wrap.appendChild(note);
+    return;
+  }
+  if (isStationTypeQuickAddModeCP()) {
+    wrap.style.display = "block";
+    const note = document.createElement("p");
+    note.className = "field-hint";
+    note.textContent = "Station type entries do not require auto-relations in this quick-add flow. crafted_at links from recipes can point here once the entry is published.";
     wrap.appendChild(note);
     return;
   }
@@ -2669,6 +2763,12 @@ function collectStructuredDiscoveryInput() {
       });
     }
     return { payload: collected.payload, relations: relations };
+  }
+
+  if (isStationTypeQuickAddModeCP() && typeof StationTypeQuickAdd !== "undefined") {
+    const collected = StationTypeQuickAdd.collectPayload();
+    if (collected.error) return collected;
+    return { payload: collected.payload, relations: [] };
   }
 
   const config = getDiscoveryConfig(category);

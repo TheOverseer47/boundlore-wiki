@@ -452,6 +452,6 @@ Same dedupe key + same value → corroboration (report_count++). Same key + diff
 | Phase | Relation work |
 |-------|---------------|
 | P0 | crafted_from, crafted_at, ingredient_of derived ✅ |
-| P0.5 | Qualifier schema in docs + BLMETA examples; station_type targets |
+| P0.5 | Qualifier schema in docs + BLMETA examples; station_type targets + safe create prefill (P0.5-D) |
 | P1 | gathered_via, crafted_by_profession, sold_by, qualifier merge engine |
 | P2 | reward_of, occurs_during, version relations, mountable_by |

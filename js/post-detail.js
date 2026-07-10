@@ -602,9 +602,13 @@ function getPostTypeLabelPD(post, postMeta, useWikiLayout) {
       EntityCore.isResourceEntry(postMeta, post)) {
     return "Resource";
   }
+  if (typeof EntityCore !== "undefined" && EntityCore.isStationTypeEntry(postMeta, post)) {
+    return "Station Type";
+  }
   if (useWikiLayout) {
     if (category === "creatures") return "Creature Entry";
     if (category === "items") return "Item Entry";
+    if (category === "crafting") return "Crafting Entry";
     if (category === "biomes") return "Biome Entry";
     if (category === "locations") return "Location Entry";
     return "Wiki Entry";
@@ -1203,6 +1207,9 @@ function getPostSubcategoryLabelPD(post, postMeta) {
       typeof EntityCore !== "undefined" &&
       EntityCore.isResourceEntry(postMeta, post)) {
     return "Resource";
+  }
+  if (typeof EntityCore !== "undefined" && EntityCore.isStationTypeEntry(postMeta, post)) {
+    return "Station Type";
   }
   const subcategory = (postMeta && postMeta.subcategory) || post.guide_subcategory || "";
   if (!subcategory) return "";

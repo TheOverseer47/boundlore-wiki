@@ -64,7 +64,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 | Official name required first? | No for stub; yes for `canonical` |
 | Multiple wood types? | Start as **variant block** on parent Wood page (Oak Wood, Pine Wood); separate pages only when distinct sources, biomes, or recipe chains justify it |
 | Current state (P0) | `Wood` in QA Staff recipe = **unresolved** (1 mention) |
-| P0.5 action | Register in Missing Entry Queue; mark parent recipe with **Entry Needed** badge |
+| P0.5-D action | Suggested as OBJECT/resource; safe create-prefill link opens Resource Quick-Add (no auto-save) |
+| P1+ action | Manual submit + moderator approve when promotion threshold met |
 
 ---
 
@@ -77,7 +78,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 | Generic type vs instance? | **Station type** = canonical entity. **Concrete forge in settlement** = `located_at` observation on station page, not a separate PLACE page |
 | Portable forge item? | OBJECT/tool with `functions_as` → station_type:forge (P1 relation) |
 | Current state (P0) | `Forge` in QA Staff recipe = **unresolved**; should be **candidate** immediately |
-| P0.5 action | Promote to stub `station_type` via moderator; backlink all `crafted_at` references |
+| P0.5-D action | Suggested as SYSTEM/station_type; safe create-prefill link opens Station Type Quick-Add (no auto-save) |
+| P1+ action | Manual submit + moderator approve; backlink all `crafted_at` references |
 
 ---
 
@@ -95,6 +97,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 ## Missing Entry Queue
 
 > **P0.5-C code baseline:** Derived/in-memory queue in [`js/unresolved-targets.js`](../../js/unresolved-targets.js) (`window.BoundLoreUnresolvedTargets`). Admin Overview shows a **read-only** table from published recipe/ relation data. Wood and Forge from QA Staff appear when admin session is available. No persistent table, no Promote/Merge/Dismiss actions yet.
+
+> **P0.5-D safe start links:** Wood → `/wiki/create-post/?type=resource&name=Wood&source=missing-entry`; Forge → `/wiki/create-post/?type=station_type&name=Forge&source=missing-entry`. Links only open the create form prefilled — **no post is created on click**, no stub, no DB write. Promote/Merge/Dismiss remain disabled/planned.
 
 Admin panel list (P0.5) showing unresolved targets sorted by promotion score.
 

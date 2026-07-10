@@ -399,9 +399,41 @@ window.BoundLoreUnresolvedTargets = (function() {
 
   function formatSuggestedType(record) {
     if (!record) return "-";
+    if (record.suggested_subtype === "station_type") return "SYSTEM / Station Type";
+    if (record.suggested_subtype === "resource") return "OBJECT / Resource";
     const domain = record.suggested_domain || "OBJECT";
     const subtype = record.suggested_subtype || "item";
     return domain + " / " + subtype;
+  }
+
+  function buildStartEntryUrl(record) {
+    if (!record || !record.display_name) return "";
+    const name = encodeURIComponent(record.display_name);
+    const source = "source=missing-entry";
+    if (record.suggested_subtype === "station_type" || record.suggested_domain === "SYSTEM") {
+      return "/wiki/create-post/?type=station_type&name=" + name + "&" + source;
+    }
+    if (record.suggested_subtype === "resource") {
+      return "/wiki/create-post/?type=resource&name=" + name + "&" + source;
+    }
+    return "/wiki/create-post/?type=discovery&name=" + name + "&" + source;
+  }
+
+  function getStartEntryLinkLabel(record) {
+    if (!record) return "Start Entry";
+    if (record.suggested_subtype === "station_type") return "Start Station Entry";
+    if (record.suggested_subtype === "resource") return "Start Resource Entry";
+    return "Start Entry";
+  }
+
+  function buildRecipeTargetPrefillUrl(name, kind) {
+    const clean = normalizeUnresolvedTargetName(name);
+    if (!clean) return "";
+    const encoded = encodeURIComponent(clean);
+    if (kind === "station") {
+      return "/wiki/create-post/?type=station_type&name=" + encoded + "&source=missing-entry";
+    }
+    return "/wiki/create-post/?type=resource&name=" + encoded + "&source=missing-entry";
   }
 
   function renderContextList(record) {
@@ -450,8 +482,13 @@ window.BoundLoreUnresolvedTargets = (function() {
       html += "<td>" + escapeHtml(record.suggested_reason || "-") + "</td>";
       html += '<td><span class="badge bl-missing-entry-status">Unresolved</span></td>';
       if (opts.showActions) {
-        html += '<td class="bl-missing-entry-actions">' +
-          '<button type="button" class="btn-small" disabled title="Planned">Promote to Stub</button> ' +
+        const startUrl = buildStartEntryUrl(record);
+        html += '<td class="bl-missing-entry-actions">';
+        if (startUrl) {
+          html += '<a class="btn-small bl-missing-entry-start" style="background:#2a8bdc;text-decoration:none;display:inline-block;" href="' +
+            escapeHtml(startUrl) + '">' + escapeHtml(getStartEntryLinkLabel(record)) + "</a> ";
+        }
+        html += '<button type="button" class="btn-small" disabled title="Planned">Promote to Stub</button> ' +
           '<button type="button" class="btn-small" disabled title="Planned">Merge into Existing</button> ' +
           '<button type="button" class="btn-small" disabled title="Planned">Dismiss</button>' +
           "</td>";
@@ -479,6 +516,6 @@ window.BoundLoreUnresolvedTargets = (function() {
     isTargetResolved: isTargetResolved,
     parsePostMeta: parsePostMeta,
     isContributionPost: isContributionPost,
-    isPublishedSourcePost: isPublishedSourcePost,
-  };
-})();
+    buildStartEntryUrl: buildStartEntryUrl,
+    buildRecipeTargetPrefillUrl: buildRecipeTargetPrefillUrl,
+    getStartEntryLinkLabel: getStartEntryLinkLabel,

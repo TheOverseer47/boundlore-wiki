@@ -437,6 +437,18 @@ window.ResourceQuickAdd = (function() {
     return out;
   }
 
+  function applyPrefill(opts) {
+    const options = opts || {};
+    if (options.name) {
+      fieldState.entity_name = String(options.name).trim();
+      const titleInput = document.getElementById("postTitle");
+      if (titleInput) titleInput.value = fieldState.entity_name;
+    }
+    if (options.source === "missing-entry") {
+      fieldState._missing_entry_source = true;
+    }
+  }
+
   function applyMetaDefaults(meta) {
     if (!meta || typeof meta !== "object") return meta;
     meta.discovery_form = "resource_quick";
@@ -492,6 +504,7 @@ window.ResourceQuickAdd = (function() {
     sanitizeResourceBlock: sanitizeResourceBlock,
     shouldLinkHarvestedFromEntity: shouldLinkHarvestedFromEntity,
     isGenericSourceDetail: isGenericSourceDetail,
+    applyPrefill: applyPrefill,
     getFieldState: function() { return Object.assign({}, fieldState); },
   };
 })();
