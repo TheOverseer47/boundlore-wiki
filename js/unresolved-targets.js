@@ -519,3 +519,7 @@ window.BoundLoreUnresolvedTargets = (function() {
     buildStartEntryUrl: buildStartEntryUrl,
     buildRecipeTargetPrefillUrl: buildRecipeTargetPrefillUrl,
     getStartEntryLinkLabel: getStartEntryLinkLabel,
+    formatSuggestedType: formatSuggestedType,
+    isPublishedSourcePost: isPublishedSourcePost,
+  };
+})();

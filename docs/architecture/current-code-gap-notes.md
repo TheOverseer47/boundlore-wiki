@@ -306,7 +306,7 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 |---|------------|--------------|--------------|----------|
 | 1 | **No Facet Layer** | `js/facet-registry.js` baseline + derived resource badges (P0.5-B) | Full BLMETA `facets` editing, search index, filters | **P0.5** (partial: registry + display) |
 | 2 | **No Unresolved Target Lifecycle** | Derived records + read-only Missing Entry Queue (P0.5-C); Entry needed badges on recipes | mentioned → unresolved → candidate → stub via promotion actions | **P0.5** (partial: derived view only) |
-| 3 | **Search title/excerpt only** | `js/search.js` ilike on posts.title, excerpt | search_documents index with facets, aliases, relations | **P0.5** baseline |
+| 3 | **Search title/excerpt only** | Client-side structured search signals + ranking (P0.5-E) | Postgres `search_documents` + FTS/pg_trgm | **P0.5** (partial: client baseline) |
 | 4 | **No station_type** | `station_type` registered in entity-core + safe create prefill (P0.5-D); Forge still unresolved text | SYSTEM/station_type entity via manual submit; no auto-promotion | **P0.5** (partial: baseline + prefill) |
 | 5 | **Resource Classification Display** | ~~Detail shows Category/Subcategory/Type as generic Item~~ | P0.5-A: resource detail shows Type/Source/Rarity; sidebar Type Resource | **Done (P0.5-A)** |
 | 6 | **No versioned statements** | Merge overwrites recipe/facts | valid_from/until/superseded_by; history widget | **P0.5** schema / **P2** UX |
@@ -417,3 +417,18 @@ Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started a
 | Not built | Real promotion, persistent queue, search baseline, Forge/Wood posts, backlink reconciliation | Deferred |
 
 **Files touched:** `js/entity-core.js`, `js/station-type-quick-add.js` (new), `js/unresolved-targets.js`, `js/wiki-entry-layout.js`, `js/post-detail.js`, `js/create-post.js`, `js/resource-quick-add.js`, `js/relations-registry.js`, `css/style.css`, `wiki/create-post/index.html`, `wiki/post/index.html` (cache bust).
+
+---
+
+## 6. P0.5-E — Structured Search Signal Baseline
+
+**Status:** Complete (client-side signal collection + ranking; no DB index, no FTS, no embeddings).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| Search signals module | `js/search-signals.js` → `window.BoundLoreSearchSignals` | buildSearchDocument, scoreSearchDocument, searchDocuments, findMissingEntrySuggestions |
+| Signal sources | title, aliases, domain/subtype, facets, resource payload, recipe payload, relations, unresolved targets | QA Ember Shard findable via mining / red crystal nodes / resource; Staff via wood/forge recipe signals |
+| Search UI | `js/search.js` extended + new `wiki/search/index.html` | Backward-compatible; missing-entry suggestions visually separated |
+| Not built | Persistent `search_documents` table, Postgres FTS/pg_trgm, compound query parser, semantic search, facet browse filters | Deferred |
+
+**Files touched:** `js/search-signals.js` (new), `js/search.js`, `wiki/search/index.html` (new), `css/style.css`, `index.html`, `wiki/post/index.html`, `wiki/browse/index.html`, `wiki/resources/index.html`, `wiki/items/index.html`.

@@ -75,6 +75,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P0.5-E — Structured Search Signal Baseline
+
+**Milestone:** P0.5-E (client-side structured signals; no DB index, no FTS, no embeddings)
+
+| Test | URL / target | Expected | Result |
+|------|--------------|----------|--------|
+| Title search | `/wiki/search/?q=QA%20Ember%20Shard` | QA Ember Shard appears | `[x]` |
+| Resource type search | `/wiki/search/?q=resource` | QA Ember Shard appears | `[x]` |
+| Mining search | `/wiki/search/?q=mining` | QA Ember Shard appears | `[x]` |
+| Source detail search | `/wiki/search/?q=red%20crystal%20nodes` | QA Ember Shard appears | `[x]` |
+| Wood search | `/wiki/search/?q=wood` | Staff and/or Missing Entry Wood; no Wood post | `[x]` |
+| Forge search | `/wiki/search/?q=forge` | Staff and/or Missing Entry Forge; no Forge post | `[x]` |
+| Station type search | `/wiki/search/?q=station%20type` | Forge missing suggestion sensible | `[x]` |
+| Staff regression | `qa-staff-of-fire-2b742628` | Recipe + Entry needed links intact | `[x]` |
+| Ember / Resources / Browse / Items / Homepage | regression URLs | No regressions | `[x]` |
+| Admin optional | `/wiki/admin/` | Queue read-only; conflict pending | `[~]` Access Denied in automation |
+
+**Not built in P0.5-E:** Persistent search_documents, Postgres FTS/pg_trgm, compound query parser, semantic search, facet browse filters, Dragon-Mount demo data.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

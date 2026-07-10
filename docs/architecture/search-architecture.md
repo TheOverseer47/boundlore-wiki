@@ -4,7 +4,9 @@
 
 BoundLore search must discover entities by meaning, not only by title match. This document supersedes [search-filter-matrix.md](./search-filter-matrix.md) as the authoritative search plan.
 
-**Current code (P0):** `js/search.js` queries `posts.title` and `posts.excerpt` only via Supabase `ilike`. This is insufficient for Blueprint 2.0 goals.
+**Current code (P0):** `js/search.js` queried `posts.title` and `posts.excerpt` only via Supabase `ilike`.
+
+**P0.5-E code baseline:** `js/search-signals.js` builds in-memory search documents from published post BLMETA (title, aliases, domain/subtype, facets, resource/recipe payload, relations) plus derived missing-entry suggestions (Wood, Forge). `js/search.js` ranks client-side over fetched published posts; `/wiki/search/?q=` provides full results page. **No** Postgres `search_documents` table, **no** FTS/pg_trgm, **no** embeddings, **no** compound-intent parser yet.
 
 ---
 

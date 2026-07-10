@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Search BoundLore wiki entries by title, facets, resources, recipes, and missing-entry suggestions." />
+  <title>Search - BoundLore</title>
+  <link rel="icon" type="image/jpeg" href="/public/images/icon.jpg" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo"><img src="/public/images/icon.jpg" alt="BoundLore" class="nav-icon" /><span class="logo-text">Bound<span class="accent">Lore</span></span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/wiki/creatures/">Creatures</a></li>
+        <li><a href="/wiki/classes/">Classes</a></li>
+        <li><a href="/wiki/items/">Items</a></li>
+        <li><a href="/wiki/guides/">Guides</a></li>
+        <li><a href="/wiki/guilds/">Guilds</a></li>
+        <li><a href="/wiki/community/">Community</a></li>
+        <li><a href="/wiki/news/">News</a></li>
+        <li><a href="/wiki/browse/">More</a></li>
+        <li><a href="/wiki/support">Support</a></li>
+      </ul>
+      <div class="nav-right">
+        <span id="authArea"></span>
+        <div class="nav-search"><input type="text" placeholder="Search..." id="searchInput" /><div class="search-results" id="searchResults"></div></div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wiki-hero">
+    <p class="breadcrumb"><a href="/">Home</a> › Search</p>
+    <h1>Search BoundLore</h1>
+    <p>Find published entries by title, type, facets, resource data, recipe references, and missing-entry suggestions.</p>
+  </div>
+
+  <div class="form-box search-page-shell" style="max-width:900px;margin:40px auto;">
+    <label for="searchPageInput">Search query</label>
+    <input type="search" id="searchPageInput" class="form-input" placeholder="Try: QA Ember Shard, mining, wood, forge, station type..." autocomplete="off" />
+    <p id="searchPageSummary" class="search-page-summary"></p>
+    <div id="searchPageResults" class="search-page-results-wrap">
+      <p class="search-page-empty">Enter a search term to explore structured wiki signals.</p>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="footer-bottom"><p>© 2026 BoundLore Community · <a href="/wiki/imprint/">Imprint</a> · <a href="/wiki/privacy/">Privacy Policy</a></p></div></footer>
+
+  <script src="/js/supabase-config.js"></script>
+  <script src="/js/patch-mode.js?v=1" data-bl-patch-mode="1"></script>
+  <script src="/js/categories-config.js?v=18"></script>
+  <script src="/js/relations-registry.js?v=2"></script>
+  <script src="/js/entity-core.js?v=10"></script>
+  <script src="/js/facet-registry.js?v=1"></script>
+  <script src="/js/unresolved-targets.js?v=3"></script>
+  <script src="/js/search-signals.js?v=2"></script>
+  <script src="/js/search.js?v=2"></script>
+  <script src="/js/auth-nav.js"></script>
+  <script src="/js/main.js?v=3"></script>
+</body>
+</html>
