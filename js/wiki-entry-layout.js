@@ -1254,6 +1254,14 @@ window.WikiEntryLayout = (function() {
     html += '<a class="bl-wiki-primary-cta" href="' +
       escapeHtml(buildContributionUrl(post, { intent: "add_info", meta: model.meta })) +
       '">Add information</a>';
+    const itemSubtype = typeof EntityCore !== "undefined"
+      ? EntityCore.resolveEntitySubtype(model.meta, { category: model.category, title: post && post.title })
+      : (model.meta && model.meta.entity_subtype) || "";
+    if (String(model.category || "").toLowerCase() === "items" && itemSubtype !== "resource") {
+      html += '<a class="bl-wiki-cta-quiet" href="' +
+        escapeHtml(buildContributionUrl(post, { intent: "add_recipe", meta: model.meta })) +
+        '">Add Recipe</a>';
+    }
     html += "</div>";
     html += "</div>";
     html += "</section>";

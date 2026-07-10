@@ -1,7 +1,7 @@
 # Current Code Gap Notes
 
 Audit of BoundLore codebase against the content architecture blueprint.  
-**Last updated:** 2026-07-09 (P0-C: Resource Quick-Add + synonym warning)
+**Last updated:** 2026-07-10 (P0-D1: Add Recipe Intent UI + Payload)
 
 ---
 
@@ -69,13 +69,46 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 ---
 
-## 3. CRAFT Relations (P0-B, unchanged)
+## 3. Add Recipe Intent (P0-D1)
 
-`crafted_from`, `crafted_at`, `ingredient_of`, `unlocks` — prepared in merge/serializer/SQL. No Add Recipe UI yet.
+| Behavior | Status |
+|----------|--------|
+| CTA on item pages (non-resource) | `Add Recipe` in hero actions |
+| Form | Ingredients (dynamic rows), station, output qty, unlock, notes, confidence, optional evidence |
+| Submit | Pending contribution only — no merge, no stubs |
+| Payload | `discovery_payload.intent: add_recipe`, `discovery_payload.recipe`, CRAFT relations |
+| Relations persisted | `crafted_from` (per ingredient), `crafted_at` (station) |
+| `ingredient_of` | **Not** persisted (derived/inverse for later widgets) |
+| Duplicate guard | Same user + target + matching recipe fingerprint blocks re-submit |
+| Admin preview | Compact Add Recipe summary + CRAFT relation lines |
+
+### Files
+
+| File | Role |
+|------|------|
+| `js/contribution-flow.js` | `add_recipe` mask, recipe form, payload + relations builder |
+| `js/wiki-entry-layout.js` | Item-page `Add Recipe` CTA |
+| `js/create-post.js` | Recipe form init, duplicate params on submit |
+| `js/knowledge-relations.js` | `buildCraftRelationsFromRecipe`, `compareRecipeContributionDuplicates` (existing) |
+| `wiki/admin/index.html` | `renderRecipeContributionSummaryA` |
+
+### Still deferred (P0-D2+)
+
+- Approve & merge recipe into target item
+- Recipe live widget on item pages
+- Usage widget on resource pages
+- Recipe conflict / duplicate E2E beyond pending fingerprint
+- `/wiki/resources/` landing
 
 ---
 
-## 4. SQL / RPC (prepared, not executed)
+## 4. CRAFT Relations (P0-B, unchanged)
+
+`crafted_from`, `crafted_at`, `ingredient_of`, `unlocks` — prepared in merge/serializer/SQL. Add Recipe UI writes payload/relations at submit (P0-D1); merge on approve is P0-D2.
+
+---
+
+## 5. SQL / RPC (prepared, not executed)
 
 | Code | Mapping |
 |------|---------|
@@ -86,19 +119,19 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 ---
 
-## 5. Still Not Implemented (by design)
+## 6. Still Not Implemented (by design)
 
 | Area | Priority |
 |------|----------|
 | `/wiki/resources/` landing | P0-E |
-| Usage / Recipe widgets | P0-F |
-| Add Recipe intent UI | P0-D |
+| Usage / Recipe widgets (live) | P0-F |
+| Recipe approve/merge | P0-D2 |
 | Evidence-tier badge UI | P0-G |
 | `ingredient_of` auto-persist on resource pages | P0-F |
-| E2E T1 full chain (usage step) | After P0-D/F |
+| E2E T1 full chain (usage step) | After P0-D2/F |
 
 ---
 
-## 6. Next Step
+## 7. Next Step
 
-**P0-D:** Add Recipe Intent
+**P0-D2:** Admin Preview/Merge for Add Recipe

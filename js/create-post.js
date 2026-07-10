@@ -398,6 +398,9 @@ async function initContributionModeCP(route) {
   if (panel) {
     panel.style.display = "block";
     panel.innerHTML = ContributionFlow.renderPanel(context);
+    if (resolvedIntent === "add_recipe" && typeof ContributionFlow.initRecipeFormHandlers === "function") {
+      ContributionFlow.initRecipeFormHandlers(panel);
+    }
   }
   if (heroTitle) heroTitle.textContent = "Contribute to Wiki Entry";
   if (heroCopy) heroCopy.textContent = "Add focused information to an existing entry. Your submission goes to admin review.";
@@ -466,21 +469,29 @@ async function submitContributionCP(errorEl) {
 
   // Same target + same intent already pending from this user → no duplicate.
   if (typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.findPendingContributionDuplicate) {
-    const duplicate = await KnowledgeRelations.findPendingContributionDuplicate(supabase, {
+    const duplicateParams = {
       authorId: userId,
       targetPostId: context.targetId,
       targetPostSlug: context.targetSlug,
       intent: context.resolvedIntent,
-    });
+    };
+    if (context.resolvedIntent === "add_recipe") {
+      duplicateParams.recipe = ContributionFlow.buildRecipePayload
+        ? ContributionFlow.buildRecipePayload(collected.values, context)
+        : { ingredients: collected.values.ingredients, station: collected.values.station };
+    }
+    const duplicate = await KnowledgeRelations.findPendingContributionDuplicate(supabase, duplicateParams);
     if (duplicate) {
-      errorEl.textContent = "You already have a pending contribution of this type for this entry. Please wait for the review instead of submitting again.";
+      errorEl.textContent = context.resolvedIntent === "add_recipe"
+        ? "You already submitted this recipe for this item and it is still pending review."
+        : "You already have a pending contribution of this type for this entry. Please wait for the review instead of submitting again.";
       errorEl.style.display = "block";
       return true;
     }
   }
 
   const relations = ContributionFlow.buildRelations(context.resolvedIntent, collected.values, context);
-  const contributionMeta = ContributionFlow.buildContributionMeta(context, collected.values, relations);
+  let contributionMeta = ContributionFlow.buildContributionMeta(context, collected.values, relations);
   const title = ContributionFlow.buildContributionTitle(context);
   let content = ContributionFlow.buildContributionContent(context, collected.values);
 

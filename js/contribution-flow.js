@@ -79,7 +79,18 @@ window.ContributionFlow = (function() {
       label: "Add known item",
       fields: ["entity_name", "relation_notes", "confidence_level", "evidence_notes"],
     },
+    add_recipe: {
+      label: "Add recipe",
+      customForm: "recipe",
+      fields: [],
+    },
   };
+
+  const RECIPE_UNIT_OPTIONS = [
+    { value: "piece", label: "piece" },
+    { value: "stack", label: "stack" },
+    { value: "unit", label: "unit" },
+  ];
 
   function escapeHtml(value) {
     return String(value || "")
@@ -117,6 +128,7 @@ window.ContributionFlow = (function() {
       found_in: "confirm_location",
       known_creature: "add_known_creature",
       known_item: "add_known_item",
+      recipe: "add_recipe",
       rarity: "add_info",
       resources_or_rewards: "add_info",
       notes: "add_info",
@@ -214,8 +226,186 @@ window.ContributionFlow = (function() {
     return html;
   }
 
+  function confidenceLevelToRecipeConfidence(level) {
+    const map = {
+      "1-rumor": "rumor",
+      "2-single-observation": "single_observation",
+      "3-repeated": "repeated_observation",
+      "4-confirmed": "confirmed",
+    };
+    return map[String(level || "")] || "single_observation";
+  }
+
+  function renderRecipeIngredientRow(index, defaults) {
+    const row = defaults || {};
+    const qty = row.quantity != null ? row.quantity : 1;
+    const unit = row.unit || "piece";
+    let html = '<div class="bl-recipe-ingredient-row" data-index="' + index + '" style="display:grid;grid-template-columns:1fr 90px 110px auto;gap:8px;align-items:end;margin-bottom:10px;">';
+    html += '<div class="form-group" style="margin:0;"><label>Ingredient Name *</label>';
+    html += '<input type="text" class="form-input bl-recipe-ing-name" maxlength="140" placeholder="e.g. Ember Shard" value="' +
+      escapeHtml(row.name || "") + '" /></div>';
+    html += '<div class="form-group" style="margin:0;"><label>Qty *</label>';
+    html += '<input type="number" class="form-input bl-recipe-ing-qty" min="1" step="1" value="' + escapeHtml(String(qty)) + '" /></div>';
+    html += '<div class="form-group" style="margin:0;"><label>Unit</label><select class="form-input bl-recipe-ing-unit">';
+    RECIPE_UNIT_OPTIONS.forEach(function(opt) {
+      const selected = unit === opt.value ? " selected" : "";
+      html += '<option value="' + escapeHtml(opt.value) + '"' + selected + ">" + escapeHtml(opt.label) + "</option>";
+    });
+    html += "</select></div>";
+    html += '<button type="button" class="btn-secondary bl-recipe-remove-row" style="margin-bottom:2px;">Remove</button>';
+    html += "</div>";
+    return html;
+  }
+
+  function renderRecipeForm(context) {
+    let html = '<div id="recipeFormRoot">';
+    html += '<p class="field-hint" style="margin:0 0 12px;">Report how <strong>' + escapeHtml(context.displayName) +
+      "</strong> is crafted. Your recipe suggestion stays pending until an admin reviews it.</p>";
+    html += '<div class="form-group"><label>Ingredients *</label>';
+    html += '<div id="recipeIngredientsList">';
+    html += renderRecipeIngredientRow(0);
+    html += "</div>";
+    html += '<button type="button" class="btn-secondary" id="recipeAddIngredientBtn" style="margin-top:4px;">Add another ingredient</button>';
+    html += "</div>";
+    html += '<div class="form-group"><label for="contrib_recipe_station">Crafting Station</label>';
+    html += '<input type="text" id="contrib_recipe_station" class="form-input" maxlength="140" placeholder="e.g. Forge (Unknown if unsure)" /></div>';
+    html += '<div class="form-group"><label for="contrib_recipe_output_qty">Output Quantity</label>';
+    html += '<input type="number" id="contrib_recipe_output_qty" class="form-input" min="1" step="1" value="1" /></div>';
+    html += '<div class="form-group"><label for="contrib_recipe_unlock">Unlock Condition</label>';
+    html += '<input type="text" id="contrib_recipe_unlock" class="form-input" maxlength="240" placeholder="Unknown" value="Unknown" /></div>';
+    html += '<div class="form-group"><label for="contrib_recipe_notes">Notes</label>';
+    html += '<textarea id="contrib_recipe_notes" class="form-input" rows="3" maxlength="500" placeholder="Optional observation notes"></textarea></div>';
+    html += renderField(FIELD_DEFS.confidence_level, { confidence_level: "2-single-observation" });
+    html += renderField(FIELD_DEFS.evidence_notes, {});
+    html += "</div>";
+    return html;
+  }
+
+  function initRecipeFormHandlers(root) {
+    const wrap = root || document.getElementById("contributionPanel");
+    if (!wrap) return;
+    const list = wrap.querySelector("#recipeIngredientsList");
+    const addBtn = wrap.querySelector("#recipeAddIngredientBtn");
+    if (!list || !addBtn) return;
+
+    function refreshRemoveButtons() {
+      const rows = list.querySelectorAll(".bl-recipe-ingredient-row");
+      rows.forEach(function(row) {
+        const btn = row.querySelector(".bl-recipe-remove-row");
+        if (btn) btn.style.display = rows.length > 1 ? "inline-flex" : "none";
+      });
+    }
+
+    addBtn.addEventListener("click", function() {
+      const index = list.querySelectorAll(".bl-recipe-ingredient-row").length;
+      list.insertAdjacentHTML("beforeend", renderRecipeIngredientRow(index));
+      refreshRemoveButtons();
+    });
+
+    list.addEventListener("click", function(event) {
+      const btn = event.target.closest(".bl-recipe-remove-row");
+      if (!btn) return;
+      const row = btn.closest(".bl-recipe-ingredient-row");
+      if (!row || list.querySelectorAll(".bl-recipe-ingredient-row").length <= 1) return;
+      row.remove();
+      refreshRemoveButtons();
+    });
+
+    refreshRemoveButtons();
+  }
+
+  function collectRecipeFormValues() {
+    const errors = [];
+    const list = document.getElementById("recipeIngredientsList");
+    const ingredients = [];
+    if (list) {
+      list.querySelectorAll(".bl-recipe-ingredient-row").forEach(function(row) {
+        const name = (row.querySelector(".bl-recipe-ing-name")?.value || "").trim();
+        const qtyRaw = row.querySelector(".bl-recipe-ing-qty")?.value;
+        const qty = qtyRaw != null && qtyRaw !== "" ? Number(qtyRaw) : 1;
+        const unit = (row.querySelector(".bl-recipe-ing-unit")?.value || "piece").trim();
+        if (!name) return;
+        if (!Number.isFinite(qty) || qty <= 0) {
+          errors.push("Each ingredient needs a positive quantity.");
+          return;
+        }
+        ingredients.push({ name: name, quantity: qty, unit: unit || "piece" });
+      });
+    }
+    if (!ingredients.length) errors.push("At least one ingredient name is required.");
+
+    const stationRaw = (document.getElementById("contrib_recipe_station")?.value || "").trim();
+    const station = stationRaw || "Unknown";
+    const outputRaw = document.getElementById("contrib_recipe_output_qty")?.value;
+    const outputQty = outputRaw != null && outputRaw !== "" ? Number(outputRaw) : 1;
+    if (!Number.isFinite(outputQty) || outputQty <= 0) errors.push("Output quantity must be a positive number.");
+
+    const unlock = (document.getElementById("contrib_recipe_unlock")?.value || "").trim() || "Unknown";
+    const notes = (document.getElementById("contrib_recipe_notes")?.value || "").trim();
+    const confidenceLevel = (document.getElementById("contrib_confidence_level")?.value || "2-single-observation").trim();
+    const evidenceNotes = (document.getElementById("contrib_evidence_notes")?.value || "").trim();
+    const imageUrl = (document.getElementById("contribImageUrl")?.value || "").trim();
+
+    const values = {
+      ingredients: ingredients,
+      station: station,
+      output_quantity: outputQty,
+      unlock_condition: unlock,
+      notes: notes,
+      confidence_level: confidenceLevel,
+      evidence_notes: evidenceNotes,
+    };
+    if (imageUrl) values.image_url = imageUrl;
+    return { values: values, errors: errors };
+  }
+
+  function buildRecipePayload(values, targetContext) {
+    return {
+      target_item: targetContext.displayName,
+      target_slug: targetContext.targetSlug,
+      ingredients: (values.ingredients || []).map(function(row) {
+        return {
+          name: row.name,
+          quantity: row.quantity,
+          unit: row.unit || "piece",
+        };
+      }),
+      station: values.station || "Unknown",
+      output_quantity: values.output_quantity != null ? values.output_quantity : 1,
+      unlock_condition: values.unlock_condition || "Unknown",
+      notes: values.notes || "",
+      evidence_tier: "reported",
+      confidence: confidenceLevelToRecipeConfidence(values.confidence_level),
+    };
+  }
+
   function renderPanel(context) {
     const mask = getMask(context.intent, context.field, context.entityType);
+    if (mask.customForm === "recipe") {
+      let html = '<section class="bl-contrib-panel">';
+      html += '<div class="bl-contrib-header">';
+      html += "<h2>Contribute to " + escapeHtml(context.displayName) + "</h2>";
+      html += "<p class=\"bl-contrib-subtitle\">You are adding <strong>" + escapeHtml(mask.label) +
+        "</strong> to this wiki entry. Your submission will be reviewed before it updates the live page.</p>";
+      html += "</div>";
+      if (context.knownFacts && context.knownFacts.length) {
+        html += '<div class="bl-contrib-known-wrap"><p class="bl-contrib-known-title">Already known</p>';
+        html += renderKnownFacts(context.knownFacts);
+        html += "</div>";
+      }
+      html += renderRecipeForm(context);
+      html += '<div class="form-group bl-contrib-evidence-upload">';
+      html += '<label for="contribMedia">Upload evidence (optional)</label>';
+      html += '<input type="file" id="contribMedia" accept="image/*,.pdf,.webp" multiple class="form-input" />';
+      html += '<p class="field-hint">Screenshots and clips help admins verify your contribution faster.</p>';
+      html += "</div>";
+      html += '<div class="form-group">';
+      html += '<label for="contribImageUrl">Image URL (optional)</label>';
+      html += '<input type="url" id="contribImageUrl" class="form-input" placeholder="https://.../screenshot.jpg" />';
+      html += "</div>";
+      html += "</section>";
+      return html;
+    }
     const defaults = {};
     if (context.relationTarget) {
       if (mask === MASKS.report_drop) defaults.dropped_by = context.relationTarget;
@@ -259,6 +449,7 @@ window.ContributionFlow = (function() {
   }
 
   function collectFormValues(mask) {
+    if (mask.customForm === "recipe") return collectRecipeFormValues();
     const out = {};
     const errors = [];
     mask.fields.forEach(function(key) {
@@ -280,6 +471,13 @@ window.ContributionFlow = (function() {
       contribution_intent: intent,
       confidence_level: values.confidence_level || "2-single-observation",
     };
+    if (intent === "add_recipe") {
+      payload.intent = "add_recipe";
+      payload.recipe = buildRecipePayload(values, targetContext);
+      if (values.notes) payload.notes = values.notes;
+      if (values.evidence_notes) payload.evidence_notes = values.evidence_notes;
+      return payload;
+    }
     if (values.damage) payload.damage = values.damage;
     if (values.scaling) payload.scaling_power = values.scaling;
     if (values.durability) payload.durability = values.durability;
@@ -380,6 +578,20 @@ window.ContributionFlow = (function() {
         target_entity_type: "item",
       }));
     }
+    if (intent === "add_recipe" && values.ingredients && values.ingredients.length) {
+      const recipe = buildRecipePayload(values, targetContext);
+      const craftRels = typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.buildCraftRelationsFromRecipe
+        ? KnowledgeRelations.buildCraftRelationsFromRecipe(recipe)
+        : [];
+      craftRels.forEach(function(rel) {
+        relations.push(Object.assign({}, relBase, rel, {
+          auto_inferred: false,
+          source_post_slug: targetContext.targetSlug,
+          source_post_id: targetContext.targetId,
+          source_post_title: targetContext.displayName,
+        }));
+      });
+    }
     if (targetContext.relationTarget && intent === "report_drop" && !relations.length) {
       relations.push(Object.assign({}, relBase, {
         relation_type: "dropped_by",
@@ -396,6 +608,15 @@ window.ContributionFlow = (function() {
     const entityKey = typeof EntityCore !== "undefined"
       ? EntityCore.buildEntityKey(context.entityType, context.displayName)
       : (context.entityType + "|" + String(context.displayName || "").toLowerCase());
+    const submittedFields = Object.assign({}, values);
+    if (context.resolvedIntent === "add_recipe" && values.ingredients) {
+      submittedFields.recipe_ingredients = values.ingredients.map(function(row) {
+        return row.name + " x" + row.quantity + " " + (row.unit || "piece");
+      }).join(", ");
+      submittedFields.crafting_station = values.station || "Unknown";
+      submittedFields.output_quantity = String(values.output_quantity != null ? values.output_quantity : 1);
+      submittedFields.unlock_condition = values.unlock_condition || "Unknown";
+    }
     return {
       contribution: {
         target_post_id: context.targetId,
@@ -408,7 +629,7 @@ window.ContributionFlow = (function() {
         missing_field: context.field || null,
         relation_target: context.relationTarget || null,
         source_page: context.sourcePage || null,
-        submitted_fields: values,
+        submitted_fields: submittedFields,
         confidence_level: values.confidence_level || "2-single-observation",
         status: "pending_review",
         created_from_existing_entry: true,
@@ -433,14 +654,28 @@ window.ContributionFlow = (function() {
   function buildContributionContent(context, values) {
     const mask = getMask(context.resolvedIntent, context.field, context.entityType);
     let html = "<p><strong>Wiki contribution</strong> for <em>" + escapeHtml(context.displayName) + "</em>.</p>";
-    html += "<p>Intent: " + escapeHtml(mask.label) + "</p><ul>";
-    Object.keys(values).forEach(function(key) {
-      if (key === "confidence_level") return;
-      const def = FIELD_DEFS[key];
-      const label = def ? def.label : formatLabel(key);
-      html += "<li><strong>" + escapeHtml(label) + ":</strong> " + escapeHtml(values[key]) + "</li>";
-    });
-    html += "</ul>";
+    html += "<p>Intent: " + escapeHtml(mask.label) + "</p>";
+    if (context.resolvedIntent === "add_recipe" && values.ingredients) {
+      html += "<ul>";
+      values.ingredients.forEach(function(row) {
+        html += "<li><strong>Ingredient:</strong> " + escapeHtml(row.name) + " x" +
+          escapeHtml(String(row.quantity)) + " " + escapeHtml(row.unit || "piece") + "</li>";
+      });
+      html += "<li><strong>Station:</strong> " + escapeHtml(values.station || "Unknown") + "</li>";
+      html += "<li><strong>Output:</strong> " + escapeHtml(String(values.output_quantity != null ? values.output_quantity : 1)) + "</li>";
+      html += "<li><strong>Unlock:</strong> " + escapeHtml(values.unlock_condition || "Unknown") + "</li>";
+      if (values.notes) html += "<li><strong>Notes:</strong> " + escapeHtml(values.notes) + "</li>";
+      html += "</ul>";
+    } else {
+      html += "<ul>";
+      Object.keys(values).forEach(function(key) {
+        if (key === "confidence_level" || key === "ingredients") return;
+        const def = FIELD_DEFS[key];
+        const label = def ? def.label : formatLabel(key);
+        html += "<li><strong>" + escapeHtml(label) + ":</strong> " + escapeHtml(String(values[key])) + "</li>";
+      });
+      html += "</ul>";
+    }
     if (values.evidence_notes) {
       html += "<p><strong>Evidence:</strong> " + escapeHtml(values.evidence_notes) + "</p>";
     }
@@ -456,10 +691,12 @@ window.ContributionFlow = (function() {
     loadTargetPost: loadTargetPost,
     buildKnownFactsSummary: buildKnownFactsSummary,
     renderPanel: renderPanel,
+    initRecipeFormHandlers: initRecipeFormHandlers,
     collectFormValues: collectFormValues,
     buildContributionMeta: buildContributionMeta,
     buildContributionTitle: buildContributionTitle,
     buildContributionContent: buildContributionContent,
     buildRelations: buildRelations,
+    buildRecipePayload: buildRecipePayload,
   };
 })();

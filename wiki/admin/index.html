@@ -727,6 +727,9 @@ function isContributionPostA(post, meta) {
 // Compact list of what the contributor actually submitted, so admins can
 // review contributions without opening the raw HTML dump.
 function renderContributionSubmittedFieldsA(info) {
+  if (info && info.intent === "add_recipe") {
+    return renderRecipeContributionSummaryA(info);
+  }
   const fields = info && info.submitted_fields && typeof info.submitted_fields === "object"
     ? info.submitted_fields
     : {};
@@ -741,6 +744,45 @@ function renderContributionSubmittedFieldsA(info) {
       "</dt><dd style=\"margin:0;color:var(--text-muted);\">" + escapeHtmlA(String(fields[key]).slice(0, 200)) + "</dd></div>";
   });
   html += "</dl>";
+  return html;
+}
+
+function renderRecipeContributionSummaryA(info) {
+  const recipe = info && info.payload && info.payload.recipe && typeof info.payload.recipe === "object"
+    ? info.payload.recipe
+    : null;
+  if (!recipe) return "";
+  const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+  const ingText = ingredients.map(function(row) {
+    return (row.name || "?") + " x" + (row.quantity != null ? row.quantity : "?") + " " + (row.unit || "piece");
+  }).join(", ");
+  const relations = Array.isArray(info.relations) ? info.relations : [];
+  const craftLines = relations.filter(function(rel) {
+    return rel && (rel.relation_type === "crafted_from" || rel.relation_type === "crafted_at");
+  }).map(function(rel) {
+    const qty = rel.quantity != null ? (" x" + rel.quantity + (rel.unit ? " " + rel.unit : "")) : "";
+    return (rel.relation_type || "related") + " → " + (rel.title || "?") + qty;
+  });
+  const rows = [
+    ["Intent", "Add Recipe"],
+    ["Target", recipe.target_item || info.target_title || ""],
+    ["Ingredients", ingText],
+    ["Station", recipe.station || "Unknown"],
+    ["Output", recipe.output_quantity != null ? String(recipe.output_quantity) : "1"],
+    ["Unlock", recipe.unlock_condition || "Unknown"],
+    ["Notes", recipe.notes || ""],
+  ].filter(function(row) { return String(row[1] || "").trim(); });
+  let html = '<p style="font-size:0.82rem;color:#9cc4ef;margin:6px 0 10px;"><strong>Add Recipe</strong></p>';
+  html += '<dl style="margin:0 0 8px;padding:8px 10px;background:rgba(74,120,184,0.12);border-radius:6px;font-size:0.82rem;">';
+  rows.forEach(function(row) {
+    html += '<div style="display:flex;gap:8px;"><dt style="color:#9cc4ef;min-width:110px;">' + escapeHtmlA(row[0]) +
+      '</dt><dd style="margin:0;color:var(--text-muted);">' + escapeHtmlA(String(row[1]).slice(0, 240)) + '</dd></div>';
+  });
+  html += "</dl>";
+  if (craftLines.length) {
+    html += '<p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 10px;">CRAFT relations: ' +
+      escapeHtmlA(craftLines.join(", ")) + "</p>";
+  }
   return html;
 }
 
