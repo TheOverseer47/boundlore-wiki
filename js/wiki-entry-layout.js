@@ -984,7 +984,7 @@ window.WikiEntryLayout = (function() {
     if (href && rel) return renderRelationLink(rel);
     let html = '<span class="bl-wiki-recipe-ingredient-name">' + escapeHtml(name) + "</span>";
     if (meaningful(name)) {
-      html += ' <span class="bl-wiki-entry-needed">Entry needed</span>';
+      html += ' <span class="bl-wiki-entry-needed" title="Tracked as unresolved target">Entry needed</span>';
     }
     return html;
   }

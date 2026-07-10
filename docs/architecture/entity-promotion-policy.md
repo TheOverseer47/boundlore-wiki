@@ -94,6 +94,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 ## Missing Entry Queue
 
+> **P0.5-C code baseline:** Derived/in-memory queue in [`js/unresolved-targets.js`](../../js/unresolved-targets.js) (`window.BoundLoreUnresolvedTargets`). Admin Overview shows a **read-only** table from published recipe/ relation data. Wood and Forge from QA Staff appear when admin session is available. No persistent table, no Promote/Merge/Dismiss actions yet.
+
 Admin panel list (P0.5) showing unresolved targets sorted by promotion score.
 
 | Column | Source |

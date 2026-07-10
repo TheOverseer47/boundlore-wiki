@@ -305,7 +305,7 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | # | Blind spot | Current code | Target state | Priority |
 |---|------------|--------------|--------------|----------|
 | 1 | **No Facet Layer** | `js/facet-registry.js` baseline + derived resource badges (P0.5-B) | Full BLMETA `facets` editing, search index, filters | **P0.5** (partial: registry + display) |
-| 2 | **No Unresolved Target Lifecycle** | Wood/Forge show `Entry needed` badge in recipe UI (P0.5-A); no queue/promotion yet | mentioned → unresolved → candidate → stub via Missing Entry Queue | **P0.5** (partial: display only) |
+| 2 | **No Unresolved Target Lifecycle** | Derived records + read-only Missing Entry Queue (P0.5-C); Entry needed badges on recipes | mentioned → unresolved → candidate → stub via promotion actions | **P0.5** (partial: derived view only) |
 | 3 | **Search title/excerpt only** | `js/search.js` ilike on posts.title, excerpt | search_documents index with facets, aliases, relations | **P0.5** baseline |
 | 4 | **No station_type** | `crafted_at` → string "Forge" | SYSTEM/station_type entity; Forge promotable | **P0.5** |
 | 5 | **Resource Classification Display** | ~~Detail shows Category/Subcategory/Type as generic Item~~ | P0.5-A: resource detail shows Type/Source/Rarity; sidebar Type Resource | **Done (P0.5-A)** |
@@ -315,7 +315,7 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 | 9 | **No relation qualifiers spec in code** | quantity/unit ad hoc in recipe payload | Typed qualifiers object on all relations | **P1** |
 | 10 | **Symmetric relation double-write** | hostile_to/allied_to may store both directions | Single-write + derived mirror | **P1** |
 | 11 | **Mount = subtype assumption** | Docs v1 listed mount as BEING subtype | creature + role/capability facets | **P1** |
-| 12 | **No Missing Entry Queue UI** | Unresolved targets show `Entry needed` badge in recipe (P0.5-A) | Admin queue + Entry Needed badges | **P0.5** (partial: recipe badge only) |
+| 12 | **No Missing Entry Queue UI** | Read-only admin Missing Entry Queue from published content (P0.5-C) | Admin queue + promote/merge/dismiss actions | **P0.5** (partial: read-only queue) |
 | 13 | **No compound search queries** | Cannot answer "items using X" | Query parser + inbound index | **P1** |
 | 14 | **Discovery auto-stub path** | `buildStubPostMeta` on discovery submit | Align with promotion policy (no blind stubs) | **P0.5** investigate |
 
@@ -379,3 +379,22 @@ Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started a
 **Derivation rules (conservative):** Only structured fields (`source_type`, `rarity`); no speculative element/taxonomy from names; `processing_stage: raw` only for resource entries without refined/component hints.
 
 **Files touched:** `js/facet-registry.js` (new), `js/wiki-entry-layout.js`, `js/render-posts.js`, `css/style.css`, `wiki/post/index.html`, `wiki/resources/index.html`, `wiki/items/index.html`, `wiki/browse/index.html`.
+
+---
+
+## 4. P0.5-C — Derived Unresolved Target Records + Missing Entry Queue
+
+**Status:** Complete (in-memory derivation + read-only admin queue; no DB table, no stub creation, no promote/merge/dismiss actions).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| Unresolved module | `js/unresolved-targets.js` → `window.BoundLoreUnresolvedTargets` | Normalize, collect from published recipes/relations, merge, sort, render queue |
+| Recipe targets | `collectUnresolvedTargetsFromRecipe()` | Unresolved ingredients (Wood) + stations (Forge) from merged published BLMETA only |
+| Exclusions | Published-only; skip contributions/pending | QA Ember Shard resolved; pending add_recipe ×4 not counted |
+| Admin queue | `wiki/admin/index.html` Overview panel | Read-only table: name, suggested type, mentions, contexts, reason, status |
+| Entry-needed UX | `wiki-entry-layout.js` tooltip | `title="Tracked as unresolved target"` on Entry needed badge |
+| Not built | Persistent `unresolved_targets` table, Promote/Merge/Dismiss, backlink reconciliation, station promotion, search | Deferred |
+
+**QA expectation:** Wood (OBJECT/resource, recipe ingredient) and Forge (SYSTEM/station_type, crafting station) from QA Staff merged recipe.
+
+**Files touched:** `js/unresolved-targets.js` (new), `wiki/admin/index.html`, `js/wiki-entry-layout.js`, `css/style.css`, `wiki/post/index.html` (cache bust).

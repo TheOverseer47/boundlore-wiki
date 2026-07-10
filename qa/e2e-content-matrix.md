@@ -41,6 +41,22 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P0.5-C — Derived Unresolved Targets + Missing Entry Queue
+
+**Milestone:** P0.5-C (derived/in-memory records; no DB persistence, no stub creation, no promotion actions)
+
+| Test | URL / target | Expected | Result |
+|------|--------------|----------|--------|
+| Staff recipe + entry needed | `qa-staff-of-fire-2b742628` | Recipe intact; Wood/Forge Entry needed; no new posts | `[x]` |
+| Ember detail regression | `qa-ember-shard-511160` | Resource + facet badges + Used In | `[x]` |
+| Resources landing regression | `/wiki/resources/` | QA Ember Shard card intact | `[x]` |
+| Admin Missing Entry Queue | `/wiki/admin/` | Wood + Forge listed; Ember not listed | `[~]` Access Denied in automation |
+| Browse / Items / Homepage | regression URLs | No regressions | `[x]` |
+
+**Not built in P0.5-C:** Persistent unresolved_targets table, Promote to Stub, Merge into Existing, Dismiss, backlink reconciliation, search baseline.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  
@@ -302,7 +318,7 @@ Architecture validation tests from Master Blueprint 2.0. Status: **planned** unt
 | T-RESOURCE-02 | Same resource from mining + loot + vendor | P1 | `[ ]` planned |
 | T-STATION-01 | Generic Forge as station_type without location | P0.5 | `[ ]` planned |
 | T-STATION-02 | Concrete Forge as located_at observation only | P0.5 | `[ ]` planned |
-| T-CRAFT-01 | Recipe with unresolved ingredient + station | P0.5 | `[x]` P0.5-A — Wood/Forge Entry needed badges; no stubs |
+| T-CRAFT-01 | Recipe with unresolved ingredient + station | P0.5 | `[x]` P0.5-A badges + P0.5-C admin queue derivation |
 | T-CRAFT-02 | Multiple alternative recipes for same item | P1 | `[ ]` planned |
 | T-CRAFT-03 | Recipe changes between two versions | P2 | `[ ]` planned |
 | T-MOUNT-01 | Creature is Dragon + Flying + Rideable Mount (one page) | P0.5 | `[ ]` planned |

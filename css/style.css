@@ -3311,6 +3311,36 @@ details.bl-kg-section > summary.bl-kg-section-title::-webkit-details-marker {
   border-style: dashed;
 }
 
+.bl-missing-entry-queue-copy {
+  color: var(--text-muted);
+  margin: 0 0 12px;
+  font-size: 0.92rem;
+}
+
+.bl-missing-entry-table .bl-missing-entry-context {
+  font-size: 0.84rem;
+  margin-bottom: 4px;
+}
+
+.bl-missing-entry-table .bl-missing-entry-context:last-child {
+  margin-bottom: 0;
+}
+
+.bl-missing-entry-status {
+  background: rgba(201, 124, 45, 0.18);
+  color: #e0a83a;
+}
+
+.bl-missing-entry-actions .btn-small[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.bl-missing-entry-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
 .bl-evidence-badge {
   display: inline-flex;
   align-items: center;

@@ -110,6 +110,12 @@
       <div class="stat-card"><div class="num" id="statGuildApplications">-</div><div class="label">Guild Applications</div></div>
       <div class="stat-card"><div class="num" id="statReports">-</div><div class="label">Open Reports</div></div>
     </div>
+    <div class="form-box" id="missingEntryQueuePanel" style="margin-bottom:16px;">
+      <div id="missingEntryQueueHost">
+        <h3 style="margin-top:0;">Missing Entry Queue</h3>
+        <p style="color:var(--text-muted);margin:0;">Loading unresolved targets from published content...</p>
+      </div>
+    </div>
     <div class="form-box" id="patchModePanel" style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
         <div>
@@ -284,9 +290,11 @@
 <script src="/js/supabase-config.js"></script>
 <script src="/js/test-data.js?v=1"></script>
 <script src="/js/categories-config.js?v=18"></script>
-<script src="/js/relations-registry.js?v=1"></script>
+<script src="/js/relations-registry.js?v=2"></script>
+<script src="/js/facet-registry.js?v=2"></script>
 <script src="/js/knowledge-relations.js?v=20"></script>
-<script src="/js/entity-core.js?v=9"></script>
+<script src="/js/entity-core.js?v=10"></script>
+<script src="/js/unresolved-targets.js?v=1"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notifications.js"></script>
@@ -355,7 +363,7 @@ async function checkAdmin() {
     syncAdminSystemNotice();
     initDiscoveryComposer();
     initAdminControls();
-    await Promise.all([loadOverview(), loadPending(), loadDiscoveries(), loadAllPosts(), loadUsers(), loadReports(), loadModerationLog()]);
+    await Promise.all([loadOverview(), loadPending(), loadDiscoveries(), loadAllPosts(), loadUsers(), loadReports(), loadModerationLog(), loadMissingEntryQueue()]);
   } catch (err) {
     console.error("Admin bootstrap failed:", err);
     showDenied("Admin dashboard initialization failed: " + (err && err.message ? err.message : "Unknown error"));
@@ -1266,6 +1274,47 @@ async function loadOverview() {
     });
   }
   await loadWikiPatchModePanelA();
+}
+
+async function loadMissingEntryQueue() {
+  const host = document.getElementById("missingEntryQueueHost");
+  if (!host) return;
+
+  if (typeof BoundLoreUnresolvedTargets === "undefined" || !BoundLoreUnresolvedTargets.collectUnresolvedTargetsFromPosts) {
+    host.innerHTML =
+      "<h3 style=\"margin-top:0;\">Missing Entry Queue</h3>" +
+      "<p style=\"color:var(--text-muted);margin:0;\">Unresolved target module not loaded.</p>";
+    return;
+  }
+
+  host.innerHTML =
+    "<h3 style=\"margin-top:0;\">Missing Entry Queue</h3>" +
+    "<p style=\"color:var(--text-muted);margin:0 0 10px;\">Scanning published content for unresolved targets...</p>";
+
+  try {
+    let query = supabase
+      .from("posts")
+      .select("id, slug, title, category, post_type, status, content, created_at, updated_at, deleted_at")
+      .eq("status", "published")
+      .order("created_at", { ascending: false });
+    if (canUseExtendedPostFields) query = query.is("deleted_at", null);
+
+    const { data: posts, error } = await query;
+    if (error) {
+      host.innerHTML =
+        "<h3 style=\"margin-top:0;\">Missing Entry Queue</h3>" +
+        "<p style=\"color:#ff8b8b;margin:0;\">Failed to load published posts: " + escapeHtmlA(error.message) + "</p>";
+      return;
+    }
+
+    const records = BoundLoreUnresolvedTargets.collectUnresolvedTargetsFromPosts(posts || []);
+    host.innerHTML = BoundLoreUnresolvedTargets.renderMissingEntryQueue(records, { showActions: true });
+  } catch (err) {
+    console.error("Missing Entry Queue load failed:", err);
+    host.innerHTML =
+      "<h3 style=\"margin-top:0;\">Missing Entry Queue</h3>" +
+      "<p style=\"color:#ff8b8b;margin:0;\">Failed to derive unresolved targets.</p>";
+  }
 }
 
 async function loadPending() {
