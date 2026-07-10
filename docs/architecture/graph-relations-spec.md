@@ -1,8 +1,12 @@
 # Graph Relations Specification
 
+**Version 2.0** — extends P0 relation families with qualifiers, forward-only persistence rules, and proposed/reserved types.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).
+
+**Related:** [CONTENT_ARCHITECTURE.md](./CONTENT_ARCHITECTURE.md) · [versioning-model.md](./versioning-model.md) · [entity-promotion-policy.md](./entity-promotion-policy.md)
 
 ---
 
@@ -82,7 +86,7 @@ Canonical relation types for BoundLore knowledge graph. Implementation registry:
 | Render widget | Drops table (primary on creature pages) |
 | Example | Ogre Mage `drops` QA Staff of Fire |
 
-**Legacy compatibility:** DB `DROPS`. Inverse `dropped_by` on item pages (keep both directions).
+**Legacy compatibility:** DB `DROPS`. Inverse `dropped_by` on item pages — **derived in 2.0** (do not persist both directions for new merges).
 
 ---
 
@@ -261,3 +265,193 @@ JOIN wiki_entities e ON e.source_post_id = p.id
 JOIN usage u ON u.source_entity_id = e.id
 WHERE p.deleted_at IS NULL AND p.status = 'published';
 ```
+
+---
+
+## Relation Registry 2.0 — Binding Rules
+
+### Forward persistence / derived inverses
+
+| Rule | Detail |
+|------|--------|
+| Persist | Forward direction only (source → target as defined per type) |
+| Derive | All inverses at render and search index time |
+| `ingredient_of` | **Derived** from `crafted_from` — never persist (P0 decision retained) |
+| `dropped_by` | Derived from `drops` |
+| `sold_by` (proposed) | Derived from `sold_by` forward on vendor → item (widget: "Sold by") |
+| `reward_of` (proposed) | Derived inverse of `reward_of` forward on quest/event → item |
+| `station_for` | Derived from `crafted_at` |
+| Symmetric types | `hostile_to`, `allied_to`, `related_to` — store once; derive mirror for display (P1 migration from double-write) |
+
+### Relation Qualifiers (typed object on each relation)
+
+Qualifiers extend the relation without creating new entities:
+
+| Qualifier | Type | Used by |
+|-----------|------|---------|
+| `quantity` | number | crafted_from, drops, reward_of |
+| `unit` | string | crafted_from |
+| `station` | entity ref or unresolved name | crafted_from (when station differs from crafted_at target) |
+| `condition` | object (time, weather, event) | spawns_at, drops, gathered_via |
+| `tool` | entity ref or name | gathered_via, harvested_from |
+| `drop_chance` | number 0–1 | drops |
+| `price` | number | sold_by |
+| `currency` | string / entity ref | sold_by |
+| `required_level` | number | crafted_by_profession, unlocks |
+| `game_version` | string, nullable | all versioned types |
+| `valid_from` | string, nullable | versioning |
+| `valid_until` | string, nullable | versioning |
+| `alternative_group` | string | crafted_from (mutually exclusive recipe branches) |
+| `unlock_type` | enum | unlocks (quest, trainer, discovery) |
+
+**Storage shape (proposed):**
+
+```json
+{
+  "type": "crafted_from",
+  "target": "items|qa-ember-shard",
+  "qualifiers": {
+    "quantity": 3,
+    "unit": "piece",
+    "game_version": null
+  },
+  "evidence_tier": "reported",
+  "confidence": "single_observation"
+}
+```
+
+Standard relation properties retained: `confidence`, `evidence_tier`, `source_post_id`, `report_count`.
+
+---
+
+## Proposed / Reserved Relation Types (Blueprint 2.0)
+
+Status key: **proposed** = spec ready, not in `js/relations-registry.js` yet · **reserved** = namespace only
+
+### DROP_YIELD / GATHERING
+
+#### gathered_via — proposed
+
+| Property | Value |
+|----------|-------|
+| Family | DROP_YIELD / GATHERING |
+| Direction | Object (resource) → SYSTEM (gathering_method) or tool |
+| Persist | Forward |
+| Inverse | derived |
+| Qualifiers | tool, skill_requirement, node_type, condition |
+| Search expansion | acquisition_method facet |
+| Example | Ember Shard `gathered_via` mining |
+
+### CRAFT
+
+#### crafted_by_profession — proposed
+
+| Property | Value |
+|----------|-------|
+| Family | CRAFT |
+| Direction | Object (result) → SYSTEM (profession) |
+| Persist | Forward |
+| Inverse | `profession_crafts` derived |
+| Qualifiers | required_level, game_version |
+| Widget | Profession requirement on item page |
+
+### ECONOMY — proposed
+
+#### sold_by
+
+| Property | Value |
+|----------|-------|
+| Direction | OBJECT → BEING (vendor) |
+| Persist | Forward (vendor sells item — or item sold_by vendor; **choose vendor → item forward** for inventory authoring) |
+| Inverse | `sells` derived for vendor page widget |
+| Qualifiers | price, currency, availability, faction_requirement, game_version |
+| Widget | "Sold by" on item (derived inbound) |
+
+#### reward_of
+
+| Property | Value |
+|----------|-------|
+| Direction | OBJECT → KNOWLEDGE/EVENT (quest or event) |
+| Inverse | `rewards` derived |
+| Qualifiers | quantity, choice_group |
+
+### MOUNT / TAME — proposed
+
+#### mountable_by / tamed_via
+
+| Property | Value |
+|----------|-------|
+| Direction | BEING (creature) → OBJECT (item/method) or SYSTEM |
+| Persist | Forward |
+| Facet sync | May derive capability:tameable / role:mount when evidence confirmed |
+| Evidence | High — review_required |
+
+### EVENT — proposed
+
+#### occurs_during
+
+| Property | Value |
+|----------|-------|
+| Direction | BEING/OBJECT → EVENT |
+| Qualifiers | schedule, region, game_version |
+| Facet sync | event_availability |
+
+### VERSION — proposed
+
+#### introduced_in / changed_in / removed_in
+
+| Property | Value |
+|----------|-------|
+| Direction | Entity → META/game_version |
+| Persist | Forward as version statements (see [versioning-model.md](./versioning-model.md)) |
+| Qualifiers | change_note, superseded_by |
+
+### OBSERVATION — proposed
+
+#### observed_as
+
+| Property | Value |
+|----------|-------|
+| Type | Observation record, not standard graph edge |
+| Purpose | Player sighting without new entity |
+| Qualifiers | reporter, observed_at, location, game_version, seed |
+
+---
+
+## Inbound Widget Derivation Map
+
+| Widget on page | Derived from inbound relation |
+|----------------|------------------------------|
+| Used In | `crafted_from` (ingredient_of inverse) |
+| Dropped By | `drops` inverse |
+| Sold By | `sold_by` inverse (P1) |
+| Rewards | `reward_of` inverse (P2) |
+| Crafts Here | `crafted_at` inverse |
+| Known Locations | `located_at` / `found_in` inverse |
+
+Widgets read derived inverses only — never maintain duplicate persisted inverse rows.
+
+---
+
+## Dedupe Keys (2.0)
+
+| Relation | Dedupe key fields |
+|----------|-------------------|
+| crafted_from | source, target, alternative_group, game_version bucket |
+| crafted_at | source, target station |
+| drops | source, target, condition hash, game_version bucket |
+| sold_by | vendor, item, game_version bucket |
+| weak_to | source, damage_type target |
+
+Same dedupe key + same value → corroboration (report_count++). Same key + different value → conflict (needs_review).
+
+---
+
+## Implementation Phases
+
+| Phase | Relation work |
+|-------|---------------|
+| P0 | crafted_from, crafted_at, ingredient_of derived ✅ |
+| P0.5 | Qualifier schema in docs + BLMETA examples; station_type targets |
+| P1 | gathered_via, crafted_by_profession, sold_by, qualifier merge engine |
+| P2 | reward_of, occurs_during, version relations, mountable_by |

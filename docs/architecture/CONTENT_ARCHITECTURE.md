@@ -1,34 +1,63 @@
 # BoundLore Content Architecture & Feature Coverage
 
-**Version 1.0 — Master Blueprint (binding for implementation)**
+**Version 2.0 — Master Blueprint (binding for implementation)**
 
-This document is the authoritative architecture plan for scaling BoundLore beyond Creatures / Items / Biomes to all realistically expected Light No Fire content types.
+This document is the authoritative architecture plan for scaling BoundLore to MMO-scale content ontology, search semantics, entity promotion, and live-service versioning.
 
-**Related artifacts:** See sibling files in `docs/architecture/` for matrices, schemas, wireframes, and code-gap notes.
+**Supersedes:** Version 1.0 sections on roadmap scope and search; P0 decisions remain valid.
+
+**Related artifacts:** See sibling files in `docs/architecture/` for registries, policies, matrices, schemas, and code-gap notes.
+
+---
+
+## Source of Truth Hierarchy
+
+1. **This file** — domain model, core decisions, roadmap summary
+2. **[facet-registry.md](./facet-registry.md)** — controlled facet vocabulary
+3. **[entity-promotion-policy.md](./entity-promotion-policy.md)** — unresolved target lifecycle
+4. **[search-architecture.md](./search-architecture.md)** — search and discoverability (replaces search-filter-matrix for new work)
+5. **[versioning-model.md](./versioning-model.md)** — versioned statements
+6. **[graph-relations-spec.md](./graph-relations-spec.md)** — relation types and qualifiers
+7. **Implementation registry:** `js/relations-registry.js` (must match docs; code lag = bug)
 
 ---
 
 ## 1. Executive Summary
 
-BoundLore has a validated core: Discovery → Entity → Relations, Contribution merge with conflict handling, RLS security, and pre-release reset readiness. E2E flows are proven for Creature, Item, Biome, Drops, Behavior, Spawn, Known Item, Conflict, Cancel, Reject, Restore, and Duplicate.
+BoundLore has completed **P0 local acceptance** (commit `635eb68` — Complete P0 acceptance sweep). The validated core remains:
 
-This blueprint scales the model without overloading discovery forms or over-modeling unconfirmed game systems.
+- Discovery → Entity → Relations
+- Contribution merge with conflict handling
+- Resource Quick-Add, Recipe intent, Used In widget, Resources landing
+- Evidence-tier badges, T3 slug protection
+- No blind stubs for Wood/Forge in QA Staff recipe (correct P0 behavior)
 
-### Core decisions (defaults)
+**Blueprint 2.0** extends P0 with foundational corrections (**P0.5**) and evidence-driven expansion (**P1/P2/P3**). It does **not** invalidate P0 work.
+
+### What changes in 2.0
+
+| Area | P0 (done) | Blueprint 2.0 addition |
+|------|-----------|------------------------|
+| Domain/Subtype | 8 domains, single subtype | **Unchanged** — remains identity base |
+| Multi-role (Mount, Boss, Vendor) | Subtype overload risk | **Facet layer:** roles, capabilities, taxonomy |
+| Unresolved targets (Wood, Forge) | Plain text in recipes | **Promotion lifecycle** + Missing Entry Queue |
+| Search | title + excerpt only | **Structured index:** facets, aliases, relations |
+| Stations | crafted_at string | **station_type** entity (SYSTEM subtype) |
+| Versioning | overwrite on merge | **Versioned statements** with superseded history |
+| Top-level domains | 8 | **No new domains** — scale via subtypes, facets, relations |
+
+### Core decisions (retained + extended)
 
 | # | Decision |
 |---|----------|
-| 1 | **8 Entity Domains** — PLACE, BEING, OBJECT, SYSTEM, KNOWLEDGE, EVENT, COMMUNITY, META. Content areas are subtypes, not separate data models. |
-| 2 | **Progressive Disclosure** — First submit = Name + Type + Where + optional observation. Everything else via wizard stages and Add-Info contributions. |
-| 3 | **Evidence Tiering** — Every fact carries `evidence_tier`: confirmed, observed, reported, speculative. |
-| 4 | **Controlled Relations** — ~20 canonical relation types in 6 families. No ad-hoc types. |
-| 5 | **Speculative systems** (Quests, Economy, Talent Trees) get taxonomy slots only — no specialized forms before evidence. |
-
-### P0 sequence (before launch)
-
-```
-Registry → CRAFT relations → Resource flow → Recipe intent → Widgets → Landing → Badges
-```
+| 1 | **8 Entity Domains** — PLACE, BEING, OBJECT, SYSTEM, KNOWLEDGE, EVENT, COMMUNITY, META. No ninth domain. |
+| 2 | **Single primary Subtype** — exclusive; multi-role via **Facets** and **Relations** |
+| 3 | **Progressive Disclosure** — Quick-Add → Wizard → Add-Info contributions |
+| 4 | **Evidence Tiering** — confirmed, observed, reported, speculative on facts, relations, and capability facets |
+| 5 | **Controlled Relations** — canonical types in registry; **forward persisted, inverses derived** |
+| 6 | **Recipes** — embedded on target item, not own pages; `ingredient_of` derived |
+| 7 | **No blind auto-stubs** — unresolved targets tracked; promotion via Missing Entry Queue |
+| 8 | **Speculative systems** — taxonomy slots + reserved relation types; no specialized forms before evidence |
 
 ---
 
@@ -36,229 +65,291 @@ Registry → CRAFT relations → Resource flow → Recipe intent → Widgets →
 
 ### Methodology
 
-1. Extend the validated core (posts + BLMETA, wiki_entities, wiki_entity_relations, wiki_observations, contribution intents).
+1. Extend the validated post + BLMETA core toward normalized graph tables (`wiki_entities`, `wiki_entity_relations`) via dual-write.
 2. Model depth follows evidence tier (Section 3).
-3. Derive patterns from reference games only where LNF plausibly has similar systems.
-4. Consolidate content areas at domain level; subtype deltas are explicit.
+3. Derive patterns from reference wikis (GW2, OSRS, Minecraft, NMS, Wikidata) — structure, not copy.
+4. Every architecturally considered concept has: modeling location, identity rule, page-worthiness rule, relation/facet rule, search path, contribution path, moderation path, evidence rule, versioning rule, acceptance test.
 
-### Key assumptions
+### Light No Fire scope tiers
 
-| # | Assumption | Confidence | Fallback |
-|---|------------|------------|----------|
-| A1 | LNF is procedurally generated open fantasy world, survival/crafting/exploration core | High | — |
-| A2 | Mounts/flying exist (shown in trailers) | High | Mount subtype remains stub |
-| A3 | Crafting/building exists | High | Recipe model stays generic |
-| A4 | Class/skill system exists in some form | Medium | Skills as facts on items/creatures |
-| A5 | Classic quest/NPC dialogue systems | Low–Medium | Quest stays P2 namespace |
-| A6 | Economy/vendors exist | Low | Economy as context facts on settlements |
-| A7 | Procedural generation ⇒ many instances per archetype (NMS-like) | High | **Archetype vs. Instance** (below) |
+| Tier | Meaning | Wiki treatment |
+|------|---------|----------------|
+| **A — Confirmed** | Official Steam/press/trailer statements | Full modeling allowed |
+| **B — Observed** | Visible in trailers/screenshots | observed tier minimum |
+| **C — Likely** | Genre-plausible, not confirmed | reported/speculative; reserved slots |
+| **D — Speculative** | No evidence | Registry reserved only; no UI promotion |
 
-### Archetyp vs. Instanz (critical)
+Never present Tier C/D as confirmed game facts.
 
-- **Archetype entities** ("Ogre Mage", "Staff of Fire", "Swamp") = canonical wiki pages.
-- **Instance observations** ("Ogre Mage at coordinate X") = `wiki_observations`, **not** new pages.
-- **Exception:** Named uniques (bosses, landmarks, settlements) get own pages.
-- Discovery asks: *"Are you describing the type or a sighting?"* — controls entity vs. observation.
-- Existing `classifyPlaceEntry` / `location_hint` pattern generalizes this.
+### Archetype vs. Instance (retained)
+
+- **Archetype entities** — canonical wiki pages (species, resources, station types, biomes)
+- **Instance observations** — coordinates, one-off spawns, procedural nodes → observations, not pages
+- **Exception:** Named uniques, player bases (opt-in), settlements with community identity
 
 ---
 
 ## 3. Evidence Coverage Tiers
 
-| Tier | Meaning | Modeling depth | Examples |
-|------|---------|----------------|----------|
-| **T1 Confirmed** | Official sources | Full specialization | Biomes, Creatures, Items, Travel, Mounts, Building, Oceans, Weather/Time, Maps |
-| **T2 Likely** | Genre-typical, strongly expected | Subtype + core fields, generic fact containers | Weapons/Armor/Tools, Resources, Recipes, Stations, Bosses, NPCs, Skills, Status Effects, Settlements, Dungeons, Lore |
-| **T3 Speculative** | Possible, unconfirmed | Taxonomy slot + slug namespace + generic KV facts only | Factions, Quests, Talent Trees, Classes, Economy, World Events, Achievements, Player Bases, Patch knowledge |
+| Tier | Meaning | Modeling depth |
+|------|---------|----------------|
+| **T1 Confirmed** | Official sources | Full specialization + capability facets |
+| **T2 Likely** | Genre-typical, strongly expected | Subtype + facets + core relations |
+| **T3 Speculative** | Possible, unconfirmed | Taxonomy slot + slug namespace + generic facts only |
 
-**Promotion rule:** T3 → T2 → T1 only via documented evidence or explicit admin "Taxonomy Promotion" — never automatic.
+**Promotion rule:** T3 → T2 → T1 only via documented evidence or admin Taxonomy Promotion — never automatic.
+
+Capability facets (rideable, tameable) require explicit evidence tier per value. See [facet-registry.md](./facet-registry.md).
 
 ---
 
-## 4. Eight Entity Domains
+## 4. Eight Entity Domains (unchanged)
 
 ```text
 1. PLACE      — spatially locatable
 2. BEING      — living/acting
 3. OBJECT     — ownable/craftable/usable
-4. SYSTEM     — game mechanics (skills, effects, classes, recipes)
-5. KNOWLEDGE  — lore, books, inscriptions, history
-6. EVENT      — time-bound (world events, patches)
-7. COMMUNITY  — player-related (guilds, bases, server meta)
-8. META       — wiki-internal (guides, news, contributions) [exists]
+4. SYSTEM     — game mechanics (skills, stations, recipes-as-facts)
+5. KNOWLEDGE  — lore, books, quests (T3 until evidence)
+6. EVENT      — time-bound occurrences
+7. COMMUNITY  — player organizations, bases
+8. META       — wiki-internal
 ```
 
 ### Subtypes (canonical `entity_subtype` values)
 
+P0 subtypes remain valid. **2.0 additions** marked ★:
+
 | Domain | Subtypes | Tier |
 |--------|----------|------|
-| PLACE | biome, region, landmark, location_hint, dungeon, ruin, cave, temple, settlement, waterbody | T1/T2 |
-| BEING | creature, boss, elite, npc, mount, wildlife | T1/T2 |
-| OBJECT | item_generic, weapon, armor, tool, resource, consumable, building_part, vehicle_boat, artifact | T1/T2 |
-| SYSTEM | recipe, crafting_station, skill, ability, status_effect, damage_type, class_archetype, talent_node | T2/T3 |
-| KNOWLEDGE | lore_book, inscription, history_entry, legend | T2 |
-| EVENT | world_event, seasonal_event, patch_note | T3 |
+| PLACE | biome, region, landmark, location_hint, dungeon, ruin, cave, temple, settlement, waterbody, ★structure, ★player_base | T1/T2 |
+| BEING | creature, boss, elite, npc, mount, wildlife, ★species | T1/T2 |
+| OBJECT | item_generic, weapon, armor, tool, resource, consumable, building_part, vehicle_boat, artifact, ★material_refined, ★component | T1/T2 |
+| SYSTEM | recipe, crafting_station, skill, ability, status_effect, damage_type, class_archetype, talent_node, ★station_type, ★profession, ★gathering_method | T2/T3 |
+| KNOWLEDGE | lore_book, inscription, history_entry, legend, ★rumor | T2 |
+| EVENT | world_event, seasonal_event, patch_note, ★event_archetype | T3 |
 | COMMUNITY | guild, player_base, server_meta | T3 |
-| META | guide, news, contribution, discovery_report | exists |
+| META | guide, news, contribution, discovery_report, ★game_version, ★source_record | exists |
 
-Full entity-relation modeling: see [entity-relation-matrix.md](./entity-relation-matrix.md).
+**Mount subtype note (2.0 change):** `mount` as BEING subtype is **deprecated for new entries**. Use `creature` + role/capability facets. Existing mount subtype entries migrate at P1.
 
----
-
-## 5. Relationship Families
-
-Six families, ~20 canonical types. Registry: `js/relations-registry.js`.
-
-| Family | Types (source → target) |
-|--------|-------------------------|
-| **SPATIAL** | found_in, located_in, spawns_at |
-| **DROP/YIELD** | drops, harvested_from, contains_loot |
-| **CRAFT** | crafted_from, crafted_at, ingredient_of, unlocks |
-| **COMBAT/SYSTEM** | weak_to, resistant_to, inflicts, requires, grants |
-| **SOCIAL/LORE** | member_of, hostile_to, allied_to, mentions, gives_quest |
-| **TAXONOMIC** | variant_of, part_of, related_to |
-
-Standard relation properties: `confidence`, `evidence_tier`, `conditions`, `quantity`, `rate`, `source_post_id`, `report_count`.
-
-Full spec: [graph-relations-spec.md](./graph-relations-spec.md).
+Full entity-relation modeling: [entity-relation-matrix.md](./entity-relation-matrix.md).
 
 ---
 
-## 6. Controlled Vocabularies
+## 5. Facet Layer (new in 2.0)
+
+Facets are the **scaling layer** for multi-valued classification without subtype explosion.
+
+| Layer | Cardinality | Purpose |
+|-------|-------------|---------|
+| `entity_domain` | 1 | Top-level bucket |
+| `entity_subtype` | 1 | Primary kind |
+| `taxonomy` | multi | Hierarchical class path |
+| `facets.*` | multi (per group) | Roles, capabilities, acquisition, etc. |
+| `relations` | multi | Entity-to-entity typed edges |
+
+Full registry: [facet-registry.md](./facet-registry.md).
+
+**Dragon Mount rule:** One BEING/creature page; taxonomy `dragon`; role `mount`; capabilities `rideable`, `flyable`. No second Mount page.
+
+---
+
+## 6. Relationship Families
+
+Six families in P0; extended in 2.0. Registry: `js/relations-registry.js`. Full spec: [graph-relations-spec.md](./graph-relations-spec.md).
+
+| Family | P0 types | 2.0 proposed (reserved) |
+|--------|----------|-------------------------|
+| **SPATIAL** | found_in, located_in, spawns_at | — |
+| **DROP/YIELD** | drops, harvested_from, contains_loot | gathered_via |
+| **CRAFT** | crafted_from, crafted_at, ingredient_of, unlocks | crafted_by_profession |
+| **COMBAT/SYSTEM** | weak_to, resistant_to, inflicts, requires, grants | — |
+| **SOCIAL/LORE** | member_of, hostile_to, allied_to, mentions, gives_quest | — |
+| **TAXONOMIC** | variant_of, part_of, related_to | — |
+| **ECONOMY** | — | sold_by, reward_of |
+| **MOUNT/TAME** | — | mountable_by, tamed_via |
+| **EVENT** | — | occurs_during |
+| **VERSION** | — | introduced_in, changed_in, removed_in |
+| **OBSERVATION** | — | observed_as |
+
+**Binding rule:** Persist forward relations only. Inverses (`ingredient_of`, `dropped_by`, `sold_by`, `station_for`) are **derived** at render/index time.
+
+---
+
+## 7. Entity Promotion (new in 2.0)
+
+Lifecycle: `mentioned → unresolved → candidate → stub → provisional → canonical → merged_alias / deprecated / historical`
+
+Policy: [entity-promotion-policy.md](./entity-promotion-policy.md).
+
+**P0 exemplars:**
+
+- **Wood** — unresolved (1 recipe mention); Missing Entry Queue candidate at P0.5
+- **Forge** — unresolved; should promote to SYSTEM/station_type stub at P0.5
+- **red crystal nodes** — source_detail on resource; never a location page
+
+---
+
+## 8. Search and Discoverability (new in 2.0)
+
+Search must index title, aliases, synonyms, domain, subtype, taxonomy, facets, relations, inbound context, structured facts, and unresolved mentions.
+
+Full plan: [search-architecture.md](./search-architecture.md).
+
+P0 gap: `js/search.js` uses title/excerpt only — **P0.5 Search Baseline** required before P1 content expansion.
+
+---
+
+## 9. Versioning (new in 2.0)
+
+Facts, relations, and recipes must support `valid_from`, `valid_until`, `superseded_by`, nullable `game_version`.
+
+Full plan: [versioning-model.md](./versioning-model.md).
+
+Pre-release: fields nullable; no overwrite of historical values once versioning merge behavior ships (P2).
+
+---
+
+## 10. Controlled Vocabularies
 
 | Vocabulary | Values |
 |------------|--------|
 | evidence_tier | confirmed, observed, reported, speculative |
 | confidence | single_observation, corroborated, verified |
 | rarity | common, uncommon, rare, epic, legendary, unique, unknown |
-| hostility | passive, neutral, defensive, aggressive, unknown |
-| damage_type | physical, fire, frost, lightning, poison, arcane, unknown |
-| time_of_day | day, night, dawn, dusk, any |
-| climate_facet | temperate, tropical, arid, arctic, swamp, volcanic, underwater, underground, sky |
-| size_class | tiny, small, medium, large, huge, colossal |
+| record_status | mentioned, unresolved, stub, provisional, canonical, merged_alias, deprecated, historical |
 | completeness | stub, needs_details, solid, comprehensive |
 
----
-
-## 7. Key Non-Entity Decisions
-
-| Topic | Default | Alternative (documented) |
-|-------|---------|--------------------------|
-| Recipes | Facts/relations on target item, not own pages | Own recipe entities if multi-output crafting confirmed |
-| Weather/Time | Conditions on relations, not entities | Weather registry pages if complex mechanics |
-| Mounts | Creature subtype with `rideable` fact | Separate mount entity — **not recommended** (duplicates) |
-| Coordinates | Observation property, not pages | Map pins on region pages (P2 UI) |
-| Status effects / damage types | Admin-curated registry pages | Community-created — **not recommended** |
+Facet vocabularies: [facet-registry.md](./facet-registry.md).
 
 ---
 
-## 8. Progressive Disclosure Model
+## 11. Key Non-Entity Decisions (updated)
+
+| Topic | Decision | Notes |
+|-------|----------|-------|
+| Recipes | Facts on target item | Retained |
+| ingredient_of | Derived inverse | Retained |
+| Weather/Time | Conditions/qualifiers | Retained |
+| Mounts | creature + role/capability facets | **Changed** from mount subtype default |
+| Coordinates | Observation property | Retained |
+| Station (Forge) | SYSTEM/station_type entity | **New** |
+| Source nodes | Observation property on resource | Retained |
+| Status effects / damage types | Admin registry, seitenlos until needed | Retained |
+
+---
+
+## 12. Progressive Disclosure Model (retained)
 
 | Stage | What | When |
 |-------|------|------|
-| **Quick-Add** | Name, domain/subtype, where (biome/region/unknown), optional screenshot, optional one-line observation | Always first |
-| **Wizard** | Subtype-specific core fields, skippable after Quick-Add | Offered immediately after submit |
-| **Add-Info Contributions** | Field-specific additions to existing entries | Anytime on published pages |
+| **Quick-Add** | Name, domain/subtype, where, optional screenshot | Always first |
+| **Wizard** | Subtype-specific core fields | After Quick-Add |
+| **Add-Info Contributions** | Field-specific additions | Anytime |
 
-Max 4 primary contribution buttons visible; rest behind "More ways to contribute".
+New intents (P1): Add Capability/Role, Correct Classification, Resolve Unresolved Target, Add Version Change. See [contribution-intent-matrix.md](./contribution-intent-matrix.md).
 
 ---
 
-## 9. Matrices (detailed)
+## 13. Matrices
 
 | Matrix | File |
 |--------|------|
 | Entity–Relation | [entity-relation-matrix.md](./entity-relation-matrix.md) |
+| Facets | [facet-registry.md](./facet-registry.md) |
+| Promotion | [entity-promotion-policy.md](./entity-promotion-policy.md) |
+| Search | [search-architecture.md](./search-architecture.md) |
+| Versioning | [versioning-model.md](./versioning-model.md) |
 | Discovery forms | [discovery-form-matrix.md](./discovery-form-matrix.md) |
 | Contribution intents | [contribution-intent-matrix.md](./contribution-intent-matrix.md) |
 | Detail pages | [detail-page-matrix.md](./detail-page-matrix.md) |
-| Search / filter | [search-filter-matrix.md](./search-filter-matrix.md) |
+| Search/filter (legacy) | [search-filter-matrix.md](./search-filter-matrix.md) |
 | Moderation / conflict | [moderation-conflict-matrix.md](./moderation-conflict-matrix.md) |
 | E2E tests | [../../qa/e2e-content-matrix.md](../../qa/e2e-content-matrix.md) |
+| Code gaps | [current-code-gap-notes.md](./current-code-gap-notes.md) |
 
 ---
 
-## 10. Gap Analysis (current state)
+## 14. Gap Analysis (post-P0 / Blueprint 2.0)
 
-| Area | Status |
-|------|--------|
-| **Works well** | Discovery→Entity core; canonical_slug + aliases; contribution merge + conflict; report_count; place archetype/instance; danger zone; empty states; evidence upload |
-| **Too generic** | `category` lacks `entity_subtype`; no controlled vocabulary for rarity/hostility; relation types not centralized |
-| **Missing forms** | Resource (P0), Recipe intent (P0), Boss branch (P1), NPC/Settlement (P1), Lore (P1) |
-| **Missing relations** | crafted_from/crafted_at/ingredient_of (P0); weak_to/resistant_to/inflicts (P1); mentions (P1) |
-| **Missing layout** | Recipe widget, Sources widget (P0); Usage on resources (P0); Registry page type (P1) |
-| **Duplication risk** | Resources (synonyms), procedural POIs, Boss vs. Elite |
-| **Overengineering risk** | Weather/coordinate/talent/vendor entities; T3 specialized forms; stat-precision filters |
-| **Prepared but not UX-ready** | wiki_entity_relations without canonical type list; evidence_tier not visible; observations log not on pages |
+| Area | P0 status | 2.0 gap | Priority |
+|------|-----------|---------|----------|
+| Registry / CRAFT / Resources / Recipe | ✅ | — | — |
+| Facet layer | ❌ | Multi-role unmodelled | P0.5 |
+| Unresolved lifecycle | ❌ | Wood/Forge invisible gaps | P0.5 |
+| Search | ⚠️ title only | Structured discovery | P0.5 baseline |
+| station_type | ❌ | Forge unresolved | P0.5 |
+| Classification display | ⚠️ | Resource shows generic Item labels | P0.5 |
+| Versioning | ❌ | Overwrite risk at launch | P0.5 schema / P2 UX |
+| Browse patch-mode | ⚠️ | Hidden content | P0.5 |
+| NPC/Quest/Event/Economy | ❌ | Reserved | P2 |
 
-Details: [current-code-gap-notes.md](./current-code-gap-notes.md).
-
----
-
-## 11. Roadmap
-
-See [roadmap.md](./roadmap.md) for P0/P1/P2 scope, acceptance criteria, E2E cases, and risks.
-
-### Summary
-
-- **P0 (pre-launch):** Registry, CRAFT relations, Resource quick-add, Recipe intent, widgets, `/wiki/resources/`, evidence badges, T3 namespace reservation.
-- **P1 (post-launch, evidence-driven):** Boss branch, COMBAT relations, NPC/Settlement, Lore, mentions/variant_of, Mount promotion, browse pages, disputed badges.
-- **P2 (on demand):** Quests, economy, events, player bases, talent facts, map pins, patch versioning, comparison widgets, stat filters.
+Details: [current-code-gap-notes.md](./current-code-gap-notes.md) § Post-P0 Blueprint 2.0 Findings.
 
 ---
 
-## 12. Reference Game Patterns
+## 15. Roadmap Summary
 
-| Pattern | Source | Value for BoundLore |
-|---------|--------|---------------------|
-| Weakness matrices | Monster Hunter | COMBAT family — **valuable** |
-| Crafting reverse lookup | Valheim, Terraria | ingredient_of pivot — **valuable** |
-| Archetype vs. instance | No Man's Sky | Core principle — **valuable** |
-| Minimal first capture | Breath of the Wild compendium | Quick-Add — **valuable** |
-| Boss tactic sections | Dark Souls | P1 layout — **optional** |
-| Lore transcripts | Skyrim | P1 lore flow — **optional** |
-| Affix databases | Diablo | **unsuitable** (precision unreachable) |
-| Coordinate catalogs | NMS wikis | **unsuitable** (misleading in procedural world) |
-| Stat filters pre-density | WoWhead | **unsuitable** before P2 |
+See [roadmap.md](./roadmap.md).
+
+- **P0:** ✅ Locally accepted (`635eb68`)
+- **P0.5:** Foundational corrections before push/deploy or P1
+- **P1:** Relation Registry 2.0 implementation, contribution intents, facet filters, query parser
+- **P2:** NPC/Quest/Event/Economy/Combat/Lore/Player Bases, versioning UX
+- **P3:** Semantic search, moderation automation, large-scale tooling
 
 ---
 
-## 13. Deliverables for Implementation Team
+## 16. Reference Patterns (benchmark-derived)
 
-| Artifact | Location | Format |
-|----------|----------|--------|
-| Master plan | This file | Markdown |
-| Matrices | `docs/architecture/*.md` | Markdown tables |
-| Schemas | `docs/architecture/schemas/*.json` | JSON examples |
-| Relations registry | `js/relations-registry.js` | JS module |
-| Graph spec | `graph-relations-spec.md` | Markdown |
-| Wireframes | `form-wireframes.md` | Markdown |
-| E2E matrix | `qa/e2e-content-matrix.md` | Checklist |
-| PR checklist | `pr-checklist.md` | Checklist |
-
-**Workflow:** Each roadmap item = one implementation task referencing (a) this doc, (b) relevant matrix, (c) PR checklist, ending with E2E cases from `qa/e2e-content-matrix.md`.
+| Pattern | Source | BoundLore use |
+|---------|--------|---------------|
+| Acquisition / Used In sections | GW2 Wiki | Derived inbound widgets |
+| Granularity + switch infobox | OSRS Wiki | Variants on one page |
+| History section for old values | Minecraft Wiki | Version History widget |
+| Discoverer + last_surveyed | NMS Wiki | Observation provenance |
+| Statement ranks + qualifiers | Wikidata | Versioned facts, conflict coexistence |
+| Related tabs + patch-stamped comments | Wowhead | Relation-aware browse (adapted) |
 
 ---
 
-## 14. Risks and Open Questions
+## 17. Deliverables for Implementation Team
 
-| # | Risk / Question | Mitigation / Default |
-|---|-----------------|---------------------|
-| R1 | LNF content differs from assumptions | Tier system + Taxonomy Promotion |
-| R2 | BLMETA-in-HTML scales poorly | Keep for now; `wiki_facts` table P2 only if query need real |
-| R3 | Registry as JS vs. DB table | **Default: JS** (PR-reviewable). DB only if runtime admin editing needed |
-| R4 | Resource synonym detection sharpness | Levenshtein + alias pool, warn only — **open: trusted-user merge?** |
-| R5 | Screenshot requirements raise barrier | Only Boss, Mount, Lore transcript |
-| R6 | Recipe review queue bottleneck | Manual default; auto-approve at ≥2 corroborating reports (P1 decision) |
-| R7 | Trusted-user role | Recommended P1 — **open** |
-| R8 | Resource slugs without hash | Default yes; collision risk accepted with synonym warning |
+| Artifact | Location |
+|----------|----------|
+| Master plan | This file (v2.0) |
+| Facet registry | facet-registry.md |
+| Promotion policy | entity-promotion-policy.md |
+| Search architecture | search-architecture.md |
+| Versioning model | versioning-model.md |
+| Graph spec v2 | graph-relations-spec.md |
+| Relations registry | js/relations-registry.js |
+| E2E matrix | qa/e2e-content-matrix.md |
+| Roadmap | roadmap.md |
+
+**Workflow:** Each roadmap item = one implementation task referencing this doc + relevant matrix + E2E archetype tests. **Docs-only commits** (like Blueprint 2.0 materialization) do not require E2E pass until implementation begins.
 
 ---
 
-## 15. UX and Knowledge Graph Standards
+## 18. Risks and Open Questions
 
-- **Progressive Disclosure:** Never require fields a player cannot know on first sighting.
-- **Staged Wizards:** 3 short steps max; always skippable.
-- **Property graph modeling:** Entities = nodes, Relations = typed directed edges with properties, Observations = provenance events.
-- **Provenance:** Every fact traceable to `source_post_id` and `evidence_tier`.
-- **Empty states:** Hide empty sections; max 3 missing-info CTAs; stub pages get single "Help complete" banner.
+| # | Risk / Question | Mitigation |
+|---|-----------------|------------|
+| R1 | LNF differs from assumptions | Tier system + reserved registries |
+| R2 | BLMETA-in-HTML scale | Dual-write to wiki_entities; index table for search |
+| R3 | Facet registry sprawl | Max 15 groups before design review |
+| R4 | Missing Entry Queue spam | Score thresholds + dismiss |
+| R5 | Search index drift | Rebuild-from-posts fallback |
+| R6 | Pre-release version noise | game_version nullable until launch |
+| R7 | Player species (rabbit/fox) — playable or NPC? | taxonomy only until confirmed |
+
+---
+
+## 19. UX and Knowledge Graph Standards (retained)
+
+- **Progressive Disclosure:** Never require unknown fields on first sighting
+- **Property graph:** Entities = nodes; Relations = typed edges with qualifiers; Observations = provenance events
+- **Provenance:** Every fact traceable to source_post_id and evidence_tier
+- **Empty states:** Hide empty widgets; single Missing Information CTA block
+- **Unresolved visibility:** Entry Needed badges when promotion score met

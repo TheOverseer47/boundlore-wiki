@@ -252,3 +252,315 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 - [ ] Reject & archive contribution
 - [ ] Restore archived contribution
 - [ ] Duplicate submit blocked/warned
+
+---
+
+## Blueprint 2.0 Archetype Tests (planned — not passed)
+
+Architecture validation tests from Master Blueprint 2.0. Status: **planned** until P0.5/P1/P2 implementation.
+
+**Legend:** `[ ]` planned · `[~]` in progress · `[x]` pass · `[!]` fail
+
+| ID | Name | Milestone | Status |
+|----|------|-----------|--------|
+| T-RESOURCE-01 | Resource with mining, biome, rarity, recipe usage | P0.5/P1 | `[ ]` planned |
+| T-RESOURCE-02 | Same resource from mining + loot + vendor | P1 | `[ ]` planned |
+| T-STATION-01 | Generic Forge as station_type without location | P0.5 | `[ ]` planned |
+| T-STATION-02 | Concrete Forge as located_at observation only | P0.5 | `[ ]` planned |
+| T-CRAFT-01 | Recipe with unresolved ingredient + station | P0.5 | `[ ]` planned |
+| T-CRAFT-02 | Multiple alternative recipes for same item | P1 | `[ ]` planned |
+| T-CRAFT-03 | Recipe changes between two versions | P2 | `[ ]` planned |
+| T-MOUNT-01 | Creature is Dragon + Flying + Rideable Mount (one page) | P0.5 | `[ ]` planned |
+| T-MOUNT-02 | Visually ridden but mount unconfirmed (observed tier) | P1 | `[ ]` planned |
+| T-SEARCH-01 | "dragon mount" finds correct creature | P0.5 | `[ ]` planned |
+| T-SEARCH-02 | "mineable fire resource" finds Ember Shard | P0.5 | `[ ]` planned |
+| T-SEARCH-03 | "items using Ember Shard" finds QA Staff of Fire | P1 | `[ ]` planned |
+| T-PROMOTION-01 | Wood promoted from unresolved mentions to resource stub | P0.5 | `[ ]` planned |
+| T-PROMOTION-02 | Forge promoted to station_type stub | P0.5 | `[ ]` planned |
+| T-NODE-01 | Procedural node does not create location page | P0.5/P2 | `[ ]` planned |
+| T-NPC-01 | NPC is vendor + quest giver on one page | P2 | `[ ]` planned |
+| T-BOSS-01 | Creature is boss in event without duplicate entity | P2 | `[ ]` planned |
+| T-VERSION-01 | Old recipe value remains historically findable | P2 | `[ ]` planned |
+| T-EVIDENCE-01 | Reported mount capability ranks below confirmed | P1 | `[ ]` planned |
+| T-DUPLICATE-01 | Alias + official name merge to one entity | P1 | `[ ]` planned |
+| T-UNKNOWN-01 | Unknown future system without new top-level domain | P3 | `[ ]` planned |
+
+---
+
+### T-RESOURCE-01 — Resource with Mining Source, Biome, Rarity, Recipe Usage
+
+**Milestone:** P0.5/P1
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | QA Ember Shard (or equivalent) with mining source, biome relation, rarity facet, Staff recipe usage |
+| Model | OBJECT/resource; acquisition_method:mining; found_in biome; rarity facet; inbound crafted_from |
+| Search | "Ember Shard", "fire resource", "mineable fire resource" |
+| Detail | Used In widget; classification shows Resource; evidence badges |
+| Contribution | Add source observation without new location stub |
+| Moderation | Standard approve path |
+| Versioning | Nullable game_version |
+| **Failure** | Rarity only in free text; Used In empty despite recipe; generic Item classification |
+
+---
+
+### T-RESOURCE-02 — Multi-Source Resource
+
+**Milestone:** P1
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | One resource with mining + drop relation + sold_by (when implemented) |
+| Model | Single OBJECT/resource page; three acquisition paths |
+| Search | Filter by acquisition_method returns same entity once |
+| Detail | Acquisition section lists all three paths |
+| **Failure** | Second page created per source; one path overwrites another |
+
+---
+
+### T-STATION-01 — Generic Forge as Station Type
+
+**Milestone:** P0.5
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Promote Forge from Missing Entry Queue |
+| Model | SYSTEM/station_type; no PLACE page |
+| Search | "forge", "crafted at forge" finds station + inbound items |
+| Detail | "Crafts here" derived inbound from crafted_at |
+| **Failure** | Forge becomes PLACE or remains unresolved string forever |
+
+---
+
+### T-STATION-02 — Concrete Forge in Settlement
+
+**Milestone:** P0.5
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Observation: Forge located in settlement X |
+| Model | located_at observation on station_type page; no second entity |
+| Detail | Known Locations widget on Forge page |
+| **Failure** | Auto-created location page for forge instance |
+
+---
+
+### T-CRAFT-01 — Unresolved Ingredient and Station
+
+**Milestone:** P0.5
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | QA Staff recipe with Wood + Forge (current P0 state) |
+| Model | Wood/Forge = unresolved targets; Entry Needed badges |
+| Queue | Both appear in Missing Entry Queue |
+| Contribution | Resolve intent prefills Quick-Add |
+| **Failure** | Auto-stubs created; silent plain text with no gap signal |
+
+---
+
+### T-CRAFT-02 — Alternative Recipes
+
+**Milestone:** P1
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Two recipes for same output item (different station or profession) |
+| Model | alternative_group qualifier; both coexist |
+| Detail | Recipe widget lists both |
+| **Failure** | Second recipe overwrites first |
+
+---
+
+### T-CRAFT-03 — Versioned Recipe Change
+
+**Milestone:** P2
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Recipe ingredient qty changes between version A and B |
+| Model | Old statement superseded; new preferred |
+| Detail | Current shows B; Version History shows A |
+| Search | Current ranks above historical unless toggle |
+| **Failure** | Old value deleted |
+
+---
+
+### T-MOUNT-01 — Dragon Mount Single Page
+
+**Milestone:** P0.5
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Creature with taxonomy dragon, role mount, capabilities rideable + flyable |
+| Model | BEING/creature only — no mount subtype page |
+| Search | T-SEARCH-01 passes |
+| Detail | Mount Capabilities widget with per-capability evidence |
+| **Failure** | Requires second "Dragon Mount" page |
+
+---
+
+### T-MOUNT-02 — Observed but Unconfirmed Mount
+
+**Milestone:** P1
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Screenshot shows riding; no official confirmation |
+| Model | capability:rideable evidence_tier = observed |
+| Search | Appears with badge; ranks below confirmed mounts |
+| **Failure** | Treated as confirmed; or capability silently dropped |
+
+---
+
+### T-SEARCH-01 — dragon mount
+
+**Milestone:** P0.5
+
+| Aspect | Expected |
+|--------|----------|
+| Query | "dragon mount" |
+| Result | Creature with dragon taxonomy + mount/rideable facets |
+| Ranking | Facet combination match beats title-only partial |
+| **Failure** | No result when title lacks "mount" |
+
+---
+
+### T-SEARCH-02 — mineable fire resource
+
+**Milestone:** P0.5
+
+| Aspect | Expected |
+|--------|----------|
+| Query | "mineable fire resource" |
+| Result | QA Ember Shard |
+| Signals | acquisition_method:mining + element:fire + subtype:resource |
+| **Failure** | Title-only miss |
+
+---
+
+### T-SEARCH-03 — items using Ember Shard
+
+**Milestone:** P1
+
+| Aspect | Expected |
+|--------|----------|
+| Query | "items using Ember Shard" |
+| Result | QA Staff of Fire |
+| Signals | Inbound crafted_from / ingredient_of index |
+| **Failure** | No result or wrong item |
+
+---
+
+### T-PROMOTION-01 — Wood Promotion
+
+**Milestone:** P0.5
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | ≥2 recipe mentions of Wood |
+| Flow | unresolved → candidate → moderator stub → provisional |
+| Backlinks | All Staff (and other) recipes link to Wood entity |
+| **Failure** | Mentions stay dead text after promotion |
+
+---
+
+### T-PROMOTION-02 — Forge Promotion
+
+**Milestone:** P0.5
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Forge in merged Staff recipe |
+| Flow | Promote to SYSTEM/station_type stub |
+| Relations | crafted_at targets resolve to Forge entity |
+| **Failure** | Forge remains string; or wrong domain (PLACE) |
+
+---
+
+### T-NODE-01 — Procedural Resource Node
+
+**Milestone:** P0.5/P2
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | source_detail "red crystal nodes" on Ember Shard |
+| Model | Property on resource; no locations/ post |
+| Search | Query finds resource via fact text |
+| **Failure** | Location stub or archetype page for procedural node |
+
+---
+
+### T-NPC-01 — Multi-Role NPC
+
+**Milestone:** P2
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | NPC sells items and gives quest |
+| Model | BEING/npc; role vendor + quest_giver facets |
+| Widgets | Vendor + Quest sections on one page |
+| **Failure** | Two NPC pages |
+
+---
+
+### T-BOSS-01 — Boss in Event
+
+**Milestone:** P2
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Creature is boss only during event |
+| Model | combat_rank:boss + occurs_during event relation |
+| **Failure** | Separate boss entity duplicate |
+
+---
+
+### T-VERSION-01 — Historical Recipe
+
+**Milestone:** P2
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Recipe changed in patch |
+| Model | Superseded statement retained |
+| UI | Version History accessible |
+| **Failure** | Only current value exists in BLMETA |
+
+---
+
+### T-EVIDENCE-01 — Evidence-Aware Ranking
+
+**Milestone:** P1
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Two rideable creatures: one confirmed, one reported |
+| Query | "rideable mount" |
+| Result | Confirmed ranks above reported; both visible |
+| **Failure** | Equal rank or reported hidden |
+
+---
+
+### T-DUPLICATE-01 — Alias Merge
+
+**Milestone:** P1
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Community name + official name for same entity |
+| Flow | Merge → alias redirect + backlink reconciliation |
+| Search | Both names find canonical entity |
+| **Failure** | Two pages; orphaned relations |
+
+---
+
+### T-UNKNOWN-01 — Unknown Future System
+
+**Milestone:** P3
+
+| Aspect | Expected |
+|--------|----------|
+| Setup | Hypothetical new system (e.g. "star cartography") |
+| Model | New SYSTEM subtype + facet group + 2 relation types via registry only |
+| **Failure** | Requires 9th top-level domain or bespoke code path |

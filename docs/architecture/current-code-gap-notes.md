@@ -286,8 +286,59 @@ Legacy `detectDiscoveryDuplicateCP` **skipped** for resource quick-add (warn-onl
 
 ---
 
-## 8. Next Step
+## 8. Next Step (pre-Blueprint 2.0)
 
 1. **Optional:** Re-run admin panel check with active TheOverseer47 session to close the ⚠️ on Admin safety.
 2. **P0-F / P1:** Full Recipe browse widget/index when prioritized.
 3. **When ready:** Push + deploy (not part of this sweep).
+
+---
+
+## 9. Post-P0 Blueprint 2.0 Findings
+
+**Source:** BoundLore Master Architecture Blueprint 2.0 audit (Fable research output, 2026-07-10).  
+**Docs materialized:** commit after P0 acceptance (`635eb68`).  
+**Status:** Documentation only — no implementation in this phase.
+
+### Fundamental blind spots (priority)
+
+| # | Blind spot | Current code | Target state | Priority |
+|---|------------|--------------|--------------|----------|
+| 1 | **No Facet Layer** | Only `entity_domain` + `entity_subtype` | Facets for role, capability, taxonomy, acquisition, etc. | **P0.5** |
+| 2 | **No Unresolved Target Lifecycle** | Wood/Forge plain text in merged recipe | mentioned → unresolved → candidate → stub via Missing Entry Queue | **P0.5** |
+| 3 | **Search title/excerpt only** | `js/search.js` ilike on posts.title, excerpt | search_documents index with facets, aliases, relations | **P0.5** baseline |
+| 4 | **No station_type** | `crafted_at` → string "Forge" | SYSTEM/station_type entity; Forge promotable | **P0.5** |
+| 5 | **Resource Classification Display** | Detail shows Category/Subcategory/Type as generic Item | Show domain/subtype/resource labels | **P0.5** |
+| 6 | **No versioned statements** | Merge overwrites recipe/facts | valid_from/until/superseded_by; history widget | **P0.5** schema / **P2** UX |
+| 7 | **No variant/instance model** | variant_of exists but no formal policy | Variant blocks + promotion rules | **P1** |
+| 8 | **Browse patch-mode visibility** | `/wiki/browse/` hidden/blank like prior homepage issue | Script order fix | **P0.5** |
+| 9 | **No relation qualifiers spec in code** | quantity/unit ad hoc in recipe payload | Typed qualifiers object on all relations | **P1** |
+| 10 | **Symmetric relation double-write** | hostile_to/allied_to may store both directions | Single-write + derived mirror | **P1** |
+| 11 | **Mount = subtype assumption** | Docs v1 listed mount as BEING subtype | creature + role/capability facets | **P1** |
+| 12 | **No Missing Entry Queue UI** | Unresolved invisible except plain text | Admin queue + Entry Needed badges | **P0.5** |
+| 13 | **No compound search queries** | Cannot answer "items using X" | Query parser + inbound index | **P1** |
+| 14 | **Discovery auto-stub path** | `buildStubPostMeta` on discovery submit | Align with promotion policy (no blind stubs) | **P0.5** investigate |
+
+### P0 decisions confirmed by Blueprint 2.0
+
+- Recipes embedded on items — retain
+- `ingredient_of` derived — retain
+- No Wood/Forge auto-stubs in QA Staff recipe — correct; becomes Missing Entry Queue case
+- red crystal nodes as source_detail — retain (not location)
+- Pending add_recipe conflict — retain pending
+
+### Documentation added (Blueprint 2.0 materialization)
+
+| File | Purpose |
+|------|---------|
+| `CONTENT_ARCHITECTURE.md` v2.0 | Master blueprint |
+| `facet-registry.md` | Facet groups and Dragon Mount example |
+| `entity-promotion-policy.md` | Lifecycle, Wood/Forge rules |
+| `search-architecture.md` | Index signals, ranking, recovery |
+| `versioning-model.md` | Versioned statements |
+| `graph-relations-spec.md` v2 | Qualifiers, proposed types |
+| `roadmap.md` | P0 accepted, P0.5 sequence |
+
+### Next implementation step (when authorized)
+
+Execute P0.5 roadmap item #1 in [roadmap.md](./roadmap.md) — **not** started as part of docs-only materialization.
