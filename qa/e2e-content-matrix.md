@@ -179,6 +179,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-A.3 — Relation Registry 2.0 Acceptance Sweep
+
+**Milestone:** P1-A foundation block complete (A.1 + A.2 + A.3); no SQL, no UI, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API sweep | console on wiki page | All P1-A.1/A.2 API checks green | `[x]` |
+| QA Staff regression | `qa-staff-of-fire-2b742628` | Recipe + Wood/Forge Entry needed | `[x]` |
+| QA Ember regression | `qa-ember-shard-511160` | Resource + facets | `[x]` |
+| Search qa ember shard | `/wiki/search/?q=qa%20ember%20shard` | QA Ember + QA Staff recipe match | `[x]` |
+| Search resource | `/wiki/search/?q=resource` | QA Ember type resource + Wood missing | `[x]` |
+| Search mining | `/wiki/search/?q=mining` | QA Ember facet mining | `[x]` |
+| Search red crystal nodes | `/wiki/search/?q=red%20crystal%20nodes` | QA Ember resource match | `[x]` |
+| Search wood/forge | `/wiki/search/?q=wood` / `forge` | Missing suggestions + QA Staff | `[x]` |
+| Reserved relations | code + console | sold_by/gathered_via/crafted_by_profession reserved only | `[x]` |
+| Admin read-only | `/wiki/admin/` | Queue + pending conflict when session present | `[~]` login redirect in automation browser |
+| Pending conflict | admin | Unchanged; approve blocked | `[x]` not executed |
+
+**P1-A accepted as local foundation.** P1-B not started.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

@@ -506,3 +506,23 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Not built | sold_by/gathered_via UI, SQL, migration | Deferred P1+ |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 11. P1-A.3 — Relation Registry 2.0 Acceptance Sweep
+
+**Status:** Complete (read-only sweep; no code/data changes beyond docs).
+
+| Check | Result |
+|-------|--------|
+| Registry API (`BoundLoreRelationsRegistry`) | Green — persistence, reserved types, qualifier helpers |
+| `crafted_from` / `crafted_at` | `persisted_forward` |
+| `ingredient_of` | `derived_inverse` (not double-persisted) |
+| Reserved types (`sold_by`, `gathered_via`, `crafted_by_profession`) | Registry-only; skipped in search; no UI flows |
+| QA Staff / QA Ember regressions | Unchanged recipe/resource display |
+| Search (mining, wood, forge, resource, red crystal nodes, qa ember shard) | Unchanged |
+| Wood/Forge | Missing Entry Suggestions only; no posts |
+| Pending `add_recipe` conflict | Not touched |
+| Admin | Session-dependent (automation browser: login redirect) |
+
+**P1-A foundation block (A.1 + A.2 + A.3) accepted locally.** P1-B not started. Deployment freeze remains active.

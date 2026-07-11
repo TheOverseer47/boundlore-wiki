@@ -6,6 +6,8 @@
 
 **P1-A.2 (local):** Reader/normalizer tolerance for typed `qualifiers` on relations and recipe payloads — legacy top-level fields (`quantity`, `unit`, `station`, evidence fields) remain supported; `qualifiers` objects are preserved through sanitize/merge paths. No UI, no SQL, no migration.
 
+**P1-A.3 (local):** Acceptance sweep completed — Registry API, reader tolerance, search, and QA regressions green as P1-A foundation block. No SQL, no UI, no data migration. Ready for P1-B planning.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).
