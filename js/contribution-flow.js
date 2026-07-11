@@ -115,6 +115,10 @@ window.ContributionFlow = (function() {
 
   function resolveIntent(intent, field) {
     const raw = String(intent || "").toLowerCase();
+    if (typeof BoundLoreContributionIntentRegistry !== "undefined") {
+      const normalized = BoundLoreContributionIntentRegistry.normalizeContributionIntent(raw);
+      if (MASKS[normalized]) return normalized;
+    }
     if (MASKS[raw]) return raw;
     const fieldKey = String(field || "").toLowerCase();
     const fieldMap = {

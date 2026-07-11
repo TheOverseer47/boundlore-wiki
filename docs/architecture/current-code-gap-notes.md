@@ -526,3 +526,20 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Admin | Session-dependent (automation browser: login redirect) |
 
 **P1-A foundation block (A.1 + A.2 + A.3) accepted locally.** P1-B not started. Deployment freeze remains active.
+
+---
+
+## 12. P1-B.1 — Contribution Intent Registry Baseline
+
+**Status:** Complete (registry + defensive reader hooks; no SQL, no UI, no migration).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| Registry module | `js/contribution-intent-registry.js` | `BoundLoreContributionIntentRegistry` with intent defs + helpers |
+| Active intents | add_recipe, add_stats, add_effect, add_behavior, add_spawn, add_known_item, … | Match existing `ContributionFlow.MASKS` codes |
+| Reserved P1 | add_capability_role, correct_classification, add_alias, resolve_unresolved_target, … | status `reserved`; no buttons/merge flows |
+| Integration | `contribution-flow.js`, `getContributionInfo` | Intent normalize only; add_recipe flow unchanged |
+| Script load | post, admin, create-post, edit-post | `contribution-intent-registry.js?v=1` |
+| Not built | new contribution buttons, merge/approve changes, SQL | Deferred P1-B+ |
+
+**Deployment freeze remains active** — no push/deploy.

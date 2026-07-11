@@ -2103,7 +2103,13 @@ window.KnowledgeRelations = (function() {
       target_title: block.target_title || meaningfulValue(payload.entity_name) || "",
       target_category: block.target_category || (post && post.category) || "",
       entity_key: block.entity_key || null,
-      intent: block.intent || m.contribution_intent || payload.contribution_intent || "add_info",
+      intent: (function() {
+        const raw = block.intent || m.contribution_intent || payload.contribution_intent || "add_info";
+        if (typeof BoundLoreContributionIntentRegistry !== "undefined") {
+          return BoundLoreContributionIntentRegistry.normalizeContributionIntent(raw);
+        }
+        return raw;
+      })(),
       missing_field: block.missing_field || m.contribution_field || null,
       submitted_fields: block.submitted_fields && typeof block.submitted_fields === "object" ? block.submitted_fields : {},
       status: block.status || "pending_review",

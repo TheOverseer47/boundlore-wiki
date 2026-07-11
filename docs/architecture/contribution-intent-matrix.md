@@ -2,6 +2,8 @@
 
 Existing intents (Stats, Effect, Behavior, Spawn, Known Item, Conflict) remain. This matrix defines extensions.
 
+**P1-B.1 (local):** `js/contribution-intent-registry.js` — typed intent metadata (active vs reserved), merge/review/evidence policies. Code-only; no new UI, no SQL, no migration. Production masks remain in `js/contribution-flow.js` (`MASKS`).
+
 | Content Area | Intent Label | Target Field / Relation | Merge Behavior | Conflict Risk | Preview? | Evidence? | Duplicate Blocking? |
 |---|---|---|---|---|---|---|---|
 | Creature | Add Stats *(exists)* | Facts: hp/damage | Field merge, conflict flow | high | yes | optional | yes |

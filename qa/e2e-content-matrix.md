@@ -201,6 +201,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-B.1 — Contribution Intent Registry Baseline
+
+**Milestone:** P1-B.1 (intent registry; no SQL, no UI, no migration)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API | console | `BoundLoreContributionIntentRegistry` loaded | `[x]` |
+| add_recipe active | console | isActiveIntent true; merge_behavior recipe_block_merge | `[x]` |
+| Reserved intents | console | add_capability_role, correct_classification, resolve_unresolved_target reserved | `[x]` |
+| QA Staff regression | `qa-staff-of-fire-2b742628` | Recipe unchanged | `[x]` |
+| Search wood/forge/mining | `/wiki/search/?q=...` | unchanged | `[x]` |
+| No new buttons | QA Staff page | no reserved intent buttons | `[x]` |
+| Pending conflict | admin read-only | unchanged; approve blocked | `[x]` not executed |
+| Admin optional | `/wiki/admin/` | session-dependent (login redirect in automation) | `[~]` |
+
+**Not built:** Add Capability/Correct Classification/Add Alias UI, SQL, contribution migration.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  
