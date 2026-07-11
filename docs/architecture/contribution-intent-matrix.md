@@ -6,6 +6,8 @@ Existing intents (Stats, Effect, Behavior, Spawn, Known Item, Conflict) remain. 
 
 **P1-B.2 (local):** Payload/admin preview tolerance — `normalizeContributionRecord`, preview safety helpers; reserved/unknown intents block approve without crashing admin. `add_recipe` conflict preview unchanged.
 
+**P1-B.3 (local):** Acceptance sweep completed — active/reserved/unknown intent APIs green; admin preview tolerance verified; no SQL, no UI, no data migration. P1-B foundation block ready for P1-C planning.
+
 | Content Area | Intent Label | Target Field / Relation | Merge Behavior | Conflict Risk | Preview? | Evidence? | Duplicate Blocking? |
 |---|---|---|---|---|---|---|---|
 | Creature | Add Stats *(exists)* | Facts: hp/damage | Field merge, conflict flow | high | yes | optional | yes |

@@ -197,7 +197,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Admin read-only | `/wiki/admin/` | Queue + pending conflict when session present | `[~]` login redirect in automation browser |
 | Pending conflict | admin | Unchanged; approve blocked | `[x]` not executed |
 
-**P1-A accepted as local foundation.** P1-B not started.
+**P1-A accepted as local foundation.** P1-B foundation block (B.1–B.3) accepted locally. P1-C not started.
 
 ---
 
@@ -235,6 +235,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Admin optional | `/wiki/admin/` | session-dependent (login redirect) | `[~]` |
 
 **Not built:** reserved intent UI flows, pending conflict merge/approve, SQL.
+
+---
+
+## P1-B.3 — Contribution Intent Registry Acceptance Sweep
+
+**Milestone:** P1-B foundation block complete (B.1 + B.2 + B.3); no SQL, no UI, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API sweep | console on wiki page | All P1-B.1/B.2 checks green | `[x]` |
+| Active intents | console | 11 active; add_recipe merge_behavior recipe_block_merge | `[x]` |
+| Reserved intents | console | 12 reserved; approveAllowed false | `[x]` |
+| Unknown intent | console | safe fallback, no crash | `[x]` |
+| QA Staff regression | `qa-staff-of-fire-2b742628` | Recipe + no reserved buttons | `[x]` |
+| Search wood/forge/mining/qa ember/resource/red crystal | `/wiki/search/?q=...` | unchanged | `[x]` |
+| Pending conflict | admin read-only | unchanged; not executed | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` login redirect |
+
+**P1-B accepted as local foundation.** P1-C not started.
 
 ---
 

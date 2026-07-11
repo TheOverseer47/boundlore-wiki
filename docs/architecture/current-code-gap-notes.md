@@ -560,3 +560,21 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Not built | new contribution buttons, merge/approve on pending conflict | Deferred |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 14. P1-B.3 — Contribution Intent Registry Acceptance Sweep
+
+**Status:** Complete (read-only sweep; no code/data changes beyond docs).
+
+| Check | Result |
+|-------|--------|
+| Registry API (`BoundLoreContributionIntentRegistry`) | Green — 11 active, 12 reserved intents |
+| `add_recipe` | active; recipe conflict blocks approve separately |
+| Reserved intents | Not in wiki UI; `approveAllowed: false` |
+| Unknown intents | Safe fallback; no crash |
+| QA Staff / Search regressions | Unchanged |
+| Pending `add_recipe` conflict | Not touched |
+| Admin | Session-dependent |
+
+**P1-B foundation block (B.1 + B.2 + B.3) accepted locally.** P1-C not started. Deployment freeze remains active.
