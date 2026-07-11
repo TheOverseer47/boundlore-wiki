@@ -600,3 +600,21 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | existing evidence badges, conflict preview, pending `add_recipe` approve block | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 16. P1-C.2 — Evidence State Rendering & Admin Preview Tolerance
+
+**Status:** Complete (local; no SQL, no data migration, no moderation actions).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Display helpers | `js/evidence-rank.js` | `getEvidenceLabel`, `getStatementStateBadges`, `shouldDisplayDisputeBadge`, `renderStatementStateBadgeGroup`, etc. |
+| Entry layout | `js/wiki-entry-layout.js` | State badges appended only when explicit disputed/deprecated/superseded fields exist |
+| Admin preview | `wiki/admin/index.html` | `renderContributionEvidenceStateHtmlA` — read-only info line when state fields present |
+| Search | `js/search-signals.js` | `getSearchStatementStateAdjustment` — deprecated/superseded/disputed penalized; QA rankings unchanged |
+
+| Unchanged | existing evidence badges (Reported/Single Observation), recipe conflict preview, pending approve block | Verified locally |
+| Not built | dispute-resolution UI, auto-ranking, merge/approve changes, SQL | Deferred P1-C+ |
+
+**P1-C foundation block (C.1 + C.2) accepted locally.** Deployment freeze remains active.

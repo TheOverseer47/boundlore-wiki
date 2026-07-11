@@ -30,3 +30,16 @@ Existing `contribution_conflicts` table and `needs_review` status remain authori
 | Search | `js/search-signals.js` | Optional internal weight hook; QA search rankings unchanged when no explicit rank fields |
 
 Real dispute-resolution workflow and auto-promote remain later P1-C scope.
+
+## P1-C.2 — Evidence State Rendering & Admin Preview Tolerance (local)
+
+**Scope:** Display helpers + read-only preview tolerance — no dispute-resolution UI, no SQL, no migration.
+
+| Layer | Module | Behavior |
+|-------|--------|----------|
+| Display helpers | `js/evidence-rank.js` | Labels, `shouldDisplay*` gates, `getStatementStateBadges`, `renderStatementStateBadgeGroup` |
+| Entry layout | `js/wiki-entry-layout.js` | State badges only for explicit disputed/deprecated/superseded/preferred fields |
+| Admin preview | `wiki/admin/index.html` | Optional read-only statement-state info line; recipe conflict preview unchanged |
+| Search | `js/search-signals.js` | Deprecated/superseded/disputed penalized; QA search unchanged |
+
+QA data without state fields shows no new badges. Pending `add_recipe` conflict approve block unchanged.

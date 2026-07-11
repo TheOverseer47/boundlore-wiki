@@ -253,7 +253,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Pending conflict | admin read-only | unchanged; not executed | `[x]` |
 | Admin optional | `/wiki/admin/` | session-dependent | `[~]` login redirect |
 
-**P1-C.1 accepted as local baseline.** Dispute-resolution UI deferred.
+**P1-C.1 accepted as local baseline.** P1-C.2 display/preview tolerance in progress.
 
 ---
 
@@ -272,7 +272,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Pending conflict | admin read-only | preview unchanged; approve blocked; not executed | `[x]` |
 | Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
 
-**Not built:** dispute-resolution UI, auto-ranking, auto-promote, SQL, new visible badges.
+**Not built:** dispute-resolution UI, auto-ranking, auto-promote, SQL, new visible badges on QA data.
+
+---
+
+## P1-C.2 — Evidence State Rendering & Admin Preview Tolerance
+
+**Milestone:** P1-C.2 (display helpers + preview tolerance; no SQL, no UI workflow, no migration)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Display API | console on wiki page | `getStatementStateBadges`, `shouldDisplayDisputeBadge` green | `[x]` |
+| Empty state | console | `{}` → no dispute/deprecated/superseded badges | `[x]` |
+| Future fields | console | disputed/deprecated/superseded gates true only with real fields | `[x]` |
+| QA Staff regression | `qa-staff-of-fire-2b742628` | Evidence badges unchanged; no state badges | `[x]` |
+| QA Ember regression | `qa-ember-shard-511160` | Resource hero unchanged | `[x]` |
+| Search wood/forge/mining/qa ember/resource/red crystal | `/wiki/search/?q=...` | unchanged | `[x]` |
+| Pending conflict | admin read-only | preview unchanged; approve blocked; not executed | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P1-C foundation block (C.1 + C.2) accepted locally.** Dispute-resolution UI deferred.
 
 ---
 

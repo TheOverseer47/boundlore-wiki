@@ -555,9 +555,16 @@ window.BoundLoreSearchSignals = (function() {
     }
 
     let score = 0;
-    if (document.evidence_context && typeof BoundLoreEvidenceRank !== "undefined" && BoundLoreEvidenceRank.getEvidenceWeight) {
-      const rankWeight = BoundLoreEvidenceRank.getEvidenceWeight(document.evidence_context);
-      if (rankWeight > 0) score += Math.min(2, Math.floor(rankWeight / 20));
+    if (document.evidence_context && typeof BoundLoreEvidenceRank !== "undefined") {
+      const ctx = document.evidence_context;
+      const stateAdj = BoundLoreEvidenceRank.getSearchStatementStateAdjustment
+        ? BoundLoreEvidenceRank.getSearchStatementStateAdjustment(ctx)
+        : 0;
+      score += stateAdj;
+      if (stateAdj >= 0 && BoundLoreEvidenceRank.getEvidenceWeight) {
+        const rankWeight = BoundLoreEvidenceRank.getEvidenceWeight(ctx);
+        if (rankWeight > 0) score += Math.min(2, Math.floor(rankWeight / 20));
+      }
     }
     const details = [];
     const groups = document.signals || {};

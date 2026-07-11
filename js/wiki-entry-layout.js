@@ -367,9 +367,19 @@ window.WikiEntryLayout = (function() {
     return fallback;
   }
 
+  function renderStatementStateBadgesSafe(meta, payload, options) {
+    if (typeof BoundLoreEvidenceRank === "undefined" || !BoundLoreEvidenceRank.renderStatementStateBadgeGroup) {
+      return "";
+    }
+    return BoundLoreEvidenceRank.renderStatementStateBadgeGroup({ meta: meta, payload: payload }, options || {});
+  }
+
   function renderEntryEvidenceBadges(meta, payload, options) {
     const signals = resolveEntryEvidenceSignals(meta, payload);
-    return renderEvidenceBadgeGroupSafe(signals.evidenceTier, signals.confidence, options);
+    let html = renderEvidenceBadgeGroupSafe(signals.evidenceTier, signals.confidence, options);
+    const stateHtml = renderStatementStateBadgesSafe(meta, payload, options);
+    if (stateHtml) html += stateHtml;
+    return html;
   }
 
   function renderEntryFacetBadges(meta, post, options) {
@@ -1187,6 +1197,12 @@ window.WikiEntryLayout = (function() {
         groupClassName: "bl-version-badges-recipe",
       });
       if (versionHtml) html += versionHtml;
+    }
+    if (recipeDisplay && typeof BoundLoreEvidenceRank !== "undefined" && BoundLoreEvidenceRank.renderStatementStateBadgeGroup) {
+      const stateHtml = BoundLoreEvidenceRank.renderStatementStateBadgeGroup(recipeDisplay.source || recipeDisplay, {
+        groupClassName: "bl-state-badges-recipe",
+      });
+      if (stateHtml) html += stateHtml;
     }
     return html;
   }

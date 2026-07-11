@@ -2,6 +2,7 @@
 // BoundLore Evidence Rank & Dispute Baseline
 // P1-C.1 — null-safe readers for evidence tier, confidence,
 // statement rank, dispute state, and statement status.
+// P1-C.2 — display helpers and statement-state badge tolerance.
 // No UI, no DB, no migration. See docs/architecture/moderation-conflict-matrix.md
 // ============================================
 
@@ -85,6 +86,46 @@ window.BoundLoreEvidenceRank = (function() {
     under_review: "disputed",
     needs_review: "disputed",
   };
+
+  const EVIDENCE_TIER_LABELS = {
+    speculative: "Speculative",
+    reported: "Reported",
+    observed: "Observed",
+    confirmed: "Confirmed",
+  };
+
+  const CONFIDENCE_LABELS = {
+    single_observation: "Single Observation",
+    corroborated: "Corroborated",
+    verified: "Verified",
+  };
+
+  const STATEMENT_RANK_LABELS = {
+    preferred: "Preferred",
+    normal: "Normal",
+    deprecated: "Deprecated",
+  };
+
+  const DISPUTE_STATE_LABELS = {
+    disputed: "Disputed",
+    resolved: "Resolved",
+    rejected: "Rejected",
+  };
+
+  const STATEMENT_STATUS_LABELS = {
+    historical: "Historical",
+    superseded: "Superseded",
+    deprecated: "Deprecated",
+    disputed: "Disputed",
+  };
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
 
   function meaningful(value) {
     const clean = String(value == null ? "" : value).trim();
@@ -369,6 +410,228 @@ window.BoundLoreEvidenceRank = (function() {
     };
   }
 
+  function hasExplicitField(source, keys) {
+    const src = source && typeof source === "object" ? source : {};
+    const payload = readPayloadLayer(src);
+    const meta = readMetaLayer(src);
+    const layers = [src, payload, meta];
+    for (let k = 0; k < keys.length; k += 1) {
+      const key = keys[k];
+      for (let i = 0; i < layers.length; i += 1) {
+        const layer = layers[i];
+        if (!layer || typeof layer !== "object") continue;
+        if (Object.prototype.hasOwnProperty.call(layer, key) && meaningful(layer[key])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function getEvidenceLabel(source) {
+    const tier = readEvidenceSignals(source).evidence_tier;
+    if (!tier) return null;
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.formatEvidenceTierLabel) {
+      const registryLabel = BoundLoreRelationsRegistry.formatEvidenceTierLabel(tier);
+      if (registryLabel) return registryLabel;
+    }
+    return EVIDENCE_TIER_LABELS[tier] || null;
+  }
+
+  function getConfidenceLabel(source) {
+    const signals = readEvidenceSignals(source);
+    if (signals.numeric_confidence != null) return null;
+    if (!signals.confidence || signals.confidence === "unknown") return null;
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.formatConfidenceLabel) {
+      const registryLabel = BoundLoreRelationsRegistry.formatConfidenceLabel(signals.confidence);
+      if (registryLabel) return registryLabel;
+    }
+    return CONFIDENCE_LABELS[signals.confidence] || null;
+  }
+
+  function getStatementRankLabel(source) {
+    if (!hasExplicitField(source, ["statement_rank"])) return null;
+    const rank = readEvidenceSignals(source).statement_rank;
+    if (!rank || rank === "normal") return null;
+    return STATEMENT_RANK_LABELS[rank] || null;
+  }
+
+  function getDisputeStateLabel(source) {
+    if (!shouldDisplayDisputeBadge(source)) return null;
+    const state = readEvidenceSignals(source).dispute_state;
+    if (state === "disputed" && hasExplicitField(source, ["statement_status"])) {
+      const status = normalizeStatementStatus(
+        readPayloadLayer(source).statement_status || readMetaLayer(source).statement_status || source.statement_status
+      );
+      if (status === "disputed") return STATEMENT_STATUS_LABELS.disputed;
+    }
+    return DISPUTE_STATE_LABELS[state] || STATEMENT_STATUS_LABELS.disputed || null;
+  }
+
+  function getStatementStatusLabel(source) {
+    if (!hasExplicitField(source, ["statement_status"])) return null;
+    const status = readEvidenceSignals(source).statement_status;
+    if (!status || status === "current") return null;
+    if (status === "disputed" && shouldDisplayDisputeBadge(source)) return null;
+    if (status === "deprecated" && shouldDisplayDeprecatedBadge(source)) return null;
+    if (status === "superseded" && shouldDisplaySupersededBadge(source)) return null;
+    return STATEMENT_STATUS_LABELS[status] || null;
+  }
+
+  function shouldDisplayEvidenceBadge(source) {
+    return !!readEvidenceSignals(source).evidence_tier;
+  }
+
+  function shouldDisplayDisputeBadge(source) {
+    if (hasExplicitField(source, ["dispute_state", "dispute_status"])) {
+      return normalizeDisputeState(
+        readPayloadLayer(source).dispute_state ||
+        readMetaLayer(source).dispute_state ||
+        source.dispute_state ||
+        source.dispute_status
+      ) === "disputed";
+    }
+    if (hasExplicitField(source, ["statement_status"])) {
+      const raw = readPayloadLayer(source).statement_status ||
+        readMetaLayer(source).statement_status ||
+        source.statement_status;
+      return normalizeStatementStatus(raw) === "disputed";
+    }
+    return false;
+  }
+
+  function shouldDisplayDeprecatedBadge(source) {
+    if (hasExplicitField(source, ["statement_rank"])) {
+      const raw = readPayloadLayer(source).statement_rank ||
+        readMetaLayer(source).statement_rank ||
+        source.statement_rank;
+      return normalizeStatementRank(raw) === "deprecated";
+    }
+    if (hasExplicitField(source, ["statement_status"])) {
+      const raw = readPayloadLayer(source).statement_status ||
+        readMetaLayer(source).statement_status ||
+        source.statement_status;
+      return normalizeStatementStatus(raw) === "deprecated";
+    }
+    return false;
+  }
+
+  function shouldDisplaySupersededBadge(source) {
+    if (hasExplicitField(source, ["superseded_by"])) return true;
+    if (hasExplicitField(source, ["statement_status"])) {
+      const raw = readPayloadLayer(source).statement_status ||
+        readMetaLayer(source).statement_status ||
+        source.statement_status;
+      return normalizeStatementStatus(raw) === "superseded";
+    }
+    return false;
+  }
+
+  function shouldDisplayPreferredBadge(source) {
+    if (!hasExplicitField(source, ["statement_rank"])) return false;
+    const raw = readPayloadLayer(source).statement_rank ||
+      readMetaLayer(source).statement_rank ||
+      source.statement_rank;
+    return normalizeStatementRank(raw) === "preferred";
+  }
+
+  function getStatementStateBadges(source) {
+    const badges = [];
+    if (shouldDisplayDisputeBadge(source)) {
+      badges.push({
+        kind: "dispute_state",
+        value: "disputed",
+        label: getDisputeStateLabel(source) || "Disputed",
+        className: "disputed",
+      });
+    }
+    if (shouldDisplayDeprecatedBadge(source)) {
+      badges.push({
+        kind: "statement_rank",
+        value: "deprecated",
+        label: getStatementRankLabel(source) || getStatementStatusLabel(source) || "Deprecated",
+        className: "deprecated",
+      });
+    }
+    if (shouldDisplaySupersededBadge(source)) {
+      const signals = readEvidenceSignals(source);
+      badges.push({
+        kind: "statement_status",
+        value: "superseded",
+        label: STATEMENT_STATUS_LABELS.superseded,
+        className: "superseded",
+        detail: signals.superseded_by || null,
+      });
+    } else {
+      const statusLabel = getStatementStatusLabel(source);
+      if (statusLabel) {
+        badges.push({
+          kind: "statement_status",
+          value: readEvidenceSignals(source).statement_status,
+          label: statusLabel,
+          className: normalizeToken(readEvidenceSignals(source).statement_status),
+        });
+      }
+    }
+    if (shouldDisplayPreferredBadge(source)) {
+      badges.push({
+        kind: "statement_rank",
+        value: "preferred",
+        label: getStatementRankLabel(source) || "Preferred",
+        className: "preferred",
+      });
+    }
+    return badges;
+  }
+
+  function getStatementStateSummary(source) {
+    const badges = getStatementStateBadges(source);
+    const state = normalizeStatementState(source);
+    if (!badges.length) {
+      return {
+        has_state: false,
+        message: "",
+        badges: [],
+        state: state,
+      };
+    }
+    const parts = badges.map(function(badge) {
+      if (badge.detail) return badge.label + " (" + badge.detail + ")";
+      return badge.label;
+    });
+    return {
+      has_state: true,
+      message: parts.join(" · "),
+      badges: badges,
+      state: state,
+    };
+  }
+
+  function renderStatementStateBadgeGroup(source, options) {
+    const badges = getStatementStateBadges(source);
+    if (!badges.length) return "";
+    const opts = options || {};
+    const parts = badges.map(function(badge) {
+      const modifier = badge.className ? " bl-version-badge--" + badge.className : "";
+      const title = badge.detail ? ' title="' + escapeHtml(badge.detail) + '"' : "";
+      return '<span class="bl-version-badge' + modifier + '"' + title + ">" +
+        escapeHtml(badge.label) + "</span>";
+    });
+    const cls = "bl-version-badges bl-state-badges" +
+      (opts.groupClassName ? " " + escapeHtml(opts.groupClassName) : "");
+    return '<div class="' + cls + '">' + parts.join("") + "</div>";
+  }
+
+  function getSearchStatementStateAdjustment(evidenceContext) {
+    if (!evidenceContext || typeof evidenceContext !== "object") return 0;
+    let adjustment = 0;
+    if (evidenceContext.is_disputed || evidenceContext.dispute_state === "disputed") adjustment -= 2;
+    if (evidenceContext.is_deprecated || evidenceContext.statement_rank === "deprecated") adjustment -= 3;
+    if (evidenceContext.statement_status === "superseded" || evidenceContext.superseded_by) adjustment -= 3;
+    if (evidenceContext.statement_status === "historical") adjustment -= 1;
+    return adjustment;
+  }
+
   function getSearchRankAdjustment(meta, post) {
     if (!hasEvidenceSignals({ meta: meta, payload: meta })) return 0;
     const weight = getEvidenceWeight({ meta: meta, payload: meta });
@@ -401,6 +664,19 @@ window.BoundLoreEvidenceRank = (function() {
     compareEvidenceRank: compareEvidenceRank,
     normalizeStatementState: normalizeStatementState,
     getStatementDisplayState: getStatementDisplayState,
+    getEvidenceLabel: getEvidenceLabel,
+    getConfidenceLabel: getConfidenceLabel,
+    getStatementRankLabel: getStatementRankLabel,
+    getDisputeStateLabel: getDisputeStateLabel,
+    getStatementStatusLabel: getStatementStatusLabel,
+    shouldDisplayEvidenceBadge: shouldDisplayEvidenceBadge,
+    shouldDisplayDisputeBadge: shouldDisplayDisputeBadge,
+    shouldDisplayDeprecatedBadge: shouldDisplayDeprecatedBadge,
+    shouldDisplaySupersededBadge: shouldDisplaySupersededBadge,
+    getStatementStateBadges: getStatementStateBadges,
+    getStatementStateSummary: getStatementStateSummary,
+    renderStatementStateBadgeGroup: renderStatementStateBadgeGroup,
+    getSearchStatementStateAdjustment: getSearchStatementStateAdjustment,
     getSearchRankAdjustment: getSearchRankAdjustment,
   };
 })();

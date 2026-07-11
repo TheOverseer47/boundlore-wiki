@@ -296,7 +296,7 @@
 <script src="/js/knowledge-relations.js?v=20"></script>
 <script src="/js/entity-core.js?v=11"></script>
 <script src="/js/versioning-model.js?v=2"></script>
-<script src="/js/evidence-rank.js?v=1"></script>
+<script src="/js/evidence-rank.js?v=2"></script>
 <script src="/js/unresolved-targets.js?v=4"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
@@ -758,6 +758,16 @@ function renderRecipeMergeStatusHtmlA(status) {
       "<strong>Duplicate recipe</strong> — matches the target recipe. Approve confirms existing data (no second recipe block).</p>";
   }
   return "";
+}
+
+function renderContributionEvidenceStateHtmlA(info) {
+  if (typeof BoundLoreEvidenceRank === "undefined" || !BoundLoreEvidenceRank.getStatementStateSummary) return "";
+  const source = info && (info.payload || info);
+  if (!source) return "";
+  const summary = BoundLoreEvidenceRank.getStatementStateSummary(source);
+  if (!summary || !summary.has_state || !summary.message) return "";
+  return '<p style="font-size:0.8rem;color:#c9a84c;margin:8px 0 0;padding:8px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.28);border-radius:6px;">' +
+    "<strong>Statement state</strong> — " + escapeHtmlA(summary.message) + "</p>";
 }
 
 function getContributionPreviewSafetyA(info) {
@@ -1412,7 +1422,8 @@ async function loadPending() {
         (pendingContributionInfo.missing_field ? " · Field: " + escapeHtmlA(pendingContributionInfo.missing_field) : "") +
         (pendingContributionInfo.evidence.length ? " · " + pendingContributionInfo.evidence.length + " evidence item(s)" : "") +
         " — approval merges into the existing entry.</p>" +
-        renderContributionSubmittedFieldsA(pendingContributionInfo)
+        renderContributionSubmittedFieldsA(pendingContributionInfo) +
+        renderContributionEvidenceStateHtmlA(pendingContributionInfo)
       : "";
 
     const div = document.createElement("div");
