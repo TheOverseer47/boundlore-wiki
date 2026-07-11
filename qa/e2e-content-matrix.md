@@ -283,16 +283,16 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 | Test | Target | Expected | Result |
 |------|--------|----------|--------|
-| Parser API | console on `/wiki/search/` | `BoundLoreSearchQueryParser` green | `[ ]` |
-| mining resource | parse + search | resource + mining hints | `[ ]` |
-| items using Ember Shard | search | QA Staff and/or QA Ember | `[ ]` |
-| crafted at forge | search | QA Staff and/or Forge missing entry | `[ ]` |
-| mineable resource | search | QA Ember Shard | `[ ]` |
-| Baseline queries | mining/wood/forge/qa ember/resource/red crystal | unchanged or better | `[ ]` |
-| QA Staff / QA Ember detail | post slugs | unchanged | `[ ]` |
-| Admin read-only | `/wiki/admin/` | not touched | `[ ]` |
+| Parser API | console on `/wiki/search/` | `BoundLoreSearchQueryParser` green | `[x]` |
+| mining resource | parse + search | resource + mining hints | `[x]` |
+| items using Ember Shard | search | QA Staff and/or QA Ember | `[x]` |
+| crafted at forge | search | QA Staff and/or Forge missing entry | `[x]` |
+| mineable resource | search | QA Ember Shard | `[x]` |
+| Baseline queries | mining/wood/forge/qa ember/resource/red crystal | unchanged or better | `[x]` |
+| QA Staff / QA Ember detail | post slugs | unchanged | `[x]` |
+| Admin read-only | `/wiki/admin/` | not touched | `[x]` |
 
-**Not built:** Postgres FTS, pg_trgm, embeddings, search_documents table, SQL.
+**P1-E.1 accepted as local baseline.** Full semantic search deferred.
 
 ---
 
