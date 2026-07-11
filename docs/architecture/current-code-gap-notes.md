@@ -691,3 +691,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | mining/wood/forge baseline queries, missing entry suggestions | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 21. P1-E.2 — Structured Search Query Parser Acceptance Sweep
+
+**Status:** Complete (local read-only sweep; client-side hints only; no SQL, no search index, no embeddings).
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreSearchQueryParser` API | Green — normalize, tokenize, parse, summary, applyParsedQueryToSignals |
+| Parser patterns | usage (`items using Ember Shard`), crafting (`crafted at forge`), acquisition/resource (`mining resource`, `mineable resource`, `resource mining`), rarity (`unknown rarity resource`), missing entry (`wood`, `forge`) |
+| Ranking model | Hints/boosts only via `applyParsedQueryToSignals`; existing search signals remain source-of-truth; no hard filters |
+| Intent UI | Small “Interpreted as: …” line; no debug dumps |
+| Search regressions | mining/wood/forge/qa ember/resource/red crystal unchanged or better |
+| Facet browse | Resources `?acquisition_method=mining` unchanged (independent of parser) |
+| Evidence penalties (P1-C) | Preserved in `search-signals.js` |
+| Reserved relations (P1-A) | Not productively activated |
+| Admin | Session-dependent — automation Access Denied; no queue/conflict actions |
+| Pending `add_recipe` conflict | Not touched |
+
+**P1-E.2 acceptance sweep completed; client-side query parser hints only; no SQL/backend search/search index.** P1-E foundation block (E.1 + E.2) accepted locally. Ready for P1-F planning. Deployment freeze remains active.

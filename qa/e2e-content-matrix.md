@@ -296,6 +296,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-E.2 — Structured Search Query Parser Acceptance Sweep
+
+**Milestone:** P1-E foundation block (E.1 + E.2); client-side query parser hints only; no SQL, no search index, no embeddings.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Parser API sweep | console on `/wiki/search/` | normalize/tokenize/parse/summary/apply green | `[x]` |
+| items using Ember Shard | search | QA Staff and/or QA Ember; intent line | `[x]` |
+| crafted at forge | search | QA Staff + Forge missing entry | `[x]` |
+| mineable resource / resource mining | search | QA Ember Shard | `[x]` |
+| unknown rarity resource | search | QA Ember or sensible interpretation | `[x]` |
+| Baseline queries | mining/wood/forge/qa ember/resource/red crystal | unchanged or better | `[x]` |
+| Intent hint line | search page | user-friendly; no debug dump | `[x]` |
+| Resources facet filter | `?acquisition_method=mining` | QA Ember visible | `[x]` |
+| QA Staff / QA Ember detail | post slugs | unchanged | `[x]` |
+| Wood/Forge | search | missing-entry suggestions; no posts | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation Access Denied |
+
+**P1-E.2 acceptance sweep completed; client-side query parser hints only; no SQL/backend search/search index.** P1-E accepted as local foundation. Ready for P1-F.
+
+---
+
 ## P1-C.1 — Evidence Rank & Dispute Baseline
 
 **Milestone:** P1-C.1 (evidence rank registry + reader tolerance; no SQL, no UI, no migration)

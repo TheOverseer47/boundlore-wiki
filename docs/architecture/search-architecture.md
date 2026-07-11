@@ -16,6 +16,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P1-E.1 code baseline:** `js/search-query-parser.js` — structured query hints (facets, usage/crafting/relation intents) for client-side search ranking boosts. **No** Postgres search index, **no** FTS/pg_trgm, **no** embeddings, **no** SQL. Parser produces hints only; existing search signals remain source-of-truth.
 
+**P1-E.2 acceptance sweep:** P1-E.2 acceptance sweep completed; client-side query parser hints only; no SQL/backend search/search index. P1-E foundation block (E.1 + E.2) accepted locally.
+
 ---
 
 ## Goals
