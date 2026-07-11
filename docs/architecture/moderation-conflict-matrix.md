@@ -16,3 +16,17 @@
 ## Conflict Flow Integration
 
 Existing `contribution_conflicts` table and `needs_review` status remain authoritative. New relation types from `js/relations-registry.js` must declare `mergeBehavior` and `conflictBehavior` before integration.
+
+## P1-C.1 — Evidence Rank & Dispute Baseline (local)
+
+**Scope:** Helper/reader tolerance only — no dispute-resolution UI, no SQL, no data migration.
+
+| Layer | Module | Behavior |
+|-------|--------|----------|
+| Registry | `js/evidence-rank.js` | Central enums: evidence tier, confidence, statement rank, dispute state, statement status |
+| Readers | `readEvidenceSignals`, `normalizeStatementState` | Null-safe; numeric confidence 0–100 separate from enum confidence |
+| UI | — | Existing evidence badges unchanged; no new rank/dispute badges on QA data |
+| Admin preview | `wiki/admin/index.html` | Future-safe `_evidenceRankContext` on contribution preview; approve block on recipe conflict unchanged |
+| Search | `js/search-signals.js` | Optional internal weight hook; QA search rankings unchanged when no explicit rank fields |
+
+Real dispute-resolution workflow and auto-promote remain later P1-C scope.

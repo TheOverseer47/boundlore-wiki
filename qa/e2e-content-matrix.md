@@ -197,7 +197,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Admin read-only | `/wiki/admin/` | Queue + pending conflict when session present | `[~]` login redirect in automation browser |
 | Pending conflict | admin | Unchanged; approve blocked | `[x]` not executed |
 
-**P1-A accepted as local foundation.** P1-B foundation block (B.1–B.3) accepted locally. P1-C not started.
+**P1-A accepted as local foundation.** P1-B foundation block (B.1–B.3) accepted locally. P1-C.1 baseline in progress.
 
 ---
 
@@ -253,7 +253,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Pending conflict | admin read-only | unchanged; not executed | `[x]` |
 | Admin optional | `/wiki/admin/` | session-dependent | `[~]` login redirect |
 
-**P1-B accepted as local foundation.** P1-C not started.
+**P1-C.1 accepted as local baseline.** Dispute-resolution UI deferred.
+
+---
+
+## P1-C.1 — Evidence Rank & Dispute Baseline
+
+**Milestone:** P1-C.1 (evidence rank registry + reader tolerance; no SQL, no UI, no migration)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API | console on wiki page | `BoundLoreEvidenceRank` object; normalizers green | `[x]` |
+| Empty tier | console | `normalizeEvidenceTier("")` null-safe, no crash | `[x]` |
+| Weight compare | console | confirmed > reported | `[x]` |
+| QA Staff regression | `qa-staff-of-fire-2b742628` | Evidence badges unchanged; no rank/dispute badges | `[x]` |
+| QA Ember regression | `qa-ember-shard-511160` | Resource hero unchanged | `[x]` |
+| Search wood/forge/mining/qa ember/resource | `/wiki/search/?q=...` | rankings unchanged | `[x]` |
+| Pending conflict | admin read-only | preview unchanged; approve blocked; not executed | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**Not built:** dispute-resolution UI, auto-ranking, auto-promote, SQL, new visible badges.
 
 ---
 

@@ -349,14 +349,22 @@ window.WikiEntryLayout = (function() {
 
   function resolveEntryEvidenceSignals(meta, payload) {
     if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.resolveEvidenceSignals) {
-      return BoundLoreRelationsRegistry.resolveEvidenceSignals({ meta: meta, payload: payload });
+      const signals = BoundLoreRelationsRegistry.resolveEvidenceSignals({ meta: meta, payload: payload });
+      if (typeof BoundLoreEvidenceRank !== "undefined" && BoundLoreEvidenceRank.normalizeEvidenceSignals) {
+        signals._rankContext = BoundLoreEvidenceRank.normalizeEvidenceSignals({ meta: meta, payload: payload });
+      }
+      return signals;
     }
-    return {
+    const fallback = {
       evidenceTier: payload && payload.evidence_tier,
       confidence: payload && (payload.confidence_level || payload.confidence),
       tierLabel: null,
       confidenceLabel: null,
     };
+    if (typeof BoundLoreEvidenceRank !== "undefined" && BoundLoreEvidenceRank.normalizeEvidenceSignals) {
+      fallback._rankContext = BoundLoreEvidenceRank.normalizeEvidenceSignals({ meta: meta, payload: payload });
+    }
+    return fallback;
   }
 
   function renderEntryEvidenceBadges(meta, payload, options) {

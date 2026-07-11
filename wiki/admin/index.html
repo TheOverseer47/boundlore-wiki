@@ -296,6 +296,7 @@
 <script src="/js/knowledge-relations.js?v=20"></script>
 <script src="/js/entity-core.js?v=11"></script>
 <script src="/js/versioning-model.js?v=2"></script>
+<script src="/js/evidence-rank.js?v=1"></script>
 <script src="/js/unresolved-targets.js?v=4"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
@@ -760,6 +761,9 @@ function renderRecipeMergeStatusHtmlA(status) {
 }
 
 function getContributionPreviewSafetyA(info) {
+  if (info && typeof BoundLoreEvidenceRank !== "undefined" && BoundLoreEvidenceRank.normalizeStatementState) {
+    info._evidenceRankContext = BoundLoreEvidenceRank.normalizeStatementState(info.payload || info);
+  }
   if (info && info.preview_safety) return info.preview_safety;
   if (typeof BoundLoreContributionIntentRegistry !== "undefined" && BoundLoreContributionIntentRegistry.getContributionPreviewSafety) {
     return BoundLoreContributionIntentRegistry.getContributionPreviewSafety(info || {});

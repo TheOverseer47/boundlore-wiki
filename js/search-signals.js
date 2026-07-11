@@ -350,9 +350,19 @@ window.BoundLoreSearchSignals = (function() {
     });
   }
 
+  function readSearchEvidenceContext(meta, post) {
+    if (typeof BoundLoreEvidenceRank === "undefined" || !BoundLoreEvidenceRank.hasEvidenceSignals) {
+      return null;
+    }
+    const source = { meta: meta || {}, payload: meta || {}, post: post || {} };
+    if (!BoundLoreEvidenceRank.hasEvidenceSignals(source)) return null;
+    return BoundLoreEvidenceRank.normalizeStatementState(source);
+  }
+
   function buildSearchDocument(post) {
     const safePost = post && typeof post === "object" ? post : {};
     const meta = parsePostMeta(safePost.content || "");
+    const evidenceContext = readSearchEvidenceContext(meta, safePost);
     const signals = {
       title: collectTitleSignals(safePost, meta),
       aliases: collectAliasSearchSignals(safePost, meta),
@@ -378,6 +388,7 @@ window.BoundLoreSearchSignals = (function() {
       excerpt: safePost.excerpt || "",
       signals: signals,
       display_labels: buildDisplayLabels(safePost, meta, signals),
+      evidence_context: evidenceContext,
     };
   }
 
@@ -544,6 +555,10 @@ window.BoundLoreSearchSignals = (function() {
     }
 
     let score = 0;
+    if (document.evidence_context && typeof BoundLoreEvidenceRank !== "undefined" && BoundLoreEvidenceRank.getEvidenceWeight) {
+      const rankWeight = BoundLoreEvidenceRank.getEvidenceWeight(document.evidence_context);
+      if (rankWeight > 0) score += Math.min(2, Math.floor(rankWeight / 20));
+    }
     const details = [];
     const groups = document.signals || {};
 

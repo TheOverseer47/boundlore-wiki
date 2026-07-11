@@ -577,4 +577,26 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 | Admin | Session-dependent |
 
-**P1-B foundation block (B.1 + B.2 + B.3) accepted locally.** P1-C not started. Deployment freeze remains active.
+**P1-B foundation block (B.1 + B.2 + B.3) accepted locally.** P1-C.1 started. Deployment freeze remains active.
+
+---
+
+## 15. P1-C.1 — Evidence Rank & Dispute Baseline
+
+**Status:** Complete (local baseline; no SQL, no UI, no migration).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Evidence rank registry | `js/evidence-rank.js` | `window.BoundLoreEvidenceRank` — tiers, confidence, statement rank, dispute state, status |
+| Normalizers | `normalizeEvidenceTier`, `normalizeConfidence`, `normalizeStatementRank`, `normalizeDisputeState`, `normalizeStatementStatus` | Null-safe; aliases for legacy tokens; numeric 0–100 confidence kept separate from enum |
+| Readers | `readEvidenceSignals`, `normalizeEvidenceSignals`, `hasEvidenceSignals`, `normalizeStatementState` | Tolerates payload/meta/qualifiers/version fields; no writes |
+| Weights / compare | `getEvidenceWeight`, `getRankWeight`, `compareEvidenceRank` | Internal ranking prep only |
+| Entry layout hook | `js/wiki-entry-layout.js` | `_rankContext` attached; existing evidence badges unchanged |
+| Search hook | `js/search-signals.js` | `evidence_context` on search documents; max +2 score bump when explicit evidence present |
+| Admin hook | `wiki/admin/index.html` | `_evidenceRankContext` on preview info; no new actions or badges |
+| Script wiring | post, admin, search, resources, items | `evidence-rank.js?v=1` after `versioning-model.js` when present |
+
+| Not built | real dispute-resolution UI, auto-ranking, auto-promote, merge/approve changes, SQL | Deferred P1-C+ |
+| Unchanged | existing evidence badges, conflict preview, pending `add_recipe` approve block | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.
