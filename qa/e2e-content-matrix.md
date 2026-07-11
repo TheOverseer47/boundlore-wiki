@@ -253,7 +253,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Pending conflict | admin read-only | unchanged; not executed | `[x]` |
 | Admin optional | `/wiki/admin/` | session-dependent | `[~]` login redirect |
 
-**P1-C accepted as local foundation (C.1–C.3).** Ready for P1-D.
+**P1-D.1 accepted as local baseline.** Search index/query parser deferred.
 
 ---
 
@@ -311,6 +311,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Admin optional | `/wiki/admin/` | session-dependent | `[~]` login redirect |
 
 **P1-C accepted as local foundation.** Ready for P1-D. Dispute-resolution UI deferred.
+
+---
+
+## P1-D.1 — Facet Browse Filter Baseline
+
+**Milestone:** P1-D.1 (client-side facet URL filters; no SQL, no search index, no query parser)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| FacetBrowse API | console on resources/browse | `BoundLoreFacetBrowse` object; parse/normalize green | `[x]` |
+| Resources unfiltered | `/wiki/resources/` | unchanged layout/list | `[x]` |
+| Resources mining | `/wiki/resources/?acquisition_method=mining` | QA Ember Shard visible | `[x]` |
+| Resources raw/unknown | `?processing_stage=raw`, `?rarity=unknown` | QA Ember visible or no regression | `[x]` |
+| Resources no match | `?acquisition_method=fishing` | empty/filter message, no crash | `[x]` |
+| Browse unfiltered | `/wiki/browse/` | unchanged category cards | `[x]` |
+| Browse filtered | `?entity_subtype=resource`, `?facet=acquisition_method:mining` | active filter summary | `[x]` |
+| QA Staff / QA Ember detail | post slugs | unchanged | `[x]` |
+| Search mining/wood/forge | `/wiki/search/?q=...` | unchanged | `[x]` |
+| Admin read-only | `/wiki/admin/` | session-dependent | `[~]` automation Access Denied |
+
+**Not built:** search index, query parser, SQL, new domains/categories.
 
 ---
 

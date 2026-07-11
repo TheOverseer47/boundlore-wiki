@@ -10,6 +10,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P0.5-F addition:** When version metadata exists on facts/relations/recipes/facets, low-weight version signals (`game_version`, validity range, superseded/historical) are indexed client-side. No ranking change when version fields are absent.
 
+**P1-D.1 code baseline:** `js/facet-browse.js` — client-side facet URL filters for Resources/Browse landing pages (`?acquisition_method=mining`, `?facet=group:value`, etc.). Uses `BoundLoreFacetRegistry` signals; **no** Postgres search index, **no** FTS/pg_trgm, **no** query parser, **no** SQL migration.
+
 ---
 
 ## Goals

@@ -1248,7 +1248,22 @@ function renderResourcesFilterControls(container, state) {
   sortFilter.value = state.sortMode || "name";
 
   const searchLabel = state.searchQuery ? (' · Search: "' + state.searchQuery + '"') : "";
-  summary.textContent = "Showing " + state.visibleCount + " of " + state.totalCount + " resources" + searchLabel;
+  const facetLabel = state.facetSummary ? (" · Facets: " + state.facetSummary) : "";
+  summary.textContent = "Showing " + state.visibleCount + " of " + state.totalCount + " resources" + searchLabel + facetLabel;
+
+  let quicklinks = controls.querySelector("#blFacetBrowseQuicklinks");
+  if (!quicklinks) {
+    quicklinks = document.createElement("p");
+    quicklinks.id = "blFacetBrowseQuicklinks";
+    quicklinks.className = "bl-facet-browse-quicklinks";
+    quicklinks.style.cssText = "font-size:0.82rem;color:var(--text-muted);margin:8px 0 0;";
+    quicklinks.innerHTML =
+      '<span>Facet browse:</span> ' +
+      '<a href="?acquisition_method=mining">Mining</a> · ' +
+      '<a href="?processing_stage=raw">Raw</a> · ' +
+      '<a href="?rarity=unknown">Unknown rarity</a>';
+    controls.appendChild(quicklinks);
+  }
 
   if (!searchFilter.dataset.bound) {
     let searchTimer = null;
@@ -1327,12 +1342,19 @@ async function renderResourcesLanding() {
   const sourceTypeFilter = getResourceFilterFromUrlRP("source_type");
   const rarityFilter = getResourceFilterFromUrlRP("rarity");
   const sortMode = getResourceSortFromUrlRP();
+  const facetFilters = typeof BoundLoreFacetBrowse !== "undefined"
+    ? BoundLoreFacetBrowse.parseFacetQuery(window.location.search)
+    : [];
+  const facetSummary = typeof BoundLoreFacetBrowse !== "undefined" && BoundLoreFacetBrowse.hasActiveFacetFilters(facetFilters)
+    ? BoundLoreFacetBrowse.getActiveFacetFilterSummary(facetFilters)
+    : "";
 
   renderResourcesFilterControls(container, {
     searchQuery: searchQuery,
     sourceType: sourceTypeFilter,
     rarity: rarityFilter,
     sortMode: sortMode,
+    facetSummary: facetSummary,
     visibleCount: 0,
     totalCount: resourcePosts.length,
   });
@@ -1344,6 +1366,7 @@ async function renderResourcesLanding() {
       sourceType: sourceTypeFilter,
       rarity: rarityFilter,
       sortMode: sortMode,
+      facetSummary: facetSummary,
       visibleCount: 0,
       totalCount: 0,
     });
@@ -1359,6 +1382,9 @@ async function renderResourcesLanding() {
       const rarityKey = normalizeResourceNameKeyRP(facts.rarity || "unknown");
       if (rarityKey !== rarityFilter) return false;
     }
+    if (facetFilters.length && typeof BoundLoreFacetBrowse !== "undefined") {
+      if (!BoundLoreFacetBrowse.postMatchesFacetFilters({ meta: meta, post: post }, facetFilters)) return false;
+    }
     return true;
   });
 
@@ -1367,6 +1393,7 @@ async function renderResourcesLanding() {
     sourceType: sourceTypeFilter,
     rarity: rarityFilter,
     sortMode: sortMode,
+    facetSummary: facetSummary,
     visibleCount: filtered.length,
     totalCount: resourcePosts.length,
   });

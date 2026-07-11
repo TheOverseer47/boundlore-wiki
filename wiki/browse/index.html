@@ -43,6 +43,7 @@
     <section class="bl-guides-section form-box">
       <h2 style="margin-top:0;">Secondary Worlds of Knowledge</h2>
       <p style="color:var(--text-muted);">These categories remain part of the wiki but live outside the main header for a cleaner navigation path.</p>
+      <div id="blBrowseFacetSummary"></div>
     </section>
 
     <section class="bl-guides-section bl-guides-listing">
@@ -60,6 +61,7 @@
   <script src="/js/supabase-config.js"></script>
   <script src="/js/patch-mode.js?v=1" data-bl-patch-mode="1"></script>
   <script src="/js/facet-registry.js?v=3"></script>
+  <script src="/js/facet-browse.js?v=1"></script>
   <script src="/js/categories-config.js?v=8"></script>
   <script src="/js/relations-registry.js?v=3"></script>
   <script src="/js/entity-core.js?v=11"></script>
@@ -68,5 +70,22 @@
   <script src="/js/auth-nav.js"></script>
   <script src="/js/search.js?v=2"></script>
   <script src="../../js/main.js?v=2"></script>
+  <script>
+  (function initBrowseFacetSummary() {
+    if (typeof BoundLoreFacetBrowse === "undefined") return;
+    var filters = BoundLoreFacetBrowse.parseFacetQuery(window.location.search);
+    var slot = document.getElementById("blBrowseFacetSummary");
+    if (!slot || !BoundLoreFacetBrowse.hasActiveFacetFilters(filters)) return;
+    slot.innerHTML = BoundLoreFacetBrowse.renderActiveFacetSummaryHtml(filters);
+    var resourceLink = filters.some(function(f) {
+      return f.group === "entity_subtype" && f.value === "resource";
+    }) || filters.some(function(f) { return f.group === "acquisition_method"; });
+    if (resourceLink) {
+      var href = "/wiki/resources/";
+      if (filters.length) href = BoundLoreFacetBrowse.buildFacetUrl(href, filters);
+      slot.innerHTML += '<p style="font-size:0.85rem;margin:8px 0 0;"><a href="' + href + '">View matching resources →</a></p>';
+    }
+  })();
+  </script>
 </body>
 </html>

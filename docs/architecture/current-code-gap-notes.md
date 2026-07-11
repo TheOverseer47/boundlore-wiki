@@ -635,3 +635,22 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | SQL / DB / data migration | None |
 
 **P1-C foundation block (C.1 + C.2 + C.3) accepted locally.** Ready for P1-D planning. Deployment freeze remains active.
+
+---
+
+## 18. P1-D.1 — Facet Browse Filter Baseline
+
+**Status:** Complete (local; client-side only; no SQL, no search index, no query parser).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Facet browse module | `js/facet-browse.js` | `window.BoundLoreFacetBrowse` — URL parse, normalize, match, filter |
+| URL params | `?facet=group:value`, `?acquisition_method=`, `?processing_stage=`, `?rarity=`, etc. | Comma/multi-`facet` tolerant |
+| Resources landing | `js/render-posts.js` + `wiki/resources/index.html` | Facet filter + summary + quick links; unchanged without filters |
+| Browse page | `wiki/browse/index.html` | Active filter summary + link to matching resources |
+| QA Ember Shard | acquisition_method mining, processing_stage raw, rarity unknown | Filterable when facets present |
+
+| Not built | Postgres search index, pg_trgm, embeddings, query parser, SQL | Deferred P1-D+ |
+| Unchanged | `/wiki/search/`, `/wiki/items/`, existing resource cards | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.
