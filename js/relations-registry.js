@@ -587,7 +587,7 @@ window.BoundLoreRelationsRegistry = (function() {
       properties: ["method", "tool", "node_type", "conditions", "evidence_tier", "confidence", "source_post_id"],
       status: "reserved",
       persistence: "reserved",
-      notes: "P1 reserved — gather method/node expansion; no production flow yet.",
+      notes: "P1 reserved — gather method/node expansion; no production flow yet. P1-F registry interprets method/tool qualifiers future-safe.",
     },
     crafted_by_profession: {
       key: "crafted_by_profession",
@@ -605,7 +605,7 @@ window.BoundLoreRelationsRegistry = (function() {
       properties: ["required_level", "unlock_type", "evidence_tier", "source_post_id"],
       status: "reserved",
       persistence: "reserved",
-      notes: "P1 reserved — profession model not implemented.",
+      notes: "P1 reserved — profession model not implemented. P1-F registry maps to SYSTEM/profession_type future-safe.",
     },
     sold_by: {
       key: "sold_by",
@@ -658,6 +658,7 @@ window.BoundLoreRelationsRegistry = (function() {
       properties: ["required_level", "evidence_tier", "source_post_id"],
       status: "reserved",
       persistence: "reserved",
+      notes: "P1 reserved — mount stays BEING + role/capability. P1-F registry future-safe.",
     },
     tamed_via: {
       key: "tamed_via",
@@ -675,6 +676,7 @@ window.BoundLoreRelationsRegistry = (function() {
       properties: ["method", "tool", "evidence_tier", "source_post_id"],
       status: "reserved",
       persistence: "reserved",
+      notes: "P1 reserved — taming flow not implemented. P1-F registry interprets method/tool qualifiers future-safe.",
     },
     occurs_during: {
       key: "occurs_during",

@@ -712,3 +712,22 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P1-E.2 acceptance sweep completed; client-side query parser hints only; no SQL/backend search/search index.** P1-E foundation block (E.1 + E.2) accepted locally. Ready for P1-F planning. Deployment freeze remains active.
+
+---
+
+## 22. P1-F.1 — Profession & Capability Model Baseline
+
+**Status:** Complete (local; registry-only; no SQL, no UI, no data migration).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Profession/capability registry | `js/profession-capability-registry.js` | `window.BoundLoreProfessionCapabilityRegistry` |
+| Entity model | `PROFESSION_ENTITY_MODEL` | SYSTEM/profession_type — **no** new top-level domain |
+| Mount model | role/capability on BEING | No mount subtype page |
+| Search integration | `js/search-signals.js` | Low-weight `profession_capability` signals only |
+| Reserved relations | `js/relations-registry.js` | `crafted_by_profession`, `gathered_via`, `tamed_via`, `mountable_by` stay reserved |
+
+| Not built | Profession UI, skilltree, leveling, crafting/gathering flows, mount/taming UI, SQL | Deferred P1-F+ |
+| Unchanged | mining/wood/forge search, QA Staff/Ember, facet browse, missing entry suggestions | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.

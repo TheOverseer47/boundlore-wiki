@@ -331,6 +331,30 @@ window.BoundLoreSearchSignals = (function() {
     return bucket.signals;
   }
 
+  function collectProfessionCapabilitySearchSignals(post, meta) {
+    const bucket = { signals: [], _seen: new Set() };
+    if (typeof BoundLoreProfessionCapabilityRegistry === "undefined") {
+      return bucket.signals;
+    }
+    const source = { meta: meta || {}, post: post || {}, facets: meta && meta.facets };
+    try {
+      BoundLoreProfessionCapabilityRegistry.getProfessionSearchSignals(source).forEach(function(entry) {
+        if (!entry || !entry.raw) return;
+        pushSignal(bucket, entry.raw, { group: "profession_capability", label: entry.label || "Profession" });
+        if (entry.label && entry.label !== entry.raw) {
+          pushSignal(bucket, entry.label, { group: "profession_capability", label: "Profession kind" });
+        }
+      });
+      BoundLoreProfessionCapabilityRegistry.getRequirementSearchSignals(source).forEach(function(entry) {
+        if (!entry || !entry.raw) return;
+        pushSignal(bucket, entry.raw, { group: "profession_capability", label: entry.label || "Requirement" });
+      });
+    } catch (err) {
+      return bucket.signals;
+    }
+    return bucket.signals;
+  }
+
   function buildDisplayLabels(post, meta, signalGroups) {
     const labels = [];
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {
@@ -371,6 +395,7 @@ window.BoundLoreSearchSignals = (function() {
       resource: collectResourceSearchSignals(safePost, meta),
       recipe: collectRecipeSearchSignals(safePost, meta),
       relations: collectRelationSearchSignals(safePost, meta),
+      profession_capability: collectProfessionCapabilitySearchSignals(safePost, meta),
       version: collectVersionSearchSignalsForPost(safePost, meta),
       text: collectTextSignals(safePost),
     };
@@ -543,6 +568,7 @@ window.BoundLoreSearchSignals = (function() {
     if (group === "recipe") return WEIGHTS.recipe;
     if (group === "relations") return WEIGHTS.relation;
     if (group === "version") return WEIGHTS.weak;
+    if (group === "profession_capability") return WEIGHTS.weak;
     return WEIGHTS.text;
   }
 

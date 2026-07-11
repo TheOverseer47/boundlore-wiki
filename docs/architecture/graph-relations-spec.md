@@ -8,6 +8,8 @@
 
 **P1-A.3 (local):** Acceptance sweep completed — Registry API, reader tolerance, search, and QA regressions green as P1-A foundation block. No SQL, no UI, no data migration. Ready for P1-B planning.
 
+**P1-F.1 (local):** `js/profession-capability-registry.js` — central profession/role/capability/requirement kinds and normalizers. No new top-level domain; future professions use SYSTEM/profession_type. Mounts stay BEING + role/capability facets. Reserved relations (`crafted_by_profession`, `gathered_via`, `tamed_via`, `mountable_by`) remain reserved; P1-F registry interprets qualifiers future-safe. No UI, no SQL, no data migration.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

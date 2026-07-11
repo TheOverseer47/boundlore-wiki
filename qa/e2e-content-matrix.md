@@ -319,6 +319,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-F.1 — Profession & Capability Model Baseline
+
+**Milestone:** P1-F.1 (registry-only; no SQL, no UI, no profession pages, no data migration)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API | console on `/wiki/search/` or `/wiki/post/` | `BoundLoreProfessionCapabilityRegistry` green | `[x]` |
+| Normalizers | console | crafting/rideable/mount/required_level | `[x]` |
+| Reserved relations | console | `isReservedRelation` for P1-F quartet | `[x]` |
+| Search regressions | mining/wood/forge/qa ember/resource/red crystal/parser queries | unchanged | `[x]` |
+| rideable/flyable mount | search | no crash; 0 results OK | `[x]` |
+| QA Staff / QA Ember | post slugs | unchanged; no new UI sections | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Resources facet | `?acquisition_method=mining` | QA Ember visible | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**Not built:** profession UI, skilltree, SQL, profession/station posts, reserved relation activation.
+
+---
+
 ## P1-C.1 — Evidence Rank & Dispute Baseline
 
 **Milestone:** P1-C.1 (evidence rank registry + reader tolerance; no SQL, no UI, no migration)
