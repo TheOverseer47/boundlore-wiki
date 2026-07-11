@@ -654,3 +654,22 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | `/wiki/search/`, `/wiki/items/`, existing resource cards | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 19. P1-D.2 — Facet Browse Filter Acceptance Sweep
+
+**Status:** Complete (read-only sweep; no code/data changes beyond docs).
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreFacetBrowse` API (parse, normalize, match) | Green |
+| QA Ember Shard via mining/raw/unknown filters | Visible on Resources |
+| Non-match (`?acquisition_method=fishing`) | Empty/filter message, no crash |
+| Browse active-filter hint + Resources link | Green |
+| Search (qa ember shard, resource, mining, red crystal nodes, wood, forge) | Unchanged |
+| Pending `add_recipe` conflict | Not touched |
+| Admin | Session-dependent (automation Access Denied) |
+| SQL / search index / query parser | None |
+
+**P1-D foundation block (D.1 + D.2) accepted locally.** Ready for P1-E planning. Deployment freeze remains active.

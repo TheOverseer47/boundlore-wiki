@@ -257,6 +257,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-D.2 — Facet Browse Filter Acceptance Sweep
+
+**Milestone:** P1-D foundation block complete (D.1 + D.2); client-side facet filters only; no SQL, no search index, no query parser.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| FacetBrowse API sweep | console on resources | parse/normalize/match green; synthetic sample green | `[x]` |
+| Resources unfiltered | `/wiki/resources/` | unchanged + quicklinks only | `[x]` |
+| Resources mining/raw/unknown | filtered URLs | QA Ember Shard visible | `[x]` |
+| Resources fishing | `?acquisition_method=fishing` | empty/filter message, no crash | `[x]` |
+| Browse filtered | `?facet=acquisition_method:mining` | active filter + resources link | `[x]` |
+| Search regressions | mining/wood/forge/qa ember/resource/red crystal | unchanged | `[x]` |
+| QA Staff / QA Ember detail | post slugs | unchanged | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation Access Denied |
+
+**P1-D accepted as local foundation.** Ready for P1-E.
+
+---
+
 ## P1-C.1 — Evidence Rank & Dispute Baseline
 
 **Milestone:** P1-C.1 (evidence rank registry + reader tolerance; no SQL, no UI, no migration)

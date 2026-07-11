@@ -12,6 +12,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P1-D.1 code baseline:** `js/facet-browse.js` — client-side facet URL filters for Resources/Browse landing pages (`?acquisition_method=mining`, `?facet=group:value`, etc.). Uses `BoundLoreFacetRegistry` signals; **no** Postgres search index, **no** FTS/pg_trgm, **no** query parser, **no** SQL migration.
 
+**P1-D.2 acceptance sweep:** P1-D.2 acceptance sweep completed; client-side facet filters only; no SQL, query parser, or search index. P1-D foundation block accepted locally.
+
 ---
 
 ## Goals
