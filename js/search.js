@@ -271,11 +271,29 @@ async function initSearchPage() {
     if (query.length < 1) {
       pageResults.innerHTML = '<p class="search-page-empty">Enter a search term to explore structured wiki signals.</p>';
       if (pageSummary) pageSummary.textContent = "";
+      const intentElEmpty = document.getElementById("searchPageIntent");
+      if (intentElEmpty) {
+        intentElEmpty.textContent = "";
+        intentElEmpty.style.display = "none";
+      }
       return;
     }
 
     pageResults.innerHTML = '<p class="search-page-loading">Searching...</p>';
     if (pageSummary) pageSummary.textContent = 'Results for "' + query + '"';
+
+    const intentEl = document.getElementById("searchPageIntent");
+    if (intentEl) {
+      if (typeof BoundLoreSearchQueryParser !== "undefined" && BoundLoreSearchQueryParser.getQueryIntentSummary) {
+        const parsed = BoundLoreSearchQueryParser.parseSearchQuery(query);
+        const intentSummary = BoundLoreSearchQueryParser.getQueryIntentSummary(parsed);
+        intentEl.textContent = intentSummary ? ("Interpreted as: " + intentSummary) : "";
+        intentEl.style.display = intentSummary ? "block" : "none";
+      } else {
+        intentEl.textContent = "";
+        intentEl.style.display = "none";
+      }
+    }
 
     if (!hasStructuredSearch()) {
       pageResults.innerHTML = '<p class="search-page-empty">Structured search is unavailable on this page.</p>';

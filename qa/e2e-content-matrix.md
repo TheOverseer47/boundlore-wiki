@@ -273,7 +273,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Pending conflict | admin read-only | not touched | `[x]` |
 | Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation Access Denied |
 
-**P1-D accepted as local foundation.** Ready for P1-E.
+**P1-D accepted as local foundation.** P1-E.1 query parser baseline documented.
+
+---
+
+## P1-E.1 — Structured Search Query Parser Baseline
+
+**Milestone:** P1-E.1 (client-side query parser hints; no SQL, no search index, no embeddings)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Parser API | console on `/wiki/search/` | `BoundLoreSearchQueryParser` green | `[ ]` |
+| mining resource | parse + search | resource + mining hints | `[ ]` |
+| items using Ember Shard | search | QA Staff and/or QA Ember | `[ ]` |
+| crafted at forge | search | QA Staff and/or Forge missing entry | `[ ]` |
+| mineable resource | search | QA Ember Shard | `[ ]` |
+| Baseline queries | mining/wood/forge/qa ember/resource/red crystal | unchanged or better | `[ ]` |
+| QA Staff / QA Ember detail | post slugs | unchanged | `[ ]` |
+| Admin read-only | `/wiki/admin/` | not touched | `[ ]` |
+
+**Not built:** Postgres FTS, pg_trgm, embeddings, search_documents table, SQL.
 
 ---
 

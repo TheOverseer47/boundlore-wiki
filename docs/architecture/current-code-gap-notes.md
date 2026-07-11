@@ -673,3 +673,21 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | SQL / search index / query parser | None |
 
 **P1-D foundation block (D.1 + D.2) accepted locally.** Ready for P1-E planning. Deployment freeze remains active.
+
+---
+
+## 20. P1-E.1 — Structured Search Query Parser Baseline
+
+**Status:** Complete (local; client-side only; no SQL, no search index, no embeddings).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Query parser | `js/search-query-parser.js` | `window.BoundLoreSearchQueryParser` — facet/usage/crafting/relation hints |
+| Search integration | `js/search-signals.js`, `js/search.js` | Optional ranking boosts; signals remain source-of-truth |
+| Search UI | `wiki/search/index.html` | Small “Interpreted as: …” intent line when hints present |
+| Patterns | usage, crafting, mining/resource, wood/forge missing entry | Hints only — no hard filters |
+
+| Not built | Postgres FTS, pg_trgm, embeddings, search_documents table, SQL | Deferred P1-E+ |
+| Unchanged | mining/wood/forge baseline queries, missing entry suggestions | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.

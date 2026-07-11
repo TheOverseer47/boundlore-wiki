@@ -608,6 +608,23 @@ window.BoundLoreSearchSignals = (function() {
       }
     }
 
+    if (typeof BoundLoreSearchQueryParser !== "undefined" && BoundLoreSearchQueryParser.applyParsedQueryToSignals) {
+      const parsed = opts.parsedQuery || BoundLoreSearchQueryParser.parseSearchQuery(query);
+      const hintResult = BoundLoreSearchQueryParser.applyParsedQueryToSignals(parsed, document);
+      if (hintResult && hintResult.boost > 0) {
+        score += hintResult.boost;
+        (hintResult.details || []).forEach(function(entry) {
+          details.push({
+            group: "parser",
+            signal: entry.signal || entry.kind,
+            label: "Query hint",
+            weight: entry.weight || 3,
+            token: null,
+          });
+        });
+      }
+    }
+
     return { score: score, details: details };
   }
 
@@ -620,6 +637,7 @@ window.BoundLoreSearchSignals = (function() {
     if (document.kind === "missing_entry") {
       return "Missing entry suggestion";
     }
+    if (top.group === "parser") return "Matched query hint: " + top.signal;
     if (top.group === "facets") return "Matched facet: " + top.signal;
     if (top.group === "resource") return "Matched resource: " + top.signal;
     if (top.group === "recipe") return "Matched recipe: " + top.signal;
@@ -630,7 +648,10 @@ window.BoundLoreSearchSignals = (function() {
   }
 
   function searchDocuments(query, documents, options) {
-    const opts = Object.assign({ limit: 20 }, options || {});
+    const parsedQuery = typeof BoundLoreSearchQueryParser !== "undefined" && BoundLoreSearchQueryParser.parseSearchQuery
+      ? BoundLoreSearchQueryParser.parseSearchQuery(query)
+      : null;
+    const opts = Object.assign({ limit: 20, parsedQuery: parsedQuery }, options || {});
     return (Array.isArray(documents) ? documents : [])
       .map(function(document) {
         const scored = scoreSearchDocument(query, document, opts);
