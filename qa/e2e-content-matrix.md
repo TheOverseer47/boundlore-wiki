@@ -142,6 +142,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-A.1 — Relation Registry 2.0 / Qualifier Baseline
+
+**Milestone:** P1-A.1 (registry + qualifier vocabulary; no SQL, no UI, no migration)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API | loaded wiki page console | `BoundLoreRelationsRegistry` object; crafted_from persisted; ingredient_of derived | `[x]` |
+| Reserved types | console | sold_by, gathered_via, crafted_by_profession exist as reserved | `[x]` |
+| Unknown type | console | unbekannter Typ crasht nicht | `[x]` |
+| QA Staff regression | `qa-staff-of-fire-2b742628` | Recipe + Wood/Forge Entry needed unchanged | `[x]` |
+| QA Ember regression | `qa-ember-shard-511160` | Resource + facets unchanged | `[x]` |
+| Search mining/wood/forge | `/wiki/search/?q=...` | P0.5-E results unchanged | `[x]` |
+| Admin optional | `/wiki/admin/` | Dashboard + queue + pending conflict | `[x]` read-only (session-dependent gate) |
+
+**Not built in P1-A.1:** sold_by/gathered_via/crafted_by_profession UI flows, SQL, relation migration, symmetric dedupe.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

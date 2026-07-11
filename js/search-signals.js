@@ -254,6 +254,11 @@ window.BoundLoreSearchSignals = (function() {
     relations.forEach(function(rel) {
       if (!rel) return;
       const type = String(rel.relation_type || rel.type || "").toLowerCase();
+      if (typeof BoundLoreRelationsRegistry !== "undefined") {
+        if (BoundLoreRelationsRegistry.isReservedRelation && BoundLoreRelationsRegistry.isReservedRelation(type)) {
+          return;
+        }
+      }
       const label = getRelationLabel(type);
       pushSignal(bucket, label, { group: "relations", label: label });
       pushSignal(bucket, type.replace(/_/g, " "), { group: "relations", label: type });

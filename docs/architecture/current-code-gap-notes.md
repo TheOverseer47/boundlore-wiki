@@ -470,3 +470,21 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Docs | `roadmap.md`, `current-code-gap-notes.md`, `e2e-content-matrix.md` updated for P0.5 completion |
 
 **Outcome:** P0.5-A–F accepted as pre-push foundation. P1 awaits explicit authorization.
+
+---
+
+## 9. P1-A.1 — Relation Registry 2.0 / Qualifier Baseline
+
+**Status:** Complete (registry + qualifier vocabulary + tolerant helpers; no SQL, no UI, no data migration).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| Qualifier registry | `QUALIFIER_REGISTRY` in `js/relations-registry.js` | quantity, unit, station, versioning fields, evidence/confidence, etc. |
+| Registry 2.0 fields | `REGISTRY_2_OVERRIDES` merged at read time | persistence, cardinality, dedupe_key, search_expansion, promotion_weight, version_support, status |
+| Active relations | found_in, crafted_from, crafted_at, ingredient_of, drops, … | `crafted_from` persisted_forward; `ingredient_of` derived_inverse |
+| Reserved P1 types | gathered_via, crafted_by_profession, sold_by, reward_of, … | status `reserved`; no production flows |
+| Helpers | normalizeRelationQualifiers, getRelationPersistence, isDerivedRelation, … | Null-safe; unknown types tolerated |
+| Search | `js/search-signals.js` | Reserved relation types skipped in relation search signals |
+| Not built | sold_by/gathered_via/crafted_by_profession UI, SQL, migration | Deferred P1+ |
+
+**Deployment freeze remains active** — no push/deploy.

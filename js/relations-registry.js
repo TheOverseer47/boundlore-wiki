@@ -50,6 +50,56 @@ window.BoundLoreRelationsRegistry = (function() {
   };
 
   // -------------------------------------------------------------------------
+  // Qualifier vocabulary baseline (Registry 2.0 — code only, no forms/DB)
+  // -------------------------------------------------------------------------
+  const QUALIFIER_REGISTRY = {
+    quantity: { key: "quantity", label: "Quantity", type: "number", notes: "Count or amount" },
+    unit: { key: "unit", label: "Unit", type: "string", notes: "e.g. piece, stack, kg" },
+    condition: { key: "condition", label: "Condition", type: "object", notes: "Structured spawn/gather conditions" },
+    time_of_day: { key: "time_of_day", label: "Time of day", type: "enum", allowed_values: ["day", "night", "dawn", "dusk", "any"] },
+    weather: { key: "weather", label: "Weather", type: "string" },
+    biome_context: { key: "biome_context", label: "Biome context", type: "string" },
+    station: { key: "station", label: "Station", type: "entity_ref", notes: "Crafting station reference or label" },
+    station_tier: { key: "station_tier", label: "Station tier", type: "string" },
+    tool: { key: "tool", label: "Tool", type: "entity_ref" },
+    method: { key: "method", label: "Method", type: "string", notes: "Gather/craft method label" },
+    node_type: { key: "node_type", label: "Node type", type: "string" },
+    drop_chance: { key: "drop_chance", label: "Drop chance", type: "string", notes: "Rate or guaranteed" },
+    price: { key: "price", label: "Price", type: "number" },
+    currency: { key: "currency", label: "Currency", type: "string" },
+    availability: { key: "availability", label: "Availability", type: "string" },
+    faction_req: { key: "faction_req", label: "Faction requirement", type: "entity_ref" },
+    required_level: { key: "required_level", label: "Required level", type: "number" },
+    unlock_type: { key: "unlock_type", label: "Unlock type", type: "string" },
+    alternative_group: { key: "alternative_group", label: "Alternative group", type: "string", notes: "Recipe ingredient swap group" },
+    game_version: { key: "game_version", label: "Game version", type: "string" },
+    valid_from: { key: "valid_from", label: "Valid from", type: "date" },
+    valid_until: { key: "valid_until", label: "Valid until", type: "date" },
+    superseded_by: { key: "superseded_by", label: "Superseded by", type: "string" },
+    change_note: { key: "change_note", label: "Change note", type: "string" },
+    evidence_tier: { key: "evidence_tier", label: "Evidence tier", type: "enum", allowed_values: ["confirmed", "observed", "reported", "speculative"] },
+    confidence: { key: "confidence", label: "Confidence", type: "enum", allowed_values: ["single_observation", "corroborated", "verified"] },
+    source_post_id: { key: "source_post_id", label: "Source post", type: "string" },
+    report_count: { key: "report_count", label: "Report count", type: "number" },
+    rate: { key: "rate", label: "Rate", type: "string", notes: "Legacy alias for drop_chance" },
+    conditions: { key: "conditions", label: "Conditions", type: "object" },
+    note: { key: "note", label: "Note", type: "string" },
+  };
+
+  const VERSION_QUALIFIER_KEYS = ["game_version", "valid_from", "valid_until", "superseded_by", "change_note"];
+
+  const DEFAULT_REGISTRY_2 = {
+    cardinality: "many_to_many",
+    persistence: "persisted_forward",
+    dedupe_key: ["source_entity_key", "target_entity_key", "relation_type"],
+    search_expansion: { include_target: true, include_label: true, weight: 1 },
+    promotion_weight: 1,
+    version_support: true,
+    status: "active",
+    notes: "",
+  };
+
+  // -------------------------------------------------------------------------
   // Controlled Vocabularies
   // -------------------------------------------------------------------------
   const CONTROLLED_VOCABULARIES = {
@@ -498,6 +548,280 @@ window.BoundLoreRelationsRegistry = (function() {
       legacy: true,
       properties: ["source_post_id"],
     },
+
+    // --- P1 prepared / reserved (registry only — no UI or persistence flows yet) ---
+    gathered_via: {
+      key: "gathered_via",
+      label: "Gathered via",
+      family: RELATION_FAMILIES.DROP_YIELD,
+      direction: "source → target (Resource gathered via method/node/tool)",
+      allowedSourceDomains: [ENTITY_DOMAINS.OBJECT],
+      allowedTargetDomains: [ENTITY_DOMAINS.PLACE, ENTITY_DOMAINS.BEING, ENTITY_DOMAINS.SYSTEM],
+      inverse: null,
+      mergeBehavior: "additive",
+      conflictBehavior: "none",
+      renderHint: "gather_method_link",
+      dbCode: null,
+      priority: "P1",
+      properties: ["method", "tool", "node_type", "conditions", "evidence_tier", "confidence", "source_post_id"],
+      status: "reserved",
+      persistence: "reserved",
+      notes: "P1 reserved — gather method/node expansion; no production flow yet.",
+    },
+    crafted_by_profession: {
+      key: "crafted_by_profession",
+      label: "Crafted by profession",
+      family: RELATION_FAMILIES.CRAFT,
+      direction: "source → target (Item crafted by profession/skill)",
+      allowedSourceDomains: [ENTITY_DOMAINS.OBJECT],
+      allowedTargetDomains: [ENTITY_DOMAINS.SYSTEM],
+      inverse: null,
+      mergeBehavior: "review_required",
+      conflictBehavior: "coexist_as_reported",
+      renderHint: "profession_link",
+      dbCode: null,
+      priority: "P1",
+      properties: ["required_level", "unlock_type", "evidence_tier", "source_post_id"],
+      status: "reserved",
+      persistence: "reserved",
+      notes: "P1 reserved — profession model not implemented.",
+    },
+    sold_by: {
+      key: "sold_by",
+      label: "Sold by",
+      family: RELATION_FAMILIES.DROP_YIELD,
+      direction: "source → target (Object sold by vendor/NPC/system)",
+      allowedSourceDomains: [ENTITY_DOMAINS.OBJECT],
+      allowedTargetDomains: [ENTITY_DOMAINS.BEING, ENTITY_DOMAINS.SYSTEM, ENTITY_DOMAINS.PLACE],
+      inverse: null,
+      mergeBehavior: "additive",
+      conflictBehavior: "none",
+      renderHint: "vendor_link",
+      dbCode: null,
+      priority: "P1",
+      properties: ["price", "currency", "availability", "evidence_tier", "source_post_id"],
+      status: "reserved",
+      persistence: "reserved",
+      notes: "P1 reserved — economy/vendor flows not implemented.",
+    },
+    reward_of: {
+      key: "reward_of",
+      label: "Reward of",
+      family: RELATION_FAMILIES.SOCIAL_LORE,
+      direction: "source → target (Object reward of quest/event)",
+      allowedSourceDomains: [ENTITY_DOMAINS.OBJECT],
+      allowedTargetDomains: [ENTITY_DOMAINS.SYSTEM, ENTITY_DOMAINS.EVENT],
+      inverse: null,
+      mergeBehavior: "review_required",
+      conflictBehavior: "none",
+      renderHint: "reward_link",
+      dbCode: null,
+      priority: "P1",
+      properties: ["evidence_tier", "source_post_id", "note"],
+      status: "reserved",
+      persistence: "reserved",
+    },
+    mountable_by: {
+      key: "mountable_by",
+      label: "Mountable by",
+      family: RELATION_FAMILIES.COMBAT_SYSTEM,
+      direction: "source → target (Mount capability for entity/class)",
+      allowedSourceDomains: [ENTITY_DOMAINS.BEING],
+      allowedTargetDomains: [ENTITY_DOMAINS.SYSTEM, ENTITY_DOMAINS.BEING],
+      inverse: null,
+      mergeBehavior: "additive",
+      conflictBehavior: "none",
+      renderHint: "mount_capability",
+      dbCode: null,
+      priority: "P1",
+      properties: ["required_level", "evidence_tier", "source_post_id"],
+      status: "reserved",
+      persistence: "reserved",
+    },
+    tamed_via: {
+      key: "tamed_via",
+      label: "Tamed via",
+      family: RELATION_FAMILIES.COMBAT_SYSTEM,
+      direction: "source → target (Being tamed via method/item)",
+      allowedSourceDomains: [ENTITY_DOMAINS.BEING],
+      allowedTargetDomains: [ENTITY_DOMAINS.OBJECT, ENTITY_DOMAINS.SYSTEM],
+      inverse: null,
+      mergeBehavior: "review_required",
+      conflictBehavior: "none",
+      renderHint: "taming_method",
+      dbCode: null,
+      priority: "P1",
+      properties: ["method", "tool", "evidence_tier", "source_post_id"],
+      status: "reserved",
+      persistence: "reserved",
+    },
+    occurs_during: {
+      key: "occurs_during",
+      label: "Occurs during",
+      family: RELATION_FAMILIES.SOCIAL_LORE,
+      direction: "source → target (Event occurs during another event/window)",
+      allowedSourceDomains: [ENTITY_DOMAINS.EVENT],
+      allowedTargetDomains: [ENTITY_DOMAINS.EVENT, ENTITY_DOMAINS.SYSTEM],
+      inverse: null,
+      mergeBehavior: "additive",
+      conflictBehavior: "none",
+      renderHint: "event_window",
+      dbCode: null,
+      priority: "P2",
+      properties: ["valid_from", "valid_until", "evidence_tier", "source_post_id"],
+      status: "reserved",
+      persistence: "reserved",
+    },
+    introduced_in: {
+      key: "introduced_in",
+      label: "Introduced in",
+      family: RELATION_FAMILIES.TAXONOMIC,
+      direction: "source → target (Entity introduced in game version)",
+      allowedSourceDomains: Object.values(ENTITY_DOMAINS),
+      allowedTargetDomains: [ENTITY_DOMAINS.SYSTEM, ENTITY_DOMAINS.META],
+      inverse: null,
+      mergeBehavior: "additive",
+      conflictBehavior: "none",
+      renderHint: "version_intro",
+      dbCode: null,
+      priority: "P2",
+      properties: VERSION_QUALIFIER_KEYS.concat(["evidence_tier", "source_post_id"]),
+      status: "reserved",
+      persistence: "reserved",
+    },
+    changed_in: {
+      key: "changed_in",
+      label: "Changed in",
+      family: RELATION_FAMILIES.TAXONOMIC,
+      direction: "source → target (Entity changed in game version)",
+      allowedSourceDomains: Object.values(ENTITY_DOMAINS),
+      allowedTargetDomains: [ENTITY_DOMAINS.SYSTEM, ENTITY_DOMAINS.META],
+      inverse: null,
+      mergeBehavior: "additive",
+      conflictBehavior: "none",
+      renderHint: "version_change",
+      dbCode: null,
+      priority: "P2",
+      properties: VERSION_QUALIFIER_KEYS.concat(["change_note", "evidence_tier", "source_post_id"]),
+      status: "reserved",
+      persistence: "reserved",
+    },
+    removed_in: {
+      key: "removed_in",
+      label: "Removed in",
+      family: RELATION_FAMILIES.TAXONOMIC,
+      direction: "source → target (Entity removed in game version)",
+      allowedSourceDomains: Object.values(ENTITY_DOMAINS),
+      allowedTargetDomains: [ENTITY_DOMAINS.SYSTEM, ENTITY_DOMAINS.META],
+      inverse: null,
+      mergeBehavior: "additive",
+      conflictBehavior: "none",
+      renderHint: "version_removal",
+      dbCode: null,
+      priority: "P2",
+      properties: VERSION_QUALIFIER_KEYS.concat(["change_note", "evidence_tier", "source_post_id"]),
+      status: "reserved",
+      persistence: "reserved",
+    },
+  };
+
+  // Registry 2.0 profile overrides (merged onto canonical definitions at read time)
+  const REGISTRY_2_OVERRIDES = {
+    found_in: {
+      qualifiers_allowed: ["condition", "time_of_day", "weather", "biome_context", "confidence", "evidence_tier", "source_post_id", "report_count"].concat(VERSION_QUALIFIER_KEYS),
+      cardinality: "many_to_many",
+      persistence: "persisted_forward",
+      dedupe_key: ["source_entity_key", "target_entity_key", "relation_type"],
+      search_expansion: { include_target: true, include_label: true, weight: 1 },
+      promotion_weight: 1,
+      version_support: true,
+      status: "active",
+    },
+    located_in: {
+      qualifiers_allowed: ["confidence", "evidence_tier", "source_post_id"].concat(VERSION_QUALIFIER_KEYS),
+      cardinality: "many_to_one",
+      persistence: "persisted_forward",
+      promotion_weight: 1,
+      version_support: true,
+      status: "active",
+    },
+    spawns_at: {
+      qualifiers_allowed: ["condition", "time_of_day", "weather", "biome_context", "confidence", "evidence_tier", "source_post_id", "report_count"],
+      cardinality: "many_to_many",
+      persistence: "persisted_forward",
+      status: "active",
+    },
+    drops: {
+      qualifiers_allowed: ["quantity", "unit", "drop_chance", "rate", "confidence", "evidence_tier", "source_post_id", "report_count"],
+      cardinality: "many_to_many",
+      persistence: "persisted_forward",
+      dedupe_key: ["source_entity_key", "target_entity_key", "relation_type"],
+      status: "active",
+    },
+    harvested_from: {
+      qualifiers_allowed: ["quantity", "unit", "method", "tool", "node_type", "condition", "rate", "confidence", "evidence_tier", "source_post_id"],
+      cardinality: "many_to_many",
+      persistence: "persisted_forward",
+      status: "active",
+    },
+    crafted_from: {
+      qualifiers_allowed: ["quantity", "unit", "alternative_group", "confidence", "evidence_tier", "source_post_id", "report_count"].concat(VERSION_QUALIFIER_KEYS),
+      cardinality: "many_to_many",
+      persistence: "persisted_forward",
+      dedupe_key: ["source_entity_key", "target_entity_key", "relation_type", "alternative_group"],
+      search_expansion: { include_target: true, include_label: true, weight: 1.1 },
+      promotion_weight: 1.2,
+      version_support: true,
+      status: "active",
+      notes: "Forward craft ingredient edge; do not persist ingredient_of separately.",
+    },
+    crafted_at: {
+      qualifiers_allowed: ["station", "station_tier", "confidence", "evidence_tier", "source_post_id"].concat(VERSION_QUALIFIER_KEYS),
+      cardinality: "many_to_one",
+      persistence: "persisted_forward",
+      search_expansion: { include_target: true, include_label: true, weight: 1 },
+      promotion_weight: 1.1,
+      version_support: true,
+      status: "active",
+    },
+    ingredient_of: {
+      qualifiers_allowed: ["quantity", "unit", "alternative_group", "confidence", "evidence_tier", "source_post_id"],
+      cardinality: "many_to_many",
+      persistence: "derived_inverse",
+      dedupe_key: ["source_entity_key", "target_entity_key", "relation_type"],
+      search_expansion: { include_target: true, include_label: true, weight: 0.6 },
+      promotion_weight: 0.5,
+      version_support: true,
+      status: "active",
+      notes: "Derived inverse of crafted_from — never double-persist.",
+    },
+    unlocks: {
+      qualifiers_allowed: ["condition", "unlock_type", "required_level", "evidence_tier", "source_post_id"].concat(VERSION_QUALIFIER_KEYS),
+      persistence: "persisted_forward",
+      status: "active",
+    },
+    weak_to: { persistence: "persisted_forward", status: "active" },
+    resistant_to: { persistence: "persisted_forward", status: "active" },
+    inflicts: { persistence: "persisted_forward", status: "active" },
+    member_of: { persistence: "persisted_forward", status: "active" },
+    hostile_to: { persistence: "persisted_forward", status: "active" },
+    allied_to: { persistence: "persisted_forward", status: "active" },
+    gives_quest: { persistence: "persisted_forward", status: "active" },
+    variant_of: { persistence: "persisted_forward", status: "active" },
+    part_of: { persistence: "persisted_forward", status: "active" },
+    related_to: {
+      persistence: "persisted_forward",
+      promotion_weight: 0.4,
+      status: "active",
+      notes: "Fallback weak link — note required for new systems.",
+    },
+    dropped_by: {
+      persistence: "derived_inverse",
+      promotion_weight: 0.5,
+      status: "active",
+      notes: "Legacy inverse of drops — prefer single-write drops in P1.",
+    },
+    contains: { persistence: "persisted_forward", status: "active", notes: "Legacy biome list edge." },
   };
 
   // -------------------------------------------------------------------------
@@ -524,6 +848,129 @@ window.BoundLoreRelationsRegistry = (function() {
   // -------------------------------------------------------------------------
   // Helpers
   // -------------------------------------------------------------------------
+  function uniqueStrings(list) {
+    const out = [];
+    (list || []).forEach(function(item) {
+      const value = String(item || "").trim();
+      if (!value || out.indexOf(value) >= 0) return;
+      out.push(value);
+    });
+    return out;
+  }
+
+  function isEmptyQualifierValue(value) {
+    if (value === null || value === undefined) return true;
+    if (typeof value === "string" && !value.trim()) return true;
+    if (Array.isArray(value) && !value.length) return true;
+    if (typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === 0) return true;
+    return false;
+  }
+
+  function stripEmptyQualifiers(qualifiers) {
+    const input = qualifiers && typeof qualifiers === "object" ? qualifiers : {};
+    const out = {};
+    Object.keys(input).forEach(function(key) {
+      const value = input[key];
+      if (!isEmptyQualifierValue(value)) out[key] = value;
+    });
+    return out;
+  }
+
+  function mapPropertiesToQualifiers(properties) {
+    return Array.isArray(properties) ? properties.slice() : [];
+  }
+
+  function normalizeRelationDefinition(def) {
+    if (!def || typeof def !== "object") return null;
+    const key = String(def.key || "").trim();
+    const override = key ? (REGISTRY_2_OVERRIDES[key] || {}) : {};
+    const fromProperties = mapPropertiesToQualifiers(def.properties);
+    const mergedQualifiers = uniqueStrings([].concat(override.qualifiers_allowed || []).concat(fromProperties));
+    const merged = Object.assign({}, DEFAULT_REGISTRY_2, def, override, {
+      qualifiers_allowed: mergedQualifiers.length ? mergedQualifiers : fromProperties,
+    });
+
+    if (merged.mergeBehavior === "auto_derived_from_crafted_from" && !override.persistence) {
+      merged.persistence = "derived_inverse";
+    }
+    if (merged.key === "ingredient_of" && !override.persistence) {
+      merged.persistence = "derived_inverse";
+    }
+    if (merged.key === "dropped_by" && !override.persistence) {
+      merged.persistence = "derived_inverse";
+    }
+    if (merged.status === "reserved" && !def.persistence && !override.persistence) {
+      merged.persistence = "reserved";
+    }
+
+    return merged;
+  }
+
+  function normalizeRelationQualifiers(type, qualifiers) {
+    const input = qualifiers && typeof qualifiers === "object" ? Object.assign({}, qualifiers) : {};
+    const stripped = stripEmptyQualifiers(input);
+    const allowed = getAllowedQualifiers(type);
+    const out = {};
+
+    Object.keys(stripped).forEach(function(key) {
+      const value = stripped[key];
+      if (allowed.indexOf(key) >= 0 || QUALIFIER_REGISTRY[key]) {
+        out[key] = value;
+        return;
+      }
+      if (!out._unknown) out._unknown = {};
+      out._unknown[key] = value;
+    });
+
+    if (typeof BoundLoreVersioning !== "undefined" && relationSupportsVersioning(type)) {
+      const versionMeta = BoundLoreVersioning.extractVersionMetadata
+        ? BoundLoreVersioning.extractVersionMetadata(out)
+        : null;
+      if (!versionMeta) {
+        VERSION_QUALIFIER_KEYS.forEach(function(vKey) {
+          if (isEmptyQualifierValue(out[vKey])) delete out[vKey];
+        });
+      }
+    }
+
+    return out;
+  }
+
+  function getAllowedQualifiers(type) {
+    const def = getRelationDefinition(type);
+    return def && Array.isArray(def.qualifiers_allowed) ? def.qualifiers_allowed.slice() : [];
+  }
+
+  function relationSupportsVersioning(type) {
+    const def = getRelationDefinition(type);
+    return !!(def && def.version_support);
+  }
+
+  function getRelationSearchExpansion(type) {
+    const def = getRelationDefinition(type);
+    if (!def || isReservedRelation(type)) return null;
+    return def.search_expansion || null;
+  }
+
+  function getRelationPersistence(type) {
+    const def = getRelationDefinition(type);
+    return def && def.persistence ? def.persistence : "persisted_forward";
+  }
+
+  function isDerivedRelation(type) {
+    const persistence = getRelationPersistence(type);
+    return persistence === "derived_inverse" || persistence === "embedded";
+  }
+
+  function isPersistedRelation(type) {
+    return getRelationPersistence(type) === "persisted_forward";
+  }
+
+  function isReservedRelation(type) {
+    const def = getRelationDefinition(type);
+    return !!(def && (def.status === "reserved" || def.persistence === "reserved"));
+  }
+
   function normalizeKey(raw) {
     const key = String(raw || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
     if (RELATION_DEFINITIONS[key]) return key;
@@ -551,7 +998,19 @@ window.BoundLoreRelationsRegistry = (function() {
 
   function getRelationDefinition(key) {
     const normalized = normalizeKey(key);
-    return RELATION_DEFINITIONS[normalized] || null;
+    const base = RELATION_DEFINITIONS[normalized];
+    if (!base) {
+      return normalizeRelationDefinition({
+        key: normalized,
+        label: normalized.replace(/_/g, " "),
+        family: null,
+        status: "unknown",
+        persistence: "persisted_forward",
+        properties: [],
+        notes: "Unknown relation type — tolerated at read time.",
+      });
+    }
+    return normalizeRelationDefinition(base);
   }
 
   function isKnownRelationType(key) {
@@ -717,11 +1176,23 @@ window.BoundLoreRelationsRegistry = (function() {
     RELATION_FAMILIES: RELATION_FAMILIES,
     RELATION_DEFINITIONS: RELATION_DEFINITIONS,
     RELATION_PROPERTY_SCHEMA: RELATION_PROPERTY_SCHEMA,
+    QUALIFIER_REGISTRY: QUALIFIER_REGISTRY,
+    REGISTRY_2_OVERRIDES: REGISTRY_2_OVERRIDES,
     CONTROLLED_VOCABULARIES: CONTROLLED_VOCABULARIES,
     LEGACY_ALIASES: LEGACY_ALIASES,
     CATEGORY_DOMAIN_MAP: CATEGORY_DOMAIN_MAP,
     T3_RESERVED_SLUG_PREFIXES: T3_RESERVED_SLUG_PREFIXES,
+    normalizeRelationDefinition: normalizeRelationDefinition,
     getRelationDefinition: getRelationDefinition,
+    getAllowedQualifiers: getAllowedQualifiers,
+    normalizeRelationQualifiers: normalizeRelationQualifiers,
+    stripEmptyQualifiers: stripEmptyQualifiers,
+    relationSupportsVersioning: relationSupportsVersioning,
+    getRelationSearchExpansion: getRelationSearchExpansion,
+    getRelationPersistence: getRelationPersistence,
+    isDerivedRelation: isDerivedRelation,
+    isPersistedRelation: isPersistedRelation,
+    isReservedRelation: isReservedRelation,
     isKnownRelationType: isKnownRelationType,
     isLegacyRelationType: isLegacyRelationType,
     getRelationsByFamily: getRelationsByFamily,
