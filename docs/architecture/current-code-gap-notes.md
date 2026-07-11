@@ -618,3 +618,20 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Not built | dispute-resolution UI, auto-ranking, merge/approve changes, SQL | Deferred P1-C+ |
 
 **P1-C foundation block (C.1 + C.2) accepted locally.** Deployment freeze remains active.
+
+---
+
+## 17. P1-C.3 — Evidence Rank Acceptance Sweep
+
+**Status:** Complete (read-only sweep; no code/data changes beyond docs).
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreEvidenceRank` API (normalizers, weights, display gates) | Green |
+| QA Staff / QA Ember regressions | Unchanged — Reported / Single Observation; no `.bl-state-badges` |
+| Search (qa ember shard, resource, mining, red crystal nodes, wood, forge) | Unchanged |
+| Pending `add_recipe` conflict | Not touched |
+| Admin | Session-dependent (login redirect) |
+| SQL / DB / data migration | None |
+
+**P1-C foundation block (C.1 + C.2 + C.3) accepted locally.** Ready for P1-D planning. Deployment freeze remains active.

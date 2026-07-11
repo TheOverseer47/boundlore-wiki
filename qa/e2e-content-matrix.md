@@ -253,7 +253,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Pending conflict | admin read-only | unchanged; not executed | `[x]` |
 | Admin optional | `/wiki/admin/` | session-dependent | `[~]` login redirect |
 
-**P1-C.1 accepted as local baseline.** P1-C.2 display/preview tolerance in progress.
+**P1-C accepted as local foundation (C.1–C.3).** Ready for P1-D.
 
 ---
 
@@ -292,6 +292,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
 
 **P1-C foundation block (C.1 + C.2) accepted locally.** Dispute-resolution UI deferred.
+
+---
+
+## P1-C.3 — Evidence Rank Acceptance Sweep
+
+**Milestone:** P1-C foundation block complete (C.1 + C.2 + C.3); no SQL, no UI workflow, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| EvidenceRank API sweep | console on wiki page | All P1-C.1/C.2 checks green | `[x]` |
+| Display gates | console | empty `{}` → no state badges; real fields → gates true | `[x]` |
+| Weight compare | console | confirmed > reported | `[x]` |
+| QA Staff regression | `qa-staff-of-fire-2b742628` | Reported / Single Observation; no `.bl-state-badges` | `[x]` |
+| QA Ember regression | `qa-ember-shard-511160` | unchanged | `[x]` |
+| Search qa ember/resource/mining/red crystal/wood/forge | `/wiki/search/?q=...` | unchanged | `[x]` |
+| Pending conflict | admin read-only | not touched; not executed | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` login redirect |
+
+**P1-C accepted as local foundation.** Ready for P1-D. Dispute-resolution UI deferred.
 
 ---
 

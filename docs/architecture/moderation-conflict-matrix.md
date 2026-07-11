@@ -43,3 +43,16 @@ Real dispute-resolution workflow and auto-promote remain later P1-C scope.
 | Search | `js/search-signals.js` | Deprecated/superseded/disputed penalized; QA search unchanged |
 
 QA data without state fields shows no new badges. Pending `add_recipe` conflict approve block unchanged.
+
+## P1-C.3 — Evidence Rank Acceptance Sweep (local)
+
+**Status:** P1-C.3 acceptance sweep completed; no SQL, no UI workflow, no data migration.
+
+| Check | Result |
+|-------|--------|
+| EvidenceRank API + display gates | Green |
+| QA regressions + search | Unchanged |
+| Pending recipe conflict | Not touched; approve block unchanged |
+| Dispute-resolution UI / auto-promote | Not built — deferred P1-D+ |
+
+**P1-C foundation block (C.1 + C.2 + C.3) accepted locally.**
