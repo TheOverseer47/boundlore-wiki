@@ -286,8 +286,17 @@ window.KnowledgeRelations = (function() {
 
   function craftRelationQuantity(rel) {
     if (!rel) return null;
-    const raw = rel.quantity != null ? rel.quantity : rel.output_quantity;
+    let raw = rel.quantity != null ? rel.quantity
+      : (rel.qualifiers && rel.qualifiers.quantity != null ? rel.qualifiers.quantity : null);
+    if (raw == null) raw = rel.output_quantity;
     return Number.isFinite(Number(raw)) ? Number(raw) : null;
+  }
+
+  function preserveRecordQualifiers(type, record) {
+    if (typeof BoundLoreRelationsRegistry === "undefined" || !BoundLoreRelationsRegistry.normalizeRelationRecord) {
+      return record;
+    }
+    return BoundLoreRelationsRegistry.normalizeRelationRecord(type, record) || record;
   }
 
   function craftRelationIdentityKey(rel) {
@@ -335,22 +344,30 @@ window.KnowledgeRelations = (function() {
     const out = [];
     const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
     ingredients.forEach(function(row) {
-      const title = meaningfulValue(row && (row.name || row.title || row.target_name));
+      const normalizedRow = preserveRecordQualifiers("crafted_from", row || {});
+      const title = meaningfulValue(normalizedRow && (normalizedRow.name || normalizedRow.title || normalizedRow.target_name));
       if (!title) return;
-      out.push({
+      const rel = {
         group: "items",
         relation_type: "crafted_from",
         title: title,
-        quantity: craftRelationQuantity(row),
-        unit: row && row.unit ? String(row.unit).slice(0, 24) : null,
-        confidence: row && row.confidence ? row.confidence : "single_observation",
-        evidence_tier: recipe.evidence_tier || row.evidence_tier || "reported",
-        target_entity_key: row && row.target_entity_key ? row.target_entity_key : null,
-      });
+        quantity: craftRelationQuantity(normalizedRow),
+        unit: normalizedRow && normalizedRow.unit ? String(normalizedRow.unit).slice(0, 24) : null,
+        confidence: normalizedRow && normalizedRow.confidence ? normalizedRow.confidence : "single_observation",
+        evidence_tier: recipe.evidence_tier || normalizedRow.evidence_tier || "reported",
+        target_entity_key: normalizedRow && normalizedRow.target_entity_key ? normalizedRow.target_entity_key : null,
+      };
+      if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.preserveRelationQualifiers) {
+        const qualifiers = BoundLoreRelationsRegistry.preserveRelationQualifiers("crafted_from", normalizedRow);
+        if (qualifiers && Object.keys(qualifiers).length) rel.qualifiers = qualifiers;
+      }
+      out.push(rel);
     });
-    const station = meaningfulValue(recipe.station || recipe.crafting_station);
+    const recipeStation = preserveRecordQualifiers("crafted_at", recipe);
+    const station = meaningfulValue(recipeStation.station || recipeStation.crafting_station
+      || (recipeStation.qualifiers && recipeStation.qualifiers.station));
     if (station) {
-      out.push({
+      const rel = {
         group: "crafting",
         relation_type: "crafted_at",
         title: station,
@@ -358,7 +375,12 @@ window.KnowledgeRelations = (function() {
         evidence_tier: recipe.evidence_tier || "reported",
         unlock_condition: recipe.unlock_condition || null,
         output_quantity: recipe.output_quantity != null ? recipe.output_quantity : null,
-      });
+      };
+      if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.preserveRelationQualifiers) {
+        const qualifiers = BoundLoreRelationsRegistry.preserveRelationQualifiers("crafted_at", recipeStation);
+        if (qualifiers && Object.keys(qualifiers).length) rel.qualifiers = qualifiers;
+      }
+      out.push(rel);
     }
     return out.map(sanitizeRelationForMeta);
   }
@@ -381,12 +403,27 @@ window.KnowledgeRelations = (function() {
           target_entity_key: row && row.target_entity_key ? String(row.target_entity_key).slice(0, 160) : null,
           evidence_tier: row && row.evidence_tier ? String(row.evidence_tier).slice(0, 16) : null,
         };
-        if (typeof BoundLoreVersioning !== "undefined") {
-          return BoundLoreVersioning.preserveVersionFieldsOnRecord(ingredient, row);
+        let preserved = ingredient;
+        if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.normalizeRelationRecord) {
+          const normalized = BoundLoreRelationsRegistry.normalizeRelationRecord("crafted_from", Object.assign({}, row, ingredient));
+          preserved = Object.assign({}, ingredient, {
+            quantity: craftRelationQuantity(normalized),
+            unit: normalized.unit ? String(normalized.unit).slice(0, 24) : ingredient.unit,
+          });
+          if (normalized.qualifiers && Object.keys(normalized.qualifiers).length) {
+            preserved.qualifiers = normalized.qualifiers;
+          }
         }
-        if (row && row.version) ingredient.version = row.version;
-        return ingredient;
+        if (typeof BoundLoreVersioning !== "undefined") {
+          return BoundLoreVersioning.preserveVersionFieldsOnRecord(preserved, row);
+        }
+        if (row && row.version) preserved.version = row.version;
+        return preserved;
       }).filter(function(row) { return !!row.name; });
+    }
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.preserveRelationQualifiers) {
+      const recipeQualifiers = BoundLoreRelationsRegistry.preserveRelationQualifiers("crafted_at", Object.assign({}, recipe, out));
+      if (recipeQualifiers && Object.keys(recipeQualifiers).length) out.qualifiers = recipeQualifiers;
     }
     if (typeof BoundLoreVersioning !== "undefined") {
       return BoundLoreVersioning.preserveVersionFieldsOnRecord(out, recipe);
@@ -1516,12 +1553,19 @@ window.KnowledgeRelations = (function() {
       evidence_tier: built.evidence_tier ? String(built.evidence_tier).slice(0, 16) : null,
       notes: built.notes ? String(built.notes).slice(0, 400) : null,
     };
-    if (typeof BoundLoreVersioning !== "undefined") {
-      return BoundLoreVersioning.preserveVersionFieldsOnRecord(sanitized, built);
+    let result = sanitized;
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.preserveRelationQualifiers) {
+      const relType = result.relation_type;
+      const qualifiers = BoundLoreRelationsRegistry.preserveRelationQualifiers(relType, Object.assign({}, built, result));
+      if (qualifiers && Object.keys(qualifiers).length) {
+        result = Object.assign({}, result, { qualifiers: qualifiers });
+      }
     }
-    if (built.version) sanitized.version = built.version;
-    if (built.qualifiers) sanitized.qualifiers = built.qualifiers;
-    return sanitized;
+    if (typeof BoundLoreVersioning !== "undefined") {
+      return BoundLoreVersioning.preserveVersionFieldsOnRecord(result, built);
+    }
+    if (built.version) result.version = built.version;
+    return result;
   }
 
   function getFollowUpQuestions(entry) {

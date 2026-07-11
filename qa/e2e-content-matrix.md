@@ -160,6 +160,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-A.2 — Relation Qualifier Preservation & Reader Tolerance
+
+**Milestone:** P1-A.2 (reader tolerance; no SQL, no UI, no migration)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry helpers | console | extractRelationQualifiers merges legacy + nested | `[x]` |
+| crafted_from persisted | console | isPersistedRelation true | `[x]` |
+| ingredient_of derived | console | isDerivedRelation true | `[x]` |
+| QA Staff recipe display | `qa-staff-of-fire-2b742628` | Ember ×3 piece, Wood ×1, Station Forge | `[x]` |
+| QA Ember regression | `qa-ember-shard-511160` | Resource + facets unchanged | `[x]` |
+| Search mining/wood/forge | `/wiki/search/?q=...` | P0.5-E results unchanged | `[x]` |
+| Pending conflict preview | admin (read-only) | QA Ember ×4 vs ×3 conflict unchanged | `[x]` not executed (no merge/approve) |
+| Admin optional | `/wiki/admin/` | Dashboard + queue; Patch Mode OFF | `[x]` session-dependent |
+
+**Not built in P1-A.2:** qualifier UI, version badges, SQL, data migration.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

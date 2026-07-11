@@ -88,6 +88,27 @@ window.BoundLoreRelationsRegistry = (function() {
 
   const VERSION_QUALIFIER_KEYS = ["game_version", "valid_from", "valid_until", "superseded_by", "change_note"];
 
+  const QUALIFIER_LEGACY_TOP_LEVEL_KEYS = [
+    "quantity", "unit", "condition", "conditions", "time_of_day", "weather", "biome_context",
+    "station", "station_tier", "tool", "method", "node_type", "drop_chance", "rate",
+    "price", "currency", "availability", "faction_req", "required_level", "unlock_type",
+    "alternative_group", "game_version", "valid_from", "valid_until", "superseded_by",
+    "change_note", "evidence_tier", "confidence", "source_post_id", "report_count", "note",
+  ];
+
+  const QUALIFIER_SEARCH_SKIP_KEYS = {
+    game_version: true,
+    valid_from: true,
+    valid_until: true,
+    superseded_by: true,
+    change_note: true,
+    _unknown: true,
+    confidence: true,
+    evidence_tier: true,
+    source_post_id: true,
+    report_count: true,
+  };
+
   const DEFAULT_REGISTRY_2 = {
     cardinality: "many_to_many",
     persistence: "persisted_forward",
@@ -906,6 +927,94 @@ window.BoundLoreRelationsRegistry = (function() {
     return merged;
   }
 
+  function isEnumConfidenceValue(value) {
+    if (value == null || value === "") return false;
+    if (typeof value === "number" || Number.isFinite(Number(value))) return false;
+    const v = String(value).trim().toLowerCase();
+    return CONTROLLED_VOCABULARIES.confidence.indexOf(v) >= 0;
+  }
+
+  function extractRelationQualifiers(type, relationOrPayload) {
+    const out = {};
+    if (!relationOrPayload || typeof relationOrPayload !== "object") return out;
+
+    const nested = relationOrPayload.qualifiers && typeof relationOrPayload.qualifiers === "object"
+      ? relationOrPayload.qualifiers
+      : {};
+    Object.keys(nested).forEach(function(key) {
+      const value = nested[key];
+      if (key === "_unknown" && value && typeof value === "object") {
+        out._unknown = Object.assign({}, value);
+        return;
+      }
+      if (!isEmptyQualifierValue(value)) out[key] = value;
+    });
+
+    QUALIFIER_LEGACY_TOP_LEVEL_KEYS.forEach(function(key) {
+      const value = relationOrPayload[key];
+      if (key === "confidence") {
+        if (isEnumConfidenceValue(value)) out.confidence = String(value).trim().toLowerCase();
+        return;
+      }
+      if (!isEmptyQualifierValue(value)) out[key] = value;
+    });
+
+    return stripEmptyQualifiers(out);
+  }
+
+  function mergeRelationQualifiers(type, baseQualifiers, relationOrPayload) {
+    const base = baseQualifiers && typeof baseQualifiers === "object" ? Object.assign({}, baseQualifiers) : {};
+    const extracted = extractRelationQualifiers(type, relationOrPayload);
+    const merged = Object.assign({}, base, extracted);
+    if (base._unknown || extracted._unknown) {
+      merged._unknown = Object.assign({}, base._unknown || {}, extracted._unknown || {});
+    }
+    return normalizeRelationQualifiers(type, merged);
+  }
+
+  function preserveRelationQualifiers(type, relationOrPayload) {
+    return normalizeRelationQualifiers(type, extractRelationQualifiers(type, relationOrPayload));
+  }
+
+  function normalizeRelationRecord(type, relationOrPayload) {
+    if (!relationOrPayload || typeof relationOrPayload !== "object") return null;
+    const relType = normalizeRelationType(type || relationOrPayload.relation_type || "");
+    const out = Object.assign({}, relationOrPayload);
+    const qualifiers = preserveRelationQualifiers(relType, relationOrPayload);
+
+    if (Object.keys(qualifiers).length) {
+      out.qualifiers = qualifiers;
+    } else if (out.qualifiers) {
+      delete out.qualifiers;
+    }
+
+    QUALIFIER_LEGACY_TOP_LEVEL_KEYS.forEach(function(key) {
+      if (key === "confidence" && out.confidence != null && !isEnumConfidenceValue(out.confidence)) {
+        if (qualifiers.confidence != null) out.confidence = qualifiers.confidence;
+        return;
+      }
+      if (qualifiers[key] != null && !isEmptyQualifierValue(qualifiers[key])) {
+        out[key] = qualifiers[key];
+      }
+    });
+
+    return out;
+  }
+
+  function collectQualifierSearchSignals(type, relationOrPayload) {
+    const signals = [];
+    const qualifiers = extractRelationQualifiers(type, relationOrPayload);
+    Object.keys(qualifiers).forEach(function(key) {
+      if (QUALIFIER_SEARCH_SKIP_KEYS[key]) return;
+      const value = qualifiers[key];
+      if (value == null || typeof value === "object") return;
+      const text = String(value).trim();
+      if (!text) return;
+      signals.push(text);
+    });
+    return signals;
+  }
+
   function normalizeRelationQualifiers(type, qualifiers) {
     const input = qualifiers && typeof qualifiers === "object" ? Object.assign({}, qualifiers) : {};
     const stripped = stripEmptyQualifiers(input);
@@ -1177,6 +1286,7 @@ window.BoundLoreRelationsRegistry = (function() {
     RELATION_DEFINITIONS: RELATION_DEFINITIONS,
     RELATION_PROPERTY_SCHEMA: RELATION_PROPERTY_SCHEMA,
     QUALIFIER_REGISTRY: QUALIFIER_REGISTRY,
+    QUALIFIER_LEGACY_TOP_LEVEL_KEYS: QUALIFIER_LEGACY_TOP_LEVEL_KEYS,
     REGISTRY_2_OVERRIDES: REGISTRY_2_OVERRIDES,
     CONTROLLED_VOCABULARIES: CONTROLLED_VOCABULARIES,
     LEGACY_ALIASES: LEGACY_ALIASES,
@@ -1184,6 +1294,11 @@ window.BoundLoreRelationsRegistry = (function() {
     T3_RESERVED_SLUG_PREFIXES: T3_RESERVED_SLUG_PREFIXES,
     normalizeRelationDefinition: normalizeRelationDefinition,
     getRelationDefinition: getRelationDefinition,
+    extractRelationQualifiers: extractRelationQualifiers,
+    mergeRelationQualifiers: mergeRelationQualifiers,
+    preserveRelationQualifiers: preserveRelationQualifiers,
+    normalizeRelationRecord: normalizeRelationRecord,
+    collectQualifierSearchSignals: collectQualifierSearchSignals,
     getAllowedQualifiers: getAllowedQualifiers,
     normalizeRelationQualifiers: normalizeRelationQualifiers,
     stripEmptyQualifiers: stripEmptyQualifiers,

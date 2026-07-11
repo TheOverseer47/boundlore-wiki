@@ -4,6 +4,8 @@
 
 **P1-A.1 (local):** Registry 2.0 qualifier baseline added in `js/relations-registry.js` — `QUALIFIER_REGISTRY`, persistence/cardinality/search_expansion metadata, and reserved P1 relation types. Code-only; no SQL, no UI, no data migration. `ingredient_of` remains derived inverse of `crafted_from`.
 
+**P1-A.2 (local):** Reader/normalizer tolerance for typed `qualifiers` on relations and recipe payloads — legacy top-level fields (`quantity`, `unit`, `station`, evidence fields) remain supported; `qualifiers` objects are preserved through sanitize/merge paths. No UI, no SQL, no migration.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

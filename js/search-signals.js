@@ -241,9 +241,21 @@ window.BoundLoreSearchSignals = (function() {
     ingredients.forEach(function(row) {
       if (!row) return;
       pushSignal(bucket, row.name || row.title || row.target_name, { group: "recipe", label: "Ingredient" });
-      pushSignal(bucket, row.unit, { group: "recipe", label: "Unit" });
-      if (row.quantity != null) pushSignal(bucket, String(row.quantity), { group: "recipe", label: "Quantity" });
+      pushSignal(bucket, row.unit || (row.qualifiers && row.qualifiers.unit), { group: "recipe", label: "Unit" });
+      const qty = row.quantity != null ? row.quantity : (row.qualifiers && row.qualifiers.quantity);
+      if (qty != null) pushSignal(bucket, String(qty), { group: "recipe", label: "Quantity" });
+      if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.collectQualifierSearchSignals) {
+        BoundLoreRelationsRegistry.collectQualifierSearchSignals("crafted_from", row).forEach(function(value) {
+          pushSignal(bucket, value, { group: "recipe", label: "Ingredient detail" });
+        });
+      }
     });
+
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.collectQualifierSearchSignals) {
+      BoundLoreRelationsRegistry.collectQualifierSearchSignals("crafted_at", recipe).forEach(function(value) {
+        pushSignal(bucket, value, { group: "recipe", label: "Craft detail" });
+      });
+    }
 
     return bucket.signals;
   }
@@ -264,6 +276,11 @@ window.BoundLoreSearchSignals = (function() {
       pushSignal(bucket, type.replace(/_/g, " "), { group: "relations", label: type });
       pushSignal(bucket, rel.title, { group: "relations", label: label + " target" });
       pushSignal(bucket, rel.target_name, { group: "relations", label: label + " target" });
+      if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.collectQualifierSearchSignals) {
+        BoundLoreRelationsRegistry.collectQualifierSearchSignals(type, rel).forEach(function(value) {
+          pushSignal(bucket, value, { group: "relations", label: label + " detail" });
+        });
+      }
     });
 
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {

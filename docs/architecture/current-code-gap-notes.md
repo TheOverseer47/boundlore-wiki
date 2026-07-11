@@ -488,3 +488,21 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Not built | sold_by/gathered_via/crafted_by_profession UI, SQL, migration | Deferred P1+ |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 10. P1-A.2 — Relation Qualifier Preservation & Reader Tolerance
+
+**Status:** Complete (reader/normalizer tolerance; no SQL, no UI, no migration).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| Qualifier extraction | `extractRelationQualifiers`, `mergeRelationQualifiers`, `preserveRelationQualifiers`, `normalizeRelationRecord` | Merges `qualifiers` + legacy top-level fields; null-safe |
+| Recipe sanitize | `sanitizeRecipeFactForMeta`, `buildCraftRelationsFromRecipe` | Ingredient `qualifiers` preserved; legacy quantity/unit unchanged for display |
+| Relation sanitize | `sanitizeRelationForMeta` | Qualifiers preserved alongside legacy fields |
+| Recipe display | `wiki-entry-layout.js` | Reads quantity/unit from qualifiers as fallback only; visual output unchanged |
+| Contribution | `buildRecipePayload` | Future-safe `qualifiers` pass-through when present |
+| Search | `collectQualifierSearchSignals` | Optional non-version qualifier signals; reserved relations still skipped |
+| Not built | sold_by/gathered_via UI, SQL, migration | Deferred P1+ |
+
+**Deployment freeze remains active** — no push/deploy.

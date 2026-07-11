@@ -364,11 +364,24 @@ window.ContributionFlow = (function() {
       target_item: targetContext.displayName,
       target_slug: targetContext.targetSlug,
       ingredients: (values.ingredients || []).map(function(row) {
-        return {
+        const base = {
           name: row.name,
           quantity: row.quantity,
           unit: row.unit || "piece",
         };
+        if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.normalizeRelationRecord) {
+          const normalized = BoundLoreRelationsRegistry.normalizeRelationRecord("crafted_from", Object.assign({}, row, base));
+          const out = {
+            name: base.name,
+            quantity: normalized.quantity != null ? normalized.quantity : base.quantity,
+            unit: normalized.unit || base.unit,
+          };
+          if (normalized.qualifiers && Object.keys(normalized.qualifiers).length) {
+            out.qualifiers = normalized.qualifiers;
+          }
+          return out;
+        }
+        return base;
       }),
       station: values.station || "Unknown",
       output_quantity: values.output_quantity != null ? values.output_quantity : 1,

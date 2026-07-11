@@ -976,6 +976,26 @@ window.WikiEntryLayout = (function() {
     return cleanUnit || "";
   }
 
+  function recipeRowQuantity(row) {
+    if (!row) return null;
+    const raw = row.quantity != null ? row.quantity
+      : (row.qualifiers && row.qualifiers.quantity != null ? row.qualifiers.quantity : null);
+    return raw != null && Number.isFinite(Number(raw)) ? Number(raw) : null;
+  }
+
+  function recipeRowUnit(row) {
+    if (!row) return null;
+    if (row.unit) return row.unit;
+    if (row.qualifiers && row.qualifiers.unit) return row.qualifiers.unit;
+    return null;
+  }
+
+  function recipeStationName(recipe) {
+    if (!recipe) return "";
+    return meaningful(recipe.station || recipe.crafting_station
+      || (recipe.qualifiers && recipe.qualifiers.station));
+  }
+
   function renderUnresolvedRecipeTarget(name, relIndex, context) {
     const key = String(name || "").trim().toLowerCase();
     const rel = key ? relIndex[key] : null;
@@ -1018,7 +1038,7 @@ window.WikiEntryLayout = (function() {
 
     if (recipe) {
       const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
-      const station = meaningful(recipe.station || recipe.crafting_station);
+      const station = recipeStationName(recipe);
       const notes = meaningful(recipe.notes);
       const unlock = meaningful(recipe.unlock_condition);
       const hasIngredients = ingredients.some(function(row) {
@@ -1038,8 +1058,8 @@ window.WikiEntryLayout = (function() {
           if (!name) return null;
           return {
             name: name,
-            quantity: row && row.quantity != null ? row.quantity : null,
-            unit: row && row.unit ? row.unit : null,
+            quantity: recipeRowQuantity(row),
+            unit: recipeRowUnit(row),
             nameHtml: renderRecipeIngredientName(name, relIndex, { kind: "ingredient" }),
           };
         }).filter(Boolean),
@@ -1071,8 +1091,8 @@ window.WikiEntryLayout = (function() {
         if (!name) return null;
         return {
           name: name,
-          quantity: rel.quantity != null ? rel.quantity : null,
-          unit: rel.unit || null,
+          quantity: recipeRowQuantity(rel),
+          unit: recipeRowUnit(rel),
           nameHtml: renderRecipeIngredientName(name, relIndex, { kind: "ingredient" }),
         };
       }).filter(Boolean),
