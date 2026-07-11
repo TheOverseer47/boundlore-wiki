@@ -220,6 +220,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-B.2 — Contribution Payload & Admin Preview Tolerance
+
+**Milestone:** P1-B.2 (payload + admin preview tolerance; no SQL, no UI, no migration)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Payload helpers | console | normalizeContributionRecord active/reserved/unknown safe | `[x]` |
+| add_recipe active | console | isActiveIntent; preview_safety.approveAllowed | `[x]` |
+| QA Staff regression | `qa-staff-of-fire-2b742628` | Recipe Ember ×3, Wood ×1, Forge | `[x]` |
+| Search wood/forge/mining | `/wiki/search/?q=...` | unchanged | `[x]` |
+| No new buttons | QA Staff | no reserved intent buttons | `[x]` |
+| Pending conflict | admin read-only | Preview + approve blocked; not clicked | `[x]` not executed |
+| Admin optional | `/wiki/admin/` | session-dependent (login redirect) | `[~]` |
+
+**Not built:** reserved intent UI flows, pending conflict merge/approve, SQL.
+
+---
+
 ## T1 — Resource + Usage Chain
 
 **Milestone:** P0  

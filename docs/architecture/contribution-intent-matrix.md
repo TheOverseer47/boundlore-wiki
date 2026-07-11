@@ -4,6 +4,8 @@ Existing intents (Stats, Effect, Behavior, Spawn, Known Item, Conflict) remain. 
 
 **P1-B.1 (local):** `js/contribution-intent-registry.js` — typed intent metadata (active vs reserved), merge/review/evidence policies. Code-only; no new UI, no SQL, no migration. Production masks remain in `js/contribution-flow.js` (`MASKS`).
 
+**P1-B.2 (local):** Payload/admin preview tolerance — `normalizeContributionRecord`, preview safety helpers; reserved/unknown intents block approve without crashing admin. `add_recipe` conflict preview unchanged.
+
 | Content Area | Intent Label | Target Field / Relation | Merge Behavior | Conflict Risk | Preview? | Evidence? | Duplicate Blocking? |
 |---|---|---|---|---|---|---|---|
 | Creature | Add Stats *(exists)* | Facts: hp/damage | Field merge, conflict flow | high | yes | optional | yes |

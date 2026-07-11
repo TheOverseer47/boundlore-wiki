@@ -2096,15 +2096,15 @@ window.KnowledgeRelations = (function() {
   function getContributionInfo(post, meta) {
     const m = meta || (post ? parseMetaFromHtml(post.content || "") : {});
     const block = m.contribution && typeof m.contribution === "object" ? m.contribution : {};
-    const payload = m.discovery_payload && typeof m.discovery_payload === "object" ? m.discovery_payload : {};
-    return {
+    const payloadRaw = m.discovery_payload && typeof m.discovery_payload === "object" ? m.discovery_payload : {};
+    const info = {
       target_post_id: block.target_post_id || null,
       target_post_slug: block.target_post_slug || m.contribution_target || null,
-      target_title: block.target_title || meaningfulValue(payload.entity_name) || "",
+      target_title: block.target_title || meaningfulValue(payloadRaw.entity_name) || "",
       target_category: block.target_category || (post && post.category) || "",
       entity_key: block.entity_key || null,
       intent: (function() {
-        const raw = block.intent || m.contribution_intent || payload.contribution_intent || "add_info";
+        const raw = block.intent || m.contribution_intent || payloadRaw.contribution_intent || "add_info";
         if (typeof BoundLoreContributionIntentRegistry !== "undefined") {
           return BoundLoreContributionIntentRegistry.normalizeContributionIntent(raw);
         }
@@ -2115,8 +2115,25 @@ window.KnowledgeRelations = (function() {
       status: block.status || "pending_review",
       evidence: Array.isArray(m.discovery_evidence) ? m.discovery_evidence : [],
       relations: resolveContributionRelations(m),
-      payload: payload,
+      payload: payloadRaw,
     };
+    if (typeof BoundLoreContributionIntentRegistry !== "undefined") {
+      const normalized = BoundLoreContributionIntentRegistry.normalizeContributionRecord({
+        meta: m,
+        contribution: block,
+        discovery_payload: payloadRaw,
+        submitted_fields: info.submitted_fields,
+        evidence: info.evidence,
+        intent: info.intent,
+      });
+      if (normalized.payload && typeof normalized.payload === "object") {
+        info.payload = normalized.payload;
+      }
+      info.intent_label = normalized.intent_label;
+      info.intent_status = normalized.intent_status;
+      info.preview_safety = normalized.preview_safety;
+    }
+    return info;
   }
 
   async function resolveContributionTargetPost(client, post, meta) {

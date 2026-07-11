@@ -485,6 +485,106 @@ window.BoundLoreContributionIntentRegistry = (function() {
     return { keys: keys, fingerprint: parts.join("|") };
   }
 
+  function extractContributionSources(contribution) {
+    const root = contribution && typeof contribution === "object" ? contribution : {};
+    const meta = root.meta && typeof root.meta === "object" ? root.meta : root;
+    const block = root.contribution && typeof root.contribution === "object" ? root.contribution
+      : (meta.contribution && typeof meta.contribution === "object" ? meta.contribution : {});
+    const payloadCandidate = root.discovery_payload || meta.discovery_payload || root.payload || root.data || {};
+    const payload = payloadCandidate && typeof payloadCandidate === "object" ? payloadCandidate : {};
+    const submitted = block.submitted_fields && typeof block.submitted_fields === "object"
+      ? block.submitted_fields
+      : (root.submitted_fields && typeof root.submitted_fields === "object" ? root.submitted_fields : {});
+    const evidence = Array.isArray(root.evidence) ? root.evidence
+      : (Array.isArray(meta.discovery_evidence) ? meta.discovery_evidence : []);
+    return { root: root, meta: meta, block: block, payload: payload, submitted: submitted, evidence: evidence };
+  }
+
+  function getContributionIntentCode(contribution) {
+    const src = extractContributionSources(contribution);
+    const raw = src.block.intent
+      || src.root.intent
+      || src.meta.contribution_intent
+      || src.payload.contribution_intent
+      || src.payload.intent
+      || src.root.contribution_type
+      || src.root.type
+      || "add_info";
+    return normalizeContributionIntent(raw);
+  }
+
+  function getContributionPayload(contribution) {
+    const code = getContributionIntentCode(contribution);
+    const src = extractContributionSources(contribution);
+    const merged = Object.assign({}, src.payload, src.submitted);
+    if (src.payload.recipe && typeof src.payload.recipe === "object") {
+      merged.recipe = src.payload.recipe;
+    }
+    return normalizeContributionPayload(code, merged);
+  }
+
+  function isContributionReserved(contribution) {
+    return isReservedIntent(getContributionIntentCode(contribution));
+  }
+
+  function isContributionUnknown(contribution) {
+    const def = getIntentDefinition(getContributionIntentCode(contribution));
+    return !!(def && def.status === "unknown");
+  }
+
+  function isContributionActionable(contribution) {
+    const def = getIntentDefinition(getContributionIntentCode(contribution));
+    return !!(def && def.status === "active");
+  }
+
+  function getContributionPreviewSafety(contribution) {
+    const code = getContributionIntentCode(contribution);
+    const def = getIntentDefinition(code);
+    const status = def && def.status ? def.status : "unknown";
+    const actionable = status === "active";
+    const approveAllowed = actionable && def.merge_behavior !== "none";
+    let message = "";
+    if (status === "reserved") {
+      message = "Reserved intent — not enabled in production flows.";
+    } else if (status === "unknown") {
+      message = "Unknown intent — preview only; automated merge is not enabled.";
+    }
+    return {
+      intent: code,
+      intent_label: def && def.label ? def.label : code.replace(/_/g, " "),
+      status: status,
+      actionable: actionable,
+      approveAllowed: approveAllowed,
+      previewAllowed: def.admin_preview !== false,
+      merge_behavior: def.merge_behavior || "none",
+      review_mode: def.review_mode || "standard",
+      message: message,
+    };
+  }
+
+  function normalizeContributionRecord(contribution) {
+    const src = extractContributionSources(contribution);
+    const code = getContributionIntentCode(contribution);
+    const def = getIntentDefinition(code);
+    const payload = getContributionPayload(contribution);
+    const previewSafety = getContributionPreviewSafety(contribution);
+    return {
+      intent: code,
+      intent_label: def && def.label ? def.label : code,
+      intent_status: def && def.status ? def.status : "unknown",
+      target_post_id: src.block.target_post_id || src.root.target_post_id || null,
+      target_post_slug: src.block.target_post_slug || src.meta.contribution_target || src.root.target_post_slug || null,
+      target_title: src.block.target_title || payload.entity_name || "",
+      target_category: src.block.target_category || src.root.target_category || "",
+      missing_field: src.block.missing_field || src.meta.contribution_field || null,
+      submitted_fields: stripEmptyStrings(Object.assign({}, src.submitted)),
+      status: src.block.status || src.root.status || "pending_review",
+      evidence: src.evidence.slice(),
+      payload: payload,
+      preview_safety: previewSafety,
+    };
+  }
+
   return {
     INTENT_DEFINITIONS: INTENT_DEFINITIONS,
     DEFAULT_INTENT: DEFAULT_INTENT,
@@ -505,5 +605,13 @@ window.BoundLoreContributionIntentRegistry = (function() {
     normalizeContributionPayload: normalizeContributionPayload,
     getIntentDuplicateKey: getIntentDuplicateKey,
     normalizeIntentCode: normalizeIntentCode,
+    extractContributionSources: extractContributionSources,
+    getContributionIntentCode: getContributionIntentCode,
+    getContributionPayload: getContributionPayload,
+    isContributionActionable: isContributionActionable,
+    isContributionReserved: isContributionReserved,
+    isContributionUnknown: isContributionUnknown,
+    getContributionPreviewSafety: getContributionPreviewSafety,
+    normalizeContributionRecord: normalizeContributionRecord,
   };
 })();

@@ -543,3 +543,20 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Not built | new contribution buttons, merge/approve changes, SQL | Deferred P1-B+ |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 13. P1-B.2 — Contribution Payload & Admin Preview Tolerance
+
+**Status:** Complete (payload normalizers + admin preview hardening; no SQL, no UI, no migration).
+
+| Item | Implementation | Result |
+|------|----------------|--------|
+| Payload helpers | `normalizeContributionRecord`, `getContributionPreviewSafety`, … | Legacy + future-safe fields preserved |
+| getContributionInfo | Enriched with `intent_label`, `preview_safety`, normalized payload | Null-safe |
+| Admin preview | Reserved/unknown intents show safe banner; approve disabled | add_recipe conflict logic unchanged |
+| approveContributionA | Early guard for non-actionable intents | No merge for reserved/unknown |
+| Cache bust | `contribution-intent-registry.js?v=2` | post/admin/create/edit |
+| Not built | new contribution buttons, merge/approve on pending conflict | Deferred |
+
+**Deployment freeze remains active** — no push/deploy.
