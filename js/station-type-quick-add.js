@@ -206,3 +206,5 @@ window.StationTypeQuickAdd = (function() {
     getSchema: getSchema,
   };
 })();
+
+window.BoundLoreStationTypeQuickAdd = window.StationTypeQuickAdd;
