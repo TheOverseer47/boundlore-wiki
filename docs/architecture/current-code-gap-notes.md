@@ -1108,3 +1108,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **Deployment freeze remains active** — no push/deploy.
 
 ---
+
+## 40. P2-G.2 — Creature Encounter, Spawn & Drop Context Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; registry/read/search/facet baseline only; no SQL, no encounter posts, no data migration).
+
+| Acceptance | Result |
+|------------|--------|
+| CreatureEncounterRegistry API (QA Ogre/Staff) | Green — all normalize/extract/search-signals/guards; empty/unknown safe |
+| Observation/ContentModel/Facet integration | BEING:creature + npc fields; behavior/spawn/drop facets explicit-only |
+| Search parser hints | creature spawn/drop/weakness/fire weakness/poison resistance — hint-only |
+| Search regressions | QA Ogre/Staff/mining/wood/forge/red crystal/coordinates/vendor/version unchanged |
+| Drop relations | `dropped_by` derived_inverse; `found_in`/`crafted_from` unchanged |
+| Contribution intents | `report_drop`/`add_behavior`/`add_spawn` active; `report_weakness_resistance` reserved |
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged; no behavior/spawn/weakness badges/sections |
+| Wood/Forge | Missing-entry only; no posts |
+| Admin | Session-dependent — automation not verified |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-G.2 acceptance sweep completed; Creature encounters, spawn contexts, drop contexts, behavior, and combat affinity accepted as registry/read/search/facet baseline only. No encounter posts, no loot UI, no SQL, no data migration.** P2-G foundation block (G.1 + G.2) accepted locally. Deployment freeze remains active.
+
+---

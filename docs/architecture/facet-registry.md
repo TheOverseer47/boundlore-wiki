@@ -14,6 +14,8 @@
 
 **P2-G.1:** `behavior`, `encounter_type`, `spawn_context`, `drop_context` facet groups added (explicit-only, `filter_relevant: false`). Drop chance/rate are qualifiers/fields, not facets.
 
+**P2-G.2 acceptance sweep:** P2-G foundation block accepted locally. No encounter posts, no loot UI, no SQL, no data migration.
+
 Controlled multi-valued classification layer for BoundLore. Facets complement — never replace — `entity_domain` and `entity_subtype`.
 
 **Related:** [CONTENT_ARCHITECTURE.md](./CONTENT_ARCHITECTURE.md) · [entity-promotion-policy.md](./entity-promotion-policy.md) · [search-architecture.md](./search-architecture.md)

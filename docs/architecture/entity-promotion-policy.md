@@ -102,6 +102,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P2-G.1:** `js/creature-encounter-registry.js` — encounter/spawn/behavior/drop contexts are structured fields, not posts. `shouldPromoteEncounterToPost`, `shouldPromoteSpawnToPost`, and `shouldPromoteDropToPost` remain false. No element taxonomy inference from item names. Loot-table/encounter UI deferred.
 
+**P2-G.2 acceptance sweep:** Creature encounters, spawn contexts, drop contexts, behavior, and combat affinity accepted as registry/read/search/facet baseline only. No encounter posts, no loot UI, no SQL, no data migration.
+
 ---
 
 ## Missing Entry Queue

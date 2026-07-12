@@ -684,6 +684,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-G.2 — Creature Encounter, Spawn & Drop Context Acceptance Sweep
+
+**Milestone:** P2-G foundation block (G.1 + G.2); registry/read/search/facet baseline only; no SQL, no encounter posts, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| CreatureEncounterRegistry API sweep | QA Ogre console | all normalize/extract/signals/guards green | `[x]` |
+| No encounter/spawn/drop posts | registry helpers | shouldPromote* false | `[x]` |
+| dropped_by / intents | relations/contribution | derived_inverse; report_drop/add_behavior/add_spawn active; report_wr reserved | `[x]` |
+| Observation/ContentModel/Facet | BEING:creature/npc; behavior/spawn/drop facets | explicit-only; create_ui false | `[x]` |
+| Search parser hints | creature spawn/drop/weakness/resistance | hint-only; no crash | `[x]` |
+| Search regressions | qa ogre/qa staff/mining/wood/forge/coordinates | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no behavior/spawn/weakness sections | `[x]` |
+| Wood/Forge | search/admin | missing-entry only; no posts | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-G.2 acceptance sweep completed; Creature encounters, spawn contexts, drop contexts, behavior, and combat affinity accepted as registry/read/search/facet baseline only. No encounter posts, no loot UI, no SQL, no data migration.** P2-G accepted as local foundation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

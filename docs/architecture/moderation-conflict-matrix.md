@@ -85,3 +85,19 @@ No automatic outdated marking. No game-version posts. QA baseline entries unchan
 | QA baseline | QA Ogre / QA Staff drop display unchanged; no new encounter/spawn/weakness sections |
 
 No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-table editor deferred.
+
+## P2-G.2 — Creature Encounter, Spawn & Drop Context Acceptance Sweep (local)
+
+**Status:** P2-G.2 acceptance sweep completed; no SQL, no loot UI, no encounter posts, no data migration.
+
+| Check | Result |
+|-------|--------|
+| CreatureEncounterRegistry API (QA Ogre/Staff) | Green — 99/99 normalize/extract/signals/guards |
+| Search parser hints | creature spawn/drop/weakness/resistance — hint-only, no crash |
+| Search regressions | QA Ogre/Staff/mining/wood/forge/coordinates unchanged |
+| Drop relations | `dropped_by` derived inverse; `report_drop`/`add_behavior`/`add_spawn` unchanged |
+| Reserved | `report_weakness_resistance` reserved |
+| QA Staff / QA Ogre / Ember / Swamp | Unchanged; no behavior/spawn/weakness sections |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-G foundation block (G.1 + G.2) accepted locally.**

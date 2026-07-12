@@ -50,6 +50,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-G.1 creature encounter baseline:** `js/creature-encounter-registry.js` — low-weight `creature_encounter`, `spawn_context`, `drop_context`, `combat_affinity` signals. Parser hints for spawn/drop/encounter/behavior/weakness/resistance (hint-only). No fire taxonomy from item names. Existing QA Ogre/Staff/mining/wood/forge queries unchanged.
 
+**P2-G.2 acceptance sweep:** P2-G foundation block accepted locally. No encounter posts, no loot UI, no SQL, no data migration.
+
 ---
 
 ## Goals
