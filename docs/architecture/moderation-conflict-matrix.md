@@ -119,3 +119,19 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 | Not built | Requirement/unlock create UI, skilltree, leveling, achievement tracker, SQL |
 
 **Deployment freeze remains active** — no push/deploy.
+
+## P2-H.2 — Requirement, Unlock & Progression Context Acceptance Sweep (local)
+
+**Status:** P2-H.2 acceptance sweep completed; no SQL, no requirement/unlock posts, no data migration.
+
+| Check | Result |
+|-------|--------|
+| RequirementUnlockRegistry API (QA Staff) | Green — 120/120 normalize/extract/signals/guards |
+| Search parser hints | required level/profession/faction/prerequisite/unlock/vendor access — hint-only, 30/30 no crash |
+| Search regressions | QA Ogre/Staff/mining/wood/forge/drop unchanged |
+| Reserved | `crafted_by_profession`, `gathered_via`, `add_capability_role`, `add_version_change` unchanged |
+| Promotion guards | `shouldPromoteRequirementToPost` / `shouldPromoteUnlockToPost` false |
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged; no requirement/unlock sections |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-H foundation block (H.1 + H.2) accepted locally.**

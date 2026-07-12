@@ -1149,3 +1149,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **Deployment freeze remains active** — no push/deploy.
 
 ---
+
+## 42. P2-H.2 — Requirement, Unlock & Progression Context Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; registry/read/search/facet baseline only; no SQL, no requirement/unlock posts, no data migration).
+
+| Acceptance | Result |
+|------------|--------|
+| RequirementUnlockRegistry API (QA Staff) | Green — 120/120 normalize/extract/signals/guards/labels |
+| Integration | Profession/Quest/Economy/Observation/Creature/ContentModel/Facet registries present; no UI activation |
+| Search parser hints | required level/profession/faction/prerequisite/unlock/vendor access/station tier/weather — hint-only, 30/30 no crash |
+| Search regressions | QA Ogre/Staff/mining/wood/forge/drop unchanged; requirement queries safe (0 results OK) |
+| Reserved relations/intents | `crafted_by_profession`, `gathered_via`, `add_capability_role`, `add_version_change` unchanged |
+| Promotion guards | `shouldPromoteRequirementToPost` / `shouldPromoteUnlockToPost` false; `RENDER_SECTIONS_ENABLED` false |
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged; no requirement/unlock/progression sections |
+| Wood/Forge | Missing-entry only; no posts |
+| Admin | Session-dependent — automation not verified |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-H.2 acceptance sweep completed; Requirements, unlocks, progression contexts, and access states accepted as registry/read/search/facet baseline only. No unlock UI, no progression posts, no SQL, no data migration.** P2-H foundation block (H.1 + H.2) accepted locally. Deployment freeze remains active.
+
+---

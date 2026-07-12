@@ -18,6 +18,8 @@
 
 **P2-H.1 requirement/unlock baseline:** Requirements, unlocks, and progression contexts are structured fields/qualifiers — not posts by default. `required_level`, `faction_req`, `unlock_type`, `access_state`, `requirement_type` facet groups added (explicit-only, `filter_relevant: false`). Weather/time/biome requirements compatible with P2-F observation context. No skilltree/progression/unlock UI.
 
+**P2-H.2 acceptance sweep:** P2-H foundation block accepted locally. No requirement/unlock posts, no progression UI, no SQL, no data migration.
+
 Controlled multi-valued classification layer for BoundLore. Facets complement — never replace — `entity_domain` and `entity_subtype`.
 
 **Related:** [CONTENT_ARCHITECTURE.md](./CONTENT_ARCHITECTURE.md) · [entity-promotion-policy.md](./entity-promotion-policy.md) · [search-architecture.md](./search-architecture.md)

@@ -729,6 +729,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-H.2 — Requirement, Unlock & Progression Context Acceptance Sweep
+
+**Milestone:** P2-H foundation block (H.1 + H.2); registry/read/search/facet baseline only; no SQL, no requirement/unlock posts, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API sweep | console on QA Staff | 120/120 normalize/extract/signals/guards/labels green | `[x]` |
+| Integration registries | console | PC/QE/EC/OC/CE/C/F present; no UI activation | `[x]` |
+| Reserved relations/intents | console | crafted_by_profession/gathered_via/add_capability_role/add_version_change | `[x]` |
+| Relation persistence | console | crafted_from/crafted_at persisted; dropped_by derived_inverse | `[x]` |
+| Search parser sweep | 30 queries incl. requirement/unlock/regression | hint-only, no crash | `[x]` |
+| Search regressions | qa ogre/qa staff/mining/wood/forge/drop/coordinates | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no requirement/unlock sections | `[x]` |
+| Wood/Forge | search/admin | missing-entry only; no posts | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-H.2 acceptance sweep completed; Requirements, unlocks, progression contexts, and access states accepted as registry/read/search/facet baseline only. No unlock UI, no progression posts, no SQL, no data migration.** P2-H accepted as local foundation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

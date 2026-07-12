@@ -106,6 +106,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P2-H.1:** `js/requirement-unlock-registry.js` — requirements/unlocks/progression are structured fields/qualifiers, not posts. `shouldPromoteRequirementToPost` and `shouldPromoteUnlockToPost` remain false. Faction remains string/ref (no new top-level domain). Level/profession-level are values, not entities. Skilltree/progression/unlock UI deferred.
 
+**P2-H.2 acceptance sweep:** Requirements, unlocks, progression contexts, and access states accepted as registry/read/search/facet baseline only. No unlock UI, no progression posts, no SQL, no data migration.
+
 ---
 
 ## Missing Entry Queue
