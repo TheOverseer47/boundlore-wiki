@@ -190,13 +190,35 @@ async function renderNotificationDropdown(userId, isAdmin, adminTaskCount) {
     const style = item.is_read ? 'opacity:0.75;' : '';
     const title = navEscape(item.title || 'Notification');
     const msg = navEscape(item.message || '');
-    const href = item.target_url || '#';
-    return '<a href="' + href + '" style="display:block;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.06);text-decoration:none;color:inherit;' + style + '">' +
+    const href = sanitizeNotificationHref(item.target_url);
+    const relAttr = isExternalNotificationHref(href) ? ' rel="noopener noreferrer"' : '';
+    return '<a href="' + navEscapeAttr(href) + '"' + relAttr + ' style="display:block;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.06);text-decoration:none;color:inherit;' + style + '">' +
       '<p style="margin:0 0 4px;font-size:0.86rem;font-weight:600;">' + title + '</p>' +
       '<p style="margin:0 0 4px;font-size:0.8rem;color:var(--text-muted);">' + msg + '</p>' +
       '<p style="margin:0;font-size:0.72rem;color:var(--text-muted);">' + navEscape(time) + '</p>' +
       '</a>';
   }).join('');
+}
+
+function sanitizeNotificationHref(value) {
+  const safety = window.BoundLoreNotificationUrlSafety;
+  if (safety && typeof safety.sanitizeNotificationTargetUrl === 'function') {
+    return safety.sanitizeNotificationTargetUrl(value, { fallback: '#' });
+  }
+  if (!value) return '#';
+  return String(value);
+}
+
+function isExternalNotificationHref(href) {
+  return /^\s*https?:\/\//i.test(href || '');
+}
+
+function navEscapeAttr(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 function navEscape(value) {
@@ -206,6 +228,7 @@ function navEscape(value) {
 }
 
 async function ensureNotificationsScript() {
+  await ensureNotificationUrlSafetyScript();
   if (window.BLNotify) return;
   if (document.getElementById('bl-notifications-script')) return;
 
@@ -213,6 +236,20 @@ async function ensureNotificationsScript() {
     const script = document.createElement('script');
     script.id = 'bl-notifications-script';
     script.src = '/js/notifications.js';
+    script.onload = function() { resolve(); };
+    script.onerror = function() { resolve(); };
+    document.head.appendChild(script);
+  });
+}
+
+async function ensureNotificationUrlSafetyScript() {
+  if (window.BoundLoreNotificationUrlSafety) return;
+  if (document.getElementById('bl-notification-url-safety-script')) return;
+
+  await new Promise(function(resolve) {
+    const script = document.createElement('script');
+    script.id = 'bl-notification-url-safety-script';
+    script.src = '/js/notification-url-safety.js';
     script.onload = function() { resolve(); };
     script.onerror = function() { resolve(); };
     document.head.appendChild(script);

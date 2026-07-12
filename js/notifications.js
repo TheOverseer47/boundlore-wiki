@@ -78,7 +78,7 @@
     const { data, error } = await query;
 
     if (error || !data) return [];
-    return data;
+    return data.map(sanitizeNotificationRow);
   }
 
   async function markAllRead(userId) {
@@ -102,16 +102,52 @@
     return { ok: true };
   }
 
+  function getUrlSafety() {
+    return window.BoundLoreNotificationUrlSafety || null;
+  }
+
+  function sanitizeTargetUrl(value) {
+    const safety = getUrlSafety();
+    if (!safety || typeof safety.sanitizeNotificationTargetUrl !== "function") {
+      return value || null;
+    }
+    const sanitized = safety.sanitizeNotificationTargetUrl(value, { fallback: "" });
+    return sanitized || null;
+  }
+
+  function sanitizeNotificationRow(row) {
+    if (!row || typeof row !== "object") return row;
+    const copy = Object.assign({}, row);
+    if (copy.target_url != null) {
+      copy.target_url = sanitizeTargetUrl(copy.target_url) || null;
+    }
+    return copy;
+  }
+
   async function createNotification(payload) {
     if (!payload || !payload.user_id || !payload.title) return { ok: false, skipped: true };
     if (!(await detectNotificationsTable())) return { ok: false, skipped: true };
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const sessionUserId = sessionData && sessionData.session ? sessionData.session.user.id : null;
+    if (!sessionUserId || payload.user_id !== sessionUserId) {
+      return { ok: false, blocked: true, reason: "cross_user_insert_blocked" };
+    }
+
+    const safeTargetUrl = sanitizeTargetUrl(payload.target_url);
+    const safety = getUrlSafety();
+    if (payload.target_url && safety && typeof safety.isSafeNotificationTargetUrl === "function") {
+      if (!safety.isSafeNotificationTargetUrl(payload.target_url)) {
+        return { ok: false, blocked: true, reason: "unsafe_target_url" };
+      }
+    }
 
     const record = {
       user_id: payload.user_id,
       type: payload.type || "system",
       title: payload.title,
       message: payload.message || null,
-      target_url: payload.target_url || null,
+      target_url: safeTargetUrl,
       is_read: false,
     };
 

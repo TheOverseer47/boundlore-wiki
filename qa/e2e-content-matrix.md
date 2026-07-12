@@ -1825,7 +1825,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
 
-**Next candidate:** **P5-B.1 Notification Injection Fix Baseline**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P5-B.2 Notification Injection Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P5-B.1 — Notification Injection Fix Baseline
+
+**Milestone:** P5-B.1 code + SQL baseline for S+-02; ready for P5-B.2 acceptance — not final accepted.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| SQL insert policy | `admin_dashboard_notifications.sql` | `WITH CHECK (user_id = auth.uid())` | `[x]` file only |
+| SQL not executed | — | no live RLS change | `[x]` |
+| URL safety helper | `js/notification-url-safety.js` | version `p5-b1`; blocks unsafe schemes | `[x]` |
+| Insert guard | `js/notifications.js` | cross-user + unsafe URL blocked client-side | `[x]` |
+| Render guard | `js/auth-nav.js` | sanitize before href | `[x]` |
+| Script order | `wiki/post/`, `wiki/admin/` | safety helper before notifications | `[x]` |
+| QA fixture | `/qa/p5-notification-security-fixtures.html` | 22+ cases PASS; `allPass === true` | `[x]` |
+| Live RLS negative test | Supabase | foreign user_id INSERT denied | `[ ]` P5-B.2 |
+| S+-02 accepted | docs | not until P5-B.2 | `[ ]` |
+| Supabase writes / deploy / push | — | none | `[x]` |
+| Product Activation FAIL | docs | documented | `[x]` |
+| Public Launch NO-GO | docs | documented | `[x]` |
+| Pending conflict | — | not touched | `[x]` |
+
+**P5-B.1 baseline implemented locally.** Insert policy and `target_url` safety prepared in repo; client URL helper and notification guards added. SQL not executed; live RLS unchanged. No Supabase writes, no deploy, no push. S+-02 remains open until P5-B.2 acceptance sweep. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
+
+**Next candidate:** **P5-B.2 Notification Injection Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
 
 ---
 

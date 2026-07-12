@@ -36,7 +36,7 @@
 
 | ID | Titel | Business Priority | Technical Severity | Status | Betroffene Bereiche | Launch Blocker | Zielzustand |
 |----|-------|-------------------|--------------------|--------|---------------------|----------------|-------------|
-| **S+-02** | Cross-User-Notification-Injection | S+ | HIGH | VERIFIED FAIL (code) | `supabase/admin_dashboard_notifications.sql`, `js/notifications.js`, `js/auth-nav.js` | **Ja** | INSERT nur eigene `user_id`; `target_url` scheme-safe |
+| **S+-02** | Cross-User-Notification-Injection | S+ | HIGH | **BASELINE IMPLEMENTED (P5-B.1)** — acceptance pending P5-B.2 | `supabase/admin_dashboard_notifications.sql`, `js/notifications.js`, `js/auth-nav.js`, `js/notification-url-safety.js` | **Ja** | INSERT nur eigene `user_id`; `target_url` scheme-safe |
 | **S+-04** | RPC Gate Bypass (`bl_register_observation`) | S+ | MEDIUM–HIGH | VERIFIED FAIL (code) | `supabase/phase_a_observations_foundation.sql`, `js/discovery-core.js` | **Ja** | Tutorial-Ack + Release-Lock in RPC; kein Definer-Write ohne Gate |
 | **S+-03** | Stored-XSS / fehlende HTML-Sanitization | S+ | HIGH | VERIFIED FAIL (code) | `js/post-detail.js`, `js/create-post.js`, `js/edit-post.js`, `wiki/admin/index.html`, URL sinks (`avatar-utils.js`, `auth-nav.js`) | **Ja** | Zentrale Sanitization-Policy; URL-Scheme-Whitelist; XSS-Korpus PASS |
 | **S+-01** | Kein serverseitiger fail-closed Pre-Release-Content-Lock | S+ | HIGH | VERIFIED FAIL (code + behavior) | `js/patch-mode.js`, `supabase/wiki_patch_mode.sql`, alle Write-Oberflächen, posts INSERT, Storage, RPC Writes | **Ja** | `release_gate` Default LOCKED; RLS/RPC/Storage-Enforcement; Admin Unlock/Re-Lock + Audit |
@@ -96,14 +96,17 @@ P5-A.1 (this plan)
 
 | Gate | Titel | Type | Scope |
 |------|-------|------|-------|
-| **P5-B.1** | Notification Injection Fix Baseline | Code + SQL | RLS policy fix; client insert guard; `target_url` validation in `notifications.js` + `auth-nav.js` |
-| **P5-B.2** | Notification Injection Acceptance Sweep | Test | RLS negative test; UI regression; scheme corpus |
+| **P5-B.1** | Notification Injection Fix Baseline | Code + SQL | **Baseline implemented** — RLS policy file prepared; client insert guard; `target_url` validation in `notifications.js` + `auth-nav.js` + `notification-url-safety.js` |
+| **P5-B.2** | Notification Injection Acceptance Sweep | Test | RLS negative test; UI regression; scheme corpus — **next** |
 
-**Betroffene Dateien (planned):**
+**Betroffene Dateien (P5-B.1):**
 
-- `supabase/admin_dashboard_notifications.sql` (new migration file preferred over in-place edit)
-- `js/notifications.js`
-- `js/auth-nav.js`
+- `supabase/admin_dashboard_notifications.sql` — insert policy `user_id = auth.uid()`; `bl_is_safe_notification_target_url` sketch (file only, not executed)
+- `js/notification-url-safety.js` — central `target_url` scheme policy
+- `js/notifications.js` — client insert guard; sanitize on create/read
+- `js/auth-nav.js` — sanitize before `<a href>` render
+- `wiki/post/index.html`, `wiki/admin/index.html` — script load order
+- `qa/p5-notification-security-fixtures.html` + `.js` — URL safety corpus (22+ cases)
 
 ### P5-C — Observation RPC Gate
 
@@ -389,7 +392,8 @@ For **future implementation gates** (P5-B through P5-E):
 |------|------|------|-------|
 | **Complete** | P5-A.1 | Docs-only | This plan |
 | **Complete** | P5-A.2 | Docs-only acceptance sweep | Plan accepted; see §11 below |
-| **Next** | P5-B.1 | Code + SQL baseline | Notification injection fix — smallest isolated fix |
+| **Complete** | P5-B.1 | Code + SQL baseline | S+-02 baseline implemented; see §12 — **not accepted until P5-B.2** |
+| **Next** | P5-B.2 | Test acceptance sweep | RLS negative test; UI regression; scheme corpus |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -421,7 +425,7 @@ For **future implementation gates** (P5-B through P5-E):
 | No implementation / no security fix claimed done | `[x]` |
 | Pending `add_recipe` conflict untouched | `[x]` |
 
-**Next candidate:** **P5-B.1 Notification Injection Fix Baseline**. No push/deploy/launch.
+**Next candidate:** **P5-B.2 Notification Injection Acceptance Sweep**. No push/deploy/launch.
 
 **STOPP — BoundLore remains NOT live-ready. Public-Launch-Ready = NO-GO until P5-F + Fable Retest 1.**
 
@@ -429,11 +433,43 @@ For **future implementation gates** (P5-B through P5-E):
 
 ---
 
+## 12. P5-B.1 — Notification Injection Fix Baseline
+
+**Milestone:** P5-B.1 code + SQL baseline for S+-02; **ready for P5-B.2 acceptance** — not final accepted.
+
+**P5-B.1 baseline implemented locally.** Insert policy in `supabase/admin_dashboard_notifications.sql` prepared with `WITH CHECK (user_id = auth.uid())` via idempotent `DROP POLICY IF EXISTS` + `CREATE POLICY`. SQL **not executed** — live RLS unchanged until a future DB/staging gate. `bl_is_safe_notification_target_url()` function sketch and documented `NOT VALID` constraint comment added for `target_url`. Cross-user notification delivery (admin ban/timeout, comment-to-author) documented as requiring a separate SECURITY DEFINER RPC — not a broad authenticated INSERT.
+
+**Client guardrails:**
+
+- `js/notification-url-safety.js` — `BoundLoreNotificationUrlSafety` (`p5-b1`); blocks `javascript:`, `data:`, `vbscript:`, `file:`, `blob:`, `ftp:`, protocol-relative, backslash obfuscation, control characters
+- `js/notifications.js` — cross-user insert blocked client-side; `target_url` sanitized on create and fetch
+- `js/auth-nav.js` — `target_url` sanitized before `<a href>`; external http(s) get `rel="noopener noreferrer"`
+- Script load order: `notification-url-safety.js` before `notifications.js` on `wiki/post/` and `wiki/admin/`; dynamic load in `auth-nav.js`
+
+**QA:** `qa/p5-notification-security-fixtures.html` — 22 URL corpus cases + meta checks; no Supabase writes.
+
+| Check | Result |
+|-------|--------|
+| SQL file changed, not executed | `[x]` |
+| Insert policy scoped to `user_id = auth.uid()` | `[x]` — file prepared |
+| `target_url` safety helper | `[x]` |
+| Unsafe schemes blocked at write/render | `[x]` — client baseline |
+| QA fixture corpus | `[x]` |
+| Live RLS applied / tested | `[ ]` — deferred to P5-B.2 |
+| S+-02 final accepted | `[ ]` — P5-B.2 only |
+| Push / deploy / Supabase writes | `[x]` — none |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Next candidate:** **P5-B.2 Notification Injection Acceptance Sweep**. No push/deploy/launch.
+
+---
+
 ## Appendix A — Related architecture docs
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/current-code-gap-notes.md` §85–§86 | P5-A.1 / P5-A.2 gate records |
+| `docs/architecture/current-code-gap-notes.md` §85–§87 | P5-A.1 / P5-A.2 / P5-B.1 gate records |
 | `docs/architecture/moderation-conflict-matrix.md` | Conflict handling must remain untouched during P5 |
 | `docs/architecture/entity-promotion-policy.md` | No auto-promotion during security fixes |
 | `docs/architecture/graph-relations-spec.md` | Relation registry unchanged in P5 |

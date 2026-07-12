@@ -3100,6 +3100,41 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-B.1 Notification Injection Fix Baseline**. No push/deploy/launch.
+**P5-B.2 Notification Injection Acceptance Sweep**. No push/deploy/launch.
+
+---
+
+## 87. P5-B.1 — Notification Injection Fix Baseline
+
+**Milestone:** P5-B.1 code + SQL baseline for S+-02 Cross-User-Notification-Injection; ready for P5-B.2 acceptance — **not final accepted**.
+
+### S+-02 baseline (file/repo only)
+
+| Item | Status |
+|------|--------|
+| `notifications_insert_authenticated` → `user_id = auth.uid()` | Prepared in SQL file; **not applied to live DB** |
+| `bl_is_safe_notification_target_url()` + constraint sketch | Documented in SQL file; apply in future DB gate |
+| `js/notification-url-safety.js` | Implemented (`p5-b1`) |
+| `js/notifications.js` insert guard + URL sanitize | Implemented |
+| `js/auth-nav.js` render-time URL sanitize | Implemented |
+| Cross-user admin/comment notifications | **Blocked** until SECURITY DEFINER RPC (future gate) |
+| QA fixture `qa/p5-notification-security-fixtures.*` | 22+ URL corpus cases |
+| SQL executed / live RLS tested | **No** — P5-B.2 |
+| Supabase writes / deploy / push | **No** |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-02 accepted | **No** — baseline only; P5-B.2 required |
+
+**P5-B.1 baseline implemented locally.** RLS insert policy and `target_url` constraint prepared in repo SQL only. Client-side URL safety helper and notification rendering/insert guards added. No live database mutation, no Supabase deploy, no push. BoundLore remains NOT live-ready.
+
+### Next candidate
+
+**P5-B.2 Notification Injection Acceptance Sweep**. No push/deploy/launch.
 
 ---
