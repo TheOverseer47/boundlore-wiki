@@ -1764,7 +1764,34 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
 
-**Next candidates:** **P5-A.1 Productive Activation Planning Gate** or **LAUNCH-0 Preflight Planning Gate**. **LAUNCH-0** required before any push/deploy.
+**Next candidates:** **P5-A.2 S+ Remediation Planning Acceptance Sweep** or **LAUNCH-0 Preflight Planning Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P5-A.1 — S+ Remediation Planning Gate
+
+**Milestone:** P5-A.1 docs-only planning gate; structures remediation for four confirmed S+ launch blockers from pre-launch audit; no code, SQL, data, deploy, or push.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Audit NO-GO accepted | docs | Foundation PASS, Product Activation FAIL, Public Launch NO-GO | `[x]` |
+| Four S+ findings listed | `p5-splus-remediation-plan.md` §2 | S+-01, S+-02, S+-03, S+-04 | `[x]` |
+| Remediation sequence | plan §3 | P5-B → P5-C → P5-D → P5-E → P5-F | `[x]` |
+| Gate structure | plan §4 | P5-B.1/B.2 through P5-F.1/F.2 defined | `[x]` |
+| Acceptance criteria per S+ | plan §5 | all four findings have measurable criteria | `[x]` |
+| Test strategy | plan §6 | static, RLS, RPC, XSS, API, storage tests documented | `[x]` |
+| Fable retest strategy | plan §7 | Retest 1 after P5-F; Retest 2 after S-blockers | `[x]` |
+| Stop conditions | plan §8 | documented | `[x]` |
+| Rollback principles | plan §9 | documented | `[x]` |
+| No implementation | — | no code/SQL/Supabase/data changes | `[x]` |
+| Not live-ready | docs | NO-GO documented | `[x]` |
+| Pending conflict | — | not touched | `[x]` |
+
+**P5-A.1 planning gate completed locally.** Pre-launch audit NO-GO accepted. P5 remediation plan documents four S+ launch blockers (notification injection, RPC gate bypass, stored XSS, missing server-side release lock) with binding sequence P5-B through P5-F, per-finding acceptance criteria, test strategy, stop conditions, rollback principles, and Fable retest handoff. No code, data, SQL, Supabase, UI activation, submit/save/approve/reject/archive flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. Project remains **not live-ready**; **LAUNCH-0** mandatory before any push/deploy/live action.
+
+**STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
+
+**Next candidate:** **P5-A.2 S+ Remediation Planning Acceptance Sweep**. Then **P5-B.1 Notification Injection Fix Baseline**. **LAUNCH-0** required before any push/deploy.
 
 ---
 

@@ -3014,9 +3014,63 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Next candidates (planning only, not auto-started):**
 
-- **P5-A.1 Productive Activation Planning Gate**
+- **P5-A.2 S+ Remediation Planning Acceptance Sweep**
 - **LAUNCH-0 Preflight Planning Gate**
 
 **LAUNCH-0** mandatory before any push/deploy/live action.
+
+---
+
+## 85. P5-A.1 — S+ Remediation Planning Gate
+
+**Milestone:** P5-A.1 docs-only planning gate; structures remediation for four confirmed S+ launch blockers from pre-launch audit; no code, SQL, data migration, productive activation, or deploy.
+
+### Audit verdict accepted
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| Deployment freeze | Active |
+
+### Four S+ findings (launch blockers)
+
+| ID | Title | Primary surfaces |
+|----|-------|------------------|
+| S+-01 | No server-side fail-closed pre-release content lock | `patch-mode.js`, `wiki_patch_mode.sql`, all write surfaces |
+| S+-02 | Cross-user notification injection | `admin_dashboard_notifications.sql`, `notifications.js`, `auth-nav.js` |
+| S+-03 | Stored XSS / missing HTML sanitization | `post-detail.js`, `create-post.js`, `edit-post.js`, admin compose, URL sinks |
+| S+-04 | `bl_register_observation` RPC gate bypass | `phase_a_observations_foundation.sql`, `discovery-core.js` |
+
+### P5 remediation sequence (binding)
+
+| Phase | Gate | Focus |
+|-------|------|-------|
+| P5-B | Notification Injection Fix | Smallest isolated RLS fix |
+| P5-C | Observation RPC Gate Fix | SECURITY DEFINER write path before release lock |
+| P5-D | Sanitization & URL Safety Fix | Central sanitizer + XSS corpus |
+| P5-E | Server-side Pre-Release Lock | `release_gate` RLS/RPC/Storage/UI/Audit |
+| P5-F | Combined S+ Acceptance + Fable Handoff | All four S+ re-verified together |
+
+**Central plan:** `docs/architecture/p5-splus-remediation-plan.md`
+
+### P5-A.1 scope confirmation
+
+| Check | Result |
+|-------|--------|
+| Audit NO-GO accepted | `[x]` |
+| P5 starts with S+ remediation (not productive activation) | `[x]` |
+| No implementation in P5-A.1 | `[x]` |
+| Four S+ findings documented with acceptance criteria | `[x]` |
+| Sequence P5-B through P5-F documented | `[x]` |
+| Test strategy, stop conditions, rollback principles documented | `[x]` |
+| Fable retest strategy documented | `[x]` |
+| Project remains not live-ready | `[x]` |
+| Code / SQL / Supabase / data changes | `[x]` — none |
+
+### Next candidate
+
+**P5-A.2 S+ Remediation Planning Acceptance Sweep** — then **P5-B.1 Notification Injection Fix Baseline**. No push/deploy/launch.
 
 ---
