@@ -66,6 +66,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-B.1 fixture harness:** QA-only synthetic fixtures; not linked from search/navigation; no index changes.
 
+**P3-B.2 acceptance sweep:** Fixture harness accepted locally. Search baseline unchanged; no backend search/index activation.
+
 ---
 
 ## Goals

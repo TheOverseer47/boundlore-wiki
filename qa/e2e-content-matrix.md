@@ -859,6 +859,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-B.2 — Synthetic Context Renderer Fixture Acceptance Sweep
+
+**Milestone:** P3-B acceptance sweep; read-only verification; no code/data changes; no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fixture page | `/qa/p3-context-renderer-fixtures.html` | HTTP 200; QA-only banner; not in navigation | `[x]` |
+| Fixture panels | fixture page | 8/8 PASS | `[x]` |
+| Console assertions | fixture page | 12/12 + 32/32 sweep checks green | `[x]` |
+| Positive fixtures A–E | fixture page | 5 visible context sections | `[x]` |
+| Negative fixtures F–H | fixture page | no sections rendered | `[x]` |
+| DOM safety | fixture page | 0 unsafe elements in `.bl-p3-context` | `[x]` |
+| Cross-registry guards | fixture page | RN/OC/CE/RU promotion guards false | `[x]` |
+| QA Staff / Ember / Ogre / Swamp | post slugs | 0 `.bl-p3-context-section`; visually unchanged | `[x]` |
+| Production regressions | 25 URLs | HTTP 200; baseline unchanged | `[x]` |
+| Resources filters | mining/raw/unknown/node_type | QA Ember visible; no false node hits | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` Access Denied |
+
+**P3-B.2 acceptance sweep completed locally.** The QA-only synthetic context renderer fixture harness is accepted. Explicit synthetic fields render the expected read-only sections; source_detail-only, name-only, and empty/unknown fixtures render no sections. No production navigation, posts, data writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

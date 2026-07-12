@@ -1275,3 +1275,23 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-B.1:** QA-only synthetic fixture harness validates read-only explicit-only context rendering without creating posts or data changes.
 
 ---
+
+## 48. P3-B.2 — Synthetic Context Renderer Fixture Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; read-only verification; no code/data changes; no deploy).
+
+| Area | Result |
+|------|--------|
+| Fixture page | `/qa/p3-context-renderer-fixtures.html` — QA-only; not in production navigation |
+| Fixture acceptance | 8/8 fixtures PASS; 12/12 built-in assertions PASS; 32/32 sweep checks PASS |
+| Positive fixtures A–E | resource_node, observation_context, creature_encounter, requirement_unlock, versioning render (5 sections) |
+| Negative fixtures F–H | source_detail-only, name-only, empty/unknown render nothing |
+| DOM safety | 0 unsafe elements in `.bl-p3-context`; no admin/create/edit links |
+| Cross-registry guards | RN/OC/CE/RU promotion guards false |
+| QA regressions | Staff/Ember/Ogre/Swamp unchanged (0 `.bl-p3-context-section`); 25/25 URLs HTTP 200 |
+| Admin | read-only; Access Denied without session (not repaired) |
+| Not activated | Production navigation, real posts, Supabase writes, admin/create/edit/moderation UI |
+
+**P3-B.2 acceptance sweep completed locally.** The QA-only synthetic context renderer fixture harness is accepted. Explicit synthetic fields render the expected read-only sections; source_detail-only, name-only, and empty/unknown fixtures render no sections. No production navigation, posts, data writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced. P3-C can later plan real local read-only detail-page data/preview strategy.
+
+---
