@@ -10,6 +10,8 @@
 
 **P1-F.1 (local):** `js/profession-capability-registry.js` — central profession/role/capability/requirement kinds and normalizers. No new top-level domain; future professions use SYSTEM/profession_type. Mounts stay BEING + role/capability facets. Reserved relations (`crafted_by_profession`, `gathered_via`, `tamed_via`, `mountable_by`) remain reserved; P1-F registry interprets qualifiers future-safe. No UI, no SQL, no data migration.
 
+**P1-F.2 acceptance sweep:** P1-F.2 acceptance sweep completed; model registry only; no profession UI, no SQL, no data migration. P1-F foundation block (F.1 + F.2) accepted locally.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

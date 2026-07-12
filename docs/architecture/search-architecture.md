@@ -20,6 +20,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P1-F.1 code baseline:** `js/profession-capability-registry.js` — future-safe profession/role/capability/requirement typing and low-weight defensive search signals. **No** profession UI, **no** new top-level domain, **no** SQL. Mounts remain BEING + role/capability; professions map to SYSTEM/profession_type when implemented.
 
+**P1-F.2 acceptance sweep:** P1-F.2 acceptance sweep completed; model registry only; no profession UI, no SQL, no data migration. P1-F foundation block (F.1 + F.2) accepted locally.
+
 ---
 
 ## Goals

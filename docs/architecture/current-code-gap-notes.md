@@ -731,3 +731,26 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | mining/wood/forge search, QA Staff/Ember, facet browse, missing entry suggestions | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 23. P1-F.2 — Profession & Capability Model Acceptance Sweep
+
+**Status:** Complete (local read-only sweep; registry-only; no SQL, no UI, no data migration).
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreProfessionCapabilityRegistry` API | Green — normalizers, extractors, has* checks, display labels |
+| Entity model | `PROFESSION_ENTITY_MODEL` → SYSTEM/profession_type; **no** new top-level domain |
+| Mount model | role/capability on BEING; no mount subtype page |
+| Reserved relations | `crafted_by_profession`, `gathered_via`, `tamed_via`, `mountable_by` — reserved, not persisted_forward |
+| Search integration | Low-weight `profession_capability` signals; no hard filters |
+| Search regressions | mining/wood/forge/qa ember/resource/red crystal/parser queries unchanged |
+| rideable/flyable mount | No crash (Smought via facet match OK) |
+| QA Staff / QA Ember | Unchanged; no new UI sections |
+| Wood/Forge | Missing-entry suggestions only; no posts |
+| Facet browse | Resources `?acquisition_method=mining` unchanged |
+| Admin | Session-dependent — automation Access Denied; no queue/conflict actions |
+| Pending `add_recipe` conflict | Not touched |
+
+**P1-F.2 acceptance sweep completed; model registry only; no profession UI, no SQL, no data migration.** P1-F foundation block (F.1 + F.2) accepted locally. Ready for P1-G planning. Deployment freeze remains active.

@@ -340,6 +340,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-F.2 — Profession & Capability Model Acceptance Sweep
+
+**Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API sweep | console on `/wiki/search/` | normalize/extract/has*/labels green | `[x]` |
+| Entity model | console | SYSTEM/profession_type; no new domain | `[x]` |
+| Reserved relations | console | P1-F quartet reserved; persistence reserved | `[x]` |
+| Search regressions | mining/wood/forge/qa ember/resource/red crystal/parser queries | unchanged | `[x]` |
+| rideable/flyable mount | search | no crash; 0 results OK | `[x]` |
+| No profession UI | pages | no new buttons/sections | `[x]` |
+| QA Staff / QA Ember | post slugs | unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Resources facet | `?acquisition_method=mining` | QA Ember visible | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation Access Denied |
+
+**P1-F.2 acceptance sweep completed; model registry only; no profession UI, no SQL, no data migration.** P1-F accepted as local foundation. Ready for P1-G.
+
+---
+
 ## P1-C.1 — Evidence Rank & Dispute Baseline
 
 **Milestone:** P1-C.1 (evidence rank registry + reader tolerance; no SQL, no UI, no migration)
