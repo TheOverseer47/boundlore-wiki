@@ -1257,3 +1257,21 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-A.2 acceptance sweep completed locally.** The read-only P2 context renderer is accepted as an explicit-only detail-page renderer. It creates no actions, buttons, forms, admin/create/edit links, posts, data changes, automatic promotion, or taxonomy inference. QA baseline pages remain visually unchanged without explicit P2 context fields. P3-B can later test individual context sections with real explicit data.
 
 ---
+
+## 47. P3-B.1 — Synthetic Explicit Context Section Fixture Baseline
+
+**Status:** Complete (local QA-only fixture harness; synthetic objects; no posts, no DB writes, no deploy).
+
+| Area | Result |
+|------|--------|
+| Fixture page | `qa/p3-context-renderer-fixtures.html` — not linked from wiki navigation |
+| Fixture harness | `qa/p3-context-renderer-fixtures.js` — 8 synthetic fixtures, assertion helpers |
+| Positive fixtures A–E | resource_node, observation_context, creature_encounter, requirement_unlock, versioning render |
+| Negative fixtures F–H | source_detail-only, name-only, empty/unknown render nothing |
+| Renderer hardening | Root-level observation condition fields (`biome_context`, `time_condition`, `weather_condition`) for explicit-only fixture coverage |
+| QA regressions | Staff/Ember/Ogre/Swamp unchanged (0 `.bl-p3-context-section`) |
+| Not built | Real wiki posts, Supabase writes, admin/create/edit/moderation UI, productive navigation links |
+
+**P3-B.1:** QA-only synthetic fixture harness validates read-only explicit-only context rendering without creating posts or data changes.
+
+---

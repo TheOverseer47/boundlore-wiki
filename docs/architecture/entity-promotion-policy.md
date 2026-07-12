@@ -114,6 +114,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-A.2 acceptance sweep:** Context renderer accepted locally as read-only/explicit-only detail-page baseline. No promotion, no inference, no admin/create/edit links. QA pages unchanged without explicit P2 fields.
 
+**P3-B.1 fixture harness:** `qa/p3-context-renderer-fixtures.html` — synthetic explicit-only objects; not in navigation; no posts or data writes.
+
 ---
 
 ## Missing Entry Queue

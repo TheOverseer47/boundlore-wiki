@@ -837,6 +837,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-B.1 — Synthetic Explicit Context Section Fixture Baseline
+
+**Milestone:** P3-B first brick; QA-only synthetic fixture harness; no posts, no DB writes, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fixture page | `/qa/p3-context-renderer-fixtures.html` | HTTP 200; QA-only banner; 8 fixtures | `[x]` |
+| Positive fixtures A–E | fixture page | resource/observation/creature/requirement/versioning sections visible | `[x]` |
+| Negative fixtures F–H | fixture page | no `.bl-p3-context-section` | `[x]` |
+| Console assertions | fixture page | 12/12 explicit-only checks green | `[x]` |
+| DOM safety | fixture page | no buttons/forms/admin/create/edit in `.bl-p3-context` | `[x]` |
+| Visible sections | fixture page | 5 positive sections (A–E) | `[x]` |
+| QA Staff / Ember / Ogre / Swamp | post slugs | 0 `.bl-p3-context-section`; visually unchanged | `[x]` |
+| Production regressions | browse/resources/items/search/admin | HTTP 200; baseline unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-B.1:** QA-only synthetic fixture harness validates explicit-only context rendering. No posts, no data changes, no admin/create/edit flows. Negative fixtures confirm source_detail/name-only/empty do not render.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
