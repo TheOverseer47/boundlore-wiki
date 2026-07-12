@@ -1386,6 +1386,33 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-B.2 — Structured Context Schema & Validation Acceptance Sweep
+
+**Milestone:** P4-B.2 docs-only acceptance sweep; no code, SQL, data migration, admin/create/edit/moderation, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P4-B.1 schema baseline accepted | `[x]` |
+| Seven sections accepted | `[x]` |
+| Field status authorable/restricted/planned/forbidden accepted | `[x]` |
+| Policy functions all false | `[x]` |
+| Negative rules accepted | `[x]` |
+| QA fixture 13/13 PASS | `[x]` |
+| P3 harness regression unchanged | `[x]` |
+| Schema not prod-integrated | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-B.2 acceptance sweep completed locally.** The structured context schema and validation baseline is accepted. `BoundLoreStructuredContextSchema` covers seven sections, validates authorable/restricted/planned fields, blocks negative/inferred/derived/unknown/empty cases as expected, keeps all write/promotion/post/action policy functions false, and remains QA-fixture-only with no production integration. No code, data, SQL, Supabase, admin/create/edit/moderation, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+**Next candidate:** **P4-C.1 Admin Read-only Structured Field Inspector Planning or Baseline**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

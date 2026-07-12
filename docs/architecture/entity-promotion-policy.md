@@ -154,6 +154,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-B.1 validation baseline:** `shouldPromoteFromValidatedData` and `shouldCreatePostFromField` always return `false`. Negative rules block source_detail-only, title-inferred weakness, and coordinate-based PLACE promotion.
 
+**P4-B.2 acceptance sweep:** Schema validation baseline accepted locally. All promotion/post policy functions remain false; no production integration.
+
 ---
 
 ## Missing Entry Queue

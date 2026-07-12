@@ -2209,3 +2209,31 @@ P3 read-only contract, renderer, preview adapter, probe, and wiki-entry-layout p
 **Next:** P4-B.2 acceptance sweep.
 
 ---
+
+## 71. P4-B.2 — Structured Context Schema & Validation Acceptance Sweep
+
+**Milestone:** P4-B.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+### Acceptance statement
+
+**P4-B.2 acceptance sweep completed locally.** The structured context schema and validation baseline is accepted. `BoundLoreStructuredContextSchema` covers seven sections, validates authorable/restricted/planned fields, blocks negative/inferred/derived/unknown/empty cases as expected, keeps all write/promotion/post/action policy functions false, and remains QA-fixture-only with no production integration. No code, data, SQL, Supabase, admin/create/edit/moderation, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §70 P4-B.1 schema baseline present | `[x]` — module, 7 sections, field status, negative rules, QA fixture |
+| Schema API (`p4-b1`) | `[x]` — policy functions all false; mutation safe |
+| QA fixture A–M | `[x]` — 13/13 PASS; `__P4StructuredContextSchemaFixtures.allPass === true` |
+| Negative rules H–M | `[x]` — blocked/invalid/unknown as expected; no post/promotion actions |
+| Prod script wiring | `[x]` — schema loaded only on QA fixture page |
+| P3 regression harnesses | `[x]` — sample 10/10; contract 9/9 + 17/17; renderer 8/8 + 12/12; guard 12/12; probe 16 links |
+| P3 layer unchanged | `[x]` — contract, renderer, probe, wiki-entry-layout not modified |
+| Prod pages (Staff/Ember) | `[x]` — 0 sections/banner/probe without preview/probe |
+| Code / data / deploy changes | `[x]` — docs-only sweep |
+
+### Next candidate
+
+**P4-C.1 — Admin Read-only Structured Field Inspector Planning or Baseline** — read-only inspection only; not production deploy without **LAUNCH-0**.
+
+---

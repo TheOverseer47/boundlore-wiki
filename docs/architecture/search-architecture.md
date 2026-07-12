@@ -104,6 +104,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-B.1 validation baseline:** Schema validation is not search indexing. `no_search_index` policy enforced; no backend field search or index activation.
 
+**P4-B.2 acceptance sweep:** Schema validation baseline accepted locally. Search/index activation remains blocked.
+
 ---
 
 ## Goals
