@@ -179,4 +179,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P3-H.2:** Data contract accepted locally. No moderation/contribution workflow activation. Pending `add_recipe` conflict remains untouched.
 
+**P3-I.1:** Sample data gate is QA-only/local; no moderation workflow, no queue actions, no conflict changes.
+
+---
+
 ---

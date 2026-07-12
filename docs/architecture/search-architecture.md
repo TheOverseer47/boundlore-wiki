@@ -90,6 +90,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-H.2 acceptance sweep:** Data contract accepted locally. Search baseline unchanged; no index activation; preview not indexed.
 
+**P3-I.1 sample data gate:** Local QA-only sample entries; no search/index changes; sample entries not indexed.
+
 ---
 
 ## Goals

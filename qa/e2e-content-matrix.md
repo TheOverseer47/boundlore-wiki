@@ -1134,6 +1134,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-I.1 — Local Read-only Sample Data Gate
+
+**Milestone:** P3-I.1 QA-only sample data harness; explicit contract fields on local entry objects; no SQL, no DB writes, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Sample data gate page | `/qa/p3-readonly-sample-data.html` | HTTP 200; QA-only banner; 10 samples | `[x]` |
+| Positive samples A–F | sample gate | expected sections render | `[x]` |
+| Negative samples G–J | sample gate | 0 sections | `[x]` |
+| Derived biome block | sample I (`_derived: true`) | 0 sections | `[x]` |
+| Pipeline | DataContract → Renderer | no writes; entry not mutated | `[x]` |
+| Contract fixture regression | `/qa/p3-context-data-contract-fixtures.html` | 9/9; 17/17 | `[x]` |
+| Renderer/matrix/guard regression | P3 harness pages | unchanged green | `[x]` |
+| QA Staff/Ember/Ogre/Swamp | without preview | 0 sections/banner | `[x]` |
+| Deploy / push / SQL | — | forbidden | `[x]` |
+
+**Next:** P3-I.2 acceptance sweep.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

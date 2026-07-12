@@ -1650,3 +1650,44 @@ Without explicit contract fields, QA Staff/Ember/Ogre/Swamp remain at 0 context 
 **P3-I Planning Gate** or a controlled local read-only sample data gate — not production deploy without separate launch/data-safety gate.
 
 ---
+
+## 60. P3-I.1 — Local Read-only Sample Data Gate
+
+**Milestone:** P3-I.1 QA-only sample data harness; local entry objects with explicit contract fields; no SQL, no DB writes, no deploy.
+
+### Harness
+
+`qa/p3-readonly-sample-data.html` + `qa/p3-readonly-sample-data.js` — not linked from wiki navigation.
+
+Pipeline per sample entry:
+
+1. `BoundLoreContextDataContract.resolveContractEntry(sampleEntry)`
+2. Contract diagnostics (read-only)
+3. `BoundLoreContextSectionRenderer.renderContextSections(resolvedEntry)`
+
+### Sample entries (10)
+
+| ID | Type | Expected sections |
+|----|------|-------------------|
+| A sampleResourceEntry | meta resource_node fields | resource_node |
+| B sampleObservationEntry | discovery_payload observation_context | observation_context |
+| C sampleCreatureEntry | structured_context creature_encounter | creature_encounter |
+| D sampleUnlockEntry | meta requirement/unlock fields | requirement_unlock |
+| E sampleVersionedEntry | meta versioning | versioning |
+| F sampleAllEntry | structured_context all five blocks | 5 sections |
+| G negativeSourceDetailOnly | source_detail only | none |
+| H negativeNameOnly | title only | none |
+| I negativeDerivedBiomeOnly | root biome + `_derived: true` | none |
+| J emptyUnknown | empty/unknown meta | none |
+
+### Contract hardening (minimal)
+
+- Entries with `_derived` / `__derived` skip root-source contract extraction (derived/enriched fields do not render).
+
+### Policy (unchanged)
+
+Read-only, explicit-only, no writes, no posts, no Supabase, no admin/create/edit/moderation, no search index, no promotion/inference.
+
+**Next:** P3-I.2 acceptance sweep.
+
+---

@@ -69,7 +69,16 @@ window.BoundLoreContextDataContract = (function() {
     description: true,
     id: true,
     slug: true,
+    _derived: true,
+    __derived: true,
+    entity_domain: true,
+    entity_subtype: true,
   };
+
+  function isDerivedContractEntry(entry) {
+    const e = entry && typeof entry === "object" ? entry : {};
+    return e._derived === true || e.__derived === true;
+  }
 
   const SECTION_EXTRACTORS = {
     resource_node: extractResourceNodeContext,
@@ -250,7 +259,10 @@ window.BoundLoreContextDataContract = (function() {
 
   function getSourceObject(entry, sourceName) {
     const source = normalizeDataSource(sourceName);
-    if (source === "root") return getEntryRootContext(entry);
+    if (source === "root") {
+      if (isDerivedContractEntry(entry)) return {};
+      return getEntryRootContext(entry);
+    }
     if (source === "meta") return getEntryMeta(entry);
     if (source === "discovery_payload") return getEntryDiscoveryPayload(entry);
     if (source === "structured_context") return getEntryStructuredContext(entry);

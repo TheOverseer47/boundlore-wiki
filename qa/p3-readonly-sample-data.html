@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>QA-only P3 Read-only Sample Data Gate - BoundLore</title>
+<link rel="stylesheet" href="/css/style.css" />
+<style>
+  .qa-fixture-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+  .qa-fixture-banner {
+    background: #1a2332;
+    border: 1px solid #3d5166;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .qa-fixture-banner h1 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+  }
+  .qa-fixture-banner p {
+    margin: 4px 0;
+    color: #b8c5d4;
+    font-size: 0.95rem;
+  }
+  .qa-fixture-summary {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+  }
+  .qa-fixture-panel {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .qa-fixture-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .qa-fixture-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .qa-fixture-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .qa-fixture-badge--pass {
+    background: #1e3a2f;
+    color: #7dcea0;
+  }
+  .qa-fixture-badge--fail {
+    background: #3a1e1e;
+    color: #e88;
+  }
+  .qa-fixture-meta {
+    margin: 4px 0;
+    font-size: 0.88rem;
+    color: #9fb0c3;
+  }
+  .qa-fixture-details pre {
+    font-size: 0.78rem;
+    overflow-x: auto;
+    background: #0d1117;
+    padding: 8px;
+    border-radius: 4px;
+  }
+  .qa-fixture-render {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #2a3544;
+  }
+  .qa-fixture-empty {
+    color: #8a97a8;
+    font-style: italic;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<div class="qa-fixture-page">
+  <header class="qa-fixture-banner">
+    <h1>QA-only local read-only sample data gate — P3-I.1</h1>
+    <p><strong>Not linked from wiki navigation.</strong> Local sample entry objects with explicit contract fields only. No Supabase. No posts. No data writes.</p>
+    <p>Pipeline: DataContract.resolveContractEntry → ContextSectionRenderer.renderContextSections</p>
+  </header>
+
+  <div id="sampleSummary" class="qa-fixture-summary">Loading sample entries…</div>
+  <div id="sampleRoot" class="bl-p3-sample-data"></div>
+</div>
+
+<script src="/js/content-model-registry.js?v=5"></script>
+<script src="/js/quest-event-registry.js?v=1"></script>
+<script src="/js/economy-registry.js?v=1"></script>
+<script src="/js/versioning-model.js?v=3"></script>
+<script src="/js/resource-node-registry.js?v=1"></script>
+<script src="/js/observation-context-registry.js?v=1"></script>
+<script src="/js/creature-encounter-registry.js?v=1"></script>
+<script src="/js/requirement-unlock-registry.js?v=1"></script>
+<script src="/js/context-data-contract.js?v=2"></script>
+<script src="/js/context-section-renderer.js?v=4"></script>
+<script src="/qa/p3-readonly-sample-data.js?v=1"></script>
+</body>
+</html>

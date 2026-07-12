@@ -140,6 +140,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-H.2 acceptance sweep:** Read-only context data contract accepted locally. Explicit fields only from root/meta/discovery_payload/structured_context; source_detail/name-only negatives stay empty; no entry mutation, no writes, no posts, no promotion/inference. Next: P3-I planning gate or controlled local read-only sample data gate.
 
+**P3-I.1 sample data gate:** `qa/p3-readonly-sample-data.html` — QA-only local sample entries prove explicit contract fields render via DataContract → Renderer pipeline. No posts, no writes, no promotion. `_derived` entries skip root extraction. P3-I.2 acceptance sweep follows.
+
 ---
 
 ## Missing Entry Queue
