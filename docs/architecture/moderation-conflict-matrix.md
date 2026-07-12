@@ -191,6 +191,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P4-A.1 planning gate:** Structured context fields require field-level conflict policy before write flows. Existing `add_recipe` conflict remains baseline only. No new approval flows activated. Pending `add_recipe` untouched. Approve-blocked behavior unchanged.
 
+**P4-B.1 validation baseline:** `BoundLoreStructuredContextSchema` validates structured fields read-only only. No moderation workflow, queue actions, conflict resolution, or write-path activation. Pending `add_recipe` untouched.
+
 ---
 
 ---

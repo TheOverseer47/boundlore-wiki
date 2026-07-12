@@ -152,6 +152,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-A.1 planning gate:** Authoring structured fields must not trigger automatic promotion. Resource Node, Observation, Requirement, Economy, and Quest fields must not auto-create posts. Promotion remains a separate explicit lifecycle/moderation step.
 
+**P4-B.1 validation baseline:** `shouldPromoteFromValidatedData` and `shouldCreatePostFromField` always return `false`. Negative rules block source_detail-only, title-inferred weakness, and coordinate-based PLACE promotion.
+
 ---
 
 ## Missing Entry Queue

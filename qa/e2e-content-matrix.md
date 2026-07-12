@@ -1360,6 +1360,32 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-B.1 — Structured Context Schema & Validation Baseline
+
+**Milestone:** P4-B.1 read-only schema and validation baseline; no SQL, data migration, admin/create/edit/moderation, search index, backfill, posts, push, or deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Schema module loaded | `qa/p4-structured-context-schema-fixtures.html` | `BoundLoreStructuredContextSchema` object | `[x]` |
+| Policy functions | console on fixture page | all `should*` return `false` | `[x]` |
+| Seven sections | schema diagnostics | resource_node … economy | `[x]` |
+| Field status | console | authorable/restricted/planned/forbidden | `[x]` |
+| Positive fixtures A–G | fixture harness | valid; restricted/planned no actions | `[x]` |
+| Negative fixtures H–M | fixture harness | blocked/invalid/unknown as expected | `[x]` |
+| Mutation safety | console | input unchanged after `createValidationReport` | `[x]` |
+| Rendering safety | fixture DOM | no button/form/admin/create-post/edit-post links | `[x]` |
+| P3 regression harnesses | p3 sample/contract/guard/probe | unchanged PASS counts | `[x]` |
+| Prod pages | Staff/Ember without preview/probe | 0 sections/banner/probe | `[x]` |
+| No prod script wiring | wiki pages | schema not loaded on prod paths | `[x]` |
+| Not live-ready documented | gap notes §70 | yes | `[x]` |
+| Code / data / deploy changes | git | schema + QA + docs only | `[x]` |
+
+**P4-B.1 validation baseline:** `js/structured-context-schema.js` defines field schemas and read-only validators for seven structured context sections. QA fixture `qa/p4-structured-context-schema-fixtures.html` runs fixtures A–M locally. No writes, no admin/create/edit/moderation, no search index, no backfill, no posts. P3 read-only layer unchanged. Project remains not live-ready; LAUNCH-0 mandatory before push/deploy.
+
+**Next candidate:** P4-B.2 Acceptance Sweep. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

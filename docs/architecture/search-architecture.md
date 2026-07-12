@@ -102,6 +102,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-A.1 planning gate:** Structured field authoring is not search indexing. Search/facet activation for P3/P4 fields requires a separate gate. No index backfills together with write-flow start.
 
+**P4-B.1 validation baseline:** Schema validation is not search indexing. `no_search_index` policy enforced; no backend field search or index activation.
+
 ---
 
 ## Goals

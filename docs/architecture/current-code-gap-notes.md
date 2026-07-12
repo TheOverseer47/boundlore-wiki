@@ -2141,3 +2141,71 @@ When write flows are implemented (not in P4-A.1):
 **P4-B.1 — Structured Context Schema & Validation Baseline** — validators/schemas only; no writes; not production deploy without **LAUNCH-0**.
 
 ---
+
+## 70. P4-B.1 — Structured Context Schema & Validation Baseline
+
+**Milestone:** P4-B.1 read-only schema and validation baseline; no writes, SQL, data migration, admin/create/edit/moderation, search index, backfill, posts, push, or deploy.
+
+### Module
+
+- **`js/structured-context-schema.js`** — `window.BoundLoreStructuredContextSchema`
+- **Schema version:** `p4-b1`
+- **Write policy:** `read_only`, `validates_only`, `no_writes`, `no_mutation`, `no_promotion`, `no_post_creation`, `no_search_index`, `no_admin_actions`
+
+### Seven structured context sections
+
+| Section | Field status mix | Notes |
+|---------|------------------|-------|
+| `resource_node` | authorable + forbidden | `source_detail` forbidden; no crystal inference from text |
+| `observation_context` | authorable + forbidden | no PLACE promotion from coordinates/location_ref |
+| `creature_encounter` | authorable + forbidden | no weakness/fire inference from title |
+| `requirement_unlock` | authorable + forbidden | no auto post creation from requirements |
+| `versioning` | restricted + forbidden | no patch/admin auto-action |
+| `quest_event` | planned + forbidden | validation only; no auto posts |
+| `economy` | planned + forbidden | validation only; no vendor shop auto posts |
+
+### Field authoring status
+
+- **authorable** — explicit structured fields (e.g. `node_type`, `biome_context`, `behavior`)
+- **restricted** — version metadata (`game_version`, `changed_in`, …); validate only
+- **planned** — quest/event/economy fields; validate only, no actions
+- **forbidden** — pseudo-fields and negative rules (`source_detail_only`, `place_promotion`, …)
+- **system_only** — unknown/unrecognized status fallback
+
+### Validation API (read-only)
+
+Normalization, field/section schema lookup, `validateFieldValue`, `validateSectionContext`, `validateStructuredContext`, `validateEntryContractFields`, `createValidationReport`, `getSchemaDiagnostics`.
+
+**Policy functions (all return `false`):** `shouldWriteValidatedData`, `shouldCreatePostFromField`, `shouldPromoteFromValidatedData`, `shouldRenderValidationActions`.
+
+### Negative rules (explicit block/invalid)
+
+- `source_detail` only → blocked; no `resource_node` promotion
+- `"red crystal nodes"` text → no `node_type=crystal_node` inference
+- title `"QA Staff of Fire"` → no creature weakness/taxonomy inference
+- coordinates/location_ref → no PLACE promotion suggestion
+- requirements → no post creation suggestion
+- versioning → no patch/admin auto-action
+- quest/event/economy → no auto posts
+- unknown fields → warning/error; not silently authorable
+- `_derived` / `__derived` → blocked; not authorable
+
+### QA fixture (local only)
+
+- **`qa/p4-structured-context-schema-fixtures.html`** + **`.js`**
+- Fixtures A–M (positive A–G, negative H–M)
+- Exposes `window.__P4StructuredContextSchemaFixtures`
+- No Supabase, auth, admin, create, edit, buttons, forms, or data writes
+- **Not linked from wiki navigation**
+
+### P3 layer unchanged
+
+P3 read-only contract, renderer, preview adapter, probe, and wiki-entry-layout pipeline are **not modified** by P4-B.1. Schema module is loaded only via QA fixture until a separate integration gate.
+
+### Not live-ready
+
+**P4-B.1 activates nothing.** No admin UI, no create/edit UI, no moderation UI, no backend writes, no search index, no backfill, no deploy, no prod script wiring.
+
+**Next:** P4-B.2 acceptance sweep.
+
+---

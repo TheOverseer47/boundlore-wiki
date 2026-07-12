@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>QA-only P4 Structured Context Schema Fixtures - BoundLore</title>
+<link rel="stylesheet" href="/css/style.css" />
+<style>
+  .qa-fixture-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+  .qa-fixture-banner {
+    background: #1a2332;
+    border: 1px solid #3d5166;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .qa-fixture-banner h1 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+  }
+  .qa-fixture-banner p {
+    margin: 4px 0;
+    color: #b8c5d4;
+    font-size: 0.95rem;
+  }
+  .qa-fixture-summary {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+  }
+  .bl-p4-schema-fixtures .qa-fixture-panel {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .qa-fixture-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .qa-fixture-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .qa-fixture-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .qa-fixture-badge--pass {
+    background: #1e3a2f;
+    color: #7dcea0;
+  }
+  .qa-fixture-badge--fail {
+    background: #3a1e1e;
+    color: #e88;
+  }
+  .qa-fixture-meta {
+    margin: 4px 0;
+    font-size: 0.88rem;
+    color: #9fb0c3;
+  }
+  .qa-fixture-details pre {
+    font-size: 0.78rem;
+    overflow-x: auto;
+    background: #0d1117;
+    padding: 8px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="qa-fixture-page">
+  <header class="qa-fixture-banner">
+    <h1>QA-only local fixture — P4-B.1 Structured Context Schema</h1>
+    <p><strong>Not linked from wiki navigation.</strong> Synthetic validation objects only. No Supabase. No posts. No data writes. No admin/create/edit flows.</p>
+    <p>P4-B.1 read-only schema and validation baseline fixture harness.</p>
+  </header>
+
+  <div id="fixtureSummary" class="qa-fixture-summary">Loading fixtures…</div>
+  <div id="fixtureRoot" class="bl-p4-schema-fixtures"></div>
+</div>
+
+<script src="/js/structured-context-schema.js?v=1"></script>
+<script src="/qa/p4-structured-context-schema-fixtures.js?v=1"></script>
+</body>
+</html>
