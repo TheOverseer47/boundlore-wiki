@@ -3014,7 +3014,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Next candidates (planning only, not auto-started):**
 
-- **P5-A.2 S+ Remediation Planning Acceptance Sweep**
+- **P5-B.1 Notification Injection Fix Baseline**
 - **LAUNCH-0 Preflight Planning Gate**
 
 **LAUNCH-0** mandatory before any push/deploy/live action.
@@ -3071,6 +3071,35 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-A.2 S+ Remediation Planning Acceptance Sweep** — then **P5-B.1 Notification Injection Fix Baseline**. No push/deploy/launch.
+**P5-B.1 Notification Injection Fix Baseline** — no push/deploy/launch.
+
+---
+
+## 86. P5-A.2 — S+ Remediation Planning Acceptance Sweep
+
+**Milestone:** P5-A.2 docs-only acceptance sweep; confirms `p5-splus-remediation-plan.md` is complete and ready for P5-B implementation gates.
+
+### P5-A.2 acceptance sweep
+
+| Check | Result |
+|-------|--------|
+| Plan §1–§10 all sections present | `[x]` |
+| Four S+ findings fully mapped (S+-01…04) | `[x]` |
+| Sequence P5-B → P5-C → P5-D → P5-E → P5-F accepted | `[x]` |
+| Gate structure P5-B.1 through P5-F.2 accepted | `[x]` |
+| Per-finding acceptance criteria measurable | `[x]` |
+| Test strategy, stop conditions, rollback accepted | `[x]` |
+| Fable retest strategy (Retest 1/2/Final) accepted | `[x]` |
+| No implementation in P5-A.2 | `[x]` |
+| No security fix marked done | `[x]` |
+| Product-Activation-Ready = FAIL | `[x]` |
+| Public-Launch-Ready = NO-GO | `[x]` |
+| Code / SQL / Supabase / data changes | `[x]` — none |
+
+**P5-A.2 acceptance sweep completed locally.** The P5 S+ Remediation Plan is accepted as docs-only. All four S+ launch blockers are mapped to dedicated implementation and acceptance gates. The order P5-B through P5-F, per-finding acceptance criteria, test strategy, stop conditions, rollback principles, and Fable retest strategy are accepted. No code, SQL, Supabase, data, UI, RLS, RPC, sanitizer, release-lock, notification, push, deploy, or launch changes were introduced. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+### Next candidate
+
+**P5-B.1 Notification Injection Fix Baseline**. No push/deploy/launch.
 
 ---

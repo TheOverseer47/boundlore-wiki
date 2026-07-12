@@ -1,8 +1,8 @@
 # P5 S+ Remediation Plan
 
-**Gate:** P5-A.1 — S+ Remediation Planning Gate  
-**Status:** Planning only — no implementation, no SQL, no deploy, no push  
-**HEAD at planning:** `3e4eb32` — Document P4 final integration gate  
+**Gate:** P5-A.1 — S+ Remediation Planning Gate · **P5-A.2 accepted**  
+**Status:** Planning accepted — no implementation, no SQL, no deploy, no push  
+**HEAD at planning:** `6c2ce45` — Document P5 S+ remediation plan  
 **Audit basis:** Pre-Launch Abnahme-, Sicherheits- und Qualitätsaudit (Fable 5, Juli 2026)
 
 ---
@@ -90,7 +90,7 @@ P5-A.1 (this plan)
 | Gate | Titel | Type | Deliverable |
 |------|-------|------|-------------|
 | **P5-A.1** | S+ Remediation Planning Gate | Docs-only | This document + gap-notes + e2e-matrix planning entry |
-| **P5-A.2** | S+ Remediation Planning Acceptance Sweep | Docs-only | Verify plan completeness; no implementation claims |
+| **P5-A.2** | S+ Remediation Planning Acceptance Sweep | Docs-only | **Accepted** — plan completeness verified; no implementation claims |
 
 ### P5-B — Notification Injection
 
@@ -387,10 +387,41 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Step | Gate | Type | Notes |
 |------|------|------|-------|
-| **Now complete** | P5-A.1 | Docs-only | This plan |
-| **Next** | P5-A.2 | Docs-only acceptance sweep | Verify plan completeness; no implementation |
-| **Then** | P5-B.1 | Code + SQL baseline | Notification injection fix — smallest isolated fix |
+| **Complete** | P5-A.1 | Docs-only | This plan |
+| **Complete** | P5-A.2 | Docs-only acceptance sweep | Plan accepted; see §11 below |
+| **Next** | P5-B.1 | Code + SQL baseline | Notification injection fix — smallest isolated fix |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
+
+---
+
+## 11. P5-A.2 — Planning Acceptance Sweep
+
+**Milestone:** P5-A.2 docs-only acceptance sweep; confirms P5-A.1 plan is complete, measurable, and ready for implementation gates P5-B through P5-F.
+
+**P5-A.2 acceptance sweep completed locally.** The P5 S+ Remediation Plan is accepted as docs-only. All four S+ launch blockers are mapped to dedicated implementation and acceptance gates. The order P5-B through P5-F, per-finding acceptance criteria, test strategy, stop conditions, rollback principles, and Fable retest strategy are accepted. No code, SQL, Supabase, data, UI, RLS, RPC, sanitizer, release-lock, notification, push, deploy, or launch changes were introduced. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+### P5-A.2 sweep checklist
+
+| Check | Result |
+|-------|--------|
+| §1 Status and Scope complete | `[x]` |
+| §2 S+ Finding Summary — all four findings | `[x]` |
+| §3 Umsetzungsreihenfolge P5-B→F with rationale | `[x]` |
+| §4 Gate structure P5-B.1 through P5-F.2 | `[x]` |
+| §5 Acceptance criteria measurable per finding | `[x]` |
+| §6 Teststrategie (12 test types) | `[x]` |
+| §7 Fable retest strategy (3 tiers) | `[x]` |
+| §8 Stop conditions | `[x]` |
+| §9 Rollback principles | `[x]` |
+| §10 Nächster Schritt | `[x]` |
+| S+-01: release_gate, fail-closed, no auto-publish | `[x]` |
+| S+-02: foreign user_id blocked, URL schemes | `[x]` |
+| S+-03: central sanitizer, XSS corpus, Quill preserved | `[x]` |
+| S+-04: RPC ack+lock checks, SECURITY DEFINER | `[x]` |
+| No implementation / no security fix claimed done | `[x]` |
+| Pending `add_recipe` conflict untouched | `[x]` |
+
+**Next candidate:** **P5-B.1 Notification Injection Fix Baseline**. No push/deploy/launch.
 
 **STOPP — BoundLore remains NOT live-ready. Public-Launch-Ready = NO-GO until P5-F + Fable Retest 1.**
 
@@ -402,7 +433,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/current-code-gap-notes.md` §85 | P5-A.1 gate record |
+| `docs/architecture/current-code-gap-notes.md` §85–§86 | P5-A.1 / P5-A.2 gate records |
 | `docs/architecture/moderation-conflict-matrix.md` | Conflict handling must remain untouched during P5 |
 | `docs/architecture/entity-promotion-policy.md` | No auto-promotion during security fixes |
 | `docs/architecture/graph-relations-spec.md` | Relation registry unchanged in P5 |
@@ -425,4 +456,4 @@ For planning continuity — remediated after P5-F, before Product-Activation ret
 
 ---
 
-*Document version: P5-A.1 planning gate. No implementation. No SQL executed.*
+*Document version: P5-A.2 planning acceptance sweep accepted. No implementation. No SQL executed.*

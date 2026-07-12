@@ -1791,7 +1791,41 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
 
-**Next candidate:** **P5-A.2 S+ Remediation Planning Acceptance Sweep**. Then **P5-B.1 Notification Injection Fix Baseline**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P5-B.1 Notification Injection Fix Baseline**. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P5-A.2 — S+ Remediation Planning Acceptance Sweep
+
+**Milestone:** P5-A.2 docs-only acceptance sweep; confirms P5-A.1 plan completeness; no code, SQL, data, deploy, or push.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Plan §1 Status and Scope | `p5-splus-remediation-plan.md` | complete | `[x]` |
+| Plan §2 S+ Finding Summary | plan | S+-01, S+-02, S+-03, S+-04 | `[x]` |
+| Plan §3 Reihenfolge | plan | P5-B → P5-C → P5-D → P5-E → P5-F with rationale | `[x]` |
+| Plan §4 Gate-Struktur | plan | P5-B.1/B.2 through P5-F.1/F.2 | `[x]` |
+| Plan §5 Acceptance Criteria | plan | measurable per finding | `[x]` |
+| Plan §6 Teststrategie | plan | 12 test types documented | `[x]` |
+| Plan §7 Fable Retest | plan | Retest 1/2/Final prerequisites | `[x]` |
+| Plan §8 Stop Conditions | plan | documented | `[x]` |
+| Plan §9 Rollback | plan | documented | `[x]` |
+| Plan §10 Nächster Schritt | plan | P5-B.1 next | `[x]` |
+| S+-01 coverage | plan §5 | release_gate, fail-closed, no auto-publish | `[x]` |
+| S+-02 coverage | plan §5 | foreign user_id, URL schemes | `[x]` |
+| S+-03 coverage | plan §5 | sanitizer, XSS corpus, Quill preserved | `[x]` |
+| S+-04 coverage | plan §5 | RPC ack+lock, SECURITY DEFINER | `[x]` |
+| No implementation | — | no code/SQL/Supabase/data changes | `[x]` |
+| No security fix done | — | planning only | `[x]` |
+| Product Activation FAIL | docs | documented | `[x]` |
+| Public Launch NO-GO | docs | documented | `[x]` |
+| Pending conflict | — | not touched | `[x]` |
+
+**P5-A.2 acceptance sweep completed locally.** The P5 S+ Remediation Plan is accepted as docs-only. All four S+ launch blockers are mapped to dedicated implementation and acceptance gates. The order P5-B through P5-F, per-finding acceptance criteria, test strategy, stop conditions, rollback principles, and Fable retest strategy are accepted. No code, SQL, Supabase, data, UI, RLS, RPC, sanitizer, release-lock, notification, push, deploy, or launch changes were introduced. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
+
+**Next candidate:** **P5-B.1 Notification Injection Fix Baseline**. **LAUNCH-0** required before any push/deploy.
 
 ---
 
