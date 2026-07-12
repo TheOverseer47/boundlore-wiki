@@ -1413,6 +1413,31 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-C.1 — Admin Read-only Structured Field Inspector Planning Gate
+
+**Milestone:** P4-C.1 docs-only planning gate; no code, SQL, data migration, admin integration, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P4-B schema/validation accepted | `[x]` |
+| Inspector scope matrix documented | `[x]` |
+| Forbidden inspector functions documented | `[x]` |
+| Inspector data pipeline planned | `[x]` |
+| P4-C.2 baseline module structure planned | `[x]` |
+| No admin inspector code integration | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-C.1 planning gate completed locally.** Admin Read-only Structured Field Inspector is planned as read-only diagnostics only: entry identity, raw structured sources, contract output, schema validation report, issues, and field status — no save, edit, approve, reject, repair, queue mutation, promotion, search index, or deploy. Inspector remains unimplemented; schema module stays QA-fixture-only. Project remains not live-ready; LAUNCH-0 mandatory before push/deploy.
+
+**Next candidate:** P4-C.2 Acceptance Sweep or Admin Read-only Structured Field Inspector Baseline. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

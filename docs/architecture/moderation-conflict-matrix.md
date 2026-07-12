@@ -195,6 +195,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P4-B.2 acceptance sweep:** Schema validation baseline accepted locally. No moderation workflow, queue actions, or write-path activation. Pending `add_recipe` untouched.
 
+**P4-C.1 planning gate:** Admin Read-only Structured Field Inspector is read-only planning only. Field-level conflict preview remains future work (post-inspector, post-write-flow). Existing `add_recipe` recipe conflict remains baseline only. No new approval flows activated. Pending `add_recipe` untouched.
+
 ---
 
 ---

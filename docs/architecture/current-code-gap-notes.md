@@ -2100,7 +2100,7 @@ When write flows are implemented (not in P4-A.1):
 | P4-A.2 | Acceptance Sweep | docs-only | Confirms authoring/moderation plan |
 | P4-B.1 | Structured Context Schema & Validation Baseline | Later code possible | Validators/schemas only; no writes |
 | P4-B.2 | Acceptance Sweep | docs-only | |
-| P4-C.1 | Admin Read-only Structured Field Inspector | Later code | Admin sees fields read-only; no edits |
+| P4-C.1 | Admin Read-only Structured Field Inspector Planning Gate | **Current — docs-only** | Inspector scope/pipeline planned; no code |
 | P4-D.1 | Structured Contribution Draft Flow Planning | Later docs/code | No real approvals yet |
 
 **Write flows** (admin edit, create with fields, contribution approve) come only after: schema, validation, conflict policy, evidence/audit policy, and separate data-safety gate.
@@ -2235,5 +2235,97 @@ P3 read-only contract, renderer, preview adapter, probe, and wiki-entry-layout p
 ### Next candidate
 
 **P4-C.1 — Admin Read-only Structured Field Inspector Planning or Baseline** — read-only inspection only; not production deploy without **LAUNCH-0**.
+
+---
+
+## 72. P4-C.1 — Admin Read-only Structured Field Inspector Planning Gate
+
+**Milestone:** P4-C.1 docs-only planning gate; no code, SQL, data migration, admin integration, or deploy.
+
+### Context
+
+- **P4-B** schema and validation baseline is **accepted** (`BoundLoreStructuredContextSchema`, schema version `p4-b1`, QA-fixture-only).
+- **P4-C.1 plans only** — no Admin Inspector code, no admin HTML/JS changes, no prod schema wiring.
+- **Goal (future):** let an authenticated admin **see** structured context fields, contract extraction, and validation diagnostics **read-only**.
+- **Not in scope:** edit, save, approve, reject, repair, queue mutation, promotion, search index, deploy.
+- **Still not live-ready** — LAUNCH-0 mandatory before any push/deploy/live action.
+
+### Inspector scope matrix
+
+| Inspector area | May display later? | Source | May trigger action? |
+|----------------|-------------------|--------|---------------------|
+| Entry Identity | Yes | Entry root fields (`title`, `slug`, `entity_domain`, `entity_subtype`, ids) | No |
+| Structured Context Raw | Yes | `root` / `meta` / `discovery_payload` / `structured_context` (read-only clone) | No |
+| Data Contract Output | Yes | `BoundLoreContextDataContract.resolveContractEntry(clone)` | No |
+| Schema Validation Report | Yes | `BoundLoreStructuredContextSchema.createValidationReport(contractContext)` | No |
+| Validation Issues | Yes | Schema report (`issues`, severities, codes) | No |
+| Field Status | Yes | `authorable` / `restricted` / `planned` / `forbidden` / `system_only` | No |
+| Evidence/Confidence Summary | Yes, if present | Existing metadata only (evidence tier, confidence badges source data) | No |
+| Diff / Conflict Preview | Planned later | Future moderation flow; not P4-C | No in Inspector |
+| Write Controls | **No** | None | **Forbidden** |
+| Repair/Danger Tools | **No** | None | **Forbidden** |
+
+### Forbidden inspector functions
+
+The future Admin Read-only Structured Field Inspector must **NOT**:
+
+- Show Save buttons or editable inputs
+- Trigger Approve / Reject / Repair / Danger Zone actions
+- Mutate queue items, pending posts, or missing-entry records
+- Create Wood/Forge posts or any new wiki posts
+- Execute Supabase inserts/updates/deletes or SQL
+- Update search index or start backfill
+- Suggest or execute automatic entity promotion
+- Suggest or execute automatic taxonomy inference (fire from title, crystal from source_detail, PLACE from coordinates)
+- Convert free text into structured authorable fields without explicit future write gate
+- Trigger version/patch/admin auto-actions from versioning fields
+
+Inspector policy helpers (future baseline) must mirror schema policy: all `shouldWrite*`, `shouldCreatePost*`, `shouldPromote*`, `shouldRenderValidationActions` return **`false`**.
+
+### Planned inspector data pipeline (future P4-C.2 baseline)
+
+1. Admin loads an **existing entry read-only** (same source as post detail / admin preview).
+2. Inspector receives a **deep clone** of the entry object — original never mutated.
+3. `BoundLoreContextDataContract.resolveContractEntry(clone)` → explicit contract context only.
+4. `BoundLoreStructuredContextSchema.createValidationReport(contractContext)` → validation report.
+5. Inspector renders read-only panels:
+   - Raw sources summary (which buckets contributed fields)
+   - Extracted context summary (seven sections, field-level status)
+   - Validation report (valid/blocked, issue list)
+   - Policy flags (write/promotion/post/search all false)
+6. **No action controls** — no buttons, forms, links to create-post/edit-post, or queue actions.
+7. Original entry and database remain **unchanged** — no Supabase writes.
+
+### Safe admin integration (future)
+
+When integrated (not in P4-C.1):
+
+- Behind **existing admin session gate** only (`admin-auth.js` / admin route).
+- **Separate panel or tab** — must not reuse Pending/Discovery approve UI or Danger Zone containers.
+- **Localhost QA fixture first** before any admin HTML script tag.
+- Inspector reads the same entry object admin already loaded for preview — no new fetch/write endpoints required for read-only baseline.
+- Must not auto-open on all admin pages; explicit entry context required (e.g. pending post preview, entry slug param).
+
+### Recommended sequence
+
+| Phase | Task | Type | Notes |
+|-------|------|------|-------|
+| **P4-C.1** | Admin Read-only Structured Field Inspector Planning Gate | **Current — docs-only** | This gate |
+| P4-C.2 | Acceptance Sweep **or** Admin Read-only Inspector Baseline | docs-only **or** read-only code | Baseline: render helpers + QA fixture; optional admin panel read-only |
+| P4-D.1 | Structured Contribution Draft Flow Planning | docs-only | No real approvals yet |
+
+**P4-C.2 baseline (when code allowed)** may add:
+
+- `js/admin-structured-context-inspector.js` — pure render helpers, no fetch/write
+- `qa/p4-admin-structured-context-inspector-fixtures.html` — QA-only harness
+- Optional admin integration: read-only panel behind session, no buttons/forms
+
+**P4-C.2 baseline must NOT add:** edit UI, save UI, approval UI, DB writes, SQL, search index, backfill, deploy.
+
+### Not live-ready
+
+**P4-C.1 activates nothing.** No admin inspector code, no schema prod wiring, no moderation workflow, no search index, no deploy.
+
+**Next:** P4-C.2 acceptance sweep or Admin Read-only Structured Field Inspector Baseline.
 
 ---
