@@ -96,6 +96,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-J.1 planning gate:** Real-data read-only probe (P3-K.1) is not a search-index gate. No backend field search or index activation until separate search gate.
 
+**P3-K.1:** Real entry contract probe renders diagnostics only; not a search index or backend search activation.
+
 ---
 
 ## Goals

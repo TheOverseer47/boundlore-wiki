@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>QA-only P3 Real Entry Contract Probe - BoundLore</title>
+<link rel="stylesheet" href="/css/style.css" />
+<style>
+  .qa-probe-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+  .qa-probe-banner {
+    background: #1a2332;
+    border: 1px solid #3d5166;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .qa-probe-banner h1 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+  }
+  .qa-probe-banner p {
+    margin: 4px 0;
+    color: #b8c5d4;
+    font-size: 0.95rem;
+  }
+  .qa-probe-summary {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+  }
+  .qa-probe-entry {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .qa-probe-entry h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+  }
+  .qa-probe-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .qa-probe-links li {
+    font-size: 0.9rem;
+  }
+  .qa-probe-links a {
+    color: #8ec8ff;
+    word-break: break-all;
+  }
+  .qa-probe-mode-label {
+    display: inline-block;
+    min-width: 160px;
+    color: #9fb0c3;
+    font-family: ui-monospace, monospace;
+    font-size: 0.82rem;
+  }
+</style>
+</head>
+<body>
+<div class="qa-probe-page bl-qa-real-entry-probe">
+  <header class="qa-probe-banner">
+    <h1>QA-only real existing entry contract probe — P3-K.1</h1>
+    <p><strong>Not linked from wiki navigation.</strong> Static localhost detail-page links only. No Supabase. No posts. No data writes.</p>
+    <p>Opens real loaded detail pages with optional <code>p3_contract_probe</code> query param for read-only contract diagnostics.</p>
+    <p>Open links manually — no iframe autoloads, no automatic side effects.</p>
+  </header>
+
+  <div id="realEntryProbeSummary" class="qa-probe-summary">Loading probe link matrix…</div>
+  <div id="realEntryProbeRoot"></div>
+</div>
+
+<script src="/qa/p3-real-entry-contract-probe.js?v=1"></script>
+</body>
+</html>

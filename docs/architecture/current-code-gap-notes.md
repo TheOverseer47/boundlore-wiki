@@ -1854,3 +1854,43 @@ LAUNCH-0 must verify (when executed later):
 **P3-K.1 — Real Existing Entry Read-only Contract Probe** — not production deploy without **LAUNCH-0**.
 
 ---
+
+## 64. P3-K.1 — Real Existing Entry Read-only Contract Probe
+
+**Milestone:** P3-K.1 localhost + query-param read-only real entry contract probe; no SQL, data migration, or deploy.
+
+### Module
+
+`js/context-real-entry-probe.js` — `window.BoundLoreContextRealEntryProbe`
+
+- Query param: `p3_contract_probe` (`1`, `true`, `summary`, `full`)
+- Active only on exact `localhost` with probe query present
+- Blocked on `127.0.0.1`, `boundlore.com`, `www.boundlore.com`, `preview.boundlore.com`
+- Read-only diagnostics panel on real detail pages; no writes, posts, Supabase, admin/create/edit, search index, promotion, or inference
+
+### Integration
+
+`wiki/post/index.html` loads probe after preview adapter; `wiki-entry-layout.js` runs probe after contract resolution and context render when probe query active. Original entry and contract entry are cloned; probe does not mutate pipeline results.
+
+### QA harness
+
+`qa/p3-real-entry-contract-probe.html` + `.js` — not linked from wiki navigation. Static localhost links for QA Staff, QA Ember, QA Ogre, Swamp across no_probe / probe_summary / probe_full / preview_all_plus_probe modes.
+
+### Verified behavior
+
+| Check | Result |
+|-------|--------|
+| Probe active only with `p3_contract_probe` on localhost | `[x]` |
+| Without probe query: 0 probe panel | `[x]` |
+| QA Staff/Ember/Ogre/Swamp without explicit contract fields | `[x]` — 0 context sections; probe panel documents diagnostics |
+| Preview + probe combined | `[x]` — preview banner/sections + probe notes preview is separate |
+| Existing QA harnesses regression | `[x]` — sample 10/10, contract 9/9, guard 12/12 |
+| Writes / posts / deploy | `[x]` — none |
+
+### Not live-ready
+
+**Noch NICHT live-ready.** LAUNCH-0 remains mandatory before push/deploy.
+
+**Next:** P3-K.2 acceptance sweep.
+
+---

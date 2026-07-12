@@ -1809,22 +1809,31 @@ window.WikiEntryLayout = (function() {
         BoundLoreContextSectionRenderer.shouldRenderAnyContext) {
       try {
         const rawPayload = model.rawDiscoveryPayload || {};
-        let contextEntry = {
+        const realEntryProbe = typeof BoundLoreContextRealEntryProbe !== "undefined"
+          ? BoundLoreContextRealEntryProbe
+          : null;
+        const probeClone = realEntryProbe && realEntryProbe.cloneProbeEntry
+          ? realEntryProbe.cloneProbeEntry.bind(realEntryProbe)
+          : function(entry) { return Object.assign({}, entry || {}); };
+        const originalContextEntry = probeClone({
           meta: Object.assign({}, model.meta, { discovery_payload: rawPayload }),
           post: model.post,
           discovery_payload: rawPayload,
           structured_context: (model.meta && model.meta.structured_context) || {},
-        };
+        });
+        let contextEntry = originalContextEntry;
         if (typeof BoundLoreContextDataContract !== "undefined" &&
             BoundLoreContextDataContract.resolveContractEntry) {
-          contextEntry = BoundLoreContextDataContract.resolveContractEntry(contextEntry);
+          contextEntry = BoundLoreContextDataContract.resolveContractEntry(probeClone(originalContextEntry));
         }
+        const contractContextEntry = contextEntry;
+        let contextRenderHtml = "";
         const previewAdapter = typeof BoundLoreContextPreviewAdapter !== "undefined"
           ? BoundLoreContextPreviewAdapter
           : null;
         if (previewAdapter && previewAdapter.isPreviewActive && previewAdapter.isPreviewActive()) {
-          const resolvedEntry = previewAdapter.resolvePreviewEntry(contextEntry);
-          const diagnostics = previewAdapter.getPreviewDiagnostics(contextEntry);
+          const resolvedEntry = previewAdapter.resolvePreviewEntry(probeClone(contractContextEntry));
+          const diagnostics = previewAdapter.getPreviewDiagnostics(probeClone(originalContextEntry));
           if (previewAdapter.shouldShowPreviewBanner && previewAdapter.shouldShowPreviewBanner()) {
             const bannerHtml = previewAdapter.renderPreviewBanner(
               previewAdapter.getActivePreviewMode(),
@@ -1836,13 +1845,30 @@ window.WikiEntryLayout = (function() {
             const contextHtml = BoundLoreContextSectionRenderer.renderContextSections(resolvedEntry, {
               mode: "read_only",
             });
-            if (contextHtml) html += contextHtml;
+            if (contextHtml) {
+              contextRenderHtml = contextHtml;
+              html += contextHtml;
+            }
           }
-        } else if (BoundLoreContextSectionRenderer.shouldRenderAnyContext(contextEntry)) {
-          const contextHtml = BoundLoreContextSectionRenderer.renderContextSections(contextEntry, {
+        } else if (BoundLoreContextSectionRenderer.shouldRenderAnyContext(contractContextEntry)) {
+          const contextHtml = BoundLoreContextSectionRenderer.renderContextSections(contractContextEntry, {
             mode: "read_only",
           });
-          if (contextHtml) html += contextHtml;
+          if (contextHtml) {
+            contextRenderHtml = contextHtml;
+            html += contextHtml;
+          }
+        }
+        if (realEntryProbe && realEntryProbe.isProbeActive && realEntryProbe.isProbeActive()) {
+          const probeResult = realEntryProbe.createProbeResult(
+            originalContextEntry,
+            contractContextEntry,
+            contextRenderHtml,
+            { mode: realEntryProbe.getActiveProbeMode() }
+          );
+          realEntryProbe.recordProbeResult(probeResult);
+          const probeHtml = realEntryProbe.renderProbePanel(probeResult);
+          if (probeHtml) html += probeHtml;
         }
       } catch (err) {
         /* P3 context renderer optional */

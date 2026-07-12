@@ -1221,6 +1221,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-K.1 — Real Existing Entry Read-only Contract Probe
+
+**Milestone:** P3-K.1 localhost + query-param read-only real entry contract probe; no SQL, data migration, or deploy.
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreContextRealEntryProbe` module | `[x]` |
+| localhost + `p3_contract_probe` only | `[x]` |
+| QA probe link page (`qa/p3-real-entry-contract-probe.html`) | `[x]` — 4 entries × 4 modes |
+| Real detail pages probed (Staff/Ember/Ogre/Swamp) | `[x]` |
+| Without probe query: 0 probe panel | `[x]` |
+| QA entries without explicit contract: 0 context sections | `[x]` |
+| Preview + probe combined | `[x]` |
+| No writes / posts / admin / search index | `[x]` |
+| Not live-ready | `[x]` |
+
+**Next candidate:** P3-K.2 acceptance sweep. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

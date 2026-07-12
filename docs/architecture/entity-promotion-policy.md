@@ -146,6 +146,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-J.1 planning gate:** Real-data binding must not trigger promotion, inference, or entity creation. Explicit contract fields only; enriched/derived fields excluded. LAUNCH-0 required before any push/deploy.
 
+**P3-K.1:** Real entry contract probe is read-only inspection only; no promotion or inference from loaded entries.
+
 ---
 
 ## Missing Entry Queue
