@@ -1377,3 +1377,21 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-D.2 acceptance sweep completed locally.** The QA-only detail preview matrix is accepted. It covers QA Staff, QA Ember, QA Ogre, and Swamp across all preview modes with local detail-page links only. Positive preview modes render expected sections; negative/off/no-preview states remain empty. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced. P3-C preview remains localhost-gated; separate launch gate required before deploy.
 
 ---
+
+## 53. P3-E.1 — Preview Production Guard Safety Baseline
+
+**Status:** Complete (local production guard helpers + QA-only guard test page; no posts, no DB writes, no deploy).
+
+| Area | Result |
+|------|--------|
+| Guard helpers | `getAllowedPreviewHostname`, `isAllowedPreviewHostname`, `getPreviewModeFromSearch`, `isPreviewActiveForLocation`, `getPreviewGuardDiagnostics` |
+| Allowed host | Exact `localhost` only |
+| Blocked hosts | `127.0.0.1`, `boundlore.com`, `www.boundlore.com`, `preview.boundlore.com`, external/empty |
+| Guard test page | `qa/p3-preview-guard-safety.html` + `qa/p3-preview-guard-safety.js` — 12/12 cases PASS |
+| Local preview | Existing `?p3_context_preview=` behavior unchanged on localhost |
+| Policy | QA-only guard page; not in navigation; no iframes; no data writes |
+| Not activated | Production preview on boundlore.com or any non-localhost host |
+
+**P3-E.1:** Preview production guard safety baseline enforces exact localhost + valid query mode. Separate launch gate still required before deploy.
+
+---

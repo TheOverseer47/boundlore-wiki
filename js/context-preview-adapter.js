@@ -1,6 +1,7 @@
 // ============================================
 // BoundLore Context Preview Adapter
 // P3-C.1 — localhost + query-param opt-in read-only detail preview overlay.
+// P3-E.1 — production guard safety helpers (exact localhost + query only).
 // No writes, no posts, no Supabase, no entry mutation, no admin/create flows.
 // See docs/architecture/current-code-gap-notes.md
 // ============================================
@@ -139,10 +140,109 @@ window.BoundLoreContextPreviewAdapter = (function() {
       .replace(/"/g, "&quot;");
   }
 
+  function getAllowedPreviewHostname() {
+    return "localhost";
+  }
+
+  function normalizeHostname(value) {
+    let raw = String(value == null ? "" : value).trim().toLowerCase();
+    if (!raw) return "";
+    const colonIdx = raw.lastIndexOf(":");
+    if (colonIdx > 0 && raw.indexOf(":") === colonIdx) {
+      const maybePort = raw.slice(colonIdx + 1);
+      if (/^\d+$/.test(maybePort)) {
+        raw = raw.slice(0, colonIdx);
+      }
+    }
+    return raw;
+  }
+
+  function isAllowedPreviewHostname(hostname) {
+    return normalizeHostname(hostname) === getAllowedPreviewHostname();
+  }
+
+  function parseLocationLike(locationLike) {
+    const loc = locationLike && typeof locationLike === "object" ? locationLike : {};
+    return {
+      hostname: normalizeHostname(loc.hostname != null ? loc.hostname : ""),
+      search: loc.search != null ? String(loc.search) : "",
+    };
+  }
+
+  function readPreviewParamFromSearch(search) {
+    try {
+      const s = String(search || "");
+      const query = s.charAt(0) === "?" ? s.slice(1) : s;
+      if (!query) return null;
+      return new URLSearchParams(query).get(PREVIEW_QUERY_PARAM);
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function isQueryParamPresentForSearch(search) {
+    const raw = readPreviewParamFromSearch(search);
+    return raw != null && raw !== "";
+  }
+
+  function getPreviewModeFromSearch(search) {
+    const raw = readPreviewParamFromSearch(search);
+    if (raw == null || raw === "") return "off";
+    return normalizePreviewMode(raw);
+  }
+
+  function getPreviewGuardReason(parsed, mode, rawParam) {
+    if (!isAllowedPreviewHostname(parsed.hostname)) {
+      return "blocked_hostname";
+    }
+    if (!isQueryParamPresentForSearch(parsed.search)) {
+      return "missing_query_param";
+    }
+    if (rawParam != null && rawParam !== "" && mode === "off") {
+      const normalizedRaw = slugKey(rawParam);
+      if (normalizedRaw === "off") return "mode_off";
+      return "unknown_mode";
+    }
+    if (mode === "off") return "mode_off";
+    return "allowed";
+  }
+
+  function isPreviewAllowedForLocation(locationLike) {
+    const parsed = parseLocationLike(locationLike);
+    if (!isAllowedPreviewHostname(parsed.hostname)) return false;
+    const rawParam = readPreviewParamFromSearch(parsed.search);
+    if (rawParam == null || rawParam === "") return false;
+    return normalizePreviewMode(rawParam) !== "off";
+  }
+
+  function isPreviewActiveForLocation(locationLike) {
+    return isPreviewAllowedForLocation(locationLike);
+  }
+
+  function getActivePreviewModeForLocation(locationLike) {
+    if (!isPreviewAllowedForLocation(locationLike)) return "off";
+    return getPreviewModeFromSearch(parseLocationLike(locationLike).search);
+  }
+
+  function getPreviewGuardDiagnostics(locationLike) {
+    const parsed = parseLocationLike(locationLike);
+    const rawParam = readPreviewParamFromSearch(parsed.search);
+    const mode = getActivePreviewModeForLocation(locationLike);
+    return {
+      hostname: parsed.hostname,
+      search: parsed.search,
+      mode: mode,
+      isAllowedHostname: isAllowedPreviewHostname(parsed.hostname),
+      isQueryParamPresent: isQueryParamPresentForSearch(parsed.search),
+      isPreviewAllowed: isPreviewAllowedForLocation(locationLike),
+      isPreviewActive: isPreviewActiveForLocation(locationLike),
+      reason: getPreviewGuardReason(parsed, mode, rawParam),
+    };
+  }
+
   function isLocalhost() {
     try {
-      const host = String(window.location && window.location.hostname || "").toLowerCase();
-      return host === "localhost";
+      return isAllowedPreviewHostname(window.location && window.location.hostname);
     } catch (err) {
       return false;
     }
@@ -154,8 +254,7 @@ window.BoundLoreContextPreviewAdapter = (function() {
 
   function readQueryPreviewMode() {
     try {
-      const params = new URLSearchParams(window.location.search || "");
-      return params.get(PREVIEW_QUERY_PARAM);
+      return readPreviewParamFromSearch(window.location.search || "");
     } catch (err) {
       return null;
     }
@@ -170,8 +269,11 @@ window.BoundLoreContextPreviewAdapter = (function() {
   }
 
   function getActivePreviewMode() {
-    if (!isPreviewAllowed()) return "off";
-    return normalizePreviewMode(readQueryPreviewMode());
+    try {
+      return getActivePreviewModeForLocation(window.location);
+    } catch (err) {
+      return "off";
+    }
   }
 
   function isPreviewModeEnabled(mode) {
@@ -180,15 +282,19 @@ window.BoundLoreContextPreviewAdapter = (function() {
   }
 
   function isPreviewAllowed() {
-    if (!isLocalhost()) return false;
-    const raw = readQueryPreviewMode();
-    if (raw == null || raw === "") return false;
-    const mode = normalizePreviewMode(raw);
-    return mode !== "off";
+    try {
+      return isPreviewAllowedForLocation(window.location);
+    } catch (err) {
+      return false;
+    }
   }
 
   function isPreviewActive() {
-    return isPreviewAllowed() && getActivePreviewMode() !== "off";
+    try {
+      return isPreviewActiveForLocation(window.location);
+    } catch (err) {
+      return false;
+    }
   }
 
   function buildAllFixture() {
@@ -257,7 +363,9 @@ window.BoundLoreContextPreviewAdapter = (function() {
   }
 
   function getPreviewDiagnostics(entry) {
-    const mode = getActivePreviewMode();
+    const guard = getPreviewGuardDiagnostics(
+      typeof window !== "undefined" ? window.location : {}
+    );
     const resolved = resolvePreviewEntry(entry);
     let renderable = false;
     if (typeof BoundLoreContextSectionRenderer !== "undefined" &&
@@ -269,13 +377,14 @@ window.BoundLoreContextPreviewAdapter = (function() {
       }
     }
     return {
-      active: isPreviewActive(),
-      allowed: isPreviewAllowed(),
-      localhost: isLocalhost(),
-      mode: mode,
+      active: guard.isPreviewActive,
+      allowed: guard.isPreviewAllowed,
+      localhost: guard.isAllowedHostname,
+      mode: guard.mode,
       query_param: PREVIEW_QUERY_PARAM,
       renderable: renderable,
       policy: PREVIEW_POLICY.slice(),
+      guard: guard,
     };
   }
 
@@ -308,6 +417,14 @@ window.BoundLoreContextPreviewAdapter = (function() {
     PREVIEW_QUERY_PARAM: PREVIEW_QUERY_PARAM,
     PREVIEW_MODES: PREVIEW_MODES,
     PREVIEW_POLICY: PREVIEW_POLICY,
+    getAllowedPreviewHostname: getAllowedPreviewHostname,
+    normalizeHostname: normalizeHostname,
+    isAllowedPreviewHostname: isAllowedPreviewHostname,
+    getPreviewModeFromSearch: getPreviewModeFromSearch,
+    isPreviewAllowedForLocation: isPreviewAllowedForLocation,
+    isPreviewActiveForLocation: isPreviewActiveForLocation,
+    getActivePreviewModeForLocation: getActivePreviewModeForLocation,
+    getPreviewGuardDiagnostics: getPreviewGuardDiagnostics,
     isLocalhost: isLocalhost,
     getPreviewQueryParam: getPreviewQueryParam,
     normalizePreviewMode: normalizePreviewMode,

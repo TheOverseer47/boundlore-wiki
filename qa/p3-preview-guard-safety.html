@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>QA-only P3 Preview Production Guard Safety - BoundLore</title>
+<link rel="stylesheet" href="/css/style.css" />
+<style>
+  .qa-guard-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+  .qa-guard-banner {
+    background: #1a2332;
+    border: 1px solid #3d5166;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .qa-guard-banner h1 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+  }
+  .qa-guard-banner p {
+    margin: 4px 0;
+    color: #b8c5d4;
+    font-size: 0.95rem;
+  }
+  .qa-guard-summary {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+  }
+  .qa-guard-summary.pass {
+    border-color: #2d6a4f;
+  }
+  .qa-guard-summary.fail {
+    border-color: #9b2c2c;
+  }
+  .qa-guard-status-pass {
+    color: #6ee7a0;
+    font-weight: 600;
+  }
+  .qa-guard-status-fail {
+    color: #f87171;
+    font-weight: 600;
+  }
+  .bl-qa-guard-table td.pass-cell {
+    color: #6ee7a0;
+  }
+  .bl-qa-guard-table td.fail-cell {
+    color: #f87171;
+  }
+</style>
+</head>
+<body>
+<div class="qa-guard-page bl-qa-preview-matrix">
+  <header class="qa-guard-banner">
+    <h1>QA-only preview production guard safety — P3-E.1</h1>
+    <p><strong>Not linked from wiki navigation.</strong> Static host/query guard tests only. No Supabase. No posts. No data writes.</p>
+    <p>Preview is allowed only on exact <code>localhost</code> with a valid <code>p3_context_preview</code> query mode.</p>
+    <p><code>127.0.0.1</code>, <code>boundlore.com</code>, and other hosts remain blocked.</p>
+  </header>
+
+  <div id="guardSummary" class="qa-guard-summary">Running guard tests…</div>
+  <div id="guardRoot"></div>
+</div>
+
+<script src="/js/context-preview-adapter.js?v=4"></script>
+<script src="/qa/p3-preview-guard-safety.js?v=1"></script>
+</body>
+</html>

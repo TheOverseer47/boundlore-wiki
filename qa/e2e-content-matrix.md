@@ -972,6 +972,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-E.1 — Preview Production Guard Safety Baseline
+
+**Milestone:** P3-E first brick; production guard helpers + QA-only guard test page; no posts, no DB writes, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Guard page | `/qa/p3-preview-guard-safety.html` | HTTP 200; QA-only banner | `[x]` |
+| Guard cases | guard page | 12/12 PASS; only A/B active | `[x]` |
+| Hostname API | console | localhost allowed; 127.0.0.1/boundlore blocked | `[x]` |
+| Location API | console | localhost+all active; boundlore+all off | `[x]` |
+| Malicious query | case L | inactive; mode off | `[x]` |
+| Link safety | guard page | no admin/create/edit; no buttons/forms | `[x]` |
+| Preview regression | QA Staff + modes | all/resource/negative/no-preview unchanged | `[x]` |
+| Matrix regression | `/qa/p3-detail-preview-matrix.html` | 44 links; 4×11 modes | `[x]` |
+| Fixture regression | `/qa/p3-context-renderer-fixtures.html` | 8/8 fixtures; 12/12 assertions | `[x]` |
+| Production regressions | browse/resources/items/search/admin + QA posts | HTTP 200; baseline unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-E.1:** Preview production guard safety baseline. Exact `localhost` + valid query mode only. boundlore.com / www / preview subdomain blocked. Not linked from production navigation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

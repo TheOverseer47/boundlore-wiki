@@ -76,6 +76,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-D.2 acceptance sweep:** Preview matrix accepted locally. Search baseline unchanged; preview not indexed.
 
+**P3-E.1 production guard:** Preview hostname guard helpers; no search/index changes; preview not indexed.
+
 ---
 
 ## Goals
