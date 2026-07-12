@@ -515,6 +515,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-C.2 — Vendor / Economy / Trade Offer Acceptance Sweep
+
+**Milestone:** P2-C foundation block (C.1 + C.2); registry/read/search baseline only; no SQL, no shop UI, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| EconomyRegistry API sweep | QA Staff post | all normalize/extract/signals green | `[x]` |
+| ContentModel/QuestEvent integration | console | economy_context; create_ui/admin false | `[x]` |
+| Reserved relations | sold_by, reward_of, occurs_during | reserved; persistence reserved | `[x]` |
+| Search parser hints | vendor/merchant/sold by/price/gold/event currency/seasonal vendor | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/parser/npc vendor/quest reward | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no vendor/price sections | `[x]` |
+| Resources mining | facet URL | QA Ember visible | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Reserved UI flows | pages | no Vendor/Offer/Currency/Price buttons | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-C.2 acceptance sweep completed; Vendor/economy/trade offers accepted as registry/read/search baseline only. No shop UI, no admin flow, no SQL, no data migration.** P2-C accepted as local foundation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

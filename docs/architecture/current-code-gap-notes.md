@@ -937,3 +937,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | QA Staff/Ember/Ogre/Swamp, mining/wood/forge search, create_ui/admin_flow false | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 32. P2-C.2 — Vendor / Economy / Trade Offer Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; registry/read/search baseline only; no SQL, no shop UI, no data migration).
+
+| Acceptance | Result |
+|------------|--------|
+| EconomyRegistry API (post page) | Green — offer/currency/price/availability normalize + signals |
+| ContentModelRegistry / QuestEventRegistry | Green — economy_context, vendor_inventory; create_ui/admin false |
+| Reserved relations | sold_by, reward_of, occurs_during — persistence `reserved` |
+| Search parser hints | vendor/merchant/sold by/price/gold/event currency/seasonal vendor | Green |
+| Search regressions | mining/wood/forge/parser/npc vendor/quest reward unchanged |
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged; no vendor/price/offer sections |
+| Resources mining | QA Ember visible |
+| Wood/Forge | Missing-entry only; no posts |
+| Admin | Session-dependent — automation not verified |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-C.2 acceptance sweep completed; Vendor/economy/trade offers accepted as registry/read/search baseline only. No shop UI, no admin flow, no SQL, no data migration.** P2-C foundation block (C.1 + C.2) accepted locally. Ready for P2-D. Deployment freeze remains active.

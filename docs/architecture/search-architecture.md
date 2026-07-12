@@ -34,6 +34,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-C.1 code baseline:** `js/economy-registry.js` — trade offers, price/currency/availability/stock normalization, vendor inventory context. Structured fields only; **no** shop UI, **no** posts by default, **no** SQL. `sold_by` remains reserved.
 
+**P2-C.2 acceptance sweep:** P2-C.2 acceptance sweep completed; Vendor/economy/trade offers accepted as registry/read/search baseline only. No shop UI, no admin flow, no SQL, no data migration. P2-C foundation block accepted locally.
+
 ---
 
 ## Goals
