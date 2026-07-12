@@ -1576,6 +1576,18 @@ window.WikiEntryLayout = (function() {
     const displayName = typeof EntityCore !== "undefined"
       ? EntityCore.getDisplayName(meta, post)
       : (post.title || "Untitled");
+    let contentModelContext = null;
+    if (typeof BoundLoreContentModelRegistry !== "undefined" && BoundLoreContentModelRegistry.resolveContentModelContext) {
+      try {
+        contentModelContext = BoundLoreContentModelRegistry.resolveContentModelContext({
+          meta: meta,
+          post: post,
+          discovery_payload: payload,
+        });
+      } catch (err) {
+        contentModelContext = null;
+      }
+    }
 
     return {
       post: post,
@@ -1599,6 +1611,7 @@ window.WikiEntryLayout = (function() {
         if (!payload || !Object.keys(payload).length) return "";
         return buildSourceDiscoveryHtml(payload, meta, post, cleanContent);
       })(),
+      contentModelContext: contentModelContext,
       supplementalHtml: "",
     };
   }

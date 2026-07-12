@@ -18,6 +18,8 @@
 
 **P1-H.1 final foundation gate:** P1 registries accepted locally as client-side foundation. No SQL, no deploy. P2 may start from this baseline.
 
+**P2-A.1 content models:** NPC = BEING/npc, Quest = KNOWLEDGE/quest, Event = EVENT/event. Model registry only; no new top-level domain; create_ui/admin_flow remain false.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

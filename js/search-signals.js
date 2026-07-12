@@ -362,6 +362,31 @@ window.BoundLoreSearchSignals = (function() {
     return bucket.signals;
   }
 
+  function collectContentModelSearchSignals(post, meta) {
+    const bucket = { signals: [], _seen: new Set() };
+    if (typeof BoundLoreContentModelRegistry === "undefined") {
+      return bucket.signals;
+    }
+    const source = Object.assign({}, meta || {}, {
+      entity_domain: meta && meta.entity_domain,
+      entity_subtype: meta && meta.entity_subtype,
+      post: post || {},
+      meta: meta || {},
+    });
+    try {
+      BoundLoreContentModelRegistry.getModelSearchSignals(source).forEach(function(entry) {
+        if (!entry || !entry.raw) return;
+        pushSignal(bucket, entry.raw, { group: "content_model", label: entry.label || "Content model" });
+        if (entry.label && entry.label !== entry.raw) {
+          pushSignal(bucket, entry.label, { group: "content_model", label: "Model field" });
+        }
+      });
+    } catch (err) {
+      return bucket.signals;
+    }
+    return bucket.signals;
+  }
+
   function buildDisplayLabels(post, meta, signalGroups) {
     const labels = [];
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {
@@ -403,6 +428,7 @@ window.BoundLoreSearchSignals = (function() {
       recipe: collectRecipeSearchSignals(safePost, meta),
       relations: collectRelationSearchSignals(safePost, meta),
       profession_capability: collectProfessionCapabilitySearchSignals(safePost, meta),
+      content_model: collectContentModelSearchSignals(safePost, meta),
       version: collectVersionSearchSignalsForPost(safePost, meta),
       text: collectTextSignals(safePost),
     };

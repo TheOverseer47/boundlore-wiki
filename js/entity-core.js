@@ -592,6 +592,9 @@ window.EntityCore = (function() {
       weapon: "Weapon",
       item_generic: "Item",
       creature: "Creature",
+      npc: "NPC",
+      quest: "Quest",
+      event: "Event",
       biome: "Biome",
       recipe: "Recipe",
     };
@@ -606,6 +609,7 @@ window.EntityCore = (function() {
       PLACE: "Place",
       SYSTEM: "System",
       KNOWLEDGE: "Knowledge",
+      EVENT: "Event",
     };
     return map[key] || key;
   }

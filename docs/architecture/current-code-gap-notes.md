@@ -826,3 +826,26 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P1-H.1 final foundation gate completed locally. P1 registries and reader/search tolerances are accepted as client-side foundation. No SQL, no backend search, no data migration, no deploy. P2 may start from this baseline.** Deployment freeze remains active.
+
+---
+
+## 27. P2-A.1 — NPC / Quest / Event Model Activation Baseline
+
+**Status:** Complete (local; model registry + defensive reader/search tolerance; no SQL, no UI, no data migration).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Content model registry | `js/content-model-registry.js` | `window.BoundLoreContentModelRegistry` |
+| NPC model | BEING / `npc` | `active_model`; `create_ui: false`; `admin_flow: false` |
+| Quest model | KNOWLEDGE / `quest` | Not a top-level domain |
+| Event model | EVENT / `event` | Uses existing EVENT domain |
+| Reserved models | quest_chain, community_event, occurrence | `reserved_model`; no UI |
+| Search signals | `js/search-signals.js` | Low-weight `content_model` group; no hard filters |
+| Query parser hints | `js/search-query-parser.js` | `npc`, `quest`, `event` type hints |
+| Reader context | `js/wiki-entry-layout.js` | `contentModelContext` only; no new sections |
+| Subtype labels | `js/entity-core.js` | npc / quest / event display labels |
+
+| Not built | NPC/Quest/Event create UI, quest tracker, event calendar, vendor/economy, occurrence system, SQL, data migration | Deferred P2+ |
+| Unchanged | QA Staff, QA Ember, Ogre, Swamp, mining/wood/forge search, Wood/Forge missing-entry only | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.

@@ -184,6 +184,11 @@ window.BoundLoreSearchQueryParser = (function() {
     if (/\bresources?\b/i.test(raw)) addHint(bucket, "entity_subtype", "resource", "entity_type");
     if (/\bitems?\b/i.test(raw) && !/\bresource/i.test(raw)) addHint(bucket, "entity_subtype", "item", "entity_type");
     if (/\bcreatures?\b/i.test(raw)) addHint(bucket, "entity_subtype", "creature", "entity_type");
+    if (/\bnpcs?\b/i.test(raw)) addHint(bucket, "entity_subtype", "npc", "entity_type");
+    if (/\bquests?\b/i.test(raw)) addHint(bucket, "entity_subtype", "quest", "entity_type");
+    if (/\bevents?\b/i.test(raw) && !/\bcommunity events?\b/i.test(raw)) {
+      addHint(bucket, "entity_subtype", "event", "entity_type");
+    }
     return bucket.list;
   }
 

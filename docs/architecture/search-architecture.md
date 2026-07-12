@@ -24,6 +24,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P1-H.1 final foundation gate:** P1 registries and reader/search tolerances accepted as client-side foundation. No SQL, no backend search, no data migration, no deploy. P2 may start from this baseline.
 
+**P2-A.1 code baseline:** `js/content-model-registry.js` — NPC (BEING/npc), Quest (KNOWLEDGE/quest), Event (EVENT/event) model definitions with future-safe field normalization and low-weight search signals. **No** create UI, **no** admin flows, **no** Postgres search index, **no** SQL migration.
+
 ---
 
 ## Goals
