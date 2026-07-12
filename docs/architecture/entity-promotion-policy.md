@@ -92,6 +92,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 | Location page? | **Never** for procedural gather nodes |
 | Current state (P0) | QA Ember Shard `source_detail: red crystal nodes` — correct; no location stub |
 
+**P2-E.1:** `js/resource-node-registry.js` — `node_type` is structured field/observation context, not a post. Concrete nodes are future Observations, not automatic PLACE pages. `shouldPromoteNodeTypeToPost` remains false. No inference from source_detail to crystal taxonomy.
+
 ---
 
 ## Missing Entry Queue

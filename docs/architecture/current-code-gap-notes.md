@@ -1002,3 +1002,25 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P2-D.2 acceptance sweep completed; Version history and live-service validity accepted as read-only helper/search/admin-preview baseline only. No patch workflow, no SQL, no data migration.** P2-D foundation block (D.1 + D.2) accepted locally. Ready for P2-E. Deployment freeze remains active.
+
+---
+
+## 35. P2-E.1 — Resource Node Type & Acquisition Source Baseline
+
+**Status:** Complete (local; registry/read/search baseline only; no SQL, no node posts, no data migration).
+
+| Layer | Module | Behavior |
+|-------|--------|----------|
+| Resource node registry | `js/resource-node-registry.js` → `window.BoundLoreResourceNodeRegistry` | node_type, acquisition sources, observation context |
+| node_type | structured field / facet / observation | **not** a post by default; **not** a PLACE page |
+| source_detail | text signal (e.g. red crystal nodes) | preserved as search signal; **no** crystal taxonomy inference |
+| Content model | `OBJECT:resource` fields | node_type, source_type, source_detail, acquisition_sources, node_observations |
+| Facet group | `node_type` future-safe | explicit field only; not derived from source_detail |
+| Search parser hints | resource node, mining node, ore vein, red crystal nodes, fishing spot, … | hint-only; low-weight |
+| Search signals | `resource_node` group | weak weight; source_detail stays in `resource` group |
+| Reader context | `js/wiki-entry-layout.js` | `resourceNodeContext` only; no node-type sections on QA data |
+
+| Not built | Node create UI, node posts, location/map/coordinates UI, spawn tracker, SQL | Deferred P2-E+ |
+| Unchanged | QA Ember (Mining/Raw/Unknown/red crystal nodes), QA Staff/Ogre/Swamp, mining/wood/forge search | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.

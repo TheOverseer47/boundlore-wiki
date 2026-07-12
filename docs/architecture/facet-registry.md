@@ -4,6 +4,8 @@
 
 > **Code baseline (P0.5-B):** Runtime registry lives in [`js/facet-registry.js`](../../js/facet-registry.js) as `window.BoundLoreFacetRegistry`. Supports normalization, conservative derivation from existing BLMETA/payload, and minimal facet badges on resource detail + resources landing. Search indexing, filters, and facet editing are **not** implemented yet.
 
+**P2-E.1:** `node_type` facet group added (future-safe). Explicit `resource.node_type` only — **not** inferred from `source_detail` text like "red crystal nodes". See [`js/resource-node-registry.js`](../../js/resource-node-registry.js).
+
 Controlled multi-valued classification layer for BoundLore. Facets complement — never replace — `entity_domain` and `entity_subtype`.
 
 **Related:** [CONTENT_ARCHITECTURE.md](./CONTENT_ARCHITECTURE.md) · [entity-promotion-policy.md](./entity-promotion-policy.md) · [search-architecture.md](./search-architecture.md)

@@ -578,6 +578,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-E.1 — Resource Node Type & Acquisition Source Baseline
+
+**Milestone:** P2-E resource node/acquisition registry; client-side only; no SQL, no node posts, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ResourceNodeRegistry API | QA Ember or search | normalize/extract/signals green | `[x]` |
+| red crystal nodes | source_detail only | no crystal taxonomy inference | `[x]` |
+| hasExplicitNodeType | source_detail vs node_type | false / true respectively | `[x]` |
+| Search parser hints | resource node/mining node/red crystal nodes/ore vein | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/red crystal/qa ember/vendor/version | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no node-type badges | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+
+**P2-E.1:** Resource node registry only. No node posts, no location pages, no SQL, no deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

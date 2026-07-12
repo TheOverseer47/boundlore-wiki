@@ -1635,6 +1635,18 @@ window.WikiEntryLayout = (function() {
         versionContext = null;
       }
     }
+    let resourceNodeContext = null;
+    if (typeof BoundLoreResourceNodeRegistry !== "undefined" && BoundLoreResourceNodeRegistry.resolveResourceNodeContext) {
+      try {
+        resourceNodeContext = BoundLoreResourceNodeRegistry.resolveResourceNodeContext({
+          meta: meta,
+          post: post,
+          discovery_payload: payload,
+        });
+      } catch (err) {
+        resourceNodeContext = null;
+      }
+    }
 
     return {
       post: post,
@@ -1662,6 +1674,7 @@ window.WikiEntryLayout = (function() {
       questEventContext: questEventContext,
       economyContext: economyContext,
       versionContext: versionContext,
+      resourceNodeContext: resourceNodeContext,
       supplementalHtml: "",
     };
   }

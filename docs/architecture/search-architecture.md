@@ -40,6 +40,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-D.2 acceptance sweep:** P2-D foundation block accepted locally. Read-only helper/search/admin-preview baseline only; no patch workflow, no SQL, no data migration.
 
+**P2-E.1 resource node baseline:** `js/resource-node-registry.js` — node_type/acquisition helpers. Parser hints for resource node/mining node/red crystal nodes (source_detail). No crystal taxonomy inference. Low-weight signals only.
+
 ---
 
 ## Goals

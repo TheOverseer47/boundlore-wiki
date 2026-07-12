@@ -127,6 +127,21 @@ window.BoundLoreFacetRegistry = (function() {
         "quest_reward", "salvage", "event", "environmental_pickup",
       ],
     }),
+    node_type: defineGroup({
+      key: "node_type",
+      label: "Node Type",
+      description: "Structured resource acquisition node classification (explicit field only; not inferred from source_detail).",
+      applicable_domains: ["OBJECT"],
+      applicable_subtypes: ["resource", "material"],
+      search_relevant: true,
+      filter_relevant: false,
+      evidence_required: "recommended",
+      values: [
+        "resource_node", "mineral_node", "ore_vein", "crystal_node", "deposit",
+        "plant_node", "herb_patch", "tree", "lumber_node", "fishing_spot",
+        "creature_source", "container", "salvage_point",
+      ],
+    }),
     processing_stage: defineGroup({
       key: "processing_stage",
       label: "Processing Stage",
@@ -505,6 +520,14 @@ window.BoundLoreFacetRegistry = (function() {
         derived.push(normalizeFacetEntry("processing_stage", "raw", "derived"));
       } else if (explicitStage) {
         derived.push(normalizeFacetEntry("processing_stage", explicitStage, "derived"));
+      }
+
+      const explicitNodeType = normalizeFacetValue(
+        "node_type",
+        resource.node_type || payload.node_type
+      );
+      if (explicitNodeType) {
+        derived.push(normalizeFacetEntry("node_type", explicitNodeType, "explicit"));
       }
     }
 

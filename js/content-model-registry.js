@@ -31,6 +31,12 @@ window.BoundLoreContentModelRegistry = (function() {
     "participants", "rewards", "related_quests", "versioning", "evidence",
   ];
 
+  const RESOURCE_FIELDS = [
+    "node_type", "source_type", "source_detail", "acquisition_method",
+    "acquisition_sources", "node_observations", "biome_context", "required_tool",
+    "evidence", "versioning",
+  ];
+
   const MODEL_DEFINITIONS = {
     "BEING:npc": {
       key: "BEING:npc",
@@ -104,6 +110,18 @@ window.BoundLoreContentModelRegistry = (function() {
       search_weight: 1,
       notes: "Reserved — occurrence scheduling deferred.",
     },
+    "OBJECT:resource": {
+      key: "OBJECT:resource",
+      domain: "OBJECT",
+      subtype: "resource",
+      label: "Resource",
+      status: MODEL_STATUS.ACTIVE,
+      create_ui: false,
+      admin_flow: false,
+      fields: RESOURCE_FIELDS.slice(),
+      search_weight: 2,
+      notes: "OBJECT/resource — node_type is structured field/observation context, not a post.",
+    },
   };
 
   const SUBTYPE_ALIASES = {
@@ -119,12 +137,17 @@ window.BoundLoreContentModelRegistry = (function() {
     quest_chain: "quest_chain",
     community_event: "community_event",
     occurrence: "occurrence",
+    resource: "resource",
+    resources: "resource",
+    material: "resource",
+    materials: "resource",
   };
 
   const DOMAIN_ALIASES = {
     being: "BEING",
     knowledge: "KNOWLEDGE",
     event: "EVENT",
+    object: "OBJECT",
   };
 
   function meaningful(value) {
@@ -272,6 +295,7 @@ window.BoundLoreContentModelRegistry = (function() {
       "roles", "capabilities", "location_refs", "dialogue_refs", "vendor_inventory",
       "trainer_for", "quest_refs", "objectives", "prerequisites", "rewards",
       "related_events", "participants", "related_quests",
+      "acquisition_sources", "node_observations",
     ];
     if (arrayFields.indexOf(field) >= 0) return normalizeArrayField(value);
     return normalizeScalarField(value);
@@ -311,6 +335,10 @@ window.BoundLoreContentModelRegistry = (function() {
           out.schema = BoundLoreQuestEventRegistry.normalizeNpcModelRecord(source);
           if (typeof BoundLoreEconomyRegistry !== "undefined") {
             out.economy = BoundLoreEconomyRegistry.normalizeEconomyContext(source);
+          }
+        } else if (def.key === "OBJECT:resource") {
+          if (typeof BoundLoreResourceNodeRegistry !== "undefined") {
+            out.resource_node = BoundLoreResourceNodeRegistry.resolveResourceNodeContext(source);
           }
         }
       } catch (err) {

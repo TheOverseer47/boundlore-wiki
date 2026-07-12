@@ -60,6 +60,21 @@ window.BoundLoreSearchQueryParser = (function() {
     { pattern: /\bversion\b/i, group: "version_context", value: "version" },
   ];
 
+  const RESOURCE_NODE_KEYWORD_HINTS = [
+    { pattern: /\bred\s+crystal\s+nodes?\b/i, group: "source_detail", value: "red crystal nodes" },
+    { pattern: /\bsource\s+detail\b/i, group: "resource_node_context", value: "source_detail" },
+    { pattern: /\bresource\s+node\b/i, group: "resource_node_context", value: "resource_node" },
+    { pattern: /\bmining\s+node\b/i, group: "resource_node_context", value: "mineral_node" },
+    { pattern: /\bore\s+vein\b/i, group: "resource_node_context", value: "ore_vein" },
+    { pattern: /\bmineral\s+node\b/i, group: "resource_node_context", value: "mineral_node" },
+    { pattern: /\bcrystal\s+node\b/i, group: "resource_node_context", value: "crystal_node" },
+    { pattern: /\bharvest\s+node\b/i, group: "resource_node_context", value: "plant_node" },
+    { pattern: /\btree\s+node\b/i, group: "resource_node_context", value: "tree" },
+    { pattern: /\bfishing\s+spot\b/i, group: "resource_node_context", value: "fishing_spot" },
+    { pattern: /\bdeposit\b/i, group: "resource_node_context", value: "deposit" },
+    { pattern: /\bnode\s+type\b/i, group: "resource_node_context", value: "node_type" },
+  ];
+
   const MISSING_ENTRY_TERMS = ["wood", "forge"];
 
   function escapeHtml(value) {
@@ -257,6 +272,20 @@ window.BoundLoreSearchQueryParser = (function() {
     return bucket.list;
   }
 
+  function extractResourceNodeHints(query) {
+    const raw = String(query || "");
+    const bucket = createHintBucket();
+    RESOURCE_NODE_KEYWORD_HINTS.forEach(function(entry) {
+      if (entry.pattern.test(raw)) {
+        addHint(bucket, entry.group, entry.value, "keyword");
+        if (entry.group === "source_detail") {
+          addHint(bucket, "resource_node_context", "source_detail", "resource_node");
+        }
+      }
+    });
+    return bucket.list;
+  }
+
   function extractEntityTypeHints(query) {
     const bucket = createHintBucket();
     const raw = String(query || "");
@@ -322,6 +351,7 @@ window.BoundLoreSearchQueryParser = (function() {
     const questEventHints = extractQuestEventHints(raw);
     const economyHints = extractEconomyHints(raw);
     const versionHints = extractVersionHints(raw);
+    const resourceNodeHints = extractResourceNodeHints(raw);
     const entityTypeHints = extractEntityTypeHints(raw);
     const acquisitionIntent = extractAcquisitionIntent(raw);
     const missingEntryIntent = extractMissingEntryIntent(raw);
@@ -330,6 +360,7 @@ window.BoundLoreSearchQueryParser = (function() {
       { list: questEventHints, _seen: new Set(questEventHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: economyHints, _seen: new Set(economyHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: versionHints, _seen: new Set(versionHints.map(function(h) { return h.group + ":" + h.value; })) },
+      { list: resourceNodeHints, _seen: new Set(resourceNodeHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: entityTypeHints, _seen: new Set(entityTypeHints.map(function(h) { return h.group + ":" + h.value; })) }
     );
 
@@ -344,12 +375,13 @@ window.BoundLoreSearchQueryParser = (function() {
       tokens: tokenizeSearchQuery(raw),
       residual: residual,
       free_text: residual || normalized,
-      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, entityTypeHints),
+      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, resourceNodeHints, entityTypeHints),
       relation_hints: relationHints,
       entity_type_hints: entityTypeHints,
       quest_event_hints: questEventHints,
       economy_hints: economyHints,
       version_hints: versionHints,
+      resource_node_hints: resourceNodeHints,
       usage_intent: usageIntent,
       crafting_intent: craftingIntent,
       acquisition_intent: acquisitionIntent,
@@ -390,6 +422,9 @@ window.BoundLoreSearchQueryParser = (function() {
     }
     (parsed.version_hints || []).forEach(function(hint) {
       if (hint.value) parts.push("Version: " + hint.value.replace(/_/g, " "));
+    });
+    (parsed.resource_node_hints || []).forEach(function(hint) {
+      if (hint.value) parts.push("Resource node: " + hint.value.replace(/_/g, " "));
     });
 
     const unique = parts.filter(function(part, index, arr) {
@@ -492,6 +527,17 @@ window.BoundLoreSearchQueryParser = (function() {
         if (signalMatchesHint(signal, hint.value)) {
           addDetail("version_hint", 2, signal.raw, hint);
         }
+      });
+    });
+
+    (parsed.resource_node_hints || []).forEach(function(hint) {
+      const groups = ["resource_node", "resource", "acquisition_source"];
+      groups.forEach(function(groupName) {
+        (signals[groupName] || []).forEach(function(signal) {
+          if (signalMatchesHint(signal, hint.value)) {
+            addDetail("resource_node_hint", 2, signal.raw, hint);
+          }
+        });
       });
     });
 

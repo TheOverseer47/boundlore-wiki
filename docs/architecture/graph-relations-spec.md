@@ -34,6 +34,8 @@
 
 **P2-D.2 acceptance sweep:** P2-D foundation block accepted locally. Read-only helper/search/admin-preview baseline only; no patch workflow, no SQL, no data migration.
 
+**P2-E.1 resource node baseline:** Resource nodes are structured fields/observations, not PLACE posts. `node_type` on qualifiers only when explicit. `source_detail` (red crystal nodes) remains text signal — no taxonomy inference.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).
