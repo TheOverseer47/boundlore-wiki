@@ -48,6 +48,18 @@ window.BoundLoreSearchQueryParser = (function() {
     { pattern: /\bseasonal\s+vendor\b/i, group: "availability", value: "seasonal", entitySubtype: "npc" },
   ];
 
+  const VERSION_KEYWORD_HINTS = [
+    { pattern: /\bchanged\s+in\b/i, group: "version_context", value: "changed_in" },
+    { pattern: /\bremoved\s+in\b/i, group: "version_context", value: "removed_in" },
+    { pattern: /\bintroduced\s+in\b/i, group: "version_context", value: "introduced_in" },
+    { pattern: /\bsuperseded\b/i, group: "version_context", value: "superseded" },
+    { pattern: /\boutdated\b/i, group: "version_context", value: "outdated" },
+    { pattern: /\bhistorical\b/i, group: "version_context", value: "historical" },
+    { pattern: /\bcurrent\s+version\b/i, group: "version_context", value: "current" },
+    { pattern: /\bpatch\b/i, group: "version_context", value: "patch" },
+    { pattern: /\bversion\b/i, group: "version_context", value: "version" },
+  ];
+
   const MISSING_ENTRY_TERMS = ["wood", "forge"];
 
   function escapeHtml(value) {
@@ -234,6 +246,17 @@ window.BoundLoreSearchQueryParser = (function() {
     return bucket.list;
   }
 
+  function extractVersionHints(query) {
+    const raw = String(query || "");
+    const bucket = createHintBucket();
+    VERSION_KEYWORD_HINTS.forEach(function(entry) {
+      if (entry.pattern.test(raw)) {
+        addHint(bucket, entry.group, entry.value, "keyword");
+      }
+    });
+    return bucket.list;
+  }
+
   function extractEntityTypeHints(query) {
     const bucket = createHintBucket();
     const raw = String(query || "");
@@ -298,6 +321,7 @@ window.BoundLoreSearchQueryParser = (function() {
     const facetHints = extractFacetHints(raw);
     const questEventHints = extractQuestEventHints(raw);
     const economyHints = extractEconomyHints(raw);
+    const versionHints = extractVersionHints(raw);
     const entityTypeHints = extractEntityTypeHints(raw);
     const acquisitionIntent = extractAcquisitionIntent(raw);
     const missingEntryIntent = extractMissingEntryIntent(raw);
@@ -305,6 +329,7 @@ window.BoundLoreSearchQueryParser = (function() {
       { list: facetHints, _seen: new Set(facetHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: questEventHints, _seen: new Set(questEventHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: economyHints, _seen: new Set(economyHints.map(function(h) { return h.group + ":" + h.value; })) },
+      { list: versionHints, _seen: new Set(versionHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: entityTypeHints, _seen: new Set(entityTypeHints.map(function(h) { return h.group + ":" + h.value; })) }
     );
 
@@ -319,11 +344,12 @@ window.BoundLoreSearchQueryParser = (function() {
       tokens: tokenizeSearchQuery(raw),
       residual: residual,
       free_text: residual || normalized,
-      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, entityTypeHints),
+      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, entityTypeHints),
       relation_hints: relationHints,
       entity_type_hints: entityTypeHints,
       quest_event_hints: questEventHints,
       economy_hints: economyHints,
+      version_hints: versionHints,
       usage_intent: usageIntent,
       crafting_intent: craftingIntent,
       acquisition_intent: acquisitionIntent,
@@ -362,6 +388,9 @@ window.BoundLoreSearchQueryParser = (function() {
     if (parsed.missing_entry_intent && parsed.missing_entry_intent.terms.length) {
       parts.push("Missing entry: " + parsed.missing_entry_intent.terms.join(", "));
     }
+    (parsed.version_hints || []).forEach(function(hint) {
+      if (hint.value) parts.push("Version: " + hint.value.replace(/_/g, " "));
+    });
 
     const unique = parts.filter(function(part, index, arr) {
       return part && arr.indexOf(part) === index;
@@ -457,6 +486,14 @@ window.BoundLoreSearchQueryParser = (function() {
         }
       });
     }
+
+    (parsed.version_hints || []).forEach(function(hint) {
+      (signals.version || []).forEach(function(signal) {
+        if (signalMatchesHint(signal, hint.value)) {
+          addDetail("version_hint", 2, signal.raw, hint);
+        }
+      });
+    });
 
     if (parsed.free_text && document.kind === "post") {
       const residualTokens = tokenizeSearchQuery(parsed.free_text).filter(function(t) {

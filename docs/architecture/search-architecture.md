@@ -36,6 +36,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-C.2 acceptance sweep:** P2-C.2 acceptance sweep completed; Vendor/economy/trade offers accepted as registry/read/search baseline only. No shop UI, no admin flow, no SQL, no data migration. P2-C foundation block accepted locally.
 
+**P2-D.1 version baseline:** `js/versioning-model.js` extended with validity/history gates. Parser hints: version, patch, outdated, changed/removed/introduced in, superseded, historical — hint-only, low-weight. No hard filters. Outdated/superseded not ranked above current. No version UI when fields absent.
+
 ---
 
 ## Goals

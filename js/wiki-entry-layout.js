@@ -1090,6 +1090,7 @@ window.WikiEntryLayout = (function() {
         version: typeof BoundLoreVersioning !== "undefined"
           ? BoundLoreVersioning.extractVersionMetadata(recipe)
           : (recipe.version || null),
+        source: recipe,
       };
     }
 
@@ -1193,10 +1194,20 @@ window.WikiEntryLayout = (function() {
     );
     if (badgeHtml) html += badgeHtml;
     if (typeof BoundLoreVersioning !== "undefined" && recipeDisplay && recipeDisplay.version) {
-      const versionHtml = BoundLoreVersioning.renderVersionBadgeGroup(recipeDisplay.version, {
-        groupClassName: "bl-version-badges-recipe",
+      const recipeSource = recipeDisplay.source || recipeDisplay;
+      if (BoundLoreVersioning.shouldDisplayVersionBadge(recipeSource)) {
+        const versionHtml = BoundLoreVersioning.renderVersionBadgeGroup(recipeDisplay.version, {
+          groupClassName: "bl-version-badges-recipe",
+        });
+        if (versionHtml) html += versionHtml;
+      }
+    }
+    if (typeof BoundLoreVersioning !== "undefined" && recipeDisplay) {
+      const recipeSource = recipeDisplay.source || recipeDisplay;
+      const historyHtml = BoundLoreVersioning.renderVersionHistoryGroup(recipeSource, {
+        groupClassName: "bl-version-history-recipe",
       });
-      if (versionHtml) html += versionHtml;
+      if (historyHtml) html += historyHtml;
     }
     if (recipeDisplay && typeof BoundLoreEvidenceRank !== "undefined" && BoundLoreEvidenceRank.renderStatementStateBadgeGroup) {
       const stateHtml = BoundLoreEvidenceRank.renderStatementStateBadgeGroup(recipeDisplay.source || recipeDisplay, {
@@ -1612,6 +1623,18 @@ window.WikiEntryLayout = (function() {
         economyContext = null;
       }
     }
+    let versionContext = null;
+    if (typeof BoundLoreVersioning !== "undefined" && BoundLoreVersioning.resolveVersionContext) {
+      try {
+        versionContext = BoundLoreVersioning.resolveVersionContext({
+          meta: meta,
+          post: post,
+          discovery_payload: payload,
+        });
+      } catch (err) {
+        versionContext = null;
+      }
+    }
 
     return {
       post: post,
@@ -1638,6 +1661,7 @@ window.WikiEntryLayout = (function() {
       contentModelContext: contentModelContext,
       questEventContext: questEventContext,
       economyContext: economyContext,
+      versionContext: versionContext,
       supplementalHtml: "",
     };
   }

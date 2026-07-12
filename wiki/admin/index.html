@@ -299,7 +299,7 @@
 <script src="/js/economy-registry.js?v=1"></script>
 <script src="/js/knowledge-relations.js?v=20"></script>
 <script src="/js/entity-core.js?v=11"></script>
-<script src="/js/versioning-model.js?v=2"></script>
+<script src="/js/versioning-model.js?v=3"></script>
 <script src="/js/evidence-rank.js?v=2"></script>
 <script src="/js/unresolved-targets.js?v=4"></script>
 <script src="/js/avatar-utils.js"></script>
@@ -871,11 +871,17 @@ function renderRecipeContributionSummaryA(info) {
   });
   html += "</dl>";
   if (typeof BoundLoreVersioning !== "undefined") {
-    const versionHtml = BoundLoreVersioning.renderVersionBadgeGroup(
-      (recipe.version || recipe),
-      { groupClassName: "bl-version-badges-admin-preview" }
-    );
-    if (versionHtml) html += versionHtml;
+    if (BoundLoreVersioning.shouldDisplayVersionBadge(recipe)) {
+      const versionHtml = BoundLoreVersioning.renderVersionBadgeGroup(
+        (recipe.version || recipe),
+        { groupClassName: "bl-version-badges-admin-preview" }
+      );
+      if (versionHtml) html += versionHtml;
+    }
+    const historyHtml = BoundLoreVersioning.renderVersionHistoryGroup(recipe, {
+      groupClassName: "bl-version-history-admin-preview",
+    });
+    if (historyHtml) html += historyHtml;
   }
   if (craftLines.length) {
     html += '<p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 10px;">CRAFT relations: ' +

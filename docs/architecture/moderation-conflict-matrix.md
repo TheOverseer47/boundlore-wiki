@@ -56,3 +56,16 @@ QA data without state fields shows no new badges. Pending `add_recipe` conflict 
 | Dispute-resolution UI / auto-promote | Not built — deferred P1-D+ |
 
 **P1-C foundation block (C.1 + C.2 + C.3) accepted locally.**
+
+## P2-D.1 — Version History & Live-Service Validity Baseline (local)
+
+**Scope:** Read-only version metadata tolerance — no Patch Mode workflow, no version editor, no SQL, no data migration.
+
+| Layer | Behavior |
+|-------|----------|
+| Version helpers | `js/versioning-model.js` — validity/history gates; badges only when real version fields exist |
+| Admin preview | Read-only version badges/history in conflict preview when data present |
+| Reserved intent | `add_version_change` remains reserved |
+| Reserved relations | `introduced_in`, `changed_in`, `removed_in` remain reserved |
+
+No automatic outdated marking. No game-version posts. QA baseline entries unchanged.

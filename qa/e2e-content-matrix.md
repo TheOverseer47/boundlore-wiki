@@ -537,6 +537,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-D.1 — Version History & Live-Service Validity Baseline
+
+**Milestone:** P2-D version history/validity registry; client-side only; no SQL, no Patch Mode workflow, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Versioning API | QA Staff post | normalize/read/validity/history gates green | `[x]` |
+| Empty version fields | console `{}` | no badges; shouldDisplay* false | `[x]` |
+| Version parser hints | version/patch/outdated/changed/removed/introduced | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/vendor/economy/parser | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no version badges/sections | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Reserved intent/relations | add_version_change; introduced/changed/removed_in | reserved | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+
+**P2-D.1:** Version history/validity registry only. No Patch Mode, no version editor, no posts, no SQL, no deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

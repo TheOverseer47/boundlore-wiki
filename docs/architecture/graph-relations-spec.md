@@ -30,6 +30,8 @@
 
 **P2-C.2 acceptance sweep:** P2-C foundation block accepted locally. Registry/read/search baseline only; no shop UI, no SQL, no data migration.
 
+**P2-D.1 version baseline:** `introduced_in`, `changed_in`, `removed_in` remain reserved/future-safe. Version metadata on qualifiers only; no game-version posts. `add_version_change` intent reserved.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

@@ -958,3 +958,26 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P2-C.2 acceptance sweep completed; Vendor/economy/trade offers accepted as registry/read/search baseline only. No shop UI, no admin flow, no SQL, no data migration.** P2-C foundation block (C.1 + C.2) accepted locally. Ready for P2-D. Deployment freeze remains active.
+
+---
+
+## 33. P2-D.1 — Version History & Live-Service Validity Baseline
+
+**Status:** Complete (local; registry/read/search baseline only; no SQL, no Patch Mode workflow, no data migration).
+
+| Layer | Module | Behavior |
+|-------|--------|----------|
+| Version helpers | `js/versioning-model.js` → `window.BoundLoreVersioning` | normalize/read/validity/history gates; nullable `game_version` |
+| Supported fields | game_version, valid_from, valid_until, superseded_by, introduced_in, changed_in, removed_in | Structured metadata only — not posts |
+| Display gates | `shouldDisplayVersionBadge`, `shouldDisplayVersionHistory`, `shouldDisplayOutdatedBadge` | false when empty/unknown; no QA badges forced |
+| Reader context | `js/wiki-entry-layout.js` | `versionContext`; history UI only with real version data |
+| Admin preview | `wiki/admin/index.html` | read-only version badges/history when data exists |
+| Search parser hints | version, patch, outdated, changed/removed/introduced in, superseded, historical | hint-only; low-weight |
+| Search signals | `js/search-signals.js` | existing `version` group stays weak weight |
+| Reserved intent | `add_version_change` | remains reserved |
+| Reserved relations | `introduced_in`, `changed_in`, `removed_in` | persistence `reserved` |
+
+| Not built | Patch Mode workflow, version editor, game-version posts, auto-outdated marking, data backfill, SQL | Deferred P2-D+ |
+| Unchanged | QA Staff/Ember/Ogre/Swamp, mining/wood/forge/vendor search, evidence/state badges | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.

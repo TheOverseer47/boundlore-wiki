@@ -1,12 +1,17 @@
 // ============================================
-// BoundLore Versioning Model — P0.5-F baseline
+// BoundLore Versioning Model — P0.5-F + P2-D.1 baseline
 // Null-safe version metadata helpers for facts,
 // relations, recipes, and facets. No DB schema,
-// no history UI, no fake game versions.
+// no history UI unless real version data exists.
 // ============================================
 
 window.BoundLoreVersioning = (function() {
   const UNKNOWN_VALUES = new Set(["unknown", "unclear", "n/a", "na", "none", "not specified", "pre-release"]);
+
+  const VERSION_FIELD_KEYS = [
+    "game_version", "valid_from", "valid_until", "superseded_by", "supersedes",
+    "change_note", "version_confidence", "introduced_in", "changed_in", "removed_in",
+  ];
 
   function escapeHtml(value) {
     return String(value || "")
@@ -40,6 +45,10 @@ window.BoundLoreVersioning = (function() {
     };
   }
 
+  function normalizeVersionRange(input) {
+    return normalizeValidityRange(input);
+  }
+
   function normalizeVersionMetadata(input) {
     const src = input && typeof input === "object" ? input : {};
     const gameVersion = normalizeGameVersion(src.game_version);
@@ -49,8 +58,14 @@ window.BoundLoreVersioning = (function() {
     const supersedes = meaningful(src.supersedes);
     const changeNote = meaningful(src.change_note);
     const versionConfidence = meaningful(src.version_confidence) || "unknown";
+    const introducedIn = meaningful(src.introduced_in);
+    const changedIn = meaningful(src.changed_in);
+    const removedIn = meaningful(src.removed_in);
 
-    const hasMeaningful = !!(gameVersion || validFrom || validUntil || supersededBy || supersedes || changeNote);
+    const hasMeaningful = !!(
+      gameVersion || validFrom || validUntil || supersededBy || supersedes ||
+      changeNote || introducedIn || changedIn || removedIn
+    );
     if (!hasMeaningful) return null;
 
     return {
@@ -61,6 +76,9 @@ window.BoundLoreVersioning = (function() {
       supersedes: supersedes || null,
       change_note: changeNote,
       version_confidence: versionConfidence,
+      introduced_in: introducedIn || null,
+      changed_in: changedIn || null,
+      removed_in: removedIn || null,
     };
   }
 
@@ -94,7 +112,41 @@ window.BoundLoreVersioning = (function() {
       supersedes: statement.supersedes,
       change_note: statement.change_note,
       version_confidence: statement.version_confidence,
+      introduced_in: statement.introduced_in,
+      changed_in: statement.changed_in,
+      removed_in: statement.removed_in,
     });
+  }
+
+  function readVersionSignals(source) {
+    if (!source || typeof source !== "object") return null;
+    const version = extractVersionMetadata(source);
+    if (version) return version;
+
+    const direct = {};
+    VERSION_FIELD_KEYS.forEach(function(key) {
+      const val = meaningful(source[key]);
+      if (val) direct[key] = val;
+    });
+    if (!Object.keys(direct).length) return null;
+    return normalizeVersionMetadata(direct);
+  }
+
+  function hasVersionSignals(source) {
+    return !!readVersionSignals(source);
+  }
+
+  function compareVersionStrings(a, b) {
+    const ca = meaningful(a);
+    const cb = meaningful(b);
+    if (!ca || !cb) return 0;
+    if (ca === cb) return 0;
+    return ca > cb ? 1 : -1;
+  }
+
+  function getContextVersion(context) {
+    const ctx = context && typeof context === "object" ? context : {};
+    return normalizeGameVersion(ctx.game_version || ctx.current_version || ctx.patch_version);
   }
 
   function attachVersionMetadata(statement, metadata) {
@@ -157,6 +209,55 @@ window.BoundLoreVersioning = (function() {
     return true;
   }
 
+  function isCurrentlyValid(source, context) {
+    void context;
+    return isCurrentStatement(source);
+  }
+
+  function isFutureValid(source, context) {
+    const signals = readVersionSignals(source);
+    if (!signals) return false;
+    const ctxVersion = getContextVersion(context);
+    if (!ctxVersion) return false;
+    const from = meaningful(signals.valid_from);
+    if (from && compareVersionStrings(from, ctxVersion) > 0) return true;
+    const intro = meaningful(signals.introduced_in);
+    if (intro && compareVersionStrings(intro, ctxVersion) > 0) return true;
+    return false;
+  }
+
+  function isExpiredInVersion(source, context) {
+    const signals = readVersionSignals(source);
+    if (!signals) return false;
+    if (isRemoved(source)) return true;
+    const ctxVersion = getContextVersion(context);
+    const until = meaningful(signals.valid_until);
+    if (until) {
+      if (!ctxVersion) return true;
+      return compareVersionStrings(until, ctxVersion) <= 0;
+    }
+    const removedIn = meaningful(signals.removed_in);
+    if (removedIn && ctxVersion) {
+      return compareVersionStrings(removedIn, ctxVersion) <= 0;
+    }
+    if (removedIn && !ctxVersion) return true;
+    return false;
+  }
+
+  function isSuperseded(source) {
+    return isSupersededStatement(source);
+  }
+
+  function isRemoved(source) {
+    const signals = readVersionSignals(source);
+    return !!(signals && meaningful(signals.removed_in));
+  }
+
+  function isIntroducedIn(source) {
+    const signals = readVersionSignals(source);
+    return !!(signals && meaningful(signals.introduced_in));
+  }
+
   function compareVersionedStatements(a, b) {
     const va = extractVersionMetadata(a);
     const vb = extractVersionMetadata(b);
@@ -190,7 +291,114 @@ window.BoundLoreVersioning = (function() {
     }
     if (version.valid_from) return "Since " + version.valid_from;
     if (version.valid_until) return "Valid until " + version.valid_until;
+    if (version.introduced_in) return "Introduced in " + version.introduced_in;
+    if (version.changed_in) return "Changed in " + version.changed_in;
+    if (version.removed_in) return "Removed in " + version.removed_in;
     return "";
+  }
+
+  function getVersionDisplayLabel(value) {
+    return formatGameVersionLabel(value);
+  }
+
+  function getVersionValidityLabel(source, context) {
+    void context;
+    const signals = readVersionSignals(source);
+    return formatValidityLabel(signals);
+  }
+
+  function getVersionStateBadges(source, context) {
+    const signals = readVersionSignals(source);
+    if (!signals) return [];
+    return buildVersionBadgeEntries(signals, context);
+  }
+
+  function getVersionHistoryEntries(source) {
+    if (!source || typeof source !== "object") return [];
+    const history = Array.isArray(source.version_history) ? source.version_history : null;
+    if (history && history.length) {
+      return history.map(function(entry) {
+        const signals = readVersionSignals(entry);
+        if (!signals) return null;
+        return {
+          signals: signals,
+          label: getVersionValidityLabel(entry) || getVersionDisplayLabel(signals.game_version) || "",
+          badges: getVersionStateBadges(entry),
+        };
+      }).filter(Boolean);
+    }
+    const signals = readVersionSignals(source);
+    if (!signals) return [];
+    return [{
+      signals: signals,
+      label: getVersionValidityLabel(source) || getVersionDisplayLabel(signals.game_version) || "",
+      badges: getVersionStateBadges(source),
+    }];
+  }
+
+  function getVersionHistorySummary(source) {
+    const entries = getVersionHistoryEntries(source);
+    if (!entries.length) return "";
+    if (entries.length === 1) {
+      const parts = (entries[0].badges || []).map(function(b) { return b.label; }).filter(Boolean);
+      return parts.join(" · ");
+    }
+    return entries.length + " version entries";
+  }
+
+  function shouldDisplayVersionBadge(source) {
+    if (!hasVersionSignals(source)) return false;
+    return getVersionStateBadges(source).length > 0;
+  }
+
+  function shouldDisplayVersionHistory(source) {
+    if (!hasVersionSignals(source)) return false;
+    const entries = getVersionHistoryEntries(source);
+    if (entries.length > 1) return true;
+    if (entries.length === 1) {
+      const s = entries[0].signals || {};
+      const lifecycleCount = [
+        "game_version", "valid_from", "valid_until", "superseded_by",
+        "introduced_in", "changed_in", "removed_in",
+      ].filter(function(k) { return meaningful(s[k]); }).length;
+      return lifecycleCount >= 2;
+    }
+    return false;
+  }
+
+  function shouldDisplayOutdatedBadge(source) {
+    if (!shouldDisplayVersionBadge(source)) return false;
+    return isSuperseded(source) || isHistoricalStatement(source);
+  }
+
+  function resolveVersionContext(input) {
+    const src = input && typeof input === "object" ? input : {};
+    const meta = src.meta && typeof src.meta === "object" ? src.meta : {};
+    const payload = src.discovery_payload && typeof src.discovery_payload === "object"
+      ? src.discovery_payload
+      : (meta.discovery_payload && typeof meta.discovery_payload === "object" ? meta.discovery_payload : {});
+    const recipe = payload.recipe && typeof payload.recipe === "object" ? payload.recipe : null;
+    const targets = [recipe, payload, meta].filter(Boolean);
+    let historySource = null;
+    let signals = null;
+    for (let i = 0; i < targets.length; i += 1) {
+      const s = readVersionSignals(targets[i]);
+      if (s) {
+        signals = s;
+        historySource = targets[i];
+        break;
+      }
+    }
+    const source = historySource || meta;
+    return {
+      hasVersion: hasVersionSignals(source),
+      signals: signals,
+      shouldDisplayBadge: shouldDisplayVersionBadge(source),
+      shouldDisplayHistory: shouldDisplayVersionHistory(source),
+      shouldDisplayOutdated: shouldDisplayOutdatedBadge(source),
+      summary: getVersionHistorySummary(source),
+      entries: getVersionHistoryEntries(source),
+    };
   }
 
   function buildVersionBadgeEntries(metadata, options) {
@@ -222,6 +430,16 @@ window.BoundLoreVersioning = (function() {
       entries.push({ key: "change_note", label: version.change_note });
     }
 
+    if (version.introduced_in) {
+      entries.push({ key: "introduced_in", label: "Introduced in " + version.introduced_in });
+    }
+    if (version.changed_in) {
+      entries.push({ key: "changed_in", label: "Changed in " + version.changed_in });
+    }
+    if (version.removed_in) {
+      entries.push({ key: "removed_in", label: "Removed in " + version.removed_in });
+    }
+
     return entries;
   }
 
@@ -244,16 +462,43 @@ window.BoundLoreVersioning = (function() {
     return '<div class="' + escapeHtml(cls) + '">' + parts.join("") + "</div>";
   }
 
+  function renderVersionHistoryGroup(source, options) {
+    if (!shouldDisplayVersionHistory(source)) return "";
+    const entries = getVersionHistoryEntries(source);
+    if (!entries.length) return "";
+    const opts = options || {};
+    let html = '<div class="bl-version-history' + (opts.groupClassName ? " " + escapeHtml(opts.groupClassName) : "") + '">';
+    html += '<div class="bl-version-history-title">Version history</div>';
+    html += '<ul class="bl-version-history-list">';
+    entries.forEach(function(entry) {
+      html += '<li class="bl-version-history-item">';
+      if (entry.label) {
+        html += '<span class="bl-version-history-label">' + escapeHtml(entry.label) + "</span>";
+      }
+      (entry.badges || []).forEach(function(badge) {
+        html += '<span class="bl-version-badge bl-version-badge--' + escapeHtml(badge.key) + '">' +
+          escapeHtml(badge.label) + "</span>";
+      });
+      html += "</li>";
+    });
+    html += "</ul></div>";
+    return html;
+  }
+
   function collectVersionSearchSignals(source) {
-    const version = extractVersionMetadata(source);
+    const version = readVersionSignals(source);
     if (!version) return [];
     const signals = [];
     if (version.game_version) signals.push(version.game_version, formatGameVersionLabel(version.game_version));
     if (version.valid_from) signals.push(version.valid_from);
     if (version.valid_until) signals.push(version.valid_until);
     if (version.change_note) signals.push(version.change_note);
+    if (version.introduced_in) signals.push("introduced in", version.introduced_in);
+    if (version.changed_in) signals.push("changed in", version.changed_in);
+    if (version.removed_in) signals.push("removed in", version.removed_in);
     if (version.superseded_by) signals.push("superseded", version.superseded_by);
     if (isHistoricalStatement({ version: version })) signals.push("historical");
+    if (isSuperseded({ version: version })) signals.push("outdated");
     return signals.filter(function(value, index, arr) {
       return value && arr.indexOf(value) === index;
     });
@@ -262,20 +507,39 @@ window.BoundLoreVersioning = (function() {
   return {
     normalizeGameVersion: normalizeGameVersion,
     normalizeValidityRange: normalizeValidityRange,
+    normalizeVersionRange: normalizeVersionRange,
     normalizeVersionMetadata: normalizeVersionMetadata,
     normalizeVersionedStatement: normalizeVersionedStatement,
     normalizeQualifiers: normalizeQualifiers,
     attachVersionMetadata: attachVersionMetadata,
     extractVersionMetadata: extractVersionMetadata,
+    readVersionSignals: readVersionSignals,
+    hasVersionSignals: hasVersionSignals,
     preserveVersionFieldsOnRecord: preserveVersionFieldsOnRecord,
     isCurrentStatement: isCurrentStatement,
+    isCurrentlyValid: isCurrentlyValid,
+    isFutureValid: isFutureValid,
+    isExpiredInVersion: isExpiredInVersion,
     isHistoricalStatement: isHistoricalStatement,
     isSupersededStatement: isSupersededStatement,
+    isSuperseded: isSuperseded,
+    isRemoved: isRemoved,
+    isIntroducedIn: isIntroducedIn,
     compareVersionedStatements: compareVersionedStatements,
     formatGameVersionLabel: formatGameVersionLabel,
     formatValidityLabel: formatValidityLabel,
+    getVersionDisplayLabel: getVersionDisplayLabel,
+    getVersionValidityLabel: getVersionValidityLabel,
+    getVersionStateBadges: getVersionStateBadges,
+    getVersionHistoryEntries: getVersionHistoryEntries,
+    getVersionHistorySummary: getVersionHistorySummary,
+    shouldDisplayVersionBadge: shouldDisplayVersionBadge,
+    shouldDisplayVersionHistory: shouldDisplayVersionHistory,
+    shouldDisplayOutdatedBadge: shouldDisplayOutdatedBadge,
+    resolveVersionContext: resolveVersionContext,
     renderVersionBadge: renderVersionBadge,
     renderVersionBadgeGroup: renderVersionBadgeGroup,
+    renderVersionHistoryGroup: renderVersionHistoryGroup,
     collectVersionSearchSignals: collectVersionSearchSignals,
     escapeHtml: escapeHtml,
   };
