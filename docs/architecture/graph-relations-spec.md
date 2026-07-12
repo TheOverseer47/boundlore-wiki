@@ -50,6 +50,8 @@
 
 **P2-H.2 acceptance sweep:** P2-H foundation block accepted locally. No requirement/unlock posts, no progression UI, no SQL, no data migration.
 
+**P2-I.1 integration gate:** P2-A through P2-H accepted as registry/read/search/facet foundations only. No productive requirement/unlock relations activated.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

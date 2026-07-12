@@ -136,6 +136,7 @@ Intent: **Add Version Change**
 - **P0.5-F (done):** `js/versioning-model.js` helpers; nullable `game_version`, `valid_from`, `valid_until`, `superseded_by` tolerated on facts, relations, recipes, facets; sanitize/merge preserve version metadata when present; optional badges only when data exists
 - **P2-D.1 (done):** Version history & live-service validity baseline — `readVersionSignals`, validity/outdated gates, history summary; UI only when real version fields present; no data backfill, no Patch Mode workflow
 - **P2-D.2 (done):** Acceptance sweep — P2-D foundation block accepted locally; no version data created; no Unknown-Version badges on QA entries
+- **P2-I.1 (done):** P2 foundation integration gate — all P2 registries verified together; `add_version_change` remains reserved; no version UI activation
 - Add nullable version fields to BLMETA schema documentation and example JSON (docs)
 - No merge-engine rank/deprecation behavior change yet
 - No Version History widget unless real version data exists

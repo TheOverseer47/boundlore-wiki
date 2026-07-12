@@ -135,3 +135,17 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 | Pending `add_recipe` conflict | Not touched |
 
 **P2-H foundation block (H.1 + H.2) accepted locally.**
+
+## P2-I.1 — P2 Foundation Integration & Blueprint Gap Gate (local)
+
+**Status:** P2-I.1 integration gate completed; no SQL, no data migration, no deploy.
+
+| Check | Result |
+|-------|--------|
+| P2 Registry matrix | 12/12 APIs on QA Staff; all promotion/render guards false |
+| Relation/intent safety | Persisted/derived + reserved unchanged across P1/P2 |
+| Search parser | 30/30 baseline + P2 queries — hint-only |
+| QA regressions | Staff/Ember/Ogre/Swamp unchanged; Wood/Forge missing-entry only |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-A through P2-H accepted as registry/read/search/facet foundations only. Remaining work: UI activation, backend/search/index, moderation workflows, data migration, launch readiness.**

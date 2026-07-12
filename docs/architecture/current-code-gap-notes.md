@@ -1170,3 +1170,22 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P2-H.2 acceptance sweep completed; Requirements, unlocks, progression contexts, and access states accepted as registry/read/search/facet baseline only. No unlock UI, no progression posts, no SQL, no data migration.** P2-H foundation block (H.1 + H.2) accepted locally. Deployment freeze remains active.
 
 ---
+
+## 43. P2-I.1 — P2 Foundation Integration & Blueprint Gap Gate
+
+**Status:** Complete (local integration gate; read-only sweep; no SQL, no data migration, no deploy).
+
+| Gate | Result |
+|------|--------|
+| P2 Registry APIs (QA Staff) | All 12 APIs present: ContentModel, QuestEvent, Economy, Versioning, ResourceNode, Observation, CreatureEncounter, RequirementUnlock, Relations, Intents, Evidence, Professions |
+| Active models | BEING:npc, KNOWLEDGE:quest, EVENT:event, OBJECT:resource, BEING:creature — `status: active_model`; create_ui/admin_flow false |
+| Promotion/render guards | All P2 registries: shouldPromote* false, shouldRender* false (RENDER_SECTIONS_ENABLED false) |
+| Relation/intent safety | crafted_from/crafted_at/found_in persisted; ingredient_of/dropped_by derived; P1/P2 reserved relations/intents unchanged |
+| Search parser | 30/30 baseline + P2 queries — hint-only, no crash |
+| QA regressions | Staff/Ember/Ogre/Swamp unchanged; Wood/Forge missing-entry only |
+| No auto-inference | No crystal/fire taxonomy from names; no PLACE from coordinates; no requirement/faction posts |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-I.1 integration gate completed locally. P2-A through P2-H are accepted as registry/read/search/facet foundations only. No productive UI flows, no admin actions, no SQL, no data migration, no deploy. Remaining work is UI activation, backend/search/index work, moderation workflows, data migration, and launch readiness.** Deployment freeze remains active; boundlore.com untouched.
+
+---

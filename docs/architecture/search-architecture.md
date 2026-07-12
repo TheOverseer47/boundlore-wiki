@@ -56,6 +56,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-H.2 acceptance sweep:** P2-H foundation block accepted locally. No requirement/unlock posts, no progression UI, no SQL, no data migration.
 
+**P2-I.1 integration gate:** P2-A through P2-H accepted as registry/read/search/facet foundations only. No productive UI, backend search/index, SQL, or deploy. See `current-code-gap-notes.md` §43.
+
 ---
 
 ## Goals

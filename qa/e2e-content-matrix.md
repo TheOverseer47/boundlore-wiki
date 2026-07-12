@@ -750,6 +750,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-I.1 — P2 Foundation Integration & Blueprint Gap Gate
+
+**Milestone:** P2 full foundation integration gate; read-only sweep; no SQL, no data migration, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API matrix | QA Staff console | 12/12 P2+P1 APIs object | `[x]` |
+| Active models | console | npc/quest/event/resource/creature active_model; create_ui/admin_flow false | `[x]` |
+| Promotion/render guards | console | all shouldPromote*/shouldRender* false across P2 registries | `[x]` |
+| Relation/intent safety | console | persisted/derived + reserved relations/intents unchanged | `[x]` |
+| Search parser sweep | 30 baseline + P2 queries | hint-only, no crash | `[x]` |
+| Resource facets | mining/raw/unknown/crystal_node filters | QA Ember on mining/raw/unknown; no false node_type match | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no P2 sections without explicit fields | `[x]` |
+| Search regressions | qa ember/staff/ogre/mining/wood/forge/drop | unchanged | `[x]` |
+| Wood/Forge | search/admin | missing-entry only; no posts | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-I.1 integration gate completed locally. P2-A through P2-H are accepted as registry/read/search/facet foundations only. No productive UI flows, no admin actions, no SQL, no data migration, no deploy. Remaining work is UI activation, backend/search/index work, moderation workflows, data migration, and launch readiness.**
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
