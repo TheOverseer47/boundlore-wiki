@@ -1659,6 +1659,18 @@ window.WikiEntryLayout = (function() {
         observationContext = null;
       }
     }
+    let creatureEncounterContext = null;
+    if (typeof BoundLoreCreatureEncounterRegistry !== "undefined" && BoundLoreCreatureEncounterRegistry.resolveCreatureEncounterContext) {
+      try {
+        creatureEncounterContext = BoundLoreCreatureEncounterRegistry.resolveCreatureEncounterContext({
+          meta: meta,
+          post: post,
+          discovery_payload: payload,
+        });
+      } catch (err) {
+        creatureEncounterContext = null;
+      }
+    }
 
     return {
       post: post,
@@ -1688,6 +1700,7 @@ window.WikiEntryLayout = (function() {
       versionContext: versionContext,
       resourceNodeContext: resourceNodeContext,
       observationContext: observationContext,
+      creatureEncounterContext: creatureEncounterContext,
       supplementalHtml: "",
     };
   }

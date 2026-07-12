@@ -1088,3 +1088,23 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P2-F.2 acceptance sweep completed; Observation locations, coordinates, biome/time/weather conditions accepted as registry/read/search/facet baseline only. No PLACE promotion, no observation posts, no SQL, no data migration.** P2-F foundation block (F.1 + F.2) accepted locally. Deployment freeze remains active.
 
 ---
+
+## 39. P2-G.1 — Creature Encounter, Spawn & Drop Context Baseline
+
+**Status:** Complete (local baseline; registry/read/search/facet tolerance only; no SQL, no encounter posts, no data migration).
+
+| Area | Result |
+|------|--------|
+| CreatureEncounterRegistry | `js/creature-encounter-registry.js` — normalize/extract/signals; no name-based taxonomy |
+| ContentModel integration | BEING:creature model; npc/creature encounter fields; explicit-only enrichment |
+| Facet groups | `behavior`, `encounter_type`, `spawn_context`, `drop_context` — explicit-only |
+| Search parser/signals | low-weight creature/spawn/drop/affinity hints; no hard filters |
+| Wiki entry layout | `creatureEncounterContext` read-only; no new sections without explicit fields |
+| Drop relations | `dropped_by` derived inverse; `report_drop`/`add_behavior`/`add_spawn` unchanged |
+| Reserved | `report_weakness_resistance` reserved; no new productive encounter/spawn relation |
+| QA regressions | Ogre/Staff/Ember/Swamp unchanged; Wood/Forge missing-entry only |
+| Not built | Loot-table editor, spawn tracker, encounter UI, combat simulator, SQL |
+
+**Deployment freeze remains active** — no push/deploy.
+
+---

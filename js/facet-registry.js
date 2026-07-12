@@ -174,6 +174,58 @@ window.BoundLoreFacetRegistry = (function() {
       filter_relevant: false,
       values: ["clear", "rain", "storm", "fog", "snow", "wind", "heat", "cold"],
     }),
+    behavior: defineGroup({
+      key: "behavior",
+      label: "Behavior",
+      description: "Explicit creature behavior context (not inferred from names or relations).",
+      applicable_domains: ["BEING"],
+      applicable_subtypes: ["creature", "monster", "npc"],
+      search_relevant: true,
+      filter_relevant: false,
+      evidence_required: "recommended",
+      values: [
+        "aggressive", "hostile", "passive", "neutral", "defensive", "territorial",
+        "fleeing", "patrol", "ambush", "caster", "ranged", "melee", "support", "boss", "elite",
+      ],
+    }),
+    encounter_type: defineGroup({
+      key: "encounter_type",
+      label: "Encounter Type",
+      description: "Explicit encounter classification (not inferred from spawn text).",
+      applicable_domains: ["BEING"],
+      applicable_subtypes: ["creature", "monster"],
+      search_relevant: true,
+      filter_relevant: false,
+      values: [
+        "overworld", "dungeon", "boss", "rare_spawn", "event_spawn", "quest_encounter",
+        "patrol", "ambush", "camp", "lair",
+      ],
+    }),
+    spawn_context: defineGroup({
+      key: "spawn_context",
+      label: "Spawn Context",
+      description: "Explicit spawn condition context (not inferred from location text).",
+      applicable_domains: ["BEING"],
+      applicable_subtypes: ["creature", "monster"],
+      search_relevant: true,
+      filter_relevant: false,
+      values: [
+        "fixed", "random", "conditional", "event_based", "quest_based", "time_based",
+        "weather_based", "biome_based", "proximity_based",
+      ],
+    }),
+    drop_context: defineGroup({
+      key: "drop_context",
+      label: "Drop Context",
+      description: "Explicit drop rarity/context (drop_chance/rate are qualifiers, not facets).",
+      applicable_domains: ["BEING", "OBJECT"],
+      search_relevant: true,
+      filter_relevant: false,
+      values: [
+        "guaranteed", "common", "uncommon", "rare", "very_rare", "conditional",
+        "quest_only", "event_only",
+      ],
+    }),
     processing_stage: defineGroup({
       key: "processing_stage",
       label: "Processing Stage",
@@ -569,6 +621,14 @@ window.BoundLoreFacetRegistry = (function() {
       if (explicitBiome) {
         derived.push(normalizeFacetEntry("biome_context", explicitBiome, "explicit"));
       }
+    }
+
+    if (domain === "BEING" && (subtype === "creature" || subtype === "monster" || subtype === "npc")) {
+      const creature = payload.creature && typeof payload.creature === "object" ? payload.creature : payload;
+      ["behavior", "encounter_type", "spawn_context", "drop_context"].forEach(function(field) {
+        const val = normalizeFacetValue(field, creature[field] || payload[field]);
+        if (val) derived.push(normalizeFacetEntry(field, val, "explicit"));
+      });
     }
 
     return derived.filter(Boolean);

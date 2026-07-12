@@ -12,6 +12,8 @@
 
 **P2-F.2 acceptance sweep:** P2-F foundation block accepted locally. No PLACE promotion, no observation posts, no SQL, no data migration.
 
+**P2-G.1:** `behavior`, `encounter_type`, `spawn_context`, `drop_context` facet groups added (explicit-only, `filter_relevant: false`). Drop chance/rate are qualifiers/fields, not facets.
+
 Controlled multi-valued classification layer for BoundLore. Facets complement — never replace — `entity_domain` and `entity_subtype`.
 
 **Related:** [CONTENT_ARCHITECTURE.md](./CONTENT_ARCHITECTURE.md) · [entity-promotion-policy.md](./entity-promotion-policy.md) · [search-architecture.md](./search-architecture.md)

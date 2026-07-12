@@ -15,12 +15,23 @@ window.BoundLoreContentModelRegistry = (function() {
     RESERVED: "reserved_model",
   };
 
+  const OBSERVATION_CONTEXT_FIELDS = [
+    "observation_context", "location_ref", "location_type", "coordinates",
+    "coordinate_system", "biome_context", "time_condition", "weather_condition", "observed_at",
+  ];
+
+  const CREATURE_ENCOUNTER_FIELDS = [
+    "behavior", "encounter_type", "spawn_context", "drop_context", "drop_chance",
+    "drop_rate", "loot", "weakness", "resistance", "creature_observations", "combat_affinities",
+  ];
+
   const NPC_FIELDS = [
     "faction", "roles", "capabilities", "location_refs", "dialogue_refs",
     "vendor_inventory", "trainer_for", "quest_refs", "schedule", "economy_context",
     "observation_context", "location_ref", "coordinates", "biome_context",
     "time_condition", "weather_condition", "observed_at",
-    "evidence", "versioning",
+    "behavior", "encounter_type", "spawn_context", "drop_context", "creature_observations",
+    "combat_affinities", "evidence", "versioning",
   ];
 
   const QUEST_FIELDS = [
@@ -44,10 +55,9 @@ window.BoundLoreContentModelRegistry = (function() {
     "evidence", "versioning",
   ];
 
-  const OBSERVATION_CONTEXT_FIELDS = [
-    "observation_context", "location_ref", "location_type", "coordinates",
-    "coordinate_system", "biome_context", "time_condition", "weather_condition", "observed_at",
-  ];
+  const CREATURE_FIELDS = CREATURE_ENCOUNTER_FIELDS.concat(OBSERVATION_CONTEXT_FIELDS).filter(function(f, i, arr) {
+    return arr.indexOf(f) === i;
+  });
 
   const MODEL_DEFINITIONS = {
     "BEING:npc": {
@@ -61,6 +71,18 @@ window.BoundLoreContentModelRegistry = (function() {
       fields: NPC_FIELDS.slice(),
       search_weight: 2,
       notes: "Non-player characters remain BEING/npc — not a top-level domain.",
+    },
+    "BEING:creature": {
+      key: "BEING:creature",
+      domain: "BEING",
+      subtype: "creature",
+      label: "Creature",
+      status: MODEL_STATUS.ACTIVE,
+      create_ui: false,
+      admin_flow: false,
+      fields: CREATURE_FIELDS.slice(),
+      search_weight: 2,
+      notes: "BEING/creature — encounter/spawn/drop context fields only; no encounter posts.",
     },
     "KNOWLEDGE:quest": {
       key: "KNOWLEDGE:quest",
@@ -137,6 +159,11 @@ window.BoundLoreContentModelRegistry = (function() {
   };
 
   const SUBTYPE_ALIASES = {
+    creature: "creature",
+    creatures: "creature",
+    monster: "creature",
+    monsters: "creature",
+    mob: "creature",
     npc: "npc",
     npcs: "npc",
     character: "npc",
@@ -308,6 +335,7 @@ window.BoundLoreContentModelRegistry = (function() {
       "trainer_for", "quest_refs", "objectives", "prerequisites", "rewards",
       "related_events", "participants", "related_quests",
       "acquisition_sources", "node_observations",
+      "creature_observations", "combat_affinities", "loot", "weakness", "resistance",
     ];
     if (arrayFields.indexOf(field) >= 0) return normalizeArrayField(value);
     return normalizeScalarField(value);
@@ -348,6 +376,10 @@ window.BoundLoreContentModelRegistry = (function() {
           if (typeof BoundLoreEconomyRegistry !== "undefined") {
             out.economy = BoundLoreEconomyRegistry.normalizeEconomyContext(source);
           }
+        } else if (def.key === "BEING:creature") {
+          if (typeof BoundLoreCreatureEncounterRegistry !== "undefined") {
+            out.creature_encounter = BoundLoreCreatureEncounterRegistry.resolveCreatureEncounterContext(source);
+          }
         } else if (def.key === "OBJECT:resource") {
           if (typeof BoundLoreResourceNodeRegistry !== "undefined") {
             out.resource_node = BoundLoreResourceNodeRegistry.resolveResourceNodeContext(source);
@@ -355,6 +387,10 @@ window.BoundLoreContentModelRegistry = (function() {
         }
         if (typeof BoundLoreObservationContextRegistry !== "undefined") {
           out.observation = BoundLoreObservationContextRegistry.resolveObservationContext(source);
+        }
+        if (typeof BoundLoreCreatureEncounterRegistry !== "undefined" &&
+            (def.key === "BEING:npc" || def.key === "BEING:creature")) {
+          out.creature_encounter = BoundLoreCreatureEncounterRegistry.resolveCreatureEncounterContext(source);
         }
       } catch (err) {
         /* schema enrichment optional */

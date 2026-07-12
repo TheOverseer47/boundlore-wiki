@@ -489,6 +489,31 @@ window.BoundLoreSearchSignals = (function() {
     return bucket.signals;
   }
 
+  function collectCreatureEncounterSearchSignals(post, meta) {
+    const bucket = { signals: [], _seen: new Set() };
+    if (typeof BoundLoreCreatureEncounterRegistry === "undefined") {
+      return bucket.signals;
+    }
+    const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+      ? meta.discovery_payload
+      : {};
+    const source = Object.assign({}, meta || {}, payload, {
+      meta: meta || {},
+      post: post || {},
+      discovery_payload: payload,
+    });
+    try {
+      BoundLoreCreatureEncounterRegistry.extractCreatureObservationSignals(source).forEach(function(entry) {
+        if (!entry || !entry.raw) return;
+        const group = entry.group || "creature_encounter";
+        pushSignal(bucket, entry.raw, { group: group, label: entry.label || "Creature encounter" });
+      });
+    } catch (err) {
+      return bucket.signals;
+    }
+    return bucket.signals;
+  }
+
   function buildDisplayLabels(post, meta, signalGroups) {
     const labels = [];
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {
@@ -535,6 +560,7 @@ window.BoundLoreSearchSignals = (function() {
       economy: collectEconomySearchSignals(safePost, meta),
       resource_node: collectResourceNodeSearchSignals(safePost, meta),
       observation_context: collectObservationContextSearchSignals(safePost, meta),
+      creature_encounter: collectCreatureEncounterSearchSignals(safePost, meta),
       version: collectVersionSearchSignalsForPost(safePost, meta),
       text: collectTextSignals(safePost),
     };
@@ -711,6 +737,10 @@ window.BoundLoreSearchSignals = (function() {
     if (group === "observation_context") return WEIGHTS.weak;
     if (group === "location_context") return WEIGHTS.weak;
     if (group === "condition_context") return WEIGHTS.weak;
+    if (group === "creature_encounter") return WEIGHTS.weak;
+    if (group === "spawn_context") return WEIGHTS.weak;
+    if (group === "drop_context") return WEIGHTS.weak;
+    if (group === "combat_affinity") return WEIGHTS.weak;
     if (group === "acquisition_source") return WEIGHTS.weak;
     if (group === "profession_capability") return WEIGHTS.weak;
     return WEIGHTS.text;

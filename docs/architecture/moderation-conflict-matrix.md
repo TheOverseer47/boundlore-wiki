@@ -71,3 +71,17 @@ QA data without state fields shows no new badges. Pending `add_recipe` conflict 
 No automatic outdated marking. No game-version posts. QA baseline entries unchanged.
 
 **P2-D.2 acceptance sweep:** Version history and live-service validity accepted as read-only helper/search/admin-preview baseline only. No patch workflow, no SQL, no data migration. P2-D foundation block accepted locally.
+
+## P2-G.1 — Creature Encounter, Spawn & Drop Context Baseline (local)
+
+**Scope:** Registry/read/search/facet tolerance only — no loot-table UI, no encounter UI, no SQL, no data migration.
+
+| Layer | Behavior |
+|-------|----------|
+| CreatureEncounterRegistry | `js/creature-encounter-registry.js` — behavior/encounter/spawn/drop/affinity helpers |
+| Drop compatibility | `dropped_by` derived inverse unchanged; drop chance/rate are qualifier fields |
+| Contribution intents | `report_drop`, `add_behavior`, `add_spawn` unchanged; `report_weakness_resistance` reserved |
+| Search | Low-weight creature/spawn/drop/affinity hints; no hard filters |
+| QA baseline | QA Ogre / QA Staff drop display unchanged; no new encounter/spawn/weakness sections |
+
+No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-table editor deferred.

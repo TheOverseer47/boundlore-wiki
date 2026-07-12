@@ -92,6 +92,28 @@ window.BoundLoreSearchQueryParser = (function() {
     { pattern: /\blocation\b/i, group: "location_context", value: "location" },
   ];
 
+  const CREATURE_ENCOUNTER_KEYWORD_HINTS = [
+    { pattern: /\bcreature\s+spawn\b/i, group: "creature_encounter", value: "creature_spawn" },
+    { pattern: /\bmonster\s+spawn\b/i, group: "creature_encounter", value: "monster_spawn" },
+    { pattern: /\brare\s+spawn\b/i, group: "spawn_context", value: "rare_spawn" },
+    { pattern: /\bboss\s+spawn\b/i, group: "spawn_context", value: "boss_spawn" },
+    { pattern: /\bhostile\s+creature\b/i, group: "creature_encounter", value: "hostile" },
+    { pattern: /\baggressive\s+creature\b/i, group: "creature_encounter", value: "aggressive" },
+    { pattern: /\bpassive\s+creature\b/i, group: "creature_encounter", value: "passive" },
+    { pattern: /\bcreature\s+behavior\b/i, group: "creature_encounter", value: "behavior" },
+    { pattern: /\bdrop\s+chance\b/i, group: "drop_context", value: "drop_chance" },
+    { pattern: /\bdrop\s+rate\b/i, group: "drop_context", value: "drop_rate" },
+    { pattern: /\brare\s+drop\b/i, group: "drop_context", value: "rare" },
+    { pattern: /\bdropped\s+by\b/i, group: "drop_context", value: "dropped_by" },
+    { pattern: /\bpoison\s+resistance\b/i, group: "combat_affinity", value: "poison_resistance" },
+    { pattern: /\bfire\s+weakness\b/i, group: "combat_affinity", value: "fire_weakness" },
+    { pattern: /\bweakness\b/i, group: "combat_affinity", value: "weakness" },
+    { pattern: /\bresistance\b/i, group: "combat_affinity", value: "resistance" },
+    { pattern: /\bencounter\b/i, group: "creature_encounter", value: "encounter" },
+    { pattern: /\bloot\b/i, group: "drop_context", value: "loot" },
+    { pattern: /\bdrops?\b/i, group: "drop_context", value: "drop" },
+  ];
+
   const MISSING_ENTRY_TERMS = ["wood", "forge"];
 
   function escapeHtml(value) {
@@ -314,6 +336,17 @@ window.BoundLoreSearchQueryParser = (function() {
     return bucket.list;
   }
 
+  function extractCreatureEncounterHints(query) {
+    const raw = String(query || "");
+    const bucket = createHintBucket();
+    CREATURE_ENCOUNTER_KEYWORD_HINTS.forEach(function(entry) {
+      if (entry.pattern.test(raw)) {
+        addHint(bucket, entry.group, entry.value, "keyword");
+      }
+    });
+    return bucket.list;
+  }
+
   function extractEntityTypeHints(query) {
     const bucket = createHintBucket();
     const raw = String(query || "");
@@ -381,6 +414,7 @@ window.BoundLoreSearchQueryParser = (function() {
     const versionHints = extractVersionHints(raw);
     const resourceNodeHints = extractResourceNodeHints(raw);
     const observationContextHints = extractObservationContextHints(raw);
+    const creatureEncounterHints = extractCreatureEncounterHints(raw);
     const entityTypeHints = extractEntityTypeHints(raw);
     const acquisitionIntent = extractAcquisitionIntent(raw);
     const missingEntryIntent = extractMissingEntryIntent(raw);
@@ -391,6 +425,7 @@ window.BoundLoreSearchQueryParser = (function() {
       { list: versionHints, _seen: new Set(versionHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: resourceNodeHints, _seen: new Set(resourceNodeHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: observationContextHints, _seen: new Set(observationContextHints.map(function(h) { return h.group + ":" + h.value; })) },
+      { list: creatureEncounterHints, _seen: new Set(creatureEncounterHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: entityTypeHints, _seen: new Set(entityTypeHints.map(function(h) { return h.group + ":" + h.value; })) }
     );
 
@@ -405,7 +440,7 @@ window.BoundLoreSearchQueryParser = (function() {
       tokens: tokenizeSearchQuery(raw),
       residual: residual,
       free_text: residual || normalized,
-      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, resourceNodeHints, observationContextHints, entityTypeHints),
+      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, resourceNodeHints, observationContextHints, creatureEncounterHints, entityTypeHints),
       relation_hints: relationHints,
       entity_type_hints: entityTypeHints,
       quest_event_hints: questEventHints,
@@ -413,6 +448,7 @@ window.BoundLoreSearchQueryParser = (function() {
       version_hints: versionHints,
       resource_node_hints: resourceNodeHints,
       observation_context_hints: observationContextHints,
+      creature_encounter_hints: creatureEncounterHints,
       usage_intent: usageIntent,
       crafting_intent: craftingIntent,
       acquisition_intent: acquisitionIntent,
@@ -459,6 +495,9 @@ window.BoundLoreSearchQueryParser = (function() {
     });
     (parsed.observation_context_hints || []).forEach(function(hint) {
       if (hint.value) parts.push("Observation: " + hint.value.replace(/_/g, " "));
+    });
+    (parsed.creature_encounter_hints || []).forEach(function(hint) {
+      if (hint.value) parts.push("Creature: " + hint.value.replace(/_/g, " "));
     });
 
     const unique = parts.filter(function(part, index, arr) {
@@ -586,6 +625,17 @@ window.BoundLoreSearchQueryParser = (function() {
       });
     });
 
+    (parsed.creature_encounter_hints || []).forEach(function(hint) {
+      const groups = ["creature_encounter", "spawn_context", "drop_context", "combat_affinity"];
+      groups.forEach(function(groupName) {
+        (signals[groupName] || []).forEach(function(signal) {
+          if (signalMatchesHint(signal, hint.value)) {
+            addDetail("creature_encounter_hint", 2, signal.raw, hint);
+          }
+        });
+      });
+    });
+
     if (parsed.free_text && document.kind === "post") {
       const residualTokens = tokenizeSearchQuery(parsed.free_text).filter(function(t) {
         return !GENERIC_TERMS.has(t);
@@ -616,6 +666,7 @@ window.BoundLoreSearchQueryParser = (function() {
     extractAcquisitionIntent: extractAcquisitionIntent,
     extractMissingEntryIntent: extractMissingEntryIntent,
     extractObservationContextHints: extractObservationContextHints,
+    extractCreatureEncounterHints: extractCreatureEncounterHints,
     getQueryIntentSummary: getQueryIntentSummary,
     getSearchParserDebugInfo: getSearchParserDebugInfo,
     applyParsedQueryToSignals: applyParsedQueryToSignals,

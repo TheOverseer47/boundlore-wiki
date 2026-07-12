@@ -42,6 +42,8 @@
 
 **P2-F.2 acceptance sweep:** P2-F foundation block accepted locally. No PLACE promotion, no observation posts, no SQL, no data migration.
 
+**P2-G.1 creature encounter baseline:** Encounter/spawn/drop contexts are structured fields, not relations. `dropped_by` remains derived inverse. `report_drop`, `add_behavior`, `add_spawn` unchanged. `report_weakness_resistance` reserved. No new productive encounter/spawn/loot relation.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

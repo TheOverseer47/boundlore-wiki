@@ -662,6 +662,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-G.1 — Creature Encounter, Spawn & Drop Context Baseline
+
+**Milestone:** P2-G creature encounter/spawn/drop registry; client-side only; no SQL, no encounter posts, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| CreatureEncounterRegistry API | console smoke | normalize/extract/signals; no crash | `[x]` |
+| No encounter/spawn/drop posts | registry helpers | shouldPromote* false | `[x]` |
+| dropped_by compatibility | relations registry | derived_inverse unchanged | `[x]` |
+| ContentModel/Facet integration | BEING:creature; behavior/spawn/drop facets | explicit-only; create_ui false | `[x]` |
+| Search parser hints | creature spawn/drop/weakness/resistance | hint-only; no crash | `[x]` |
+| Search regressions | qa ogre/qa staff/mining/wood/forge/coordinates | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no behavior/spawn/weakness sections | `[x]` |
+| Wood/Forge | search/admin | missing-entry only; no posts | `[x]` |
+| Relations/intents | report_drop/add_behavior/add_spawn/report_weakness_resistance | unchanged / reserved | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[ ]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-G.1:** Creature encounter/spawn/drop baseline only. No encounter posts, no loot UI, no SQL, no deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
