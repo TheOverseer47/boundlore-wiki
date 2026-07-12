@@ -8,6 +8,8 @@
 
 **P2-E.2 acceptance sweep:** P2-E foundation block accepted locally. No node posts, no PLACE promotion, no taxonomy inference from source_detail.
 
+**P2-F.1:** `biome_context`, `time_condition`, `weather_condition` facet groups added (explicit-only, `filter_relevant: false`). Observation location/coordinate fields are not facets by default. No inference from free text or coordinates.
+
 Controlled multi-valued classification layer for BoundLore. Facets complement — never replace — `entity_domain` and `entity_subtype`.
 
 **Related:** [CONTENT_ARCHITECTURE.md](./CONTENT_ARCHITECTURE.md) · [entity-promotion-policy.md](./entity-promotion-policy.md) · [search-architecture.md](./search-architecture.md)

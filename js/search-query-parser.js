@@ -75,6 +75,23 @@ window.BoundLoreSearchQueryParser = (function() {
     { pattern: /\bnode\s+type\b/i, group: "resource_node_context", value: "node_type" },
   ];
 
+  const OBSERVATION_CONTEXT_KEYWORD_HINTS = [
+    { pattern: /\bcoordinates?\b/i, group: "observation_context", value: "coordinates" },
+    { pattern: /\bobserved\s+at\b/i, group: "observation_context", value: "observed_at" },
+    { pattern: /\bfound\s+near\b/i, group: "location_context", value: "found_near" },
+    { pattern: /\bspawn\s+location\b/i, group: "observation_context", value: "spawn" },
+    { pattern: /\bresource\s+location\b/i, group: "observation_context", value: "resource_location" },
+    { pattern: /\bevent\s+location\b/i, group: "observation_context", value: "event_location" },
+    { pattern: /\bswamp\s+biome\b/i, group: "condition_context", value: "swamp" },
+    { pattern: /\bbiome\b/i, group: "condition_context", value: "biome" },
+    { pattern: /\bweather\b/i, group: "condition_context", value: "weather" },
+    { pattern: /\brain\b/i, group: "condition_context", value: "rain" },
+    { pattern: /\bstorm\b/i, group: "condition_context", value: "storm" },
+    { pattern: /\bnighttime\b/i, group: "condition_context", value: "nighttime" },
+    { pattern: /\bdaytime\b/i, group: "condition_context", value: "daytime" },
+    { pattern: /\blocation\b/i, group: "location_context", value: "location" },
+  ];
+
   const MISSING_ENTRY_TERMS = ["wood", "forge"];
 
   function escapeHtml(value) {
@@ -286,6 +303,17 @@ window.BoundLoreSearchQueryParser = (function() {
     return bucket.list;
   }
 
+  function extractObservationContextHints(query) {
+    const raw = String(query || "");
+    const bucket = createHintBucket();
+    OBSERVATION_CONTEXT_KEYWORD_HINTS.forEach(function(entry) {
+      if (entry.pattern.test(raw)) {
+        addHint(bucket, entry.group, entry.value, "keyword");
+      }
+    });
+    return bucket.list;
+  }
+
   function extractEntityTypeHints(query) {
     const bucket = createHintBucket();
     const raw = String(query || "");
@@ -352,6 +380,7 @@ window.BoundLoreSearchQueryParser = (function() {
     const economyHints = extractEconomyHints(raw);
     const versionHints = extractVersionHints(raw);
     const resourceNodeHints = extractResourceNodeHints(raw);
+    const observationContextHints = extractObservationContextHints(raw);
     const entityTypeHints = extractEntityTypeHints(raw);
     const acquisitionIntent = extractAcquisitionIntent(raw);
     const missingEntryIntent = extractMissingEntryIntent(raw);
@@ -361,6 +390,7 @@ window.BoundLoreSearchQueryParser = (function() {
       { list: economyHints, _seen: new Set(economyHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: versionHints, _seen: new Set(versionHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: resourceNodeHints, _seen: new Set(resourceNodeHints.map(function(h) { return h.group + ":" + h.value; })) },
+      { list: observationContextHints, _seen: new Set(observationContextHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: entityTypeHints, _seen: new Set(entityTypeHints.map(function(h) { return h.group + ":" + h.value; })) }
     );
 
@@ -375,13 +405,14 @@ window.BoundLoreSearchQueryParser = (function() {
       tokens: tokenizeSearchQuery(raw),
       residual: residual,
       free_text: residual || normalized,
-      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, resourceNodeHints, entityTypeHints),
+      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, resourceNodeHints, observationContextHints, entityTypeHints),
       relation_hints: relationHints,
       entity_type_hints: entityTypeHints,
       quest_event_hints: questEventHints,
       economy_hints: economyHints,
       version_hints: versionHints,
       resource_node_hints: resourceNodeHints,
+      observation_context_hints: observationContextHints,
       usage_intent: usageIntent,
       crafting_intent: craftingIntent,
       acquisition_intent: acquisitionIntent,
@@ -425,6 +456,9 @@ window.BoundLoreSearchQueryParser = (function() {
     });
     (parsed.resource_node_hints || []).forEach(function(hint) {
       if (hint.value) parts.push("Resource node: " + hint.value.replace(/_/g, " "));
+    });
+    (parsed.observation_context_hints || []).forEach(function(hint) {
+      if (hint.value) parts.push("Observation: " + hint.value.replace(/_/g, " "));
     });
 
     const unique = parts.filter(function(part, index, arr) {
@@ -541,6 +575,17 @@ window.BoundLoreSearchQueryParser = (function() {
       });
     });
 
+    (parsed.observation_context_hints || []).forEach(function(hint) {
+      const groups = ["observation_context", "location_context", "condition_context"];
+      groups.forEach(function(groupName) {
+        (signals[groupName] || []).forEach(function(signal) {
+          if (signalMatchesHint(signal, hint.value)) {
+            addDetail("observation_context_hint", 2, signal.raw, hint);
+          }
+        });
+      });
+    });
+
     if (parsed.free_text && document.kind === "post") {
       const residualTokens = tokenizeSearchQuery(parsed.free_text).filter(function(t) {
         return !GENERIC_TERMS.has(t);
@@ -570,6 +615,7 @@ window.BoundLoreSearchQueryParser = (function() {
     extractCraftingIntent: extractCraftingIntent,
     extractAcquisitionIntent: extractAcquisitionIntent,
     extractMissingEntryIntent: extractMissingEntryIntent,
+    extractObservationContextHints: extractObservationContextHints,
     getQueryIntentSummary: getQueryIntentSummary,
     getSearchParserDebugInfo: getSearchParserDebugInfo,
     applyParsedQueryToSignals: applyParsedQueryToSignals,

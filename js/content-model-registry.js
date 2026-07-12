@@ -18,23 +18,35 @@ window.BoundLoreContentModelRegistry = (function() {
   const NPC_FIELDS = [
     "faction", "roles", "capabilities", "location_refs", "dialogue_refs",
     "vendor_inventory", "trainer_for", "quest_refs", "schedule", "economy_context",
+    "observation_context", "location_ref", "coordinates", "biome_context",
+    "time_condition", "weather_condition", "observed_at",
     "evidence", "versioning",
   ];
 
   const QUEST_FIELDS = [
     "quest_giver", "objectives", "prerequisites", "rewards", "required_level",
     "faction_req", "starts_from", "ends_at", "related_events", "evidence", "versioning",
+    "observation_context", "location_ref", "coordinates", "biome_context",
+    "time_condition", "weather_condition",
   ];
 
   const EVENT_FIELDS = [
     "event_type", "starts_at", "ends_at", "recurrence", "location_refs",
     "participants", "rewards", "related_quests", "versioning", "evidence",
+    "observation_context", "location_ref", "coordinates", "biome_context",
+    "time_condition", "weather_condition",
   ];
 
   const RESOURCE_FIELDS = [
     "node_type", "source_type", "source_detail", "acquisition_method",
     "acquisition_sources", "node_observations", "biome_context", "required_tool",
+    "observation_context", "location_ref", "coordinates", "time_condition", "weather_condition",
     "evidence", "versioning",
+  ];
+
+  const OBSERVATION_CONTEXT_FIELDS = [
+    "observation_context", "location_ref", "location_type", "coordinates",
+    "coordinate_system", "biome_context", "time_condition", "weather_condition", "observed_at",
   ];
 
   const MODEL_DEFINITIONS = {
@@ -340,6 +352,9 @@ window.BoundLoreContentModelRegistry = (function() {
           if (typeof BoundLoreResourceNodeRegistry !== "undefined") {
             out.resource_node = BoundLoreResourceNodeRegistry.resolveResourceNodeContext(source);
           }
+        }
+        if (typeof BoundLoreObservationContextRegistry !== "undefined") {
+          out.observation = BoundLoreObservationContextRegistry.resolveObservationContext(source);
         }
       } catch (err) {
         /* schema enrichment optional */

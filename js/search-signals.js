@@ -464,6 +464,31 @@ window.BoundLoreSearchSignals = (function() {
     return bucket.signals;
   }
 
+  function collectObservationContextSearchSignals(post, meta) {
+    const bucket = { signals: [], _seen: new Set() };
+    if (typeof BoundLoreObservationContextRegistry === "undefined") {
+      return bucket.signals;
+    }
+    const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+      ? meta.discovery_payload
+      : {};
+    const source = Object.assign({}, meta || {}, payload, {
+      meta: meta || {},
+      post: post || {},
+      discovery_payload: payload,
+    });
+    try {
+      BoundLoreObservationContextRegistry.getObservationSearchSignals(source).forEach(function(entry) {
+        if (!entry || !entry.raw) return;
+        const group = entry.group || "observation_context";
+        pushSignal(bucket, entry.raw, { group: group, label: entry.label || "Observation" });
+      });
+    } catch (err) {
+      return bucket.signals;
+    }
+    return bucket.signals;
+  }
+
   function buildDisplayLabels(post, meta, signalGroups) {
     const labels = [];
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {
@@ -509,6 +534,7 @@ window.BoundLoreSearchSignals = (function() {
       quest_event: collectQuestEventSearchSignals(safePost, meta),
       economy: collectEconomySearchSignals(safePost, meta),
       resource_node: collectResourceNodeSearchSignals(safePost, meta),
+      observation_context: collectObservationContextSearchSignals(safePost, meta),
       version: collectVersionSearchSignalsForPost(safePost, meta),
       text: collectTextSignals(safePost),
     };
@@ -682,6 +708,9 @@ window.BoundLoreSearchSignals = (function() {
     if (group === "relations") return WEIGHTS.relation;
     if (group === "version") return WEIGHTS.weak;
     if (group === "resource_node") return WEIGHTS.weak;
+    if (group === "observation_context") return WEIGHTS.weak;
+    if (group === "location_context") return WEIGHTS.weak;
+    if (group === "condition_context") return WEIGHTS.weak;
     if (group === "acquisition_source") return WEIGHTS.weak;
     if (group === "profession_capability") return WEIGHTS.weak;
     return WEIGHTS.text;

@@ -38,6 +38,8 @@
 
 **P2-E.2 acceptance sweep:** P2-E foundation block accepted locally. No node posts, no PLACE promotion, no SQL, no data migration.
 
+**P2-F.1 observation context baseline:** Coordinates and location refs are observation fields, not relations. `found_in` unchanged — not replaced by coordinate observations. `add_observation_location` remains reserved contribution intent. No new productive coordinate/location relation.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

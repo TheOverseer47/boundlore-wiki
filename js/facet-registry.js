@@ -142,6 +142,38 @@ window.BoundLoreFacetRegistry = (function() {
         "creature_source", "container", "salvage_point",
       ],
     }),
+    biome_context: defineGroup({
+      key: "biome_context",
+      label: "Biome Context",
+      description: "Explicit biome observation context (not inferred from free-text location).",
+      applicable_domains: ["OBJECT", "BEING", "EVENT", "KNOWLEDGE", "PLACE"],
+      search_relevant: true,
+      filter_relevant: false,
+      evidence_required: "recommended",
+      values: [
+        "swamp", "forest", "desert", "mountain", "cave", "coast", "plains", "ruins", "dungeon", "city",
+      ],
+    }),
+    time_condition: defineGroup({
+      key: "time_condition",
+      label: "Time Condition",
+      description: "Observation time-of-day context (explicit field only).",
+      applicable_domains: ENTITY_DOMAINS,
+      search_relevant: true,
+      filter_relevant: false,
+      values: [
+        "daytime", "nighttime", "dawn", "dusk", "morning", "afternoon", "evening", "always",
+      ],
+    }),
+    weather_condition: defineGroup({
+      key: "weather_condition",
+      label: "Weather Condition",
+      description: "Observation weather context (explicit field only).",
+      applicable_domains: ENTITY_DOMAINS,
+      search_relevant: true,
+      filter_relevant: false,
+      values: ["clear", "rain", "storm", "fog", "snow", "wind", "heat", "cold"],
+    }),
     processing_stage: defineGroup({
       key: "processing_stage",
       label: "Processing Stage",
@@ -528,6 +560,14 @@ window.BoundLoreFacetRegistry = (function() {
       );
       if (explicitNodeType) {
         derived.push(normalizeFacetEntry("node_type", explicitNodeType, "explicit"));
+      }
+
+      const explicitBiome = normalizeFacetValue(
+        "biome_context",
+        resource.biome_context || payload.biome_context
+      );
+      if (explicitBiome) {
+        derived.push(normalizeFacetEntry("biome_context", explicitBiome, "explicit"));
       }
     }
 

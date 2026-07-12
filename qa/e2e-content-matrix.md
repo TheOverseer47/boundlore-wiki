@@ -619,6 +619,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-F.1 — Observation Location & Condition Context Baseline
+
+**Milestone:** P2-F observation location/condition registry; client-side only; no SQL, no posts, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ObservationContextRegistry API | console smoke | normalize/extract/signals; no crash | `[x]` |
+| Coordinates not PLACE | registry helpers | `shouldPromoteCoordinatesToPlace` false | `[x]` |
+| Free-text location | location_ref | no post promotion | `[x]` |
+| ContentModel/Facet integration | explicit fields only | biome/time/weather facets explicit-only | `[x]` |
+| Search parser hints | coordinates/location/weather/nighttime/spawn location | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/red crystal/resource node/vendor/version | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no observation badges/sections | `[x]` |
+| Wood/Forge | search/admin | missing-entry only; no posts | `[x]` |
+| Relations safety | found_in / add_observation_location | unchanged / reserved | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[ ]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-F.1:** Observation location/condition baseline only. Coordinates are not PLACE pages. No SQL, no deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

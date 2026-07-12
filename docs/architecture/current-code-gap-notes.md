@@ -1045,3 +1045,25 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P2-E.2 acceptance sweep completed; Resource node types and acquisition sources accepted as registry/read/search/facet baseline only. No node posts, no PLACE promotion, no SQL, no data migration.** P2-E foundation block (E.1 + E.2) accepted locally. Ready for P2-F. Deployment freeze remains active.
+
+---
+
+## 37. P2-F.1 — Observation Location & Condition Context Baseline
+
+**Status:** Complete (local baseline; registry/read/search/facet tolerance only; no SQL, no posts, no data migration).
+
+| Area | Result |
+|------|--------|
+| ObservationContextRegistry | `js/observation-context-registry.js` — normalize/extract/signals; coordinates as structured fields |
+| ContentModel integration | observation fields on resource/event/quest/npc models; explicit-only enrichment |
+| Facet groups | `biome_context`, `time_condition`, `weather_condition` — explicit-only, no filter |
+| Search parser/signals | low-weight observation/location/condition hints; no hard filters |
+| Wiki entry layout | `observationContext` read-only; no new sections/badges without explicit fields |
+| PLACE promotion | `shouldPromoteCoordinatesToPlace` / `shouldPromoteObservationToPost` false |
+| Relations | `found_in` unchanged; `add_observation_location` reserved |
+| QA regressions | Staff/Ember/Ogre/Swamp unchanged; Wood/Forge missing-entry only |
+| Not built | Map, coordinate editor, location create UI, spawn tracker, weather/time systems, SQL |
+
+**Deployment freeze remains active** — no push/deploy.
+
+---

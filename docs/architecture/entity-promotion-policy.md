@@ -96,6 +96,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P2-E.2 acceptance sweep:** Resource node types and acquisition sources accepted as registry/read/search/facet baseline only. No node posts, no PLACE promotion, no SQL, no data migration.
 
+**P2-F.1:** `js/observation-context-registry.js` — coordinates, location refs, biome/time/weather conditions are structured observation fields, not posts. `shouldPromoteCoordinatesToPlace` and `shouldPromoteObservationToPost` remain false. Free-text locations stay text signals; no PLACE promotion from coordinates or location text. Map/route/spawn UI deferred.
+
 ---
 
 ## Missing Entry Queue
