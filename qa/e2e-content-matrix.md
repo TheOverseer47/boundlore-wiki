@@ -1543,6 +1543,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-D.2 — Structured Contribution Draft Flow Acceptance Sweep
+
+**Milestone:** P4-D.2 docs-only acceptance sweep; no code, SQL, data migration, contribution UI, submit flows, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| §76 P4-D.1 draft planning present | `[x]` |
+| Draft lifecycle matrix (8 states) accepted | `[x]` |
+| Draft payload contract (9 fields) accepted | `[x]` |
+| Contribution intent mapping (7 reserved) accepted | `[x]` |
+| Field-level conflict policy accepted | `[x]` |
+| Moderation review requirements accepted | `[x]` |
+| Supporting docs consistent | `[x]` |
+| `ContributionIntentRegistry` unchanged | `[x]` |
+| `add_recipe` pending conflict baseline | `[x]` |
+| No contribution UI activated | `[x]` |
+| No draft submit/save flows activated | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-D.2 acceptance sweep completed locally.** The Structured Contribution Draft Flow plan is accepted as docs-only. The Draft Lifecycle Matrix, Draft Payload Contract, Contribution Intent Mapping, Field-Level Conflict Policy, and Moderation Review Requirements are accepted. No code, data, SQL, Supabase, contribution UI, draft submit/save flows, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+**Next candidate:** **P4-E.1 Structured Contribution Draft Contract Baseline**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

@@ -2101,7 +2101,9 @@ When write flows are implemented (not in P4-A.1):
 | P4-B.1 | Structured Context Schema & Validation Baseline | Later code possible | Validators/schemas only; no writes |
 | P4-B.2 | Acceptance Sweep | docs-only | |
 | P4-C.1 | Admin Read-only Structured Field Inspector Planning Gate | **Accepted — docs-only** | Inspector scope/pipeline planned; no code |
-| P4-D.1 | Structured Contribution Draft Flow Planning Gate | **Current — docs-only** | Draft lifecycle, payload, intents, conflicts; no submit |
+| P4-D.1 | Structured Contribution Draft Flow Planning Gate | **Accepted — docs-only** | Draft lifecycle, payload, intents, conflicts; no submit |
+| P4-D.2 | Acceptance Sweep | **Accepted — docs-only** | Confirms draft plan |
+| P4-E.1 | Structured Contribution Draft Contract Baseline | Later code possible | Draft contract module; no submit |
 
 **Write flows** (admin edit, create with fields, contribution approve) come only after: schema, validation, conflict policy, evidence/audit policy, and separate data-safety gate.
 
@@ -2528,14 +2530,49 @@ A future moderator view would need read-only access to:
 
 | Phase | Task | Type | Notes |
 |-------|------|------|-------|
-| **P4-D.1** | Structured Contribution Draft Flow Planning Gate | **Current — docs-only** | This gate |
-| P4-D.2 | Acceptance Sweep | docs-only | Confirms draft plan |
-| P4-D.3+ | Draft UI / submit / moderation baselines | Later code/docs | Separate gates each |
+| **P4-D.1** | Structured Contribution Draft Flow Planning Gate | **Accepted — docs-only** | Draft plan documented |
+| **P4-D.2** | Acceptance Sweep | **Accepted — docs-only** | This gate |
+| P4-E.1 | Structured Contribution Draft Contract Baseline | Later code/docs | Separate gate |
 
 ### Not live-ready
 
 **P4-D.1 activates nothing.** No contribution UI, no draft submit, no save, no approve/reject, no queue mutation, no search index, no deploy.
 
-**Next:** P4-D.2 acceptance sweep.
+**Next:** P4-E.1 Structured Contribution Draft Contract Baseline.
+
+---
+
+## 77. P4-D.2 — Structured Contribution Draft Flow Acceptance Sweep
+
+**Milestone:** P4-D.2 docs-only acceptance sweep; no code, SQL, data migration, contribution UI, submit flows, or deploy.
+
+### Acceptance statement
+
+**P4-D.2 acceptance sweep completed locally.** The Structured Contribution Draft Flow plan is accepted as docs-only. The Draft Lifecycle Matrix, Draft Payload Contract, Contribution Intent Mapping, Field-Level Conflict Policy, and Moderation Review Requirements are accepted. No code, data, SQL, Supabase, contribution UI, draft submit/save flows, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action. Next recommended step: **P4-E.1 Structured Contribution Draft Contract Baseline**.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §76 P4-D.1 draft planning present | `[x]` — lifecycle, payload, intents, conflicts, moderation requirements |
+| P4-C inspector baseline accepted | `[x]` — referenced in §76 context |
+| Draft lifecycle matrix (8 states) | `[x]` — all states; activated now = **No** for each |
+| Draft payload contract (9 fields) | `[x]` — auto-create post = **No** for all fields |
+| Contribution intent mapping (7 reserved) | `[x]` — planned/reserved only; no registry activation |
+| `ContributionIntentRegistry` unchanged | `[x]` — no `suggest_*_context` intents added |
+| `add_recipe` pending conflict baseline | `[x]` — untouched; no new approval flows |
+| Field-level conflict policy | `[x]` — duplicate/conflict/merge/restricted/planned/blocks documented |
+| Moderation review requirements | `[x]` — future read-only view; no review UI in P4-D |
+| Supporting docs consistent | `[x]` — moderation-conflict, entity-promotion, search, graph-relations |
+| No contribution UI / draft submit / save | `[x]` |
+| No admin/create/edit/moderation write-flows | `[x]` |
+| No queue actions / search index / backfill | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code / data / deploy changes | `[x]` — docs-only sweep |
+
+### Next candidate
+
+**P4-E.1 — Structured Contribution Draft Contract Baseline** — draft contract module only; not production deploy without **LAUNCH-0**.
 
 ---
