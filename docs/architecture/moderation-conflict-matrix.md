@@ -163,3 +163,16 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 | P3 readiness | Documented in current-code-gap-notes §44 |
 
 **P2 Foundation ready for P3 UI activation. No push/deploy without separate Launch/Data-Safety Gate.**
+
+## P3-G.1 — Context Field Moderation & Contribution (planned)
+
+**Status:** Future work only; docs-only planning gate; no admin/create/edit activation.
+
+| Area | P3-G decision |
+|------|----------------|
+| Context field contributions | Not implemented; separate moderation/contribution gate required |
+| Admin create/edit for P2 structured fields | Not implemented; separate UI gate required |
+| Conflict preview for context fields | Existing recipe conflict flow unchanged; pending `add_recipe` untouched |
+| Auto-promotion from context text | Forbidden per entity-promotion-policy |
+
+**P3-G.1:** Admin/create/edit/moderation for P2 context fields remains future work. P3-H.1 data contract is read-only normalization only.

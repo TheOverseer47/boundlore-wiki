@@ -134,6 +134,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-F.2 final acceptance:** P3 preview layer accepted end-to-end locally. No promotion, no inference, no production activation. boundlore.com untouched.
 
+**P3-G.1 planning gate:** Real read-only data binding remains future work (P3-H.1). Explicit fields only; no promotion from source_detail, coordinates, names, or requirements. Launch gate required before deploy.
+
 ---
 
 ## Missing Entry Queue

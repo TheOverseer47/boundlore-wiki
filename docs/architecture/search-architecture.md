@@ -84,6 +84,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-F.2 final acceptance:** P3 preview layer accepted end-to-end locally. Search baseline unchanged; preview not indexed.
 
+**P3-G.1 planning gate:** P3-H data-contract plan does not activate search/index. Backend P2 field search remains future work.
+
 ---
 
 ## Goals

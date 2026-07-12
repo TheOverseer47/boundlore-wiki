@@ -1455,3 +1455,99 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-F.2 final acceptance sweep completed locally.** The P3 preview layer is accepted end-to-end. Renderer, fixture harness, local detail preview adapter, preview matrix, production guard, and integration gate are all green. The layer remains read-only, explicit-only, synthetic/ephemeral, localhost-only, query-param-only, production-guarded, QA-only harnessed, and disconnected from admin/create/edit/moderation flows. No production navigation, data writes, posts, Supabase writes, automatic promotion, or taxonomy inference were introduced. boundlore.com remains untouched. Separate launch/data-safety gate required before deploy.
 
 ---
+
+## 57. P3-G.1 — Blueprint Gap & Read-only Data Binding Plan Gate
+
+**Status:** Complete (docs-only planning gate; no code/data/UI changes; no deploy).
+
+### P3 Preview Layer — final accepted locally
+
+| Component | Status |
+|-----------|--------|
+| P3-A Renderer | Read-only, explicit-only; `js/context-section-renderer.js` on post detail |
+| P3-B Fixture Harness | QA-only; 8/8 fixtures; 12/12 assertions |
+| P3-C Preview Adapter | Synthetic/ephemeral; localhost + `?p3_context_preview=` only |
+| P3-D Preview Matrix | QA-only; 44 localhost links; not in navigation |
+| P3-E Production Guard | Exact `localhost` + valid query mode; boundlore hosts blocked |
+| P3-F Integration + Final Acceptance | End-to-end green; QA pages without preview unchanged |
+| Safety | No data writes, no posts, no Supabase writes, no admin/create/edit/moderation |
+| Production | boundlore.com untouched; preview not production-activated |
+
+### Blueprint / production gap matrix
+
+#### A. Finished / accepted locally
+
+| Area | Scope |
+|------|--------|
+| P1 Foundation | Registry, relations, intent, evidence, facets, search parser, browse filters |
+| P2 Foundation | Content/quest/event/economy/version/resource-node/observation/creature/requirement baselines |
+| P3 Preview Layer | Read-only renderer + synthetic preview + QA harnesses + production guard |
+
+#### B. Open / not implemented
+
+| Gap | Notes |
+|-----|--------|
+| Real read-only data binding for P2 context sections | Next candidate: P3-H.1 data contract only |
+| Data contract for structured context fields from real entries | Normalize explicit fields only; no inference |
+| Migration/backfill strategy for existing entries | Separate data gate; no SQL in P3-H.1 |
+| Admin/Create/Edit UI for structured P2 fields | Future; separate moderation/contribution gate |
+| Moderation/contribution workflows for context fields | Future; see moderation-conflict-matrix |
+| Backend/search index for P2 fields | Future; separate search gate |
+| Production QA on boundlore.com | Blocked until launch gate |
+| Launch/data-safety gate | Mandatory before deploy |
+| Push/deploy decision | Deployment freeze active |
+
+#### C. Explicitly still forbidden
+
+| Rule | Rationale |
+|------|-----------|
+| Automatic entity promotion | Moderator-only per entity-promotion-policy |
+| `source_detail` → node/taxonomy promotion | e.g. "red crystal nodes" stays text on resource |
+| `coordinates` → PLACE promotion | Observation only until explicit PLACE entity |
+| Name/free text → element/weakness/taxonomy inference | e.g. "QA Staff of Fire" ≠ fire weakness |
+| Requirements/unlocks → posts | Requirement context ≠ new entity |
+| Synthetic preview → real persisted data | Preview overlay is ephemeral |
+| QA-only pages → production navigation | Fixtures/matrix/guard stay under `/qa/` |
+| Admin/create/edit without separate gate | No workflow activation in P3-H |
+
+### Read-only data binding plan (P3-H candidate)
+
+**Recommended next implementation step:** **P3-H.1 — Read-only Context Data Contract Baseline**
+
+P3-H.1 may only:
+
+- Read real entry data from existing in-memory entry objects (`meta`, `discovery_payload`, documented safe fields)
+- Normalize explicit structured fields for the renderer
+- Leave pages without explicit fields unchanged (QA Staff/Ember/Ogre/Swamp baseline)
+- Use fixtures/preview/QA pages for validation
+- Avoid writes, posts, DB migration, admin/create/edit, search index, auto-promotion, inference
+
+P3-H.2 (later): acceptance sweep confirming real fields render only when explicit; negatives stay empty.
+
+**Not now:** real testdata backfill, admin/create/edit UI, search index, deploy — each requires its own gate.
+
+### Planned data contract — allowed read-only fields per section
+
+| Context section | Allowed future read-only fields | Not allowed alone |
+|-----------------|--------------------------------|-------------------|
+| **Resource Node** | `meta.node_type`, `meta.acquisition_sources`, `meta.node_observations`, `discovery_payload.node_type`, `discovery_payload.acquisition_sources`, `discovery_payload.node_observations` | `source_detail` only |
+| **Observation Context** | `meta.observation_context`, `meta.coordinates`, `meta.location_ref`, `meta.biome_context`, `meta.time_condition`, `meta.weather_condition`, `discovery_payload.observation_context` | Free location text → PLACE |
+| **Creature Encounter** | `meta.creature_encounter`, `meta.behavior`, `meta.encounter_type`, `meta.spawn_context`, `meta.drop_context`, `meta.weakness`, `meta.resistance`, `discovery_payload.creature_encounter` | Title "of Fire" → fire/weakness |
+| **Requirements & Unlocks** | `meta.requirements`, `meta.required_level`, `meta.profession_level`, `meta.faction_req`, `meta.unlock_type`, `meta.access_state`, `discovery_payload.requirements` | Requirement → post |
+| **Version History** | `meta.game_version`, `meta.valid_from`, `meta.valid_until`, `meta.introduced_in`, `meta.changed_in`, `meta.removed_in`, `discovery_payload.versioning` | Patch workflow / admin action |
+| **Quest / Event / Economy** | Planned read-only only | No active UI without separate gate |
+
+### Required gates before later phases
+
+| Gate | Before |
+|------|--------|
+| P3-H.1 data contract baseline | Any real field binding in renderer |
+| P3-H.2 acceptance sweep | Treating data contract as accepted |
+| Data/fixture backfill gate | Populating real structured fields on entries |
+| Moderation/contribution gate | Admin/create/edit for context fields |
+| Search/index gate | Backend or index for P2 context fields |
+| Launch/data-safety gate | Deploy, production preview, boundlore.com activation |
+
+**P3-G.1 planning gate completed locally.** P3 preview layer is final accepted. Next safe step: **P3-H.1 Read-only Context Data Contract Baseline**. No deploy without separate launch/data-safety gate.
+
+---

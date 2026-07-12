@@ -1061,6 +1061,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-G.1 — Blueprint Gap & Read-only Data Binding Plan Gate
+
+**Milestone:** P3 planning/gap gate; docs-only; no code, no SQL, no data migration, no deploy.
+
+| Check | Result |
+|-------|--------|
+| P3-F.2 final accepted | `[x]` |
+| P3-G.1 gap matrix documented | `[x]` |
+| Read-only data binding plan | `[x]` — P3-H.1 recommended next |
+| Code changes | none |
+| Data changes | none |
+| UI activation | none |
+| Deploy | forbidden without launch/data-safety gate |
+
+**Next candidate:** P3-H.1 Read-only Context Data Contract Baseline. Then P3-H.2 acceptance sweep. Deploy remains blocked.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
