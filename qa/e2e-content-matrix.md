@@ -1689,6 +1689,32 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-F.3 — Structured Contribution Draft Preview Baseline
+
+**Milestone:** P4-F.3 read-only QA baseline; draft preview module + 15-case fixture; no prod wiring, no submit/save/queue/moderation writes, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Preview module API | `/qa/p4-structured-contribution-draft-preview-fixtures.html` | `BoundLoreStructuredContributionDraftPreview` object; version `p4-f3` | `[x]` |
+| Draft contract integration | same | uses `BoundLoreStructuredContributionDraftContract` | `[x]` |
+| Schema integration | same | uses `BoundLoreStructuredContextSchema` | `[x]` |
+| Fixture cases A–O | same | 15/15 PASS | `[x]` |
+| Policy gates | console | all `should*` false | `[x]` |
+| Mutation safety | console | draft/entry unchanged after report | `[x]` |
+| Rendering safety | DOM | no button/form/input/action links | `[x]` |
+| Field-level diff | fixtures | added/changed/conflict/duplicate/merge_candidate/blocked/restricted | `[x]` |
+| No prod script load | wiki/admin/post paths | preview script absent | `[x]` |
+| P3/P4 harness regression | existing QA pages | prior pass counts unchanged | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Not live-ready | docs | documented | `[x]` |
+| Code / data / deploy | — | no push/deploy/SQL/writes/posts | `[x]` |
+
+**P4-F.3 baseline completed locally.** `BoundLoreStructuredContributionDraftPreview` provides read-only draft preview reports, field-level diffs, validation/contract summaries, policy flags, and risk warnings for QA fixtures only. No production draft preview UI, no contribution UI, no submit/save/approve/reject/archive flows, no admin/create/edit/moderation write-paths, no queue actions, no search index, no backfill, no posts, no push, no deploy. Project remains not live-ready; **LAUNCH-0** mandatory before any push/deploy/live action.
+
+**Next candidate:** **P4-F.4 Acceptance Sweep** or **P4 Final Integration Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

@@ -66,6 +66,8 @@
 
 **P4-F.1 draft preview planning:** Draft preview must not persist derived inverse relations. Relation changes require a separate relation/contribution policy gate.
 
+**P4-F.3 draft preview baseline:** Preview renders section-scoped field diffs only; no relation graph persistence from preview reports.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

@@ -2813,3 +2813,50 @@ The future Draft Inspector / Preview must **NOT**:
 **P4-F.3 — Structured Contribution Draft Preview Baseline** — read-only preview render module only; not production deploy without **LAUNCH-0**.
 
 ---
+
+## 82. P4-F.3 — Structured Contribution Draft Preview Baseline
+
+**Milestone:** P4-F.3 read-only QA baseline; draft preview module + QA fixture; no prod wiring, no submit/save/queue/moderation writes, no deploy.
+
+### Delivered locally
+
+| Artifact | Purpose |
+|----------|---------|
+| `js/structured-contribution-draft-preview.js` | `window.BoundLoreStructuredContributionDraftPreview` — read-only preview reports, field-level diffs, safe HTML render |
+| `qa/p4-structured-contribution-draft-preview-fixtures.html` | QA-only harness (localhost-gated; not linked from wiki nav) |
+| `qa/p4-structured-contribution-draft-preview-fixtures.js` | 15 fixture cases A–O with pass/fail registry |
+
+**Version:** `DRAFT_PREVIEW_VERSION = "p4-f3"`.
+
+**Modes:** `summary`, `full`, `diff`, `diagnostics`.
+
+**Diff statuses:** `unchanged`, `added`, `changed`, `removed`, `conflict`, `duplicate`, `merge_candidate`, `blocked`, `restricted_review`, `planned_only`, `unknown`.
+
+**Uses (read-only):** `BoundLoreStructuredContributionDraftContract`, `BoundLoreStructuredContextSchema`, optional `BoundLoreAdminStructuredContextInspector`.
+
+**Policy:** All `shouldWritePreviewData`, `shouldSubmitPreview`, `shouldSavePreview`, `shouldModifyQueue`, `shouldApprovePreview`, `shouldRejectPreview`, `shouldArchivePreview`, `shouldTriggerRepair`, `shouldCreatePostFromPreview`, `shouldCreateMissingEntryFromPreview`, `shouldPromoteFromPreview`, `shouldAutoMergePreview`, `shouldUpdateSearchIndexFromPreview`, `shouldMutateContributionIntentRegistry` return **false**.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| QA fixture 15/15 PASS | `[x]` |
+| Policy checks all false | `[x]` |
+| Mutation safe (clone in / clone out) | `[x]` |
+| Rendering safe (no buttons/forms/inputs/action links) | `[x]` |
+| Field-level diff (added/changed/conflict/duplicate/merge_candidate/blocked/restricted) | `[x]` |
+| No prod draft preview script on wiki/admin paths | `[x]` |
+| No submit/save/approve/reject/archive/repair UI | `[x]` |
+| No queue actions / search index / backfill | `[x]` |
+| No SQL / Supabase writes / posts created | `[x]` |
+| Existing P3/P4 harness regressions | `[x]` |
+| `add_recipe` pending conflict baseline | `[x]` — untouched |
+| Not live-ready | `[x]` |
+
+### Not live-ready
+
+**P4-F.3 activates nothing in production.** No draft preview UI on wiki/admin/create/edit pages. No contribution UI. No submit/save/approve/reject/archive flows. No admin/create/edit/moderation write-paths. Preview remains strictly localhost + QA fixture gated.
+
+**Next:** **P4-F.4 Acceptance Sweep** or **P4 Final Integration Gate**. **LAUNCH-0** mandatory before any push/deploy/live action.
+
+---

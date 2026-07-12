@@ -172,6 +172,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-F.1 draft preview planning:** Draft preview must not suggest or trigger promotion. Preview must not create missing entries. Wood/Forge remain missing-entry queue items until a separate promotion gate.
 
+**P4-F.3 draft preview baseline:** `shouldPromoteFromPreview` and `shouldCreateMissingEntryFromPreview` always false. Preview does not promote entities, infer PLACE from coordinates, or create Wood/Forge posts.
+
 ---
 
 ## Missing Entry Queue

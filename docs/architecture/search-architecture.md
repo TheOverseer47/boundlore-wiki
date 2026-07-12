@@ -122,6 +122,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-F.1 draft preview planning:** Draft preview reports are not search-indexed. Pending/draft data are not activated in search/facet. Search index remains a separate gate after accepted writes.
 
+**P4-F.3 draft preview baseline:** `shouldUpdateSearchIndexFromPreview` always false. Preview reports are diagnostics-only and not indexed.
+
 ---
 
 ## Goals
