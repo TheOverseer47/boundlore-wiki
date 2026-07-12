@@ -12,6 +12,8 @@
 
 **P1-F.2 acceptance sweep:** P1-F.2 acceptance sweep completed; model registry only; no profession UI, no SQL, no data migration. P1-F foundation block (F.1 + F.2) accepted locally.
 
+**P1-G.1 (local):** Symmetric relation dedupe & derived mirror baseline in `js/relations-registry.js` — `directionality`, `mirror_behavior`, `canonical_pair_order`, dedupe helpers. Reader/search defensive dedupe via `dedupeRelationRecords`. No SQL, no data migration, no repair. Single-write + derived mirror target model only.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

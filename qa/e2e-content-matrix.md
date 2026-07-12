@@ -340,6 +340,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-G.1 — Symmetric Relation Dedupe & Derived Mirror Baseline
+
+**Milestone:** P1-G.1 (registry + defensive dedupe; no SQL, no data migration, no repair)
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry mirror API | console on QA Staff post | directionality/mirror/dedupe helpers green | `[x]` |
+| crafted_from directed | console | staff→ember ≠ ember→staff dedupe keys | `[x]` |
+| ingredient_of derived | console | derived_inverse mirror behavior | `[x]` |
+| hostile_to symmetric | console | a↔b dedupe to one record | `[x]` |
+| Reserved relations | console | not persistable | `[x]` |
+| Search regressions | mining/wood/forge/qa ember/parser queries | unchanged | `[x]` |
+| QA Staff / QA Ember | post slugs | recipe/Used In unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**Not built:** SQL dedupe, repair script, symmetric UI, data migration.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

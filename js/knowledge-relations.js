@@ -263,6 +263,11 @@ window.KnowledgeRelations = (function() {
 
   function dedupeKeyForRelation(rel) {
     const type = normalizeRelationType(rel.relation_type);
+    const reg = getRelationsRegistry();
+    if (reg && reg.getRelationDedupeKey) {
+      const registryKey = reg.getRelationDedupeKey(type, rel);
+      if (registryKey) return registryKey;
+    }
     const group = String(rel.group || inferGroupFromRelation(type) || "").toLowerCase();
     const title = normalizeTitleKey(rel.title);
     const context = String(rel.target_entity_type || rel.category || "").toLowerCase();
@@ -1871,9 +1876,24 @@ window.KnowledgeRelations = (function() {
   }
 
   function dedupeRelationsForDisplay(relations) {
+    const list = Array.isArray(relations) ? relations : [];
+    const reg = getRelationsRegistry();
+    if (reg && reg.dedupeRelationRecords) {
+      try {
+        return reg.dedupeRelationRecords(list, { skipDerivedInverseDuplicates: false }).map(function(rel) {
+          const built = buildRelation(rel);
+          if (typeof EntityCore !== "undefined") {
+            Object.assign(built, EntityCore.enrichRelation(built));
+          }
+          return built;
+        }).filter(function(rel) { return rel && rel.title; });
+      } catch (err) {
+        /* fall through to legacy dedupe */
+      }
+    }
     const out = [];
     const seen = new Set();
-    (Array.isArray(relations) ? relations : []).forEach(function(rel) {
+    list.forEach(function(rel) {
       const built = buildRelation(rel);
       if (!built.title) return;
       if (typeof EntityCore !== "undefined") {

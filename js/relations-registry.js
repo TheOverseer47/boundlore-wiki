@@ -112,12 +112,33 @@ window.BoundLoreRelationsRegistry = (function() {
   const DEFAULT_REGISTRY_2 = {
     cardinality: "many_to_many",
     persistence: "persisted_forward",
+    directionality: "directed",
+    mirror_behavior: "none",
+    canonical_pair_order: "preserve",
     dedupe_key: ["source_entity_key", "target_entity_key", "relation_type"],
     search_expansion: { include_target: true, include_label: true, weight: 1 },
     promotion_weight: 1,
     version_support: true,
     status: "active",
     notes: "",
+  };
+
+  const RELATION_DIRECTIONALITY = {
+    DIRECTED: "directed",
+    DERIVED_INVERSE: "derived_inverse",
+    SYMMETRIC: "symmetric",
+  };
+
+  const RELATION_MIRROR_BEHAVIOR = {
+    NONE: "none",
+    DERIVED_INVERSE: "derived_inverse",
+    SYMMETRIC_DEDUPE: "symmetric_dedupe",
+    RESERVED: "reserved",
+  };
+
+  const CANONICAL_PAIR_ORDER = {
+    PRESERVE: "preserve",
+    SORT_ENDPOINTS: "sort_endpoints",
   };
 
   // -------------------------------------------------------------------------
@@ -791,7 +812,10 @@ window.BoundLoreRelationsRegistry = (function() {
       qualifiers_allowed: ["quantity", "unit", "alternative_group", "confidence", "evidence_tier", "source_post_id", "report_count"].concat(VERSION_QUALIFIER_KEYS),
       cardinality: "many_to_many",
       persistence: "persisted_forward",
-      dedupe_key: ["source_entity_key", "target_entity_key", "relation_type", "alternative_group"],
+      directionality: "directed",
+      mirror_behavior: "none",
+      canonical_pair_order: "preserve",
+      dedupe_key: ["source_entity_key", "target_entity_key", "relation_type", "alternative_group", "quantity", "unit"],
       search_expansion: { include_target: true, include_label: true, weight: 1.1 },
       promotion_weight: 1.2,
       version_support: true,
@@ -802,6 +826,9 @@ window.BoundLoreRelationsRegistry = (function() {
       qualifiers_allowed: ["station", "station_tier", "confidence", "evidence_tier", "source_post_id"].concat(VERSION_QUALIFIER_KEYS),
       cardinality: "many_to_one",
       persistence: "persisted_forward",
+      directionality: "directed",
+      mirror_behavior: "none",
+      canonical_pair_order: "preserve",
       search_expansion: { include_target: true, include_label: true, weight: 1 },
       promotion_weight: 1.1,
       version_support: true,
@@ -811,7 +838,10 @@ window.BoundLoreRelationsRegistry = (function() {
       qualifiers_allowed: ["quantity", "unit", "alternative_group", "confidence", "evidence_tier", "source_post_id"],
       cardinality: "many_to_many",
       persistence: "derived_inverse",
-      dedupe_key: ["source_entity_key", "target_entity_key", "relation_type"],
+      directionality: "derived_inverse",
+      mirror_behavior: "derived_inverse",
+      canonical_pair_order: "preserve",
+      dedupe_key: ["source_entity_key", "target_entity_key", "relation_type", "alternative_group", "quantity", "unit"],
       search_expansion: { include_target: true, include_label: true, weight: 0.6 },
       promotion_weight: 0.5,
       version_support: true,
@@ -827,8 +857,20 @@ window.BoundLoreRelationsRegistry = (function() {
     resistant_to: { persistence: "persisted_forward", status: "active" },
     inflicts: { persistence: "persisted_forward", status: "active" },
     member_of: { persistence: "persisted_forward", status: "active" },
-    hostile_to: { persistence: "persisted_forward", status: "active" },
-    allied_to: { persistence: "persisted_forward", status: "active" },
+    hostile_to: {
+      persistence: "persisted_forward",
+      status: "active",
+      directionality: "symmetric",
+      mirror_behavior: "symmetric_dedupe",
+      canonical_pair_order: "sort_endpoints",
+    },
+    allied_to: {
+      persistence: "persisted_forward",
+      status: "active",
+      directionality: "symmetric",
+      mirror_behavior: "symmetric_dedupe",
+      canonical_pair_order: "sort_endpoints",
+    },
     gives_quest: { persistence: "persisted_forward", status: "active" },
     variant_of: { persistence: "persisted_forward", status: "active" },
     part_of: { persistence: "persisted_forward", status: "active" },
@@ -836,10 +878,16 @@ window.BoundLoreRelationsRegistry = (function() {
       persistence: "persisted_forward",
       promotion_weight: 0.4,
       status: "active",
+      directionality: "symmetric",
+      mirror_behavior: "symmetric_dedupe",
+      canonical_pair_order: "sort_endpoints",
       notes: "Fallback weak link — note required for new systems.",
     },
     dropped_by: {
       persistence: "derived_inverse",
+      directionality: "derived_inverse",
+      mirror_behavior: "derived_inverse",
+      canonical_pair_order: "preserve",
       promotion_weight: 0.5,
       status: "active",
       notes: "Legacy inverse of drops — prefer single-write drops in P1.",
@@ -924,6 +972,31 @@ window.BoundLoreRelationsRegistry = (function() {
     }
     if (merged.status === "reserved" && !def.persistence && !override.persistence) {
       merged.persistence = "reserved";
+    }
+    if (!merged.directionality) {
+      if (merged.persistence === "derived_inverse") {
+        merged.directionality = RELATION_DIRECTIONALITY.DERIVED_INVERSE;
+      } else if (merged.inverse && merged.inverse === merged.key) {
+        merged.directionality = RELATION_DIRECTIONALITY.SYMMETRIC;
+      } else {
+        merged.directionality = RELATION_DIRECTIONALITY.DIRECTED;
+      }
+    }
+    if (!merged.mirror_behavior) {
+      if (merged.persistence === "reserved" || merged.status === "reserved") {
+        merged.mirror_behavior = RELATION_MIRROR_BEHAVIOR.RESERVED;
+      } else if (merged.directionality === RELATION_DIRECTIONALITY.DERIVED_INVERSE) {
+        merged.mirror_behavior = RELATION_MIRROR_BEHAVIOR.DERIVED_INVERSE;
+      } else if (merged.directionality === RELATION_DIRECTIONALITY.SYMMETRIC) {
+        merged.mirror_behavior = RELATION_MIRROR_BEHAVIOR.SYMMETRIC_DEDUPE;
+      } else {
+        merged.mirror_behavior = RELATION_MIRROR_BEHAVIOR.NONE;
+      }
+    }
+    if (!merged.canonical_pair_order) {
+      merged.canonical_pair_order = merged.directionality === RELATION_DIRECTIONALITY.SYMMETRIC
+        ? CANONICAL_PAIR_ORDER.SORT_ENDPOINTS
+        : CANONICAL_PAIR_ORDER.PRESERVE;
     }
 
     return merged;
@@ -1278,6 +1351,220 @@ window.BoundLoreRelationsRegistry = (function() {
     return CATEGORY_DOMAIN_MAP[String(categorySlug || "").toLowerCase()] || null;
   }
 
+  function getRelationDirectionality(type) {
+    const def = getRelationDefinition(type);
+    if (!def) return RELATION_DIRECTIONALITY.DIRECTED;
+    return def.directionality || RELATION_DIRECTIONALITY.DIRECTED;
+  }
+
+  function getRelationMirrorBehavior(type) {
+    const def = getRelationDefinition(type);
+    if (!def) return RELATION_MIRROR_BEHAVIOR.NONE;
+    if (isReservedRelation(type)) return RELATION_MIRROR_BEHAVIOR.RESERVED;
+    return def.mirror_behavior || RELATION_MIRROR_BEHAVIOR.NONE;
+  }
+
+  function isSymmetricRelation(type) {
+    return getRelationDirectionality(type) === RELATION_DIRECTIONALITY.SYMMETRIC;
+  }
+
+  function relationUsesCanonicalPair(type) {
+    const def = getRelationDefinition(type);
+    if (!def) return false;
+    return def.canonical_pair_order === CANONICAL_PAIR_ORDER.SORT_ENDPOINTS;
+  }
+
+  function normalizeRelationEndpoint(value) {
+    const raw = String(value == null ? "" : value).trim().toLowerCase();
+    if (!raw) return "";
+    return raw.replace(/\s+/g, " ").replace(/-/g, "_");
+  }
+
+  function getCanonicalRelationPair(type, source, target) {
+    const src = normalizeRelationEndpoint(source);
+    const tgt = normalizeRelationEndpoint(target);
+    if (!src && !tgt) return { source: "", target: "" };
+    if (relationUsesCanonicalPair(type)) {
+      if (src <= tgt) return { source: src, target: tgt };
+      return { source: tgt, target: src };
+    }
+    return { source: src, target: tgt };
+  }
+
+  function extractRelationEndpoints(record) {
+    const rel = record && typeof record === "object" ? record : {};
+    const source = rel.source_post_id || rel.source_post_slug || rel.source_entity_key ||
+      rel.source_title || rel.source_post_title || rel.source_name || "";
+    const target = rel.target_post_id || rel.target_post_slug || rel.target_entity_key ||
+      rel.title || rel.target_name || rel.target_title || rel.target_post_title || "";
+    return {
+      source: normalizeRelationEndpoint(source),
+      target: normalizeRelationEndpoint(target),
+    };
+  }
+
+  function qualifierValuesForDedupeKey(type, record) {
+    const rel = record && typeof record === "object" ? record : {};
+    const qualifiers = extractRelationQualifiers(type, rel);
+    const def = getRelationDefinition(type);
+    const keys = def && Array.isArray(def.dedupe_key) ? def.dedupe_key.slice() : [];
+    const parts = [];
+    keys.forEach(function(key) {
+      if (key === "source_entity_key" || key === "target_entity_key" || key === "relation_type") return;
+      let value = qualifiers[key];
+      if (value == null && rel[key] != null) value = rel[key];
+      if (value == null || typeof value === "object") return;
+      const text = String(value).trim();
+      if (text) parts.push(key + "=" + normalizeRelationEndpoint(text));
+    });
+    return parts;
+  }
+
+  function getRelationDedupeKey(type, relationOrSource, maybeTarget) {
+    let record = relationOrSource;
+    let relType = type;
+    if (relationOrSource && typeof relationOrSource === "object" && maybeTarget === undefined) {
+      relType = normalizeRelationType(relType || relationOrSource.relation_type || relationOrSource.type || "");
+      record = relationOrSource;
+    } else {
+      relType = normalizeRelationType(relType || "");
+      record = {
+        relation_type: relType,
+        source_post_id: relationOrSource,
+        target_post_id: maybeTarget,
+      };
+    }
+    if (!relType) return "";
+
+    const endpoints = extractRelationEndpoints(record);
+    const pair = getCanonicalRelationPair(relType, endpoints.source, endpoints.target);
+    const qualifierPart = qualifierValuesForDedupeKey(relType, record).join("|");
+    const base = [
+      relType,
+      pair.source || "_",
+      pair.target || "_",
+    ].join("|");
+    return qualifierPart ? base + "|" + qualifierPart : base;
+  }
+
+  function areRelationRecordsEquivalent(a, b) {
+    if (!a || !b) return false;
+    const typeA = normalizeRelationType(a.relation_type || a.type || "");
+    const typeB = normalizeRelationType(b.relation_type || b.type || "");
+    if (!typeA || typeA !== typeB) return false;
+    return getRelationDedupeKey(typeA, a) === getRelationDedupeKey(typeB, b);
+  }
+
+  function swapRelationEndpointFields(record) {
+    const out = Object.assign({}, record);
+    const swapPairs = [
+      ["source_post_id", "target_post_id"],
+      ["source_post_slug", "target_post_slug"],
+      ["source_entity_key", "target_entity_key"],
+      ["source_title", "title"],
+      ["source_post_title", "target_post_title"],
+      ["source_name", "target_name"],
+    ];
+    swapPairs.forEach(function(pair) {
+      const left = out[pair[0]];
+      const right = out[pair[1]];
+      if (left !== undefined || right !== undefined) {
+        out[pair[0]] = right;
+        out[pair[1]] = left;
+      }
+    });
+    return out;
+  }
+
+  function deriveMirrorRelation(record, options) {
+    const opts = options || {};
+    if (!record || typeof record !== "object") return null;
+    const type = normalizeRelationType(record.relation_type || record.type || "");
+    if (!type || isReservedRelation(type)) return null;
+
+    const behavior = getRelationMirrorBehavior(type);
+    if (behavior === RELATION_MIRROR_BEHAVIOR.NONE || behavior === RELATION_MIRROR_BEHAVIOR.RESERVED) {
+      return null;
+    }
+
+    const endpoints = extractRelationEndpoints(record);
+    if (behavior === RELATION_MIRROR_BEHAVIOR.SYMMETRIC_DEDUPE) {
+      const pair = getCanonicalRelationPair(type, endpoints.source, endpoints.target);
+      return Object.assign({}, record, {
+        relation_type: type,
+        _mirror_kind: "symmetric_canonical",
+        _canonical_source: pair.source,
+        _canonical_target: pair.target,
+      });
+    }
+
+    if (behavior === RELATION_MIRROR_BEHAVIOR.DERIVED_INVERSE) {
+      const def = getRelationDefinition(type);
+      const inverseType = def && def.inverse ? normalizeRelationType(def.inverse) : "";
+      if (!inverseType || inverseType === type) return null;
+      const mirrored = swapRelationEndpointFields(Object.assign({}, record, {
+        relation_type: inverseType,
+        _mirror_kind: "derived_inverse",
+        _derived_from_type: type,
+      }));
+      return mirrored;
+    }
+
+    return null;
+  }
+
+  function shouldPersistRelationDirection(type, source, target) {
+    const relType = normalizeRelationType(type);
+    if (!relType || isReservedRelation(relType)) return false;
+    if (isDerivedRelation(relType)) return false;
+
+    const directionality = getRelationDirectionality(relType);
+    if (directionality === RELATION_DIRECTIONALITY.SYMMETRIC) {
+      const pair = getCanonicalRelationPair(relType, source, target);
+      if (!pair.source || !pair.target) return true;
+      return pair.source <= pair.target;
+    }
+    return directionality === RELATION_DIRECTIONALITY.DIRECTED;
+  }
+
+  function dedupeRelationRecords(records, options) {
+    const opts = Object.assign({ skipDerivedInverseDuplicates: true }, options || {});
+    const list = Array.isArray(records) ? records : [];
+    const out = [];
+    const seen = new Set();
+    const forwardKeys = new Set();
+
+    list.forEach(function(record) {
+      if (!record || typeof record !== "object") return;
+      const type = normalizeRelationType(record.relation_type || record.type || "");
+      if (!type) return;
+      if (isReservedRelation(type)) return;
+
+      const normalized = normalizeRelationRecord(type, record) || record;
+      const key = getRelationDedupeKey(type, normalized);
+      if (!key || seen.has(key)) return;
+
+      if (opts.skipDerivedInverseDuplicates && getRelationMirrorBehavior(type) === RELATION_MIRROR_BEHAVIOR.DERIVED_INVERSE) {
+        const def = getRelationDefinition(type);
+        const forwardType = def && def.inverse ? normalizeRelationType(def.inverse) : "";
+        if (forwardType && forwardType !== type) {
+          const mirror = deriveMirrorRelation(normalized);
+          const forwardKey = mirror ? getRelationDedupeKey(forwardType, mirror) : "";
+          if (forwardKey && forwardKeys.has(forwardKey)) return;
+        }
+      }
+
+      seen.add(key);
+      if (getRelationMirrorBehavior(type) === RELATION_MIRROR_BEHAVIOR.NONE ||
+          getRelationDirectionality(type) === RELATION_DIRECTIONALITY.DIRECTED) {
+        forwardKeys.add(key);
+      }
+      out.push(normalized);
+    });
+
+    return out;
+  }
+
   function resolveCanonicalKey(raw) {
     return normalizeKey(raw);
   }
@@ -1290,6 +1577,9 @@ window.BoundLoreRelationsRegistry = (function() {
     QUALIFIER_REGISTRY: QUALIFIER_REGISTRY,
     QUALIFIER_LEGACY_TOP_LEVEL_KEYS: QUALIFIER_LEGACY_TOP_LEVEL_KEYS,
     REGISTRY_2_OVERRIDES: REGISTRY_2_OVERRIDES,
+    RELATION_DIRECTIONALITY: RELATION_DIRECTIONALITY,
+    RELATION_MIRROR_BEHAVIOR: RELATION_MIRROR_BEHAVIOR,
+    CANONICAL_PAIR_ORDER: CANONICAL_PAIR_ORDER,
     CONTROLLED_VOCABULARIES: CONTROLLED_VOCABULARIES,
     LEGACY_ALIASES: LEGACY_ALIASES,
     CATEGORY_DOMAIN_MAP: CATEGORY_DOMAIN_MAP,
@@ -1310,6 +1600,17 @@ window.BoundLoreRelationsRegistry = (function() {
     isDerivedRelation: isDerivedRelation,
     isPersistedRelation: isPersistedRelation,
     isReservedRelation: isReservedRelation,
+    getRelationDirectionality: getRelationDirectionality,
+    getRelationMirrorBehavior: getRelationMirrorBehavior,
+    isSymmetricRelation: isSymmetricRelation,
+    relationUsesCanonicalPair: relationUsesCanonicalPair,
+    normalizeRelationEndpoint: normalizeRelationEndpoint,
+    getCanonicalRelationPair: getCanonicalRelationPair,
+    getRelationDedupeKey: getRelationDedupeKey,
+    areRelationRecordsEquivalent: areRelationRecordsEquivalent,
+    dedupeRelationRecords: dedupeRelationRecords,
+    deriveMirrorRelation: deriveMirrorRelation,
+    shouldPersistRelationDirection: shouldPersistRelationDirection,
     isKnownRelationType: isKnownRelationType,
     isLegacyRelationType: isLegacyRelationType,
     getRelationsByFamily: getRelationsByFamily,

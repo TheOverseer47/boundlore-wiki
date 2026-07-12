@@ -754,3 +754,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P1-F.2 acceptance sweep completed; model registry only; no profession UI, no SQL, no data migration.** P1-F foundation block (F.1 + F.2) accepted locally. Ready for P1-G planning. Deployment freeze remains active.
+
+---
+
+## 24. P1-G.1 — Symmetric Relation Dedupe & Derived Mirror Baseline
+
+**Status:** Complete (local; registry + defensive reader/search dedupe; no SQL, no data migration).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Mirror/symmetry metadata | `js/relations-registry.js` | `directionality`, `mirror_behavior`, `canonical_pair_order` |
+| Dedupe helpers | `getRelationDedupeKey`, `dedupeRelationRecords`, `deriveMirrorRelation`, etc. | Null-safe; qualifiers preserved |
+| Reader dedupe | `js/knowledge-relations.js` | `dedupeRelationsForDisplay` delegates to registry when loaded |
+| Search dedupe | `js/search-signals.js` | Relation signals deduped before scoring |
+| Symmetric types | `hostile_to`, `allied_to`, `related_to` | `symmetric_dedupe`; not productively activated in UI |
+| Directed unchanged | `crafted_from`, `crafted_at`, `found_in` | Preserve endpoint order |
+| Derived inverse | `ingredient_of`, `dropped_by` | Remain derived; search skips duplicate forward/inverse |
+
+| Not built | SQL migration, repair script, auto-merge existing data, symmetric UI | Deferred P1-G+ |
+| Unchanged | QA Staff recipe, QA Ember, mining/wood/forge search | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.

@@ -262,7 +262,14 @@ window.BoundLoreSearchSignals = (function() {
 
   function collectRelationSearchSignals(post, meta) {
     const bucket = { signals: [], _seen: new Set() };
-    const relations = Array.isArray(meta && meta.discovery_relations) ? meta.discovery_relations : [];
+    let relations = Array.isArray(meta && meta.discovery_relations) ? meta.discovery_relations.slice() : [];
+    if (typeof BoundLoreRelationsRegistry !== "undefined" && BoundLoreRelationsRegistry.dedupeRelationRecords) {
+      try {
+        relations = BoundLoreRelationsRegistry.dedupeRelationRecords(relations, { skipDerivedInverseDuplicates: true });
+      } catch (err) {
+        /* keep original relations */
+      }
+    }
     relations.forEach(function(rel) {
       if (!rel) return;
       const type = String(rel.relation_type || rel.type || "").toLowerCase();
