@@ -46,6 +46,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-F.1 observation context baseline:** `js/observation-context-registry.js` — low-weight `observation_context`, `location_context`, `condition_context` signals. Parser hints for coordinates/location/found near/biome/weather/time/spawn location (hint-only, no hard filters). Existing mining/wood/forge/red crystal/resource node queries unchanged.
 
+**P2-F.2 acceptance sweep:** P2-F foundation block accepted locally. No PLACE promotion, no observation posts, no SQL, no data migration.
+
 ---
 
 ## Goals

@@ -98,6 +98,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P2-F.1:** `js/observation-context-registry.js` — coordinates, location refs, biome/time/weather conditions are structured observation fields, not posts. `shouldPromoteCoordinatesToPlace` and `shouldPromoteObservationToPost` remain false. Free-text locations stay text signals; no PLACE promotion from coordinates or location text. Map/route/spawn UI deferred.
 
+**P2-F.2 acceptance sweep:** Observation locations, coordinates, biome/time/weather conditions accepted as registry/read/search/facet baseline only. No PLACE promotion, no observation posts, no SQL, no data migration.
+
 ---
 
 ## Missing Entry Queue

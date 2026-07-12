@@ -1067,3 +1067,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **Deployment freeze remains active** — no push/deploy.
 
 ---
+
+## 38. P2-F.2 — Observation Location & Condition Context Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; registry/read/search/facet baseline only; no SQL, no observation posts, no data migration).
+
+| Acceptance | Result |
+|------------|--------|
+| ObservationContextRegistry API (QA Ember/Staff) | Green — all normalize/extract/signals; empty/unknown safe (null, no UI) |
+| ResourceNodeRegistry integration | Green — red crystal nodes source_detail only; no node_type promotion |
+| ContentModel/Facet integration | OBJECT:resource + npc/quest/event models; biome/time/weather facets explicit-only |
+| Search parser hints | coordinates/location/found near/biome/weather/time/spawn location — hint-only, no crash |
+| Search regressions | mining/wood/forge/red crystal/resource node/vendor/version unchanged |
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged; no observation/coordinate/weather/time badges or sections |
+| Wood/Forge | Missing-entry only; no posts |
+| Relations | `found_in` persisted_forward; `add_observation_location` reserved; `confirm_location` active |
+| Admin | Session-dependent — automation not verified |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-F.2 acceptance sweep completed; Observation locations, coordinates, biome/time/weather conditions accepted as registry/read/search/facet baseline only. No PLACE promotion, no observation posts, no SQL, no data migration.** P2-F foundation block (F.1 + F.2) accepted locally. Deployment freeze remains active.
+
+---
