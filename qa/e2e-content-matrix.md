@@ -1313,6 +1313,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-A.1 — Structured Context Authoring & Moderation Planning Gate
+
+**Milestone:** P4-A.1 docs-only authoring/moderation planning gate; no code, SQL, data migration, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P3 Read-only Context Layer final accepted | `[x]` |
+| Authorable Field Matrix documented | `[x]` |
+| Flow Matrix documented | `[x]` |
+| Safety rules for future writes documented | `[x]` |
+| Recommended P4 sequence documented | `[x]` |
+| No admin/create/edit/moderation activated | `[x]` |
+| No data changes / no deploy | `[x]` |
+| Not live-ready | `[x]` |
+| Code changes | none |
+| Deploy / push | forbidden |
+
+**P4-A.1 planning gate completed locally.** P4 begins with authoring/moderation planning only. No write flows, UI, search index, backfill, or deploy activated.
+
+**Next candidate:** P4-A.2 Acceptance Sweep. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

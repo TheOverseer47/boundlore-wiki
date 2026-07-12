@@ -150,6 +150,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-L.1:** P3 read-only context layer integration confirms no P3 component may trigger promotion, inference, or entity creation.
 
+**P4-A.1 planning gate:** Authoring structured fields must not trigger automatic promotion. Resource Node, Observation, Requirement, Economy, and Quest fields must not auto-create posts. Promotion remains a separate explicit lifecycle/moderation step.
+
 ---
 
 ## Missing Entry Queue

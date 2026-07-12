@@ -2038,3 +2038,77 @@ Vor Push/Deploy/Live ist zwingend erforderlich:
 **P4-A.1 — Structured Context Authoring & Moderation Planning Gate** — not production deploy without **LAUNCH-0**.
 
 ---
+
+## 68. P4-A.1 — Structured Context Authoring & Moderation Planning Gate
+
+**Milestone:** P4-A.1 docs-only authoring/moderation planning gate; no code, SQL, data migration, or deploy.
+
+### Context
+
+- **P3 Read-only Context Layer: FINAL ACCEPTED locally** (P3-L.2)
+- **P4 begins with planning, not writes.** Goal: safe future capture of structured P2/P3 context fields
+- **Not activated in P4-A.1:** admin/create/edit/moderation flows, data changes, search index, deploy
+- **Still not live-ready.** LAUNCH-0 mandatory before push/deploy
+
+### Authorable Field Matrix
+
+| Context Section | Authorable später? | Erfassungsweg | Moderation nötig? | Verbotene Ableitungen |
+|-----------------|-------------------|---------------|-------------------|------------------------|
+| Resource Node | Ja, nur explicit fields | Admin/Create/Edit structured fields oder Contribution Intent | Ja | `source_detail` allein; „red crystal nodes“ → `crystal_node` |
+| Observation Context | Ja | Structured observation block | Ja | coordinates/location text → PLACE promotion |
+| Creature Encounter | Ja | Encounter/drop/behavior contribution | Ja | Item name „of Fire“ → fire weakness inference |
+| Requirement Unlock | Ja | Requirement/unlock block | Ja | requirement → post/entity promotion |
+| Versioning | Ja, restricted | Version change contribution / admin review | Ja | patch workflow auto-action |
+| Quest/Event | Planned | Future quest/event model | Ja | quest text → entity/post |
+| Economy | Planned | Vendor/offer/price contribution | Ja | shop/vendor post auto-creation |
+
+Contract-allowed explicit fields align with `BoundLoreContextDataContract` section extractors (`meta`, `discovery_payload`, `structured_context`); enriched/derived fields remain excluded.
+
+### Flow Matrix
+
+| Flow | Zweck | Status jetzt | Vor Implementierung nötig |
+|------|-------|--------------|---------------------------|
+| Admin Structured Edit | Trusted Admin setzt strukturierte Felder | Nicht aktiviert | Schema contract, validation, audit, rollback |
+| Create Structured Fields | Neue Entries mit Context-Feldern erstellen | Nicht aktiviert | Form schema, validation, moderation rules |
+| User Contribution | Nutzer melden Context-Feld-Ergänzungen | Nicht aktiviert | Contribution intents, conflict detection, evidence rank |
+| Moderation Queue | Pending structured changes reviewen | Nicht aktiviert | Diff preview, approve/reject/archive rules |
+| Conflict Preview | Bestehende vs. vorgeschlagene Werte | Nur bestehender `add_recipe` baseline | Field-level conflict policy |
+| Versioned Changes | `valid_from`/`valid_until`/`changed_in` verwalten | Read-only model only | Version workflow; no auto patch action |
+
+### Safety rules for future P4/P5 writes
+
+When write flows are implemented (not in P4-A.1):
+
+1. Jeder Write braucht explizites User/Admin-Intent
+2. Jeder strukturierte Field-Write braucht Validation gegen schema contract
+3. Jeder Contribution-Write braucht Moderation oder klaren Trusted-Admin-Bypass
+4. Jede Änderung braucht Evidence/Confidence oder Audit-Metadaten
+5. Keine automatische Entity/Post-Erzeugung aus structured fields
+6. Keine Promotion aus Freitext
+7. Keine Taxonomie-Inferenz aus Namen
+8. Keine inversen Persistierungen, wenn Relation derived ist
+9. Keine Search-Index-Aktivierung im selben Gate wie neue Writes
+10. Kein Backfill im selben Gate wie UI-Write-Flows
+11. Kein Deploy im selben Gate wie neue Write-Flows
+12. **LAUNCH-0** bleibt separater Gate vor Push/Deploy
+
+### Recommended P4 sequence
+
+| Phase | Task | Type | Notes |
+|-------|------|------|-------|
+| P4-A.1 | Structured Context Authoring & Moderation Planning Gate | **Current — docs-only** | No writes |
+| P4-A.2 | Acceptance Sweep | docs-only | Confirms authoring/moderation plan |
+| P4-B.1 | Structured Context Schema & Validation Baseline | Later code possible | Validators/schemas only; no writes |
+| P4-B.2 | Acceptance Sweep | docs-only | |
+| P4-C.1 | Admin Read-only Structured Field Inspector | Later code | Admin sees fields read-only; no edits |
+| P4-D.1 | Structured Contribution Draft Flow Planning | Later docs/code | No real approvals yet |
+
+**Write flows** (admin edit, create with fields, contribution approve) come only after: schema, validation, conflict policy, evidence/audit policy, and separate data-safety gate.
+
+### Not live-ready
+
+**P4-A.1 activates nothing.** No admin UI, no create/edit UI, no moderation UI, no backend writes, no search index, no backfill, no deploy.
+
+**Next:** P4-A.2 acceptance sweep.
+
+---

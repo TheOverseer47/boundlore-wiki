@@ -189,6 +189,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P3-L.1:** P3 read-only context layer integration confirms P3 fields have no admin/create/edit/moderation flows until separate P4/P5 gate.
 
+**P4-A.1 planning gate:** Structured context fields require field-level conflict policy before write flows. Existing `add_recipe` conflict remains baseline only. No new approval flows activated. Pending `add_recipe` untouched. Approve-blocked behavior unchanged.
+
 ---
 
 ---

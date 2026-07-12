@@ -100,6 +100,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-L.1:** P3 read-only context layer integration confirms P3 is not a search-index gate; backend/index activation remains blocked.
 
+**P4-A.1 planning gate:** Structured field authoring is not search indexing. Search/facet activation for P3/P4 fields requires a separate gate. No index backfills together with write-flow start.
+
 ---
 
 ## Goals
