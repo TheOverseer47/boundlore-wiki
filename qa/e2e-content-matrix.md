@@ -1199,6 +1199,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-J.2 — Real-Data Readiness & Safety Acceptance Sweep
+
+**Milestone:** P3-J.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P3-J.1 planning gate accepted | `[x]` |
+| Real-Data Readiness Matrix A–H accepted | `[x]` |
+| P3-K.1 next technical candidate confirmed | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Not live-ready documented | `[x]` |
+| Browser smoke (7 URLs, harnesses, QA Staff/Ember) | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P3-J.2 acceptance sweep completed locally.** The real-data readiness and safety plan is accepted as docs-only. P3-K.1 is the next technical candidate for a read-only real existing entry contract probe. The project is still not live-ready. LAUNCH-0 remains mandatory before any push/deploy/live action. No code, data, SQL, Supabase, admin/create/edit/moderation, search-index, posts, push, or deploy changes were introduced.
+
+**Next candidate:** P3-K.1 Real Existing Entry Read-only Contract Probe. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

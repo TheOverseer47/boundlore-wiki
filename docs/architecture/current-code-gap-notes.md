@@ -1818,6 +1818,39 @@ LAUNCH-0 must verify (when executed later):
 
 **LAUNCH-0 is NOT executed in P3-J.1.** No push. No deploy.
 
-**P3-J.1 planning gate completed locally.** Recommended next step: **P3-K.1 Real Existing Entry Read-only Contract Probe**.
+**P3-J.1 planning gate completed locally.** Recommended next step: **P3-J.2 acceptance sweep**, then **P3-K.1 Real Existing Entry Read-only Contract Probe**.
+
+---
+
+## 63. P3-J.2 — Real-Data Readiness & Safety Acceptance Sweep
+
+**Milestone:** P3-J.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+### Acceptance statement
+
+**P3-J.2 acceptance sweep completed locally.** The real-data readiness and safety plan is accepted as docs-only. P3-K.1 is the next technical candidate for a read-only real existing entry contract probe. The project is still not live-ready. LAUNCH-0 remains mandatory before any push/deploy/live action. No code, data, SQL, Supabase, admin/create/edit/moderation, search-index, posts, push, or deploy changes were introduced.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §62 P3-J.1 planning gate present | `[x]` — accepted stack, matrix A–H, tabu list, P3-K.1, LAUNCH-0 |
+| Real-Data Readiness Matrix A–H | `[x]` — complete; read-only next steps; forbidden items explicit |
+| P3-K.1 probe candidate | `[x]` — may/may-not list documented |
+| LAUNCH-0 gate | `[x]` — documented; not executed |
+| Not live-ready | `[x]` — explicit in §62 and supporting docs |
+| boundlore.com | `[x]` — untouched; deployment freeze active |
+| Core files unchanged | `[x]` — contract, renderer, preview, layout, post-detail |
+| QA harnesses under `qa/` only | `[x]` — no Supabase/admin/write flows in harnesses |
+| Sample data gate | `[x]` — 10/10 PASS |
+| Data contract fixtures | `[x]` — 9/9, 17/17 |
+| Preview guard | `[x]` — 12/12 PASS |
+| QA Staff/Ember without preview | `[x]` — 0 sections, 0 banner |
+| Standard URL smoke | `[x]` — 7/7 HTTP 200 |
+| Code / data / deploy changes | `[x]` — none |
+
+### Next candidate
+
+**P3-K.1 — Real Existing Entry Read-only Contract Probe** — not production deploy without **LAUNCH-0**.
 
 ---
