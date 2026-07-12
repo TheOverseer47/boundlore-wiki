@@ -300,6 +300,20 @@ window.BoundLoreContentModelRegistry = (function() {
       out.fields[field] = normalizeFieldValue(field, raw);
     });
 
+    if (typeof BoundLoreQuestEventRegistry !== "undefined" && def && out.active_model) {
+      try {
+        if (def.key === "KNOWLEDGE:quest") {
+          out.schema = BoundLoreQuestEventRegistry.normalizeQuestModelRecord(source);
+        } else if (def.key === "EVENT:event" || def.key === "EVENT:occurrence") {
+          out.schema = BoundLoreQuestEventRegistry.normalizeEventModelRecord(source);
+        } else if (def.key === "BEING:npc") {
+          out.schema = BoundLoreQuestEventRegistry.normalizeNpcModelRecord(source);
+        }
+      } catch (err) {
+        /* schema enrichment optional */
+      }
+    }
+
     return out;
   }
 

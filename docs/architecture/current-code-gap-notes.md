@@ -869,3 +869,27 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P2-A.2 acceptance sweep completed; NPC/Quest/Event models accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration.** P2-A foundation block (A.1 + A.2) accepted locally. Ready for P2-B. Deployment freeze remains active.
+
+---
+
+## 29. P2-B.1 — Quest Objective, Reward & Event Occurrence Baseline
+
+**Status:** Complete (local; quest/event substructure registry; no SQL, no UI, no data migration).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Quest/Event registry | `js/quest-event-registry.js` | `window.BoundLoreQuestEventRegistry` |
+| Quest objectives | structured fields on KNOWLEDGE/quest | kill/collect/gather/… — not posts |
+| Quest rewards | structured facts | item/resource/reputation/… — link only if post exists |
+| Event occurrences | EVENT/event substructures | scheduled/active/… — no create flow |
+| NPC services | BEING/npc roles | quest_giver/vendor/trainer/… — no top-level type |
+| Reserved relations | reward_of, occurs_during, sold_by | remain reserved in relations-registry |
+| Search signals | `js/search-signals.js` | low-weight `quest_event` group |
+| Query parser hints | `js/search-query-parser.js` | quest reward/objective, npc vendor/trainer, event schedule |
+| Reader context | `js/wiki-entry-layout.js` | `questEventContext` only; no new sections |
+| Content model schema | `js/content-model-registry.js` | optional schema enrichment |
+
+| Not built | Quest tracker, event calendar, vendor/economy, reward claim, occurrence editor, SQL | Deferred P2-B+ |
+| Unchanged | QA Staff/Ember/Ogre/Swamp, mining/wood/forge search, create_ui/admin_flow false | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.

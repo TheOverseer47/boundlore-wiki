@@ -22,6 +22,8 @@
 
 **P2-A.2 acceptance sweep:** P2-A foundation block accepted locally. Registry/read/search baseline only; no create UI, no SQL, no data migration.
 
+**P2-B.1 substructures:** Objectives/rewards/occurrences are structured fields, not posts. NPC services are roles/fields. Reserved relations: reward_of, occurs_during, sold_by (unchanged).
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

@@ -453,6 +453,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-B.1 — Quest Objective, Reward & Event Occurrence Baseline
+
+**Milestone:** P2-B quest/event substructure registry; client-side only; no SQL, no UI, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| QuestEventRegistry API | post or search page | normalize/extract/signals green | `[x]` |
+| Objective/reward types | console | collect/kill/item/reputation etc. | `[x]` |
+| Event/occurrence types | console | world/scheduled etc. | `[x]` |
+| NPC service types | console | vendor/quest_giver/trainer | `[x]` |
+| create_ui/admin_flow | ContentModelRegistry | false | `[x]` |
+| Search parser hints | quest reward/objective, npc vendor, event schedule | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/parser/npc/quest/event | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no new sections | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[ ]` |
+
+**P2-B.1:** Substructure registry only. No posts, no create UI, no SQL, no deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

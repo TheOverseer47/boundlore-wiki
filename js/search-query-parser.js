@@ -21,6 +21,19 @@ window.BoundLoreSearchQueryParser = (function() {
     { pattern: /\bflyable\b/i, group: "capability", value: "flyable" },
   ];
 
+  const QUEST_EVENT_KEYWORD_HINTS = [
+    { pattern: /\bquest\s+reward/i, group: "quest_context", value: "reward", entitySubtype: "quest" },
+    { pattern: /\bquest\s+objective/i, group: "quest_context", value: "objective", entitySubtype: "quest" },
+    { pattern: /\bquest\s+giver/i, group: "quest_context", value: "quest_giver", entitySubtype: "quest" },
+    { pattern: /\bnpc\s+vendor/i, group: "npc_service", value: "vendor", entitySubtype: "npc" },
+    { pattern: /\bnpc\s+trainer/i, group: "npc_service", value: "trainer", entitySubtype: "npc" },
+    { pattern: /\bevent\s+reward/i, group: "event_context", value: "reward", entitySubtype: "event" },
+    { pattern: /\bevent\s+schedule/i, group: "event_context", value: "schedule", entitySubtype: "event" },
+    { pattern: /\bworld\s+event/i, group: "event_type", value: "world", entitySubtype: "event" },
+    { pattern: /\bseasonal\s+event/i, group: "event_type", value: "seasonal", entitySubtype: "event" },
+    { pattern: /\bboss\s+event/i, group: "event_type", value: "boss_spawn", entitySubtype: "event" },
+  ];
+
   const MISSING_ENTRY_TERMS = ["wood", "forge"];
 
   function escapeHtml(value) {
@@ -178,6 +191,19 @@ window.BoundLoreSearchQueryParser = (function() {
     return bucket.list;
   }
 
+  function extractQuestEventHints(query) {
+    const raw = String(query || "");
+    const bucket = createHintBucket();
+    QUEST_EVENT_KEYWORD_HINTS.forEach(function(entry) {
+      if (entry.pattern.test(raw)) {
+        addHint(bucket, entry.group, entry.value, "keyword");
+        if (entry.entitySubtype) addHint(bucket, "entity_subtype", entry.entitySubtype, "quest_event");
+        if (entry.group === "event_type") addHint(bucket, "event_type", entry.value, "keyword");
+      }
+    });
+    return bucket.list;
+  }
+
   function extractEntityTypeHints(query) {
     const bucket = createHintBucket();
     const raw = String(query || "");
@@ -240,11 +266,13 @@ window.BoundLoreSearchQueryParser = (function() {
     const craftingIntent = extractCraftingIntent(raw);
     const relationHints = extractRelationIntentHints(raw);
     const facetHints = extractFacetHints(raw);
+    const questEventHints = extractQuestEventHints(raw);
     const entityTypeHints = extractEntityTypeHints(raw);
     const acquisitionIntent = extractAcquisitionIntent(raw);
     const missingEntryIntent = extractMissingEntryIntent(raw);
     const allFacetHints = mergeHintBuckets(
       { list: facetHints, _seen: new Set(facetHints.map(function(h) { return h.group + ":" + h.value; })) },
+      { list: questEventHints, _seen: new Set(questEventHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: entityTypeHints, _seen: new Set(entityTypeHints.map(function(h) { return h.group + ":" + h.value; })) }
     );
 
@@ -259,9 +287,10 @@ window.BoundLoreSearchQueryParser = (function() {
       tokens: tokenizeSearchQuery(raw),
       residual: residual,
       free_text: residual || normalized,
-      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(entityTypeHints),
+      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, entityTypeHints),
       relation_hints: relationHints,
       entity_type_hints: entityTypeHints,
+      quest_event_hints: questEventHints,
       usage_intent: usageIntent,
       crafting_intent: craftingIntent,
       acquisition_intent: acquisitionIntent,

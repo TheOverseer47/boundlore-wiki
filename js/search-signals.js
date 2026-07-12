@@ -387,6 +387,35 @@ window.BoundLoreSearchSignals = (function() {
     return bucket.signals;
   }
 
+  function collectQuestEventSearchSignals(post, meta) {
+    const bucket = { signals: [], _seen: new Set() };
+    if (typeof BoundLoreQuestEventRegistry === "undefined") {
+      return bucket.signals;
+    }
+    const source = Object.assign({}, meta || {}, {
+      meta: meta || {},
+      post: post || {},
+    });
+    try {
+      [
+        BoundLoreQuestEventRegistry.getQuestSearchSignals(source),
+        BoundLoreQuestEventRegistry.getEventSearchSignals(source),
+        BoundLoreQuestEventRegistry.getNpcServiceSearchSignals(source),
+      ].forEach(function(group) {
+        (group || []).forEach(function(entry) {
+          if (!entry || !entry.raw) return;
+          pushSignal(bucket, entry.raw, { group: "quest_event", label: entry.label || "Quest/Event" });
+          if (entry.label && entry.label !== entry.raw) {
+            pushSignal(bucket, entry.label, { group: "quest_event", label: entry.group || "Context" });
+          }
+        });
+      });
+    } catch (err) {
+      return bucket.signals;
+    }
+    return bucket.signals;
+  }
+
   function buildDisplayLabels(post, meta, signalGroups) {
     const labels = [];
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {
@@ -429,6 +458,7 @@ window.BoundLoreSearchSignals = (function() {
       relations: collectRelationSearchSignals(safePost, meta),
       profession_capability: collectProfessionCapabilitySearchSignals(safePost, meta),
       content_model: collectContentModelSearchSignals(safePost, meta),
+      quest_event: collectQuestEventSearchSignals(safePost, meta),
       version: collectVersionSearchSignalsForPost(safePost, meta),
       text: collectTextSignals(safePost),
     };

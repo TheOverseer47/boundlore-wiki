@@ -28,6 +28,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-A.2 acceptance sweep:** P2-A.2 acceptance sweep completed; NPC/Quest/Event models accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration. P2-A foundation block accepted locally.
 
+**P2-B.1 code baseline:** `js/quest-event-registry.js` — quest objectives/rewards, event occurrences/schedules, NPC service roles. Structured fields only; **no** posts by default, **no** create UI, **no** SQL. Low-weight search/parser hints only.
+
 ---
 
 ## Goals

@@ -1588,6 +1588,18 @@ window.WikiEntryLayout = (function() {
         contentModelContext = null;
       }
     }
+    let questEventContext = null;
+    if (typeof BoundLoreQuestEventRegistry !== "undefined" && BoundLoreQuestEventRegistry.resolveQuestEventContext) {
+      try {
+        questEventContext = BoundLoreQuestEventRegistry.resolveQuestEventContext({
+          meta: meta,
+          post: post,
+          discovery_payload: payload,
+        });
+      } catch (err) {
+        questEventContext = null;
+      }
+    }
 
     return {
       post: post,
@@ -1612,6 +1624,7 @@ window.WikiEntryLayout = (function() {
         return buildSourceDiscoveryHtml(payload, meta, post, cleanContent);
       })(),
       contentModelContext: contentModelContext,
+      questEventContext: questEventContext,
       supplementalHtml: "",
     };
   }
