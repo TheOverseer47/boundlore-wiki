@@ -361,6 +361,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-G.2 — Symmetric Relation Dedupe Acceptance Sweep
+
+**Milestone:** P1-G foundation block (G.1 + G.2); reader/search dedupe only; no SQL, no repair, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Mirror/dedupe API sweep | console on QA Staff post | all P1-G.1 checks green | `[x]` |
+| Directed keys | console | crafted_from staff→ember ≠ ember→staff | `[x]` |
+| Symmetric dedupe | console | hostile_to a↔b → 1 record | `[x]` |
+| Derived inverse | console | ingredient_of derived_inverse | `[x]` |
+| Reserved relations | console | not persistable | `[x]` |
+| Search regressions | mining/wood/forge/qa ember/parser queries | unchanged | `[x]` |
+| QA Staff / QA Ember | post slugs | recipe/Used In/badges unchanged | `[x]` |
+| No mirror UI | pages | no hostile/allied/symmetric buttons | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation Access Denied |
+
+**P1-G.2 acceptance sweep completed; reader/search dedupe only; no SQL, no repair, no data migration.** P1-G accepted as local foundation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

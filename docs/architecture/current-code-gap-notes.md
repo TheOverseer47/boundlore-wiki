@@ -775,3 +775,25 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | QA Staff recipe, QA Ember, mining/wood/forge search | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 25. P1-G.2 — Symmetric Relation Dedupe Acceptance Sweep
+
+**Status:** Complete (local read-only sweep; reader/search dedupe only; no SQL, no repair, no data migration).
+
+| Check | Result |
+|-------|--------|
+| Mirror/dedupe API | Green — directionality, mirror_behavior, canonical pair, dedupe keys |
+| Directed | `crafted_from`, `crafted_at`, `found_in` — endpoint order preserved; staff→ember ≠ ember→staff |
+| Derived inverse | `ingredient_of`, `dropped_by` — derived_inverse; not primary truth |
+| Symmetric | `hostile_to`, `allied_to`, `related_to` — symmetric_dedupe; a↔b → 1 record |
+| Reserved | P1-F quartet reserved; `shouldPersistRelationDirection` false |
+| Reader/search dedupe | Defensive only; no data migration or repair |
+| Search regressions | mining/wood/forge/qa ember/parser queries unchanged |
+| QA Staff / QA Ember | Recipe, Used In, badges unchanged |
+| Wood/Forge | Missing-entry suggestions; no posts |
+| Admin | Session-dependent — automation Access Denied; no queue actions |
+| Pending `add_recipe` conflict | Not touched |
+
+**P1-G.2 acceptance sweep completed; reader/search dedupe only; no SQL, no repair, no data migration.** P1-G foundation block (G.1 + G.2) accepted locally. Ready for next P1 milestone. Deployment freeze remains active.

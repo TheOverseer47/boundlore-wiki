@@ -14,6 +14,8 @@
 
 **P1-G.1 (local):** Symmetric relation dedupe & derived mirror baseline in `js/relations-registry.js` — `directionality`, `mirror_behavior`, `canonical_pair_order`, dedupe helpers. Reader/search defensive dedupe via `dedupeRelationRecords`. No SQL, no data migration, no repair. Single-write + derived mirror target model only.
 
+**P1-G.2 acceptance sweep:** P1-G.2 acceptance sweep completed; reader/search dedupe only; no SQL, no repair, no data migration. P1-G foundation block (G.1 + G.2) accepted locally.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).
