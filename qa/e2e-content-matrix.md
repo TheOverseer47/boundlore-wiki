@@ -1629,7 +1629,34 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **P4-E.2 acceptance sweep completed locally.** The Structured Contribution Draft Contract baseline is accepted. `BoundLoreStructuredContributionDraftContract` is read-only and validates-only, normalizes draft states, validates payloads, uses planned intent mapping read-only without mutating `ContributionIntentRegistry`, produces field-level conflict reports, mutates no inputs, and keeps all submit/save/queue/approve/reject/archive/post/missing-entry/promotion/search policy functions false. It remains QA-fixture-only with no production contribution integration. No code, data, SQL, Supabase, contribution UI, draft submit/save flows, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
 
-**Next candidate:** **P4-F.1 Structured Contribution Draft Inspector / Preview Planning Gate** or **P4 Final Integration Gate**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P4-F.1 Structured Contribution Draft Inspector / Preview Planning Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P4-F.1 — Structured Contribution Draft Inspector / Preview Planning Gate
+
+**Milestone:** P4-F.1 docs-only draft inspector/preview planning gate; no code, SQL, data migration, draft preview UI, submit flows, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P4-E draft contract baseline accepted | `[x]` |
+| Draft preview scope matrix documented | `[x]` |
+| Draft preview pipeline planned | `[x]` |
+| Visual diff policy planned | `[x]` |
+| Forbidden preview functions documented | `[x]` |
+| P4-F.3 baseline module structure planned | `[x]` |
+| No draft preview UI activated | `[x]` |
+| No submit/save/approve/reject/archive flows activated | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-F.1 planning gate completed locally.** Structured contribution draft inspector/preview is planned as docs-only: preview scope matrix, planned pipeline, visual diff policy, forbidden preview functions, and P4-F.3 baseline module outline. No draft preview UI, no submit/save, no approve/reject/archive, no queue actions, no search index. Existing `add_recipe` pending conflict remains baseline. Project remains not live-ready; LAUNCH-0 mandatory before push/deploy.
+
+**Next candidate:** P4-F.2 Acceptance Sweep. **LAUNCH-0** required before any push/deploy.
 
 ---
 

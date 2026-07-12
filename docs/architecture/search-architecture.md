@@ -120,6 +120,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-E.2 acceptance sweep:** Draft contract baseline accepted locally. Search/index activation remains blocked.
 
+**P4-F.1 draft preview planning:** Draft preview reports are not search-indexed. Pending/draft data are not activated in search/facet. Search index remains a separate gate after accepted writes.
+
 ---
 
 ## Goals

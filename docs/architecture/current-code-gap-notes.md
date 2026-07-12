@@ -2105,7 +2105,7 @@ When write flows are implemented (not in P4-A.1):
 | P4-D.2 | Acceptance Sweep | **Accepted — docs-only** | Confirms draft plan |
 | P4-E.1 | Structured Contribution Draft Contract Baseline | **Accepted — read-only code** | Draft contract module + QA fixture; no submit |
 | P4-E.2 | Acceptance Sweep | **Accepted — docs-only** | Confirms draft contract baseline |
-| P4-F.1 | Structured Contribution Draft Inspector / Preview Planning Gate | Later docs | Draft preview planning; no submit |
+| P4-F.1 | Structured Contribution Draft Inspector / Preview Planning Gate | **Current — docs-only** | Draft preview scope, pipeline, diff policy; no UI |
 
 **Write flows** (admin edit, create with fields, contribution approve) come only after: schema, validation, conflict policy, evidence/audit policy, and separate data-safety gate.
 
@@ -2536,7 +2536,7 @@ A future moderator view would need read-only access to:
 | **P4-D.2** | Acceptance Sweep | **Accepted — docs-only** | Confirms draft plan |
 | **P4-E.1** | Structured Contribution Draft Contract Baseline | **Accepted — read-only code** | Draft contract module + QA fixture |
 | **P4-E.2** | Acceptance Sweep | **Accepted — docs-only** | Confirms draft contract baseline |
-| P4-F.1 | Structured Contribution Draft Inspector / Preview Planning Gate | Later docs | Draft preview planning; no submit |
+| P4-F.1 | Structured Contribution Draft Inspector / Preview Planning Gate | **Current — docs-only** | Draft preview scope, pipeline, diff policy; no UI |
 
 ### Not live-ready
 
@@ -2662,5 +2662,116 @@ Seven section → `suggest_*_context` mappings; all planned/reserved; registry n
 ### Next candidate
 
 **P4-F.1 — Structured Contribution Draft Inspector / Preview Planning Gate** — docs-only draft preview planning; not production deploy without **LAUNCH-0**.
+
+---
+
+## 80. P4-F.1 — Structured Contribution Draft Inspector / Preview Planning Gate
+
+**Milestone:** P4-F.1 docs-only draft inspector/preview planning gate; no code, SQL, data migration, draft preview UI, submit flows, or deploy.
+
+### Context
+
+- **P4-E** Structured Contribution Draft Contract is **accepted** (`BoundLoreStructuredContributionDraftContract`, `p4-e1`, QA-fixture-only).
+- **P4-C** Admin Read-only Structured Field Inspector is **accepted** (`BoundLoreAdminStructuredContextInspector`, QA-fixture-only).
+- **P4-B** schema baseline (`BoundLoreStructuredContextSchema`) remains read-only validation only.
+- **P4-F begins with draft inspector/preview planning only** — no Draft Preview UI, no Submit, no Save, no Approve/Reject/Archive, no queue actions.
+- **Goal (future):** read-only visibility into draft payloads, field-level diffs, conflict reports, validation issues, evidence/confidence, and policy flags before any write or moderation gate.
+- **Still not live-ready** — LAUNCH-0 mandatory before any push/deploy/live action.
+
+### Draft preview scope matrix
+
+| Preview area | May display later? | Source | May trigger action? |
+|--------------|-------------------|--------|---------------------|
+| Draft identity | Yes | Draft Contract report | **No** |
+| Target entry summary | Yes | Read-only existing entry snapshot | **No** |
+| Target section | Yes | `draft.target_section` | **No** |
+| Field changes | Yes | `draft.field_changes` | **No** |
+| Existing values | Yes | `source_snapshot` / existingEntry clone | **No** |
+| Field-level diff | Yes | Draft Contract conflict report | **No** |
+| Schema validation report | Yes | `BoundLoreStructuredContextSchema` | **No** |
+| Draft contract report | Yes | `BoundLoreStructuredContributionDraftContract` | **No** |
+| Evidence / confidence | Yes, when present | `draft.evidence` | **No** |
+| Audit metadata | Yes, when present | `draft.audit_metadata` | **No** |
+| Risk warnings | Yes | Validation / conflict / policy reports | **No** |
+| Policy flags | Yes | `should*` policy functions (all false in baseline) | **No** |
+| Submit / save controls | **No** | None | **Forbidden** |
+| Approve / reject / archive controls | **No** | None | **Forbidden** |
+| Repair / danger tools | **No** | None | **Forbidden** |
+
+### Planned draft preview pipeline (future baseline — not P4-F.1)
+
+1. Draft loaded locally/read-only or provided as QA fixture object
+2. Existing entry snapshot provided as clone (no fetch/write required for baseline)
+3. `BoundLoreStructuredContributionDraftContract.createDraftReport(draft, existingEntry)`
+4. `BoundLoreStructuredContextSchema.createValidationReport` on `field_changes` / `target_section`
+5. Field-level conflict report read from Draft Contract output
+6. Preview renders read-only: target entry, section, proposed changes, existing values, validation issues, conflict report, evidence/confidence, policy flags, risk warnings
+7. Preview shows **no actions**
+8. Original draft and entry remain unmutated
+9. No Supabase writes
+10. No queue actions
+
+### Visual diff policy (planned)
+
+| Diff status | Meaning | Preview may show? | May trigger merge/write? |
+|-------------|---------|-------------------|---------------------------|
+| `unchanged` | Old and new value identical | Yes | **No** |
+| `added` | Field new in draft | Yes | **No** |
+| `changed` | Existing field would get different value | Yes | **No** |
+| `removed` | Field removal (future; not in baseline) | Planned later | **No** |
+| `conflict` | Same field key, different value | Yes | **No** |
+| `duplicate` | Same field key, same value | Yes | **No** |
+| `merge_candidate` | Array/object overlap — review only | Yes | **No** |
+| `blocked` | unknown/forbidden/derived/source_detail/name-only/etc. | Yes | **No** |
+| `restricted_review` | Restricted field requires review | Yes | **No** |
+| `planned_only` | Planned section/field — no production submit without gate | Yes | **No** |
+
+**Important:** Diff display must not trigger merge actions, auto-correction, or write buttons.
+
+### Forbidden draft preview functions
+
+The future Draft Inspector / Preview must **NOT**:
+
+- Show Submit, Save, Approve, Reject, Archive, or Repair buttons
+- Show inputs or forms
+- Mutate queue items or pending posts
+- Create missing entries or Wood/Forge posts
+- Execute Supabase inserts/updates/deletes or SQL
+- Update search index or start backfill
+- Suggest or trigger entity promotion or taxonomy inference
+- Convert free text into structured fields
+- Auto-merge diffs or auto-save drafts to pending
+- Trigger version/patch admin actions
+
+### Module integration (planned)
+
+| Layer | Module | Role in preview |
+|-------|--------|-----------------|
+| Draft validation | `BoundLoreStructuredContributionDraftContract` | Draft report, conflict report, policy flags |
+| Schema validation | `BoundLoreStructuredContextSchema` | Field/section validation issues |
+| Admin inspector (optional) | `BoundLoreAdminStructuredContextInspector` | Existing entry structured context diagnostics |
+| P3 context (optional) | `BoundLoreContextDataContract` | Read-only entry context extraction for snapshot |
+
+### Recommended sequence
+
+| Phase | Task | Type | Notes |
+|-------|------|------|-------|
+| **P4-F.1** | Structured Contribution Draft Inspector / Preview Planning Gate | **Current — docs-only** | This gate |
+| P4-F.2 | Acceptance Sweep | docs-only | Confirms preview plan |
+| P4-F.3 | Structured Contribution Draft Preview Baseline | Later read-only code | `js/structured-contribution-draft-preview.js` + QA fixture; no prod wiring |
+
+**P4-F.3 baseline (when code allowed) may add:**
+
+- `js/structured-contribution-draft-preview.js` — pure read-only render helpers, no fetch/write
+- `qa/p4-structured-contribution-draft-preview-fixtures.html` — QA-only harness
+- Uses Draft Contract + Schema (+ optional Admin Inspector) APIs
+
+**P4-F.3 baseline must NOT add:** submit UI, save UI, approval UI, DB writes, SQL, search index, backfill, deploy, prod admin/contribution integration.
+
+### Not live-ready
+
+**P4-F.1 activates nothing.** No draft preview UI, no draft preview module, no submit/save, no approve/reject/archive, no queue mutation, no search index, no deploy.
+
+**Next:** P4-F.2 acceptance sweep.
 
 ---

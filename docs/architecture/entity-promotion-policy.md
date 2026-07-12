@@ -170,6 +170,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-E.2 acceptance sweep:** Draft contract baseline accepted locally. All promotion/post policy functions remain false; no production contribution integration.
 
+**P4-F.1 draft preview planning:** Draft preview must not suggest or trigger promotion. Preview must not create missing entries. Wood/Forge remain missing-entry queue items until a separate promotion gate.
+
 ---
 
 ## Missing Entry Queue
