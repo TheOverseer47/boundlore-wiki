@@ -36,6 +36,8 @@
 
 **P2-E.1 resource node baseline:** Resource nodes are structured fields/observations, not PLACE posts. `node_type` on qualifiers only when explicit. `source_detail` (red crystal nodes) remains text signal — no taxonomy inference.
 
+**P2-E.2 acceptance sweep:** P2-E foundation block accepted locally. No node posts, no PLACE promotion, no SQL, no data migration.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

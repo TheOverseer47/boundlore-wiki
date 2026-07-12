@@ -42,6 +42,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-E.1 resource node baseline:** `js/resource-node-registry.js` — node_type/acquisition helpers. Parser hints for resource node/mining node/red crystal nodes (source_detail). No crystal taxonomy inference. Low-weight signals only.
 
+**P2-E.2 acceptance sweep:** P2-E foundation block accepted locally. No node posts, no PLACE promotion, no SQL, no data migration.
+
 ---
 
 ## Goals

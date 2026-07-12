@@ -94,6 +94,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P2-E.1:** `js/resource-node-registry.js` — `node_type` is structured field/observation context, not a post. Concrete nodes are future Observations, not automatic PLACE pages. `shouldPromoteNodeTypeToPost` remains false. No inference from source_detail to crystal taxonomy.
 
+**P2-E.2 acceptance sweep:** Resource node types and acquisition sources accepted as registry/read/search/facet baseline only. No node posts, no PLACE promotion, no SQL, no data migration.
+
 ---
 
 ## Missing Entry Queue

@@ -6,6 +6,8 @@
 
 **P2-E.1:** `node_type` facet group added (future-safe). Explicit `resource.node_type` only — **not** inferred from `source_detail` text like "red crystal nodes". See [`js/resource-node-registry.js`](../../js/resource-node-registry.js).
 
+**P2-E.2 acceptance sweep:** P2-E foundation block accepted locally. No node posts, no PLACE promotion, no taxonomy inference from source_detail.
+
 Controlled multi-valued classification layer for BoundLore. Facets complement — never replace — `entity_domain` and `entity_subtype`.
 
 **Related:** [CONTENT_ARCHITECTURE.md](./CONTENT_ARCHITECTURE.md) · [entity-promotion-policy.md](./entity-promotion-policy.md) · [search-architecture.md](./search-architecture.md)

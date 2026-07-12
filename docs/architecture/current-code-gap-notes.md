@@ -1024,3 +1024,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | QA Ember (Mining/Raw/Unknown/red crystal nodes), QA Staff/Ogre/Swamp, mining/wood/forge search | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 36. P2-E.2 — Resource Node Type & Acquisition Source Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; registry/read/search/facet baseline only; no SQL, no node posts, no data migration).
+
+| Acceptance | Result |
+|------------|--------|
+| ResourceNodeRegistry API (QA Ember post) | Green — normalize/extract/signals; no taxonomy inference |
+| ContentModel/Facet integration | OBJECT:resource fields; node_type facet explicit-only |
+| red crystal nodes | source_detail/search signal only; `hasExplicitNodeType` false |
+| Search parser hints | resource node/mining node/red crystal nodes/ore vein/fishing spot — hint-only |
+| Search regressions | mining/wood/forge/red crystal/vendor/version unchanged |
+| Resources facets | mining/raw/unknown show QA Ember; node_type=crystal_node no false Ember match |
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged; 0 node-type badges/sections |
+| Wood/Forge | Missing-entry only; no posts |
+| Admin | Session-dependent — automation not verified |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-E.2 acceptance sweep completed; Resource node types and acquisition sources accepted as registry/read/search/facet baseline only. No node posts, no PLACE promotion, no SQL, no data migration.** P2-E foundation block (E.1 + E.2) accepted locally. Ready for P2-F. Deployment freeze remains active.

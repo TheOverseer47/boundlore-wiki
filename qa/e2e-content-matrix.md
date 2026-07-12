@@ -597,6 +597,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-E.2 — Resource Node Type & Acquisition Source Acceptance Sweep
+
+**Milestone:** P2-E foundation block (E.1 + E.2); registry/read/search/facet baseline only; no SQL, no node posts, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ResourceNodeRegistry API sweep | QA Ember post | all normalize/extract/signals green | `[x]` |
+| red crystal nodes inference | source_detail only | no node_type/crystal taxonomy forced | `[x]` |
+| ContentModel/Facet integration | OBJECT:resource; node_type facet | explicit-only; create_ui/admin false | `[x]` |
+| Search parser hints | resource node/mineral/crystal/red crystal/fishing spot | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/red crystal/vendor/version | unchanged | `[x]` |
+| Resources facets | mining/raw/unknown; node_type=crystal_node | QA Ember on facets; no false crystal match | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no node-type badges/sections | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Reserved UI/relations | pages | no node/relation buttons; gathered_via unchanged | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-E.2 acceptance sweep completed; Resource node types and acquisition sources accepted as registry/read/search/facet baseline only. No node posts, no PLACE promotion, no SQL, no data migration.** P2-E accepted as local foundation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
