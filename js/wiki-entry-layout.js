@@ -1486,10 +1486,11 @@ window.WikiEntryLayout = (function() {
 
   function buildModel(post, meta, relations, cleanContent) {
     const category = String(post.category || "").toLowerCase();
+    const rawDiscoveryPayload = Object.assign({}, meta.discovery_payload || {});
     const enrichFn = typeof EntityCore !== "undefined"
       ? EntityCore.enrichPayloadFromRelations.bind(EntityCore)
       : enrichPayloadFromRelations;
-    const payload = enrichFn(meta.discovery_payload || {}, relations, meta.knowledge_entry);
+    const payload = enrichFn(Object.assign({}, meta.discovery_payload || {}), relations, meta.knowledge_entry);
     meta.discovery_payload = payload;
     const stub = isStubEntry(post, meta);
     const heroImage = extractHeroImage(cleanContent, meta);
@@ -1688,6 +1689,7 @@ window.WikiEntryLayout = (function() {
       post: post,
       meta: meta,
       payload: payload,
+      rawDiscoveryPayload: rawDiscoveryPayload,
       category: category,
       stub: stub,
       heroImage: heroImage,
@@ -1806,11 +1808,17 @@ window.WikiEntryLayout = (function() {
     if (typeof BoundLoreContextSectionRenderer !== "undefined" &&
         BoundLoreContextSectionRenderer.shouldRenderAnyContext) {
       try {
-        const contextEntry = {
-          meta: model.meta,
+        const rawPayload = model.rawDiscoveryPayload || {};
+        let contextEntry = {
+          meta: Object.assign({}, model.meta, { discovery_payload: rawPayload }),
           post: model.post,
-          discovery_payload: model.payload,
+          discovery_payload: rawPayload,
+          structured_context: (model.meta && model.meta.structured_context) || {},
         };
+        if (typeof BoundLoreContextDataContract !== "undefined" &&
+            BoundLoreContextDataContract.resolveContractEntry) {
+          contextEntry = BoundLoreContextDataContract.resolveContractEntry(contextEntry);
+        }
         const previewAdapter = typeof BoundLoreContextPreviewAdapter !== "undefined"
           ? BoundLoreContextPreviewAdapter
           : null;

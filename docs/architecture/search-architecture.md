@@ -86,6 +86,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-G.1 planning gate:** P3-H data-contract plan does not activate search/index. Backend P2 field search remains future work.
 
+**P3-H.1 data contract baseline:** `js/context-data-contract.js` read-only normalizes explicit context fields on detail pages only. No search index, no backend field search, no query parser changes. Preview remains localhost-gated and not indexed.
+
 ---
 
 ## Goals

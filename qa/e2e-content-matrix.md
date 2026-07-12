@@ -1079,6 +1079,33 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-H.1 — Read-only Context Data Contract Baseline
+
+**Milestone:** P3-H.1 code baseline; read-only explicit field normalization; no SQL, no data migration, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Data contract module | `js/context-data-contract.js` | `BoundLoreContextDataContract` API; no writes | `[x]` |
+| Contract fixture page | `/qa/p3-context-data-contract-fixtures.html` | HTTP 200; QA-only banner; 9 fixtures A–I | `[x]` |
+| Positive fixtures | A–E, I | Expected sections render | `[x]` |
+| Negative fixtures | F, G, H | 0 sections | `[x]` |
+| Contract assertions | console | 17/17 checks (writes/promotion/actions false) | `[x]` |
+| Entry immutability | console | `before === after` on resolve | `[x]` |
+| Renderer regression | `/qa/p3-context-renderer-fixtures.html` | 8/8 fixtures; 12/12 assertions | `[x]` |
+| Preview matrix | `/qa/p3-detail-preview-matrix.html` | 4×11; 44 links | `[x]` |
+| Guard safety | `/qa/p3-preview-guard-safety.html` | 12/12 PASS | `[x]` |
+| Preview QA Staff | `?p3_context_preview=all/resource_node/negative_source_detail/off` | Banner/sections per mode | `[x]` |
+| QA Staff/Ember/Ogre/Swamp | post slugs without preview | 0 `.bl-p3-context-section`; 0 banner | `[x]` |
+| Standard regression | homepage/browse/resources/items/search/admin | HTTP 200; unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+| Deploy / push / SQL | — | forbidden | `[x]` |
+
+**Next:** P3-H.2 acceptance sweep after local verification.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

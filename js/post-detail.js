@@ -124,6 +124,7 @@ async function renderPost(post) {
   document.getElementById("postContent").style.display = "block";
 
   let postMeta = parsePostMetaPD(post.content || "");
+  const rawDiscoveryPayloadForContext = Object.assign({}, postMeta.discovery_payload || {});
   const useWikiLayout = typeof WikiEntryLayout !== "undefined" && WikiEntryLayout.isWikiLayoutPost(post);
   if (typeof EntityCore !== "undefined" && useWikiLayout) {
     const repaired = EntityCore.normalizeEntityMeta(post, postMeta, { repairPayload: true });
@@ -189,6 +190,7 @@ async function renderPost(post) {
         );
       }
       const wikiModel = WikiEntryLayout.buildModel(viewPost, postMeta, wikiRelations, cleanContent);
+      wikiModel.rawDiscoveryPayload = rawDiscoveryPayloadForContext;
       document.getElementById("postBody").innerHTML = WikiEntryLayout.render(wikiModel);
       wikiLayoutRendered = true;
       document.getElementById("postContent").classList.add("bl-wiki-page");

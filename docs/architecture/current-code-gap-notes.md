@@ -1551,3 +1551,70 @@ P3-H.2 (later): acceptance sweep confirming real fields render only when explici
 **P3-G.1 planning gate completed locally.** P3 preview layer is final accepted. Next safe step: **P3-H.1 Read-only Context Data Contract Baseline**. No deploy without separate launch/data-safety gate.
 
 ---
+
+## 58. P3-H.1 — Read-only Context Data Contract Baseline
+
+**Milestone:** P3-H.1 code baseline; read-only explicit field normalization for P2 context sections.
+
+### Module
+
+`js/context-data-contract.js` — `window.BoundLoreContextDataContract`
+
+### Policy
+
+| Rule | Status |
+|------|--------|
+| Read-only | `[x]` — `shouldWriteContractData()` always false |
+| Explicit-only | `[x]` — allowed fields from root/meta/discovery_payload/structured_context only |
+| No writes / mutation | `[x]` — input entry never mutated; deep clone for resolved output |
+| No promotion / inference | `[x]` — `shouldPromoteContractData()` false; no source_detail/name/coordinates promotion |
+| No actions | `[x]` — `shouldRenderContractActions()` false |
+| No empty sections | `[x]` — empty/unknown values stripped before merge |
+
+### Source order (stable, first non-empty field wins per key)
+
+1. root explicit safe fields
+2. meta
+3. discovery_payload
+4. structured_context section blocks
+
+Conflicts are diagnostic-only; no aggressive merge resolution.
+
+### Supported sections
+
+`resource_node`, `observation_context`, `creature_encounter`, `requirement_unlock`, `versioning`, `quest_event`, `economy` (read-only planned fields when explicit).
+
+### Explicit prohibitions (unchanged from P3-G.1)
+
+- `source_detail` alone does **not** trigger resource_node
+- Names/titles/descriptions do **not** trigger taxonomy or encounter sections
+- coordinates/location_ref do **not** promote PLACE
+- requirements/unlocks do **not** promote posts or entities
+
+### Integration
+
+`wiki/post/index.html` loads contract after P2 registries, before context renderer.
+
+`wiki-entry-layout.js` pipeline:
+
+1. Build context entry from model
+2. `BoundLoreContextDataContract.resolveContractEntry(entry)`
+3. `BoundLoreContextPreviewAdapter.resolvePreviewEntry(contractEntry)` when preview active
+4. `BoundLoreContextSectionRenderer` when `shouldRenderAnyContext()` true
+
+Without explicit contract fields, QA Staff/Ember/Ogre/Swamp remain at 0 context sections (no preview).
+
+### QA harness
+
+`qa/p3-context-data-contract-fixtures.html` — 9 fixtures (A–I); positive A–E + I; negative F/G/H empty.
+
+### Not built
+
+- No SQL, DB migration, backfill, or real P2 dataset
+- No admin/create/edit/moderation UI
+- No search index activation
+- No deploy or production preview activation
+
+**Next:** P3-H.2 acceptance sweep confirming contract + regression baseline.
+
+---

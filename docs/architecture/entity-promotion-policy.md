@@ -136,6 +136,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-G.1 planning gate:** Real read-only data binding remains future work (P3-H.1). Explicit fields only; no promotion from source_detail, coordinates, names, or requirements. Launch gate required before deploy.
 
+**P3-H.1 data contract baseline:** `js/context-data-contract.js` normalizes explicit root/meta/discovery_payload/structured_context fields read-only into detail-page context entry shape. No writes, no posts, no promotion, no inference. Preview layer remains localhost-gated. P3-H.2 acceptance sweep follows.
+
 ---
 
 ## Missing Entry Queue
