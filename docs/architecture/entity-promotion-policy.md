@@ -158,6 +158,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-C.1 planning gate:** Admin Inspector must not trigger or suggest promotion. Inspector may make structured fields visible for diagnosis only; no entity lifecycle transition, no stub creation, no PLACE/resource/creature inference from displayed validation output.
 
+**P4-C.2 acceptance sweep:** Admin Inspector planning accepted locally. No promotion paths activated.
+
 ---
 
 ## Missing Entry Queue

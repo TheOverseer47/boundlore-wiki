@@ -2100,7 +2100,7 @@ When write flows are implemented (not in P4-A.1):
 | P4-A.2 | Acceptance Sweep | docs-only | Confirms authoring/moderation plan |
 | P4-B.1 | Structured Context Schema & Validation Baseline | Later code possible | Validators/schemas only; no writes |
 | P4-B.2 | Acceptance Sweep | docs-only | |
-| P4-C.1 | Admin Read-only Structured Field Inspector Planning Gate | **Current — docs-only** | Inspector scope/pipeline planned; no code |
+| P4-C.1 | Admin Read-only Structured Field Inspector Planning Gate | **Accepted — docs-only** | Inspector scope/pipeline planned; no code |
 | P4-D.1 | Structured Contribution Draft Flow Planning | Later docs/code | No real approvals yet |
 
 **Write flows** (admin edit, create with fields, contribution approve) come only after: schema, validation, conflict policy, evidence/audit policy, and separate data-safety gate.
@@ -2282,7 +2282,7 @@ The future Admin Read-only Structured Field Inspector must **NOT**:
 
 Inspector policy helpers (future baseline) must mirror schema policy: all `shouldWrite*`, `shouldCreatePost*`, `shouldPromote*`, `shouldRenderValidationActions` return **`false`**.
 
-### Planned inspector data pipeline (future P4-C.2 baseline)
+### Planned inspector data pipeline (future P4-C.3 baseline)
 
 1. Admin loads an **existing entry read-only** (same source as post detail / admin preview).
 2. Inspector receives a **deep clone** of the entry object — original never mutated.
@@ -2310,22 +2310,52 @@ When integrated (not in P4-C.1):
 
 | Phase | Task | Type | Notes |
 |-------|------|------|-------|
-| **P4-C.1** | Admin Read-only Structured Field Inspector Planning Gate | **Current — docs-only** | This gate |
-| P4-C.2 | Acceptance Sweep **or** Admin Read-only Inspector Baseline | docs-only **or** read-only code | Baseline: render helpers + QA fixture; optional admin panel read-only |
+| **P4-C.1** | Admin Read-only Structured Field Inspector Planning Gate | **Accepted — docs-only** | Inspector scope/pipeline planned |
+| **P4-C.2** | Planning Acceptance Sweep | docs-only | Confirms P4-C.1 plan |
+| P4-C.3 | Admin Read-only Structured Field Inspector Baseline | Later read-only code | Render helpers + QA fixture; optional admin panel |
 | P4-D.1 | Structured Contribution Draft Flow Planning | docs-only | No real approvals yet |
 
-**P4-C.2 baseline (when code allowed)** may add:
+**P4-C.3 baseline (when code allowed)** may add:
 
 - `js/admin-structured-context-inspector.js` — pure render helpers, no fetch/write
 - `qa/p4-admin-structured-context-inspector-fixtures.html` — QA-only harness
 - Optional admin integration: read-only panel behind session, no buttons/forms
 
-**P4-C.2 baseline must NOT add:** edit UI, save UI, approval UI, DB writes, SQL, search index, backfill, deploy.
+**P4-C.3 baseline must NOT add:** edit UI, save UI, approval UI, DB writes, SQL, search index, backfill, deploy.
 
 ### Not live-ready
 
 **P4-C.1 activates nothing.** No admin inspector code, no schema prod wiring, no moderation workflow, no search index, no deploy.
 
-**Next:** P4-C.2 acceptance sweep or Admin Read-only Structured Field Inspector Baseline.
+**Next:** P4-C.2 acceptance sweep.
+
+---
+
+## 73. P4-C.2 — Admin Read-only Structured Field Inspector Planning Acceptance Sweep
+
+**Milestone:** P4-C.2 docs-only acceptance sweep; no code, SQL, data migration, admin integration, or deploy.
+
+### Acceptance statement
+
+**P4-C.2 acceptance sweep completed locally.** The Admin Read-only Structured Field Inspector plan is accepted as docs-only. The Inspector Scope Matrix, forbidden inspector functions, read-only inspector data pipeline, and future module structure (P4-C.3 baseline) are accepted. No code, data, SQL, Supabase, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §72 P4-C.1 planning gate present | `[x]` — scope matrix, forbidden functions, pipeline, module plan |
+| Inspector scope matrix (10 areas) | `[x]` — read-only display allowed; write/repair forbidden |
+| Forbidden inspector functions | `[x]` — save/edit/approve/repair/queue/promotion/inference blocked |
+| Inspector data pipeline | `[x]` — clone → contract → schema report → render; no writes |
+| Future P4-C.3 module structure | `[x]` — render helpers + QA fixture; optional admin read-only |
+| Supporting docs aligned | `[x]` — moderation, promotion, search hints present |
+| No admin inspector code | `[x]` — no `admin-structured-context-inspector.js` in repo |
+| Schema still QA-fixture-only | `[x]` — no prod script wiring |
+| P3 / prod regression smoke | `[x]` — HTTP 200; Staff/Ember 0 sections without preview/probe |
+| Code / data / deploy changes | `[x]` — docs-only sweep |
+
+### Next candidate
+
+**P4-C.3 — Admin Read-only Structured Field Inspector Baseline** — read-only render helpers + QA fixture; optional admin panel behind session; not production deploy without **LAUNCH-0**.
 
 ---

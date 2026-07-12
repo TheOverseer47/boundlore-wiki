@@ -1438,6 +1438,31 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-C.2 — Admin Read-only Structured Field Inspector Planning Acceptance Sweep
+
+**Milestone:** P4-C.2 docs-only acceptance sweep; no code, SQL, data migration, admin integration, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P4-C.1 planning gate accepted | `[x]` |
+| Inspector scope matrix accepted | `[x]` |
+| Forbidden inspector functions accepted | `[x]` |
+| Inspector data pipeline accepted | `[x]` |
+| Future P4-C.3 module structure accepted | `[x]` |
+| No admin inspector code integration | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-C.2 acceptance sweep completed locally.** The Admin Read-only Structured Field Inspector plan is accepted as docs-only. The Inspector Scope Matrix, forbidden inspector functions, read-only inspector data pipeline, and future module structure are accepted. No code, data, SQL, Supabase, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+**Next candidate:** **P4-C.3 Admin Read-only Structured Field Inspector Baseline**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

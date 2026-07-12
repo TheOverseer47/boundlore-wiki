@@ -108,6 +108,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-C.1 planning gate:** Admin Inspector is not a search index. Validation and inspection reports are display-only and must not be indexed. Search/facet activation for structured fields remains a separate gate.
 
+**P4-C.2 acceptance sweep:** Admin Inspector planning accepted locally. Search/index activation remains blocked.
+
 ---
 
 ## Goals
