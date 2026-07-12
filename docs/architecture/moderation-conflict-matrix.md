@@ -187,6 +187,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P3-K.1:** Probe panel has no admin/create/edit/moderation controls; query-param gated on localhost only.
 
+**P3-L.1:** P3 read-only context layer integration confirms P3 fields have no admin/create/edit/moderation flows until separate P4/P5 gate.
+
 ---
 
 ---

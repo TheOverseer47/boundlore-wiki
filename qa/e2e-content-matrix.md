@@ -1265,6 +1265,31 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-L.1 — P3 Read-only Context Layer Final Integration Gate
+
+**Milestone:** P3-L.1 docs-only final integration gate; no code, SQL, data migration, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P3-A through P3-K stack documented as accepted | `[x]` |
+| P3 Layer Integration Matrix (A–K) | `[x]` |
+| Accepted / Not Activated Matrix | `[x]` |
+| Preview + Contract + Sample + Probe integration documented | `[x]` |
+| QA Staff/Ember baseline without preview/probe | `[x]` — 0 sections/banner/probe |
+| Harness regression (sample/contract/guard/probe links) | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Next recommended area: P4-A.1 Authoring & Moderation Planning | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P3-L.1 integration gate completed locally.** P3-A through P3-K accepted as a cohesive read-only context layer. Preview, data contract, sample data gate, and real entry probe integrate without writes. Still not live-ready; LAUNCH-0 required before push/deploy.
+
+**Next candidate:** P3-L.2 acceptance sweep, then **P4-A.1 Structured Context Authoring & Moderation Planning Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

@@ -1923,3 +1923,84 @@ LAUNCH-0 must verify (when executed later):
 **P3-L Planning Gate** or Real-Data Probe Final Integration Gate — not production deploy without **LAUNCH-0**.
 
 ---
+
+## 66. P3-L.1 — P3 Read-only Context Layer Final Integration Gate
+
+**Milestone:** P3-L.1 docs-only final integration gate; no code, SQL, data migration, or deploy.
+
+### P3 Layer Integration Matrix
+
+| Layer | Status | Zweck | Aktivierung | Produktionsstatus |
+|-------|--------|-------|-------------|-------------------|
+| P3-A Context Renderer | Accepted | Read-only explicit context sections rendern | Echte Detailseite, nur bei expliziten Context-Feldern | Keine Actions, keine Writes |
+| P3-B Renderer Fixtures | Accepted | Synthetische QA-only Renderer-Verifikation | `qa/` harness only | Nicht produktiv verlinkt |
+| P3-C Preview Adapter | Accepted | Synthetische Preview-Daten lokal testen | `localhost` + `p3_context_preview` | Production guarded |
+| P3-D Preview Matrix | Accepted | 4×11 Preview-Matrix | `qa/` harness only | Nicht produktiv verlinkt |
+| P3-E Production Guard | Accepted | Blockiert Preview außerhalb localhost | Guard API auf Detailseite | boundlore-Hosts blockiert |
+| P3-F Preview Final Acceptance | Accepted | Preview Layer final geschlossen | Docs/acceptance | Kein Deploy |
+| P3-G Blueprint Gap/Data Binding Plan | Accepted | Real-Data-Plan ohne Code | Docs-only | Nicht live-ready |
+| P3-H Data Contract | Accepted | `root`/`meta`/`discovery_payload`/`structured_context` read-only normalisieren | Echte Entry-Pipeline | No writes, no promotion, explicit-only |
+| P3-I Local Sample Data Gate | Accepted | Lokale vollständige Sample Entries durch echte Pipeline | `qa/` harness only | Nicht produktiv verlinkt |
+| P3-J Real-Data Safety Plan | Accepted | Real-Data/Launch-Safety planen | Docs-only | LAUNCH-0 weiterhin Pflicht |
+| P3-K Real Entry Probe | Accepted | Echte bestehende Entries diagnostics-only inspizieren | `localhost` + `p3_contract_probe` | boundlore-Hosts blockiert, no writes |
+
+### Accepted / Not Activated Matrix
+
+| Bereich | Accepted | Produktiv aktiviert? | Begründung |
+|---------|----------|----------------------|------------|
+| Read-only Context Renderer | Ja | Defensiv ja, explicit-only | Ohne explizite Felder keine Sections |
+| Synthetic Preview | Ja | Nein | localhost + query-param + guard only |
+| Data Contract | Ja | Defensiv ja | Normalisiert nur vorhandene safe fields; no writes |
+| Sample Data Harnesses | Ja | Nein | qa-only, nicht verlinkt |
+| Real Entry Probe | Ja | Nein | localhost + query-param only |
+| Admin/Create/Edit/Moderation für P3 Fields | Nein | Nein | Separater P4/P5 Gate nötig |
+| Search Index für P3 Fields | Nein | Nein | Separates Search-Gate nötig |
+| Migration/Backfill | Nein | Nein | Separates Data-Safety-/Migration-Gate nötig |
+| Deploy/Live | Nein | Nein | LAUNCH-0 zwingend vorher |
+
+### Integrated local stack (P3-A through P3-K)
+
+End-to-end detail pipeline (read-only):
+
+1. **Raw entry** captured before enrich (`post-detail.js`)
+2. **Data Contract** normalizes explicit fields only (`BoundLoreContextDataContract`)
+3. **Preview Adapter** optional synthetic overlay (`localhost` + `p3_context_preview`; production guarded)
+4. **Context Renderer** renders explicit sections only (`BoundLoreContextSectionRenderer`)
+5. **Real Entry Probe** optional diagnostics panel (`localhost` + `p3_contract_probe`; no writes)
+
+**Regression baseline unchanged:** QA Staff / Ember / Ogre / Swamp without preview/probe → 0 context sections, 0 banner, 0 probe panel.
+
+### Next major development area (post P3-L)
+
+| Option | Ziel | Vorteil | Risiko |
+|--------|------|---------|--------|
+| **A — P4 Admin/Create/Edit Planning** | P2/P3-Felder später sicher erfassbar machen | Content-Erstellung wird möglich | Write-Flows, Moderation, Datenintegrität |
+| **B — P4 Search/Index Planning** | P2/P3 Context-Felder durchsuchbar/filterbar | Browse/Search-Nutzen steigt | Indexing, Cache, Performance, falsche Inferenz |
+| **C — P4 Real Data Authoring Strategy** | Entscheiden, wie Contract-Felder in Entries kommen | Grundlage für Admin/Create/Edit/Search | Migration/Backfill/Moderation |
+
+**Empfehlung:** **P4-A.1 — Structured Context Authoring & Moderation Planning Gate**
+
+- Search ergibt erst Sinn, wenn Daten verlässlich erfasst werden.
+- Real Data braucht sichere Authoring-/Moderation-Regeln.
+- Write-Flows müssen vor jeder echten Content-Produktion sauber geplant werden.
+- Weiterhin kein Deploy ohne **LAUNCH-0**.
+
+### STOPP — Not live-ready
+
+**Wir sind nach P3-L noch NICHT live-ready.**
+
+Vor Push/Deploy/Live ist zwingend erforderlich:
+
+- P4/P5 Entscheidung für Authoring/Moderation oder bewusster Verzicht
+- Search/Index-Entscheidung oder bewusster Verzicht
+- Data Safety Review
+- Production QA
+- Supabase Environment Check
+- Admin State Check
+- Cache/Rollback Plan
+- **LAUNCH-0 Gate**
+- Bewusste manuelle Push-/Deploy-Freigabe
+
+**P3-L.1 integration gate completed locally.** Recommended next: **P3-L.2 acceptance sweep**, then **P4-A.1 Structured Context Authoring & Moderation Planning Gate**.
+
+---

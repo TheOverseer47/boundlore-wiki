@@ -98,6 +98,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-K.1:** Real entry contract probe renders diagnostics only; not a search index or backend search activation.
 
+**P3-L.1:** P3 read-only context layer integration confirms P3 is not a search-index gate; backend/index activation remains blocked.
+
 ---
 
 ## Goals

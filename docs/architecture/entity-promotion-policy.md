@@ -148,6 +148,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-K.1:** Real entry contract probe is read-only inspection only; no promotion or inference from loaded entries.
 
+**P3-L.1:** P3 read-only context layer integration confirms no P3 component may trigger promotion, inference, or entity creation.
+
 ---
 
 ## Missing Entry Queue
