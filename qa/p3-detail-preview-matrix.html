@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>QA-only P3 Detail Preview Matrix - BoundLore</title>
+<link rel="stylesheet" href="/css/style.css" />
+<style>
+  .qa-matrix-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+  .qa-matrix-banner {
+    background: #1a2332;
+    border: 1px solid #3d5166;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .qa-matrix-banner h1 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+  }
+  .qa-matrix-banner p {
+    margin: 4px 0;
+    color: #b8c5d4;
+    font-size: 0.95rem;
+  }
+  .qa-matrix-summary {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+  }
+  .qa-matrix-summary p {
+    margin: 4px 0;
+  }
+</style>
+</head>
+<body>
+<div class="qa-matrix-page bl-qa-preview-matrix">
+  <header class="qa-matrix-banner">
+    <h1>QA-only local preview matrix — P3 Detail Context Preview</h1>
+    <p><strong>Not linked from wiki navigation.</strong> Localhost preview URLs only. No Supabase. No posts. No data writes.</p>
+    <p>P3-D.1 detail preview matrix QA harness for P3-C preview adapter.</p>
+    <p>Open links manually — no iframe autoloads, no automatic side effects.</p>
+  </header>
+
+  <div id="previewMatrixSummary" class="qa-matrix-summary">Loading matrix…</div>
+  <div id="previewMatrixRoot"></div>
+</div>
+
+<script src="/qa/p3-detail-preview-matrix.js?v=1"></script>
+</body>
+</html>

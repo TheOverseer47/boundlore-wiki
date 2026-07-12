@@ -122,6 +122,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-C.2 acceptance sweep:** Preview adapter accepted locally. localhost + query-param only; no promotion, no inference, no production activation.
 
+**P3-D.1 preview matrix:** `qa/p3-detail-preview-matrix.html` — QA-only link catalog for all preview modes × QA detail pages; not in navigation.
+
 ---
 
 ## Missing Entry Queue

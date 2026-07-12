@@ -1336,3 +1336,22 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-C.2 acceptance sweep completed locally.** The local detail-page context preview adapter is accepted as localhost-only, query-param-only, ephemeral, read-only preview. Positive preview modes render expected sections; negative modes and no-query pages remain empty. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced. boundlore.com untouched.
 
 ---
+
+## 51. P3-D.1 — Detail Preview Matrix QA Harness
+
+**Status:** Complete (local QA-only preview matrix; link catalog; no posts, no DB writes, no deploy).
+
+| Area | Result |
+|------|--------|
+| Preview matrix | `qa/p3-detail-preview-matrix.html` + `qa/p3-detail-preview-matrix.js` |
+| Coverage | 4 entries × 11 modes = 44 localhost preview URLs |
+| Entries | QA Staff, QA Ember, QA Ogre, Swamp |
+| Modes | no_preview, resource/observation/creature/requirement/versioning/all, negative_*, off |
+| Expected behavior | Documented per mode (sections/banner counts) |
+| Policy | QA-only; not in navigation; no iframes; manual link open only |
+| QA regressions | Without preview: 0 sections/banners on QA pages |
+| Not built | Production navigation, Supabase writes, auto-preview, deploy |
+
+**P3-D.1:** QA-only preview matrix catalogs all localhost detail-page preview URLs with expected behavior. P3-C preview remains localhost-gated.
+
+---

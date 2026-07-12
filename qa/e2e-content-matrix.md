@@ -926,6 +926,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-D.1 — Detail Preview Matrix QA Harness
+
+**Milestone:** P3-D first brick; QA-only preview URL matrix for P3-C; no posts, no DB writes, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Matrix page | `/qa/p3-detail-preview-matrix.html` | HTTP 200; QA-only banner | `[x]` |
+| Entries | matrix page | 4 entries (Staff/Ember/Ogre/Swamp) | `[x]` |
+| Modes | matrix page | 11 modes per entry, 44 links | `[x]` |
+| Link safety | matrix page | no admin/create/edit links; no buttons/forms | `[x]` |
+| Expected docs | matrix page | sections/banner counts per mode | `[x]` |
+| Sample positive preview | Staff/Ember/Ogre/Swamp + modes | banner + expected sections | `[x]` |
+| Sample negative preview | negative_source_detail/name_only/empty | 0 sections | `[x]` |
+| Without preview | QA Staff/Ember/Ogre/Swamp | 0 sections, 0 banner | `[x]` |
+| Production regressions | browse/resources/items/search/admin | HTTP 200; baseline unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-D.1:** QA-only preview matrix catalogs localhost detail-page preview URLs with expected behavior. Not linked from production navigation. P3-C preview remains localhost-gated.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
