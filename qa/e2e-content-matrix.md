@@ -949,6 +949,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-D.2 — Detail Preview Matrix Acceptance Sweep
+
+**Milestone:** P3-D foundation block (D.1 + D.2); QA-only preview matrix acceptance; no code, no SQL, no data migration, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Matrix page | `/qa/p3-detail-preview-matrix.html` | HTTP 200; QA-only banner; 44 links | `[x]` |
+| Link safety | matrix page | no admin/create/edit; no buttons/forms | `[x]` |
+| Entry/mode coverage | `__P3DetailPreviewMatrix` | 4 entries; 11 modes each | `[x]` |
+| Sample positive preview | Staff/Ember/Ogre/Swamp + modes | banner + expected sections | `[x]` |
+| Sample negative preview | negative_source_detail/name_only/empty | 0 sections | `[x]` |
+| Without preview | QA Staff/Ember/Ogre/Swamp | 0 sections, 0 banner | `[x]` |
+| PreviewAdapter safety | Staff + `?p3_context_preview=all` | no mutation; no unsafe HTML | `[x]` |
+| Fixture regression | `/qa/p3-context-renderer-fixtures.html` | 8/8 fixtures; 12/12 assertions | `[x]` |
+| Production regressions | browse/resources/items/search/admin + QA posts | HTTP 200; baseline unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-D.2 acceptance sweep completed locally.** The QA-only detail preview matrix is accepted. It covers QA Staff, QA Ember, QA Ogre, and Swamp across all preview modes with local detail-page links only. Positive preview modes render expected sections; negative/off/no-preview states remain empty. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced. P3-C preview remains localhost-gated.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

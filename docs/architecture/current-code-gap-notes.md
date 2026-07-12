@@ -1355,3 +1355,25 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-D.1:** QA-only preview matrix catalogs all localhost detail-page preview URLs with expected behavior. P3-C preview remains localhost-gated.
 
 ---
+
+## 52. P3-D.2 — Detail Preview Matrix Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; read-only verification; docs-only commit; no code/data changes; no deploy).
+
+| Area | Result |
+|------|--------|
+| Matrix page | `/qa/p3-detail-preview-matrix.html` — HTTP 200; QA-only banner; 44 links |
+| Link safety | 0 admin/create/edit links; 0 buttons/forms; only `p3-detail-preview-matrix.js` loaded |
+| Entry/mode coverage | 4 entries × 11 modes via `__P3DetailPreviewMatrix` globals |
+| Sample positive preview | Staff/Ember/Ogre/Swamp — banner + expected section counts (1 or 5 for `all`) |
+| Sample negative preview | negative_source_detail/name_only/empty_unknown → 0 sections + banner |
+| Without preview | QA Staff/Ember/Ogre/Swamp: 0 `.bl-p3-context-section`, 0 `.bl-p3-preview-banner` |
+| PreviewAdapter safety | localhost gate; no entry mutation; rendered HTML has no button/form/admin/create/edit |
+| Fixture regression | `/qa/p3-context-renderer-fixtures.html` — 8/8 fixtures, 12/12 assertions |
+| Production regressions | 20/20 URLs HTTP 200; baseline unchanged |
+| Admin | HTTP 200; in-browser read-only dashboard not re-run (session-dependent) |
+| Not activated | Production navigation links, Supabase writes, posts, admin/create/edit flows, deploy |
+
+**P3-D.2 acceptance sweep completed locally.** The QA-only detail preview matrix is accepted. It covers QA Staff, QA Ember, QA Ogre, and Swamp across all preview modes with local detail-page links only. Positive preview modes render expected sections; negative/off/no-preview states remain empty. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced. P3-C preview remains localhost-gated; separate launch gate required before deploy.
+
+---

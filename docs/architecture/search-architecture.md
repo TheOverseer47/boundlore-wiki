@@ -74,6 +74,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-D.1 preview matrix:** QA-only localhost preview URL catalog; no search/index changes.
 
+**P3-D.2 acceptance sweep:** Preview matrix accepted locally. Search baseline unchanged; preview not indexed.
+
 ---
 
 ## Goals
