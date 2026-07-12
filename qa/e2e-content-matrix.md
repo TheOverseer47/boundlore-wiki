@@ -996,6 +996,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-E.2 — Preview Production Guard Acceptance Sweep
+
+**Milestone:** P3-E foundation block (E.1 + E.2); production guard acceptance; no code, no SQL, no data migration, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Guard page | `/qa/p3-preview-guard-safety.html` | HTTP 200; 12/12 PASS | `[x]` |
+| Hostname API | console | localhost only; 127.0.0.1/boundlore blocked | `[x]` |
+| Location API | console | localhost+valid active; off/unknown/malicious inactive | `[x]` |
+| Link safety | guard page | no admin/create/edit; no buttons/forms | `[x]` |
+| Preview regression | QA Staff + modes | all/resource/negative/off/no-preview | `[x]` |
+| Matrix regression | `/qa/p3-detail-preview-matrix.html` | 44 links; 4×11 modes | `[x]` |
+| Fixture regression | `/qa/p3-context-renderer-fixtures.html` | 8/8 fixtures; 12/12 assertions | `[x]` |
+| Production regressions | browse/resources/items/search/admin + QA posts | HTTP 200; baseline unchanged | `[x]` |
+| Without preview | QA Staff/Ember/Ogre/Swamp | 0 sections, 0 banner | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-E.2 acceptance sweep completed locally.** The preview production guard is accepted. Preview remains active only for exact localhost plus a valid p3_context_preview query mode. 127.0.0.1, boundlore.com, www.boundlore.com, preview.boundlore.com, unknown/off/no-query, and malicious query values remain inactive. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

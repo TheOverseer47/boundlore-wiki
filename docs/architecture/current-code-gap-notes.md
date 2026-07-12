@@ -1395,3 +1395,23 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-E.1:** Preview production guard safety baseline enforces exact localhost + valid query mode. Separate launch gate still required before deploy.
 
 ---
+
+## 54. P3-E.2 — Preview Production Guard Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; read-only verification; docs-only commit; no code/data changes; no deploy).
+
+| Area | Result |
+|------|--------|
+| Guard page | `/qa/p3-preview-guard-safety.html` — 12/12 cases PASS |
+| Hostname API | `localhost` allowed; `127.0.0.1`, `0.0.0.0`, boundlore hosts, external blocked |
+| Location API | Active only for localhost + valid mode; off/unknown/malicious/no-query inactive |
+| Preview regression | QA Staff all/resource/negative/off/no-preview unchanged |
+| Matrix regression | 44 links; 4 entries × 11 modes |
+| Fixture regression | 8/8 fixtures; 12/12 assertions |
+| Production regressions | 22/22 URLs HTTP 200; QA pages 0 sections/banners without preview |
+| Admin | HTTP 200; in-browser read-only not re-run (session-dependent) |
+| Not activated | Production preview, Supabase writes, posts, admin/create/edit flows, deploy |
+
+**P3-E.2 acceptance sweep completed locally.** The preview production guard is accepted. Preview remains active only for exact localhost plus a valid p3_context_preview query mode. 127.0.0.1, boundlore.com, www.boundlore.com, preview.boundlore.com, unknown/off/no-query, and malicious query values remain inactive. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced.
+
+---

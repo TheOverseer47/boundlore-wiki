@@ -128,6 +128,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-E.1 production guard:** Preview allowed only on exact `localhost` + valid `p3_context_preview` mode. `127.0.0.1` and boundlore.com hosts blocked. QA guard page under `/qa/`.
 
+**P3-E.2 acceptance sweep:** Production guard accepted locally. Preview remains localhost + query-param only; no promotion, no inference, no production activation.
+
 ---
 
 ## Missing Entry Queue
