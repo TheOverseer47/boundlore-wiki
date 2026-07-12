@@ -1415,3 +1415,23 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-E.2 acceptance sweep completed locally.** The preview production guard is accepted. Preview remains active only for exact localhost plus a valid p3_context_preview query mode. 127.0.0.1, boundlore.com, www.boundlore.com, preview.boundlore.com, unknown/off/no-query, and malicious query values remain inactive. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced.
 
 ---
+
+## 55. P3-F.1 — Preview Layer Final Integration & Readiness Gate
+
+**Status:** Complete (local integration gate; read-only verification; docs-only commit; no code/data changes; no deploy).
+
+| Layer | Component | Result |
+|-------|-----------|--------|
+| P3-A | `js/context-section-renderer.js` — read-only explicit-only sections | Integrated on post detail |
+| P3-B | `qa/p3-context-renderer-fixtures.html` — synthetic fixture harness | 8/8 fixtures; 12/12 assertions |
+| P3-C | `js/context-preview-adapter.js` — localhost query-param overlay | Synthetic/ephemeral; no entry mutation |
+| P3-D | `qa/p3-detail-preview-matrix.html` — preview URL matrix | 4 entries × 11 modes; 44 links; QA-only |
+| P3-E | `qa/p3-preview-guard-safety.html` — production guard | 12/12 cases; exact localhost only |
+| Integration smoke | Staff/Ember/Ogre/Swamp + preview modes | Positive modes render; negative/off/no-preview empty |
+| Console acceptance | CSR + CPA + promotion/inference guards | All guards false; no unsafe HTML |
+| Production regressions | 29/29 URLs HTTP 200; QA pages 0 sections/banners without preview |
+| Not built | Real P2 data binding, production preview, admin/create/edit flows, deploy |
+
+**P3-F.1 integration gate completed locally.** The P3 preview layer from renderer through fixtures, detail preview adapter, preview matrix, and production guard is integrated and ready for final acceptance. The layer remains read-only, explicit-only, synthetic/ephemeral, localhost-only, query-param-only, production-guarded, and disconnected from admin/create/edit/moderation flows. Separate launch/data-safety gate required before deploy. Next: P3-F.2 final acceptance sweep or controlled planning for real read-only data binding (still no write flows).
+
+---

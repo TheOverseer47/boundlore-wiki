@@ -80,6 +80,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-E.2 acceptance sweep:** Production guard accepted locally. Search baseline unchanged; preview not indexed.
 
+**P3-F.1 integration gate:** P3 preview layer integrated locally. No search/index changes; preview not indexed.
+
 ---
 
 ## Goals

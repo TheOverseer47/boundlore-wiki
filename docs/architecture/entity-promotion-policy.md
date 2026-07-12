@@ -130,6 +130,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-E.2 acceptance sweep:** Production guard accepted locally. Preview remains localhost + query-param only; no promotion, no inference, no production activation.
 
+**P3-F.1 integration gate:** P3-A through P3-E integrated locally. Preview layer read-only, explicit-only, synthetic, localhost-gated, production-guarded. Launch gate required before deploy.
+
 ---
 
 ## Missing Entry Queue
