@@ -114,6 +114,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-C.4 acceptance sweep:** Admin Inspector baseline accepted locally. Search/index activation remains blocked.
 
+**P4-D.1 draft flow planning:** Draft payloads and pending structured changes are not search-indexed. Search/facet activation for accepted writes remains a separate gate after moderation and write approval.
+
 ---
 
 ## Goals

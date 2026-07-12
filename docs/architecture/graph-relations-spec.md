@@ -58,6 +58,8 @@
 
 **P3-A.2 acceptance sweep:** Context renderer accepted locally. Existing Drop/Recipe/Relation UI unchanged; no new relations or contribution flows.
 
+**P4-D.1 draft flow planning:** Structured context drafts must not persist derived inverse relations or mutate relation graphs directly. Proposed field changes are section-scoped; relation changes require a separate relation/contribution policy gate (`ContributionIntentRegistry` unchanged in P4-D.1).
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

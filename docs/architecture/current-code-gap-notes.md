@@ -2101,7 +2101,7 @@ When write flows are implemented (not in P4-A.1):
 | P4-B.1 | Structured Context Schema & Validation Baseline | Later code possible | Validators/schemas only; no writes |
 | P4-B.2 | Acceptance Sweep | docs-only | |
 | P4-C.1 | Admin Read-only Structured Field Inspector Planning Gate | **Accepted — docs-only** | Inspector scope/pipeline planned; no code |
-| P4-D.1 | Structured Contribution Draft Flow Planning | Later docs/code | No real approvals yet |
+| P4-D.1 | Structured Contribution Draft Flow Planning Gate | **Current — docs-only** | Draft lifecycle, payload, intents, conflicts; no submit |
 
 **Write flows** (admin edit, create with fields, contribution approve) come only after: schema, validation, conflict policy, evidence/audit policy, and separate data-safety gate.
 
@@ -2426,5 +2426,116 @@ P4-C.3 does **not** modify `wiki/admin/index.html`, `admin-dashboard.js`, or oth
 ### Next candidate
 
 **P4-D.1 — Structured Contribution Draft Flow Planning Gate** — docs-only planning; not production deploy without **LAUNCH-0**.
+
+---
+
+## 76. P4-D.1 — Structured Contribution Draft Flow Planning Gate
+
+**Milestone:** P4-D.1 docs-only contribution draft planning gate; no code, SQL, data migration, contribution UI, submit flows, or deploy.
+
+### Context
+
+- **P4-C** Admin Read-only Structured Field Inspector is **accepted** (`BoundLoreAdminStructuredContextInspector`, QA-fixture-only).
+- **P4-B** schema/validation baseline is **accepted** (`BoundLoreStructuredContextSchema`, `BoundLoreContextDataContract`).
+- **P4-D begins with draft/contribution planning only** — no Contribution UI, no Draft Submit, no Save, no Approve/Reject, no queue actions.
+- **Goal (future):** safe structured field suggestions as reviewable drafts before any entry mutation.
+- **Still not live-ready** — LAUNCH-0 mandatory before any push/deploy/live action.
+
+### Draft lifecycle matrix
+
+| Draft state | Purpose | Data status | Allowed action later | Activated now? |
+|-------------|---------|-------------|----------------------|----------------|
+| `not_started` | No draft exists | No draft data | Start draft | **No** |
+| `local_draft` | User/admin fills structured fields locally | Browser/UI state only | Validate / discard | **No** |
+| `validated_draft` | Draft passes schema validation | Not persisted | Submit for review | **No** |
+| `blocked_draft` | Forbidden/unknown/derived/unsafe fields | Not persistable | Correct / discard | **No** |
+| `submitted_pending` | Draft stored as pending contribution | DB pending state | Moderator review | **No** |
+| `conflict_review` | Draft conflicts with existing field value | Pending + conflict metadata | Moderator field-level review | **No** |
+| `approved` | Moderator accepts change | Would mutate entry | Separate write gate only | **No** |
+| `rejected_archived` | Moderator rejects draft | Pending archived | Separate moderation gate only | **No** |
+
+### Draft payload contract (planned)
+
+| Payload field | Purpose | Required? | Validation | May auto-create post? |
+|---------------|---------|-----------|------------|------------------------|
+| `target_entry_id` / `target_slug` | Target entry | Yes | Must reference existing entry | **No** |
+| `target_section` | Structured section key | Yes | Known section from `BoundLoreStructuredContextSchema` | **No** |
+| `field_changes` | Proposed structured fields | Yes | Known authorable/planned fields only; not forbidden/system_only | **No** |
+| `source_snapshot` | Read-only snapshot of current values | Recommended | Clone only; no mutation | **No** |
+| `evidence` | Source/proof/confidence | Recommended or required per field | EvidenceRank / confidence policy | **No** |
+| `reason` | Short rationale | Optional | Safe text; no inference | **No** |
+| `validation_report` | `BoundLoreStructuredContextSchema` output | Required before submit | Must not contain blocked issues | **No** |
+| `conflict_report` | Old vs new comparison | When conflict detected | Field-level conflict policy | **No** |
+| `audit_metadata` | Who/when/context | Required later | Auth/session dependent | **No** |
+
+### Contribution intent mapping (planned — not activated)
+
+| Context section | Future intent (reserved) | Status now | Special conflict notes |
+|-----------------|--------------------------|------------|-------------------------|
+| Resource Node | `suggest_resource_node_context` | planned/reserved | `node_type`, acquisition source conflicts |
+| Observation Context | `suggest_observation_context` | planned/reserved | coordinates/location/weather/time conflicts; no PLACE promotion |
+| Creature Encounter | `suggest_creature_encounter_context` | planned/reserved | behavior/drop/weakness/resistance conflicts |
+| Requirement Unlock | `suggest_requirement_unlock_context` | planned/reserved | level/faction/unlock conflicts; no post creation |
+| Versioning | `suggest_version_context` | planned/reserved/restricted | valid_from/valid_until/changed_in conflicts; no patch auto-action |
+| Quest/Event | `suggest_quest_event_context` | planned/reserved | objective/reward/occurrence conflicts |
+| Economy | `suggest_economy_context` | planned/reserved | price/vendor/stock/availability conflicts; no shop post |
+
+**Important:** No new intents activated in P4-D.1. `ContributionIntentRegistry` unchanged. Existing `add_recipe` pending conflict remains baseline only.
+
+### Field-level conflict policy (planned)
+
+- Same field, same value → duplicate / no-op
+- Same field, different value → conflict (requires review)
+- Array field additive overlap → possible merge candidate, review only
+- Object field partial change → field-level diff required
+- Restricted fields → always require review
+- Planned fields → no production submit without separate gate
+- Unknown fields → block
+- Forbidden fields → block
+- Derived fields (`_derived` / `__derived`) → block
+- `source_detail`-only → block
+- Name-only inference (e.g. “QA Staff of Fire” → fire weakness) → block
+- coordinates/location_ref → PLACE promotion → block
+- requirement fields → post/entity creation → block
+- economy/vendor fields → shop post creation → block
+- versioning fields → patch/admin auto-action → block
+
+### Moderation review requirements (planned)
+
+A future moderator view would need read-only access to:
+
+- Target entry identity
+- Affected section and field status (authorable/restricted/planned/forbidden)
+- Old values vs proposed values
+- Validation report from `BoundLoreStructuredContextSchema`
+- Evidence/confidence summary
+- Conflict report (field-level)
+- Risk hints (promotion, inference, relation impact, search/index impact, migration/backfill need)
+
+**P4-D.1 provides no review UI**, no buttons, no queue actions, no Approve/Reject, no data changes.
+
+### Planned draft pipeline (future baseline — not P4-D.1)
+
+1. Load target entry read-only + `source_snapshot`
+2. User fills `field_changes` in local draft UI (future)
+3. `BoundLoreStructuredContextSchema.createValidationReport` → `validated_draft` or `blocked_draft`
+4. Optional `BoundLoreAdminStructuredContextInspector.createInspectorReport` for preview (read-only)
+5. On submit (future gate): persist as `submitted_pending` with evidence + audit metadata
+6. Conflict detector compares snapshot vs proposal → `conflict_review` if needed
+7. Moderator approve/reject (future separate gate) — never auto-approve from validation pass alone
+
+### Recommended sequence
+
+| Phase | Task | Type | Notes |
+|-------|------|------|-------|
+| **P4-D.1** | Structured Contribution Draft Flow Planning Gate | **Current — docs-only** | This gate |
+| P4-D.2 | Acceptance Sweep | docs-only | Confirms draft plan |
+| P4-D.3+ | Draft UI / submit / moderation baselines | Later code/docs | Separate gates each |
+
+### Not live-ready
+
+**P4-D.1 activates nothing.** No contribution UI, no draft submit, no save, no approve/reject, no queue mutation, no search index, no deploy.
+
+**Next:** P4-D.2 acceptance sweep.
 
 ---

@@ -203,6 +203,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P4-C.4 acceptance sweep:** Admin Inspector baseline accepted locally. No moderation workflow, queue actions, or write-path activation. Pending `add_recipe` untouched.
 
+**P4-D.1 draft flow planning:** Structured contribution drafts are planning-only. Field-level structured conflicts are planned; existing `add_recipe` recipe conflict remains baseline only. No new approval flows activated. Pending `add_recipe` untouched.
+
 ---
 
 ---

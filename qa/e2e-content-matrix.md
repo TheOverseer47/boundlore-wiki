@@ -1516,6 +1516,33 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-D.1 — Structured Contribution Draft Flow Planning Gate
+
+**Milestone:** P4-D.1 docs-only contribution draft planning gate; no code, SQL, data migration, contribution UI, submit flows, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P4-C inspector baseline accepted | `[x]` |
+| Draft lifecycle matrix documented | `[x]` |
+| Draft payload contract planned | `[x]` |
+| Contribution intent mapping planned | `[x]` |
+| Field-level conflict policy planned | `[x]` |
+| Moderation review requirements planned | `[x]` |
+| No contribution UI activated | `[x]` |
+| No draft submit/save flows activated | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-D.1 planning gate completed locally.** Structured contribution draft flow is planned as docs-only: draft lifecycle, payload contract, reserved intent mapping, field-level conflict policy, and moderation review requirements. No contribution UI, no draft submit, no save/approve/reject, no queue actions, no search index. Existing `add_recipe` pending conflict remains baseline. Project remains not live-ready; LAUNCH-0 mandatory before push/deploy.
+
+**Next candidate:** P4-D.2 Acceptance Sweep. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

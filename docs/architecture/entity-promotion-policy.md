@@ -164,6 +164,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-C.4 acceptance sweep:** Admin Inspector baseline accepted locally. All promotion/post policy functions remain false; no production admin integration.
 
+**P4-D.1 draft flow planning:** Structured contribution drafts must not trigger promotion or auto-create missing entries. Wood/Forge remain missing-entry queue items until a separate promotion gate. Drafts may propose explicit structured fields only; no entity lifecycle transition from draft validation alone.
+
 ---
 
 ## Missing Entry Queue
