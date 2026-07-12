@@ -2112,3 +2112,32 @@ When write flows are implemented (not in P4-A.1):
 **Next:** P4-A.2 acceptance sweep.
 
 ---
+
+## 69. P4-A.2 — Structured Context Authoring & Moderation Acceptance Sweep
+
+**Milestone:** P4-A.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+### Acceptance statement
+
+**P4-A.2 acceptance sweep completed locally.** The structured context authoring and moderation plan is accepted as docs-only. The Authorable Field Matrix, Flow Matrix, Safety Rules, and recommended P4 sequence are accepted. No code, data, SQL, Supabase, admin/create/edit/moderation, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action. Next recommended step: **P4-B.1 Structured Context Schema & Validation Baseline**.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §68 P4-A.1 planning gate present | `[x]` — matrices, safety rules, P4 sequence, not live-ready |
+| Authorable Field Matrix (7 sections) | `[x]` — explicit paths, moderation, forbidden derivations |
+| Flow Matrix (6 flows) | `[x]` — all not activated; prerequisites documented |
+| Safety Rules (12 rules) | `[x]` — intent, validation, moderation, no auto-promotion, LAUNCH-0 |
+| P4 sequence A.1 → D.1 | `[x]` — writes deferred until schema/validation/conflict/evidence |
+| Supporting docs (promotion/search/moderation) | `[x]` — P4-A.1 hints aligned |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| P3 regression baseline (Staff/Ember) | `[x]` — 0 sections/banner/probe without preview/probe |
+| Harness smoke (sample/probe links) | `[x]` — HTTP 200 |
+| Code / data / deploy changes | `[x]` — none |
+
+### Next candidate
+
+**P4-B.1 — Structured Context Schema & Validation Baseline** — validators/schemas only; no writes; not production deploy without **LAUNCH-0**.
+
+---

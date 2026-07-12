@@ -1336,6 +1336,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-A.2 — Structured Context Authoring & Moderation Acceptance Sweep
+
+**Milestone:** P4-A.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P4-A.1 planning gate accepted | `[x]` |
+| Authorable Field Matrix accepted | `[x]` |
+| Flow Matrix accepted | `[x]` |
+| Safety Rules accepted | `[x]` |
+| P4 sequence accepted | `[x]` |
+| No write/admin/moderation/search activated | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-A.2 acceptance sweep completed locally.** The structured context authoring and moderation plan is accepted as docs-only. The Authorable Field Matrix, Flow Matrix, Safety Rules, and recommended P4 sequence are accepted. No code, data, SQL, Supabase, admin/create/edit/moderation, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action. Next recommended step: **P4-B.1 Structured Context Schema & Validation Baseline**.
+
+**Next candidate:** **P4-B.1 Structured Context Schema & Validation Baseline**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
