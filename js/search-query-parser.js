@@ -34,6 +34,20 @@ window.BoundLoreSearchQueryParser = (function() {
     { pattern: /\bboss\s+event/i, group: "event_type", value: "boss_spawn", entitySubtype: "event" },
   ];
 
+  const ECONOMY_KEYWORD_HINTS = [
+    { pattern: /\bmerchant\b/i, group: "npc_service", value: "vendor", entitySubtype: "npc" },
+    { pattern: /\bsold\s+by\b/i, group: "economy_context", value: "sold_by" },
+    { pattern: /\bsells?\b/i, group: "trade_offer", value: "sell" },
+    { pattern: /\bprice\b/i, group: "economy_context", value: "price" },
+    { pattern: /\bcost\b/i, group: "economy_context", value: "cost" },
+    { pattern: /\bcurrency\b/i, group: "economy_context", value: "currency" },
+    { pattern: /\bgold\b/i, group: "currency", value: "gold" },
+    { pattern: /\breputation\s+vendor\b/i, group: "npc_service", value: "faction_rep", entitySubtype: "npc" },
+    { pattern: /\bfaction\s+vendor\b/i, group: "npc_service", value: "faction_rep", entitySubtype: "npc" },
+    { pattern: /\bevent\s+currency\b/i, group: "currency", value: "event_currency" },
+    { pattern: /\bseasonal\s+vendor\b/i, group: "availability", value: "seasonal", entitySubtype: "npc" },
+  ];
+
   const MISSING_ENTRY_TERMS = ["wood", "forge"];
 
   function escapeHtml(value) {
@@ -204,6 +218,22 @@ window.BoundLoreSearchQueryParser = (function() {
     return bucket.list;
   }
 
+  function extractEconomyHints(query) {
+    const raw = String(query || "");
+    const bucket = createHintBucket();
+    ECONOMY_KEYWORD_HINTS.forEach(function(entry) {
+      if (entry.pattern.test(raw)) {
+        addHint(bucket, entry.group, entry.value, "keyword");
+        if (entry.entitySubtype) addHint(bucket, "entity_subtype", entry.entitySubtype, "economy");
+        if (entry.group === "currency") addHint(bucket, "currency", entry.value, "keyword");
+      }
+    });
+    if (/\bvendor\b/i.test(raw) && !/\bnpc\s+vendor/i.test(raw)) {
+      addHint(bucket, "economy_context", "vendor", "keyword");
+    }
+    return bucket.list;
+  }
+
   function extractEntityTypeHints(query) {
     const bucket = createHintBucket();
     const raw = String(query || "");
@@ -267,12 +297,14 @@ window.BoundLoreSearchQueryParser = (function() {
     const relationHints = extractRelationIntentHints(raw);
     const facetHints = extractFacetHints(raw);
     const questEventHints = extractQuestEventHints(raw);
+    const economyHints = extractEconomyHints(raw);
     const entityTypeHints = extractEntityTypeHints(raw);
     const acquisitionIntent = extractAcquisitionIntent(raw);
     const missingEntryIntent = extractMissingEntryIntent(raw);
     const allFacetHints = mergeHintBuckets(
       { list: facetHints, _seen: new Set(facetHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: questEventHints, _seen: new Set(questEventHints.map(function(h) { return h.group + ":" + h.value; })) },
+      { list: economyHints, _seen: new Set(economyHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: entityTypeHints, _seen: new Set(entityTypeHints.map(function(h) { return h.group + ":" + h.value; })) }
     );
 
@@ -287,10 +319,11 @@ window.BoundLoreSearchQueryParser = (function() {
       tokens: tokenizeSearchQuery(raw),
       residual: residual,
       free_text: residual || normalized,
-      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, entityTypeHints),
+      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, entityTypeHints),
       relation_hints: relationHints,
       entity_type_hints: entityTypeHints,
       quest_event_hints: questEventHints,
+      economy_hints: economyHints,
       usage_intent: usageIntent,
       crafting_intent: craftingIntent,
       acquisition_intent: acquisitionIntent,

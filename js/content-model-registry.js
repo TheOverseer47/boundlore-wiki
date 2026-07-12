@@ -17,7 +17,8 @@ window.BoundLoreContentModelRegistry = (function() {
 
   const NPC_FIELDS = [
     "faction", "roles", "capabilities", "location_refs", "dialogue_refs",
-    "vendor_inventory", "trainer_for", "quest_refs", "schedule", "evidence", "versioning",
+    "vendor_inventory", "trainer_for", "quest_refs", "schedule", "economy_context",
+    "evidence", "versioning",
   ];
 
   const QUEST_FIELDS = [
@@ -308,6 +309,9 @@ window.BoundLoreContentModelRegistry = (function() {
           out.schema = BoundLoreQuestEventRegistry.normalizeEventModelRecord(source);
         } else if (def.key === "BEING:npc") {
           out.schema = BoundLoreQuestEventRegistry.normalizeNpcModelRecord(source);
+          if (typeof BoundLoreEconomyRegistry !== "undefined") {
+            out.economy = BoundLoreEconomyRegistry.normalizeEconomyContext(source);
+          }
         }
       } catch (err) {
         /* schema enrichment optional */

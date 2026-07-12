@@ -32,6 +32,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-B.2 acceptance sweep:** P2-B.2 acceptance sweep completed; Quest objectives, rewards, event occurrences, and NPC services accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration. P2-B foundation block accepted locally.
 
+**P2-C.1 code baseline:** `js/economy-registry.js` — trade offers, price/currency/availability/stock normalization, vendor inventory context. Structured fields only; **no** shop UI, **no** posts by default, **no** SQL. `sold_by` remains reserved.
+
 ---
 
 ## Goals

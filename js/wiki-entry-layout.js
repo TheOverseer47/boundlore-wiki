@@ -1600,6 +1600,18 @@ window.WikiEntryLayout = (function() {
         questEventContext = null;
       }
     }
+    let economyContext = null;
+    if (typeof BoundLoreEconomyRegistry !== "undefined" && BoundLoreEconomyRegistry.resolveEconomyContext) {
+      try {
+        economyContext = BoundLoreEconomyRegistry.resolveEconomyContext({
+          meta: meta,
+          post: post,
+          discovery_payload: payload,
+        });
+      } catch (err) {
+        economyContext = null;
+      }
+    }
 
     return {
       post: post,
@@ -1625,6 +1637,7 @@ window.WikiEntryLayout = (function() {
       })(),
       contentModelContext: contentModelContext,
       questEventContext: questEventContext,
+      economyContext: economyContext,
       supplementalHtml: "",
     };
   }

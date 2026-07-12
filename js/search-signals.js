@@ -416,6 +416,29 @@ window.BoundLoreSearchSignals = (function() {
     return bucket.signals;
   }
 
+  function collectEconomySearchSignals(post, meta) {
+    const bucket = { signals: [], _seen: new Set() };
+    if (typeof BoundLoreEconomyRegistry === "undefined") {
+      return bucket.signals;
+    }
+    const source = Object.assign({}, meta || {}, {
+      meta: meta || {},
+      post: post || {},
+    });
+    try {
+      BoundLoreEconomyRegistry.extractEconomySearchSignals(source).forEach(function(entry) {
+        if (!entry || !entry.raw) return;
+        pushSignal(bucket, entry.raw, { group: "economy", label: entry.label || "Economy" });
+        if (entry.label && entry.label !== entry.raw) {
+          pushSignal(bucket, entry.label, { group: "economy", label: entry.group || "Vendor" });
+        }
+      });
+    } catch (err) {
+      return bucket.signals;
+    }
+    return bucket.signals;
+  }
+
   function buildDisplayLabels(post, meta, signalGroups) {
     const labels = [];
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {
@@ -459,6 +482,7 @@ window.BoundLoreSearchSignals = (function() {
       profession_capability: collectProfessionCapabilitySearchSignals(safePost, meta),
       content_model: collectContentModelSearchSignals(safePost, meta),
       quest_event: collectQuestEventSearchSignals(safePost, meta),
+      economy: collectEconomySearchSignals(safePost, meta),
       version: collectVersionSearchSignalsForPost(safePost, meta),
       text: collectTextSignals(safePost),
     };

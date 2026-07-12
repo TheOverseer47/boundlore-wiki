@@ -372,6 +372,9 @@ window.BoundLoreQuestEventRegistry = (function() {
       location_refs: toArray(readField(source, "location_refs")).map(meaningful).filter(Boolean),
       quest_refs: toArray(readField(source, "quest_refs")).map(meaningful).filter(Boolean),
       schedule: meaningful(readField(source, "schedule")) || null,
+      economy_context: typeof BoundLoreEconomyRegistry !== "undefined"
+        ? BoundLoreEconomyRegistry.normalizeEconomyContext(source)
+        : null,
     };
   }
 

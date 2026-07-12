@@ -26,6 +26,8 @@
 
 **P2-B.2 acceptance sweep:** P2-B foundation block accepted locally. Registry/read/search baseline only; no create UI, no SQL, no data migration.
 
+**P2-C.1 economy baseline:** Offers/prices/currencies are structured fields, not posts. Vendor is NPC service context. `sold_by` remains reserved/future-safe.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

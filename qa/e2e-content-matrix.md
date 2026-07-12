@@ -496,6 +496,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-C.1 — Vendor / Economy / Trade Offer Baseline
+
+**Milestone:** P2-C economy registry; client-side only; no SQL, no shop UI, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| EconomyRegistry API | post or search page | normalize/extract/signals green | `[x]` |
+| Offer/currency/availability types | console | sell/gold/seasonal/limited etc. | `[x]` |
+| sold_by reserved | RelationsRegistry | reserved; not persisted_forward | `[x]` |
+| Search parser hints | merchant/sold by/price/gold/event currency | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/npc vendor/quest reward | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no vendor/price sections | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[ ]` |
+
+**P2-C.1:** Economy registry only. No shop UI, no posts, no SQL, no deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

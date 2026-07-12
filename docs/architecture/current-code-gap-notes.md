@@ -914,3 +914,26 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P2-B.2 acceptance sweep completed; Quest objectives, rewards, event occurrences, and NPC services accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration.** P2-B foundation block (B.1 + B.2) accepted locally. Ready for P2-C. Deployment freeze remains active.
+
+---
+
+## 31. P2-C.1 — Vendor / Economy / Trade Offer Baseline
+
+**Status:** Complete (local; economy registry + defensive reader/search tolerance; no SQL, no shop UI, no data migration).
+
+| Deliverable | Location | Notes |
+|-------------|----------|-------|
+| Economy registry | `js/economy-registry.js` | `window.BoundLoreEconomyRegistry` |
+| Trade offers | structured fields | sell/buy/barter/… — not posts |
+| Price/currency | structured values | gold/reputation/event_currency — not posts |
+| Availability/stock | structured states | available/seasonal/limited/… |
+| Vendor context | BEING/npc service | vendor_inventory + economy_context |
+| Reserved relation | `sold_by` | remains reserved; not persisted_forward |
+| Search signals | `js/search-signals.js` | low-weight `economy` group |
+| Query parser hints | merchant, sold by, price, gold, event currency, … | hint-only |
+| Reader context | `js/wiki-entry-layout.js` | `economyContext` only; no new sections |
+
+| Not built | Shop UI, marketplace, buy/sell, currency posts, price history, SQL | Deferred P2-C+ |
+| Unchanged | QA Staff/Ember/Ogre/Swamp, mining/wood/forge search, create_ui/admin_flow false | Verified locally |
+
+**Deployment freeze remains active** — no push/deploy.
