@@ -1803,6 +1803,25 @@ window.WikiEntryLayout = (function() {
         model.sourceDiscoveryHtml + "</section>";
     }
 
+    if (typeof BoundLoreContextSectionRenderer !== "undefined" &&
+        BoundLoreContextSectionRenderer.shouldRenderAnyContext) {
+      try {
+        const contextEntry = {
+          meta: model.meta,
+          post: model.post,
+          discovery_payload: model.payload,
+        };
+        if (BoundLoreContextSectionRenderer.shouldRenderAnyContext(contextEntry)) {
+          const contextHtml = BoundLoreContextSectionRenderer.renderContextSections(contextEntry, {
+            mode: "read_only",
+          });
+          if (contextHtml) html += contextHtml;
+        }
+      } catch (err) {
+        /* P3 context renderer optional */
+      }
+    }
+
     html += "</article>";
     return html;
   }

@@ -1220,3 +1220,20 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3 must activate UI in small controlled steps only.** Before any push/deploy: separate Launch/Data-Safety Gate required. Do not deploy directly from P2 acceptance.
 
 ---
+
+## 45. P3-A.1 — Read-only P2 Context Renderer Baseline
+
+**Status:** Complete (local baseline; first P3 UI brick; read-only/explicit-only; no SQL, no data migration, no deploy).
+
+| Area | Result |
+|------|--------|
+| ContextSectionRenderer | `js/context-section-renderer.js` — explicit-only P2 context sections on detail pages |
+| Integration | `wiki-entry-layout.js` hook; renders only when `shouldRenderAnyContext` true |
+| Policy | read_only; no buttons/forms/admin/create links; `shouldPromoteContextToPost` false |
+| Explicit-only | `source_detail` alone does not render resource_node; no name inference |
+| QA regressions | Staff/Ember/Ogre/Swamp unchanged (no explicit P2 section fields) |
+| Not built | Admin/create/edit/moderation UI, backend search, data migration |
+
+**P3-A.1:** First controlled P3 UI activation — detail-page read-only context renderer only. P3-B can test individual sections with real explicit data.
+
+---

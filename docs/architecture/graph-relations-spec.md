@@ -54,6 +54,8 @@
 
 **P2-I.2 final acceptance:** P2 Foundation locally complete. P3 may activate UI in controlled steps; separate launch gate before push/deploy.
 
+**P3-A.1 context renderer:** Read-only explicit-only P2 sections on detail pages. No new relations or contribution flows.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

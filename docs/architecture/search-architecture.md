@@ -60,6 +60,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-I.2 final acceptance:** P2 Foundation locally complete (P2-A … P2-I.1). Ready as base for P3 UI activation. Not deployed; boundlore.com untouched. See `current-code-gap-notes.md` §44.
 
+**P3-A.1 context renderer:** `js/context-section-renderer.js` — read-only explicit-only P2 sections on detail pages. No search/admin/create changes.
+
 ---
 
 ## Goals

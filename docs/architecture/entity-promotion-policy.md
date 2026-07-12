@@ -110,6 +110,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P2-I.2 final acceptance:** P2 Foundation locally complete (P2-A … P2-I.1). All promotion guards remain false. P3 UI activation requires separate launch gate before deploy.
 
+**P3-A.1 context renderer:** Read-only detail-page sections; explicit fields only; `shouldPromoteContextToPost` false; no automatic promotion.
+
 ---
 
 ## Missing Entry Queue

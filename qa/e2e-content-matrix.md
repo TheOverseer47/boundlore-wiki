@@ -794,6 +794,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-A.1 — Read-only P2 Context Renderer Baseline
+
+**Milestone:** P3-A first UI brick; detail-page read-only context renderer; explicit-only; no SQL, no data migration, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ContextSectionRenderer API | console on QA Staff | normalize/shouldRender/hasExplicit green | `[x]` |
+| Explicit-only guards | console | source_detail no node section; title no requirement section | `[x]` |
+| Promotion/actions | console | shouldPromoteContextToPost/shouldRenderContextActions false | `[x]` |
+| DOM on QA pages | post slugs | `.bl-p3-context-section` count 0 | `[x]` |
+| QA Staff / Ember / Ogre / Swamp | post slugs | visually unchanged | `[x]` |
+| Search regressions | qa staff/ember/ogre/mining/wood/forge | unchanged | `[x]` |
+| Wood/Forge | search/admin | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-A.1:** Read-only P2 context renderer baseline. No admin/create/edit flows. P3-B can enable section tests with explicit data.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
