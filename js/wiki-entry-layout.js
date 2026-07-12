@@ -1811,7 +1811,26 @@ window.WikiEntryLayout = (function() {
           post: model.post,
           discovery_payload: model.payload,
         };
-        if (BoundLoreContextSectionRenderer.shouldRenderAnyContext(contextEntry)) {
+        const previewAdapter = typeof BoundLoreContextPreviewAdapter !== "undefined"
+          ? BoundLoreContextPreviewAdapter
+          : null;
+        if (previewAdapter && previewAdapter.isPreviewActive && previewAdapter.isPreviewActive()) {
+          const resolvedEntry = previewAdapter.resolvePreviewEntry(contextEntry);
+          const diagnostics = previewAdapter.getPreviewDiagnostics(contextEntry);
+          if (previewAdapter.shouldShowPreviewBanner && previewAdapter.shouldShowPreviewBanner()) {
+            const bannerHtml = previewAdapter.renderPreviewBanner(
+              previewAdapter.getActivePreviewMode(),
+              diagnostics
+            );
+            if (bannerHtml) html += bannerHtml;
+          }
+          if (BoundLoreContextSectionRenderer.shouldRenderAnyContext(resolvedEntry)) {
+            const contextHtml = BoundLoreContextSectionRenderer.renderContextSections(resolvedEntry, {
+              mode: "read_only",
+            });
+            if (contextHtml) html += contextHtml;
+          }
+        } else if (BoundLoreContextSectionRenderer.shouldRenderAnyContext(contextEntry)) {
           const contextHtml = BoundLoreContextSectionRenderer.renderContextSections(contextEntry, {
             mode: "read_only",
           });

@@ -883,6 +883,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-C.1 — Local Read-only Detail Context Preview Adapter Baseline
+
+**Milestone:** P3-C first brick; localhost query-param preview on real detail pages; no posts, no DB writes, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Preview adapter API | console on QA Staff + `?p3_context_preview=all` | 26/26 checks green | `[x]` |
+| Positive preview modes | QA Staff + resource/observation/creature/requirement/versioning/all | banner + matching sections | `[x]` |
+| Negative preview modes | QA Staff + negative_source_detail/name_only/empty_unknown/off | banner or none; 0 sections | `[x]` |
+| Without preview query | QA Staff/Ember/Ogre/Swamp | 0 `.bl-p3-context-section`; visually unchanged | `[x]` |
+| DOM safety | preview pages | no buttons/forms/admin/create/edit in preview context | `[x]` |
+| Production regressions | browse/resources/items/search/admin | HTTP 200; baseline unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-C.1:** Local read-only detail context preview via `?p3_context_preview=` on localhost post pages only. Ephemeral synthetic overlay; no data writes, no posts, no production navigation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

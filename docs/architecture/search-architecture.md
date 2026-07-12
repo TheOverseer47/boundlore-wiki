@@ -68,6 +68,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-B.2 acceptance sweep:** Fixture harness accepted locally. Search baseline unchanged; no backend search/index activation.
 
+**P3-C.1 preview adapter:** Localhost query-param preview only; no search/index changes.
+
 ---
 
 ## Goals

@@ -1162,6 +1162,25 @@ a:hover { color: var(--gold-light); }
   font-size: 0.9375rem;
 }
 
+.bl-p3-preview-banner {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px dashed rgba(255, 196, 86, 0.45);
+  border-radius: 8px;
+  background: rgba(255, 196, 86, 0.08);
+}
+
+.bl-p3-preview-note {
+  margin: 0;
+  color: #e8c878;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.bl-p3-preview-note + .bl-p3-preview-note {
+  margin-top: 4px;
+}
+
 .bl-category-filters {
   margin-bottom: 14px;
   padding: 12px;

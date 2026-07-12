@@ -1295,3 +1295,22 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-B.2 acceptance sweep completed locally.** The QA-only synthetic context renderer fixture harness is accepted. Explicit synthetic fields render the expected read-only sections; source_detail-only, name-only, and empty/unknown fixtures render no sections. No production navigation, posts, data writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced. P3-C can later plan real local read-only detail-page data/preview strategy.
 
 ---
+
+## 49. P3-C.1 — Local Read-only Detail Context Preview Adapter Baseline
+
+**Status:** Complete (local localhost + query-param preview; ephemeral overlay; no posts, no DB writes, no deploy).
+
+| Area | Result |
+|------|--------|
+| PreviewAdapter | `js/context-preview-adapter.js` — `?p3_context_preview=<mode>` on localhost only |
+| Integration | `wiki-entry-layout.js` resolves preview entry without mutating original |
+| Preview modes | resource_node, observation_context, creature_encounter, requirement_unlock, versioning, all, negative_*, off |
+| Positive preview | Renders read-only context sections + local QA banner on detail pages |
+| Negative preview | Banner only; no sections for source_detail/name-only/empty fixtures |
+| Without query | QA Staff/Ember/Ogre/Swamp unchanged (0 `.bl-p3-context-section`) |
+| Policy | read_only; no writes; no admin/create/edit links; localhost_only |
+| Not built | Production navigation links, Supabase writes, real post creation, deploy preview |
+
+**P3-C.1:** Local read-only detail context preview via `?p3_context_preview=` on localhost post pages only. Before deploy, preview must remain localhost-gated or pass separate launch gate.
+
+---

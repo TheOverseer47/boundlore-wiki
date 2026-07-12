@@ -307,13 +307,6 @@ window.BoundLoreContextSectionRenderer = (function() {
       if (OC.hasExplicitLocationRef && OC.hasExplicitLocationRef(explicitSource)) return true;
       if (OC.hasConditionContext && OC.hasConditionContext(explicitSource)) return true;
     }
-    const rootConditions = ["biome_context", "time_condition", "weather_condition"];
-    for (let i = 0; i < rootConditions.length; i += 1) {
-      const val = readExplicitField(entry, rootConditions[i]);
-      if (val != null && val !== "" && meaningful(String(val)) && slugKey(String(val)) !== "unknown") {
-        return true;
-      }
-    }
     return false;
   }
 
@@ -461,12 +454,6 @@ window.BoundLoreContextSectionRenderer = (function() {
       const block = readObservationBlock(entry);
       const rootFields = ["coordinates", "location_ref"];
       rootFields.forEach(function(field) {
-        const raw = readExplicitField(entry, field);
-        if (raw == null || raw === "") return;
-        const display = formatDisplayValue(raw);
-        if (display) rows.push({ label: titleCase(field.replace(/_/g, " ")), value: raw, html: display });
-      });
-      ["biome_context", "time_condition", "weather_condition"].forEach(function(field) {
         const raw = readExplicitField(entry, field);
         if (raw == null || raw === "") return;
         const display = formatDisplayValue(raw);

@@ -26,11 +26,13 @@
       expectSections: ["observation_context"],
       data: {
         title: "Synthetic Observation Context Fixture",
-        coordinates: { x: 10, y: 20, z: 0, system: "map" },
-        location_ref: "Synthetic Cave",
-        biome_context: "cave",
-        time_condition: "nighttime",
-        weather_condition: "rain",
+        observation_context: {
+          coordinates: { x: 10, y: 20, z: 0, system: "map" },
+          location_ref: "Synthetic Cave",
+          biome_context: "cave",
+          time_condition: "nighttime",
+          weather_condition: "rain",
+        },
       },
     },
     {
