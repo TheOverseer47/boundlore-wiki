@@ -1040,6 +1040,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-F.2 — Preview Layer Final Acceptance Sweep
+
+**Milestone:** P3 preview layer final acceptance (A–F); read-only verification; no code, no SQL, no data migration, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fixture harness | `/qa/p3-context-renderer-fixtures.html` | 8/8 fixtures; 12/12 assertions | `[x]` |
+| Preview matrix | `/qa/p3-detail-preview-matrix.html` | 44 links; 4×11 modes; QA-only | `[x]` |
+| Production guard | `/qa/p3-preview-guard-safety.html` | 12/12 PASS; localhost only | `[x]` |
+| Preview smoke | Staff/Ember/Ogre/Swamp + modes | positive/negative/off/no-preview | `[x]` |
+| Console acceptance | Staff + `?p3_context_preview=all` | CSR+CPA; guards false; no mutation | `[x]` |
+| Without preview | QA Staff/Ember/Ogre/Swamp | 0 sections, 0 banner; baseline content | `[x]` |
+| Production regressions | browse/resources/items/search/admin + QA posts | 37/37 HTTP 200 | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-F.2 final acceptance sweep completed locally.** The P3 preview layer is accepted end-to-end. Renderer, fixture harness, local detail preview adapter, preview matrix, production guard, and integration gate are all green. The layer remains read-only, explicit-only, synthetic/ephemeral, localhost-only, query-param-only, production-guarded, QA-only harnessed, and disconnected from admin/create/edit/moderation flows. No production navigation, data writes, posts, Supabase writes, automatic promotion, or taxonomy inference were introduced. boundlore.com remains untouched.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

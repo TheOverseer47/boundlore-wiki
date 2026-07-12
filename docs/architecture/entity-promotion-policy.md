@@ -132,6 +132,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-F.1 integration gate:** P3-A through P3-E integrated locally. Preview layer read-only, explicit-only, synthetic, localhost-gated, production-guarded. Launch gate required before deploy.
 
+**P3-F.2 final acceptance:** P3 preview layer accepted end-to-end locally. No promotion, no inference, no production activation. boundlore.com untouched.
+
 ---
 
 ## Missing Entry Queue

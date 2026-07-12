@@ -82,6 +82,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-F.1 integration gate:** P3 preview layer integrated locally. No search/index changes; preview not indexed.
 
+**P3-F.2 final acceptance:** P3 preview layer accepted end-to-end locally. Search baseline unchanged; preview not indexed.
+
 ---
 
 ## Goals

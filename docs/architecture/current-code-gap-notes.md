@@ -1435,3 +1435,23 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-F.1 integration gate completed locally.** The P3 preview layer from renderer through fixtures, detail preview adapter, preview matrix, and production guard is integrated and ready for final acceptance. The layer remains read-only, explicit-only, synthetic/ephemeral, localhost-only, query-param-only, production-guarded, and disconnected from admin/create/edit/moderation flows. Separate launch/data-safety gate required before deploy. Next: P3-F.2 final acceptance sweep or controlled planning for real read-only data binding (still no write flows).
 
 ---
+
+## 56. P3-F.2 — Preview Layer Final Acceptance Sweep
+
+**Status:** Complete (local final acceptance; read-only verification; docs-only commit; no code/data changes; no deploy). **P3 preview layer locally accepted end-to-end.**
+
+| Area | Result |
+|------|--------|
+| P3-A Renderer | Read-only explicit-only; integrated on post detail |
+| P3-B Fixtures | 8/8 fixtures; 12/12 assertions; QA-only |
+| P3-C Preview Adapter | Synthetic/ephemeral; no entry mutation |
+| P3-D Preview Matrix | 44 links; 4×11 modes; not in navigation |
+| P3-E Production Guard | 12/12 cases; exact localhost only |
+| P3-F.1 Integration | End-to-end smoke + console acceptance green |
+| Without preview | QA Staff/Ember/Ogre/Swamp: 0 sections/banners |
+| Production regressions | 37/37 URLs HTTP 200 |
+| Not activated | Production preview, real P2 data, admin/create/edit, deploy |
+
+**P3-F.2 final acceptance sweep completed locally.** The P3 preview layer is accepted end-to-end. Renderer, fixture harness, local detail preview adapter, preview matrix, production guard, and integration gate are all green. The layer remains read-only, explicit-only, synthetic/ephemeral, localhost-only, query-param-only, production-guarded, QA-only harnessed, and disconnected from admin/create/edit/moderation flows. No production navigation, data writes, posts, Supabase writes, automatic promotion, or taxonomy inference were introduced. boundlore.com remains untouched. Separate launch/data-safety gate required before deploy.
+
+---
