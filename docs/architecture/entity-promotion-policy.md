@@ -108,6 +108,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P2-H.2 acceptance sweep:** Requirements, unlocks, progression contexts, and access states accepted as registry/read/search/facet baseline only. No unlock UI, no progression posts, no SQL, no data migration.
 
+**P2-I.2 final acceptance:** P2 Foundation locally complete (P2-A … P2-I.1). All promotion guards remain false. P3 UI activation requires separate launch gate before deploy.
+
 ---
 
 ## Missing Entry Queue

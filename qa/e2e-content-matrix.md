@@ -772,6 +772,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-I.2 — P2 Final Acceptance & P3 Readiness Gate
+
+**Milestone:** P2 foundation officially closed locally; P3 readiness documented; no SQL, no data migration, no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| P2 inventory | docs | P2-A … P2-I.1 documented and accepted | `[x]` |
+| Final browser smoke | 22 URLs + QA pages | HTTP 200; QA baseline unchanged | `[x]` |
+| Final console smoke | QA Staff | 12/12 APIs; 38/38 guards | `[x]` |
+| Search parser final | 28 queries | hint-only, no crash | `[x]` |
+| No UI/backend/SQL | code/docs | no productive activation | `[x]` |
+| Wood/Forge | search/admin | missing-entry only; no posts | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+| P3 readiness note | docs | done vs. open documented | `[x]` |
+
+**P2-I.2 final acceptance completed locally. P2-A through P2-I.1 are accepted as registry/read/search/facet foundations only. No productive UI flows, no admin actions, no SQL, no data migration, no deploy. P2 Foundation is ready to be used as the base for P3 UI activation. Remaining work: P3 UI activation, admin/moderation workflow activation, backend/search-index work, data migration strategy, production QA, deployment readiness, and launch decision.**
+
+**P2 Foundation lokal abgeschlossen — nicht deployed. boundlore.com unangetastet. Deployment Freeze aktiv.**
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

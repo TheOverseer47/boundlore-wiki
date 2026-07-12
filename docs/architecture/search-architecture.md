@@ -58,6 +58,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-I.1 integration gate:** P2-A through P2-H accepted as registry/read/search/facet foundations only. No productive UI, backend search/index, SQL, or deploy. See `current-code-gap-notes.md` §43.
 
+**P2-I.2 final acceptance:** P2 Foundation locally complete (P2-A … P2-I.1). Ready as base for P3 UI activation. Not deployed; boundlore.com untouched. See `current-code-gap-notes.md` §44.
+
 ---
 
 ## Goals

@@ -1189,3 +1189,34 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P2-I.1 integration gate completed locally. P2-A through P2-H are accepted as registry/read/search/facet foundations only. No productive UI flows, no admin actions, no SQL, no data migration, no deploy. Remaining work is UI activation, backend/search/index work, moderation workflows, data migration, and launch readiness.** Deployment freeze remains active; boundlore.com untouched.
 
 ---
+
+## 44. P2-I.2 — P2 Final Acceptance & P3 Readiness Gate
+
+**Status:** Complete (local final acceptance; docs-only gate; no SQL, no data migration, no deploy).
+
+| Final acceptance | Result |
+|------------------|--------|
+| P2-A through P2-H | All blocks documented and locally accepted as registry/read/search/facet baselines |
+| P2-I.1 integration | Verified — 12/12 APIs, promotion guards false, relation/intent safety green |
+| Final browser smoke | 22/22 URLs HTTP 200; QA Staff/Ember/Ogre/Swamp unchanged |
+| Final console smoke | 38/38 QA Staff guards; 28/28 search parser queries |
+| No productive activation | No create/admin/moderation UI, no backend search/index, no SQL, no data migration |
+| Pending `add_recipe` conflict | Not touched |
+| Deployment | P2 locally complete; **not deployed**; boundlore.com untouched |
+
+**P2-I.2 final acceptance completed locally. P2-A through P2-I.1 are accepted as registry/read/search/facet foundations only. No productive UI flows, no admin actions, no SQL, no data migration, no deploy. P2 Foundation is ready to be used as the base for P3 UI activation.**
+
+### P3 Readiness (what is done vs. open)
+
+| Done (P0.5 + P1 + P2) | Still open (P3+) |
+|------------------------|------------------|
+| Entity domain/subtype, facets, relations, evidence | Productive create/admin/moderation UI activation |
+| Content models (npc/quest/event/resource/creature) | Backend search + search index |
+| Quest/event/economy/version/node/observation/encounter/requirement registries | Data migration strategy + execution |
+| Search parser + low-weight signals | Production QA + launch decision |
+| Reader/layout tolerance; promotion guards false | Patch Mode / version editor / queue workflows |
+| Missing Entry Queue (Wood/Forge) | Deployment readiness gate before any push |
+
+**P3 must activate UI in small controlled steps only.** Before any push/deploy: separate Launch/Data-Safety Gate required. Do not deploy directly from P2 acceptance.
+
+---

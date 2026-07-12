@@ -52,6 +52,8 @@
 
 **P2-I.1 integration gate:** P2-A through P2-H accepted as registry/read/search/facet foundations only. No productive requirement/unlock relations activated.
 
+**P2-I.2 final acceptance:** P2 Foundation locally complete. P3 may activate UI in controlled steps; separate launch gate before push/deploy.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

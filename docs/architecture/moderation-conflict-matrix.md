@@ -149,3 +149,17 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 | Pending `add_recipe` conflict | Not touched |
 
 **P2-A through P2-H accepted as registry/read/search/facet foundations only. Remaining work: UI activation, backend/search/index, moderation workflows, data migration, launch readiness.**
+
+## P2-I.2 — P2 Final Acceptance & P3 Readiness Gate (local)
+
+**Status:** P2-I.2 final acceptance completed; P2 Foundation locally closed; not deployed.
+
+| Check | Result |
+|-------|--------|
+| P2 blocks P2-A … P2-I.1 | All accepted as baselines only |
+| Final smoke | 22 URLs + 38 console + 28 parser — green |
+| QA baseline | Staff/Ember/Ogre/Swamp unchanged; Wood/Forge missing-entry |
+| Pending `add_recipe` conflict | Not touched |
+| P3 readiness | Documented in current-code-gap-notes §44 |
+
+**P2 Foundation ready for P3 UI activation. No push/deploy without separate Launch/Data-Safety Gate.**
