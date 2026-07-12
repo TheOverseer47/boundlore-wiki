@@ -2312,7 +2312,7 @@ When integrated (not in P4-C.1):
 |-------|------|------|-------|
 | **P4-C.1** | Admin Read-only Structured Field Inspector Planning Gate | **Accepted — docs-only** | Inspector scope/pipeline planned |
 | **P4-C.2** | Planning Acceptance Sweep | docs-only | Confirms P4-C.1 plan |
-| P4-C.3 | Admin Read-only Structured Field Inspector Baseline | Later read-only code | Render helpers + QA fixture; optional admin panel |
+| P4-C.3 | Admin Read-only Structured Field Inspector Baseline | **Current — read-only code** | Render helpers + QA fixture; no admin HTML |
 | P4-D.1 | Structured Contribution Draft Flow Planning | docs-only | No real approvals yet |
 
 **P4-C.3 baseline (when code allowed)** may add:
@@ -2357,5 +2357,45 @@ When integrated (not in P4-C.1):
 ### Next candidate
 
 **P4-C.3 — Admin Read-only Structured Field Inspector Baseline** — read-only render helpers + QA fixture; optional admin panel behind session; not production deploy without **LAUNCH-0**.
+
+---
+
+## 74. P4-C.3 — Admin Read-only Structured Field Inspector Baseline
+
+**Milestone:** P4-C.3 read-only inspector baseline; no admin HTML integration, SQL, data migration, queue/repair writes, search index, backfill, posts, push, or deploy.
+
+### Module
+
+- **`js/admin-structured-context-inspector.js`** — `window.BoundLoreAdminStructuredContextInspector`
+- **Inspector version:** `p4-c3`
+- **Policy:** `read_only`, `diagnostics_only`, `no_writes`, `no_mutation`, `no_actions`, `no_queue_actions`, `no_repair_actions`, `no_post_creation`, `no_promotion`, `no_search_index`, `no_admin_write_flows`
+
+### Pipeline (read-only)
+
+1. Clone entry (no mutation)
+2. `BoundLoreContextDataContract.extractAllContractContext` + contract diagnostics
+3. Build schema input from extracted `structured_context` sections
+4. `BoundLoreStructuredContextSchema.createValidationReport`
+5. Render read-only inspector panels (identity, raw sources, contract, validation, issues, field status, policy flags)
+
+**Policy functions (all return `false`):** `shouldWriteInspectorData`, `shouldRenderInspectorActions`, `shouldModifyQueue`, `shouldTriggerRepair`, `shouldCreateMissingEntry`, `shouldCreatePost`, `shouldPromoteEntity`, `shouldUpdateSearchIndex`.
+
+### QA fixture (local only)
+
+- **`qa/p4-admin-structured-context-inspector-fixtures.html`** + **`.js`**
+- Fixtures A–J (positive A–E, negative F–I, empty J)
+- Exposes `window.__P4AdminStructuredContextInspectorFixtures`
+- Loads DataContract + StructuredContextSchema + Inspector only
+- **Not linked from wiki navigation**; **not loaded on `/wiki/admin/`**
+
+### No prod admin integration
+
+P4-C.3 does **not** modify `wiki/admin/index.html`, `admin-dashboard.js`, or other admin write surfaces. Admin integration remains a separate future gate behind existing session.
+
+### Not live-ready
+
+**P4-C.3 activates nothing on production paths.** No admin dashboard wiring, no schema prod wiring, no moderation workflow, no search index, no deploy.
+
+**Next:** P4-C.4 acceptance sweep.
 
 ---

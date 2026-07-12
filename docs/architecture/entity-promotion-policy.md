@@ -160,6 +160,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-C.2 acceptance sweep:** Admin Inspector planning accepted locally. No promotion paths activated.
 
+**P4-C.3 inspector baseline:** Inspector renders validation only; `shouldPromoteEntity` and `shouldCreatePost` always false. No promotion from inspector output.
+
 ---
 
 ## Missing Entry Queue

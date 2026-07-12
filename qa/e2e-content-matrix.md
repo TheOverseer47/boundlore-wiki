@@ -1463,6 +1463,31 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-C.3 — Admin Read-only Structured Field Inspector Baseline
+
+**Milestone:** P4-C.3 read-only inspector baseline; no admin HTML integration, SQL, data migration, queue/repair writes, search index, backfill, posts, push, or deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Inspector module loaded | `qa/p4-admin-structured-context-inspector-fixtures.html` | `BoundLoreAdminStructuredContextInspector` object | `[x]` |
+| Uses DataContract + Schema | fixture harness | both APIs present | `[x]` |
+| Policy functions | console on fixture page | all `should*` return `false` | `[x]` |
+| Positive fixtures A–E | fixture harness | identity/contract/validation visible | `[x]` |
+| Negative fixtures F–I | fixture harness | blocked/warning as expected | `[x]` |
+| Empty fixture J | fixture harness | safe report, no crash | `[x]` |
+| 10/10 PASS | fixture harness | `allPass === true` | `[x]` |
+| Mutation safe | console | entry unchanged after report | `[x]` |
+| Rendering safe | fixture DOM | no button/form/input/action links | `[x]` |
+| No prod admin wiring | `/wiki/admin/` | inspector script not loaded | `[x]` |
+| P3/P4 regression | existing harnesses | unchanged PASS | `[x]` |
+| Not live-ready documented | gap notes §74 | yes | `[x]` |
+
+**P4-C.3 inspector baseline:** `js/admin-structured-context-inspector.js` merges DataContract extraction and StructuredContextSchema validation into read-only inspector reports. QA fixture runs A–J locally. No admin dashboard integration, no writes, no queue/repair actions, no search index. Project remains not live-ready; LAUNCH-0 mandatory before push/deploy.
+
+**Next candidate:** P4-C.4 Acceptance Sweep. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
