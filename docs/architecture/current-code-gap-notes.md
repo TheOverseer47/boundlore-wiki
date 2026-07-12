@@ -1237,3 +1237,23 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-A.1:** First controlled P3 UI activation — detail-page read-only context renderer only. P3-B can test individual sections with real explicit data.
 
 ---
+
+## 46. P3-A.2 — Read-only P2 Context Renderer Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; read-only verification; no code/data changes; no deploy).
+
+| Area | Result |
+|------|--------|
+| ContextSectionRenderer API | 46/46 console acceptance checks green on QA Staff |
+| Policy | read-only; explicit-only; `shouldRenderContextActions`/`shouldPromoteContextToPost` false |
+| Explicit-only guards | `source_detail` alone no resource_node; title no fire/weakness/requirement inference |
+| Cross-registry guards | Resource/observation/creature/requirement promotion guards false |
+| DOM safety | `.bl-p3-context-section` count 0 on QA Staff/Ember/Ogre/Swamp |
+| QA regressions | Staff/Ember/Ogre/Swamp visually unchanged; Drop/Recipe/Relation UI unchanged |
+| Search/resources | 23/23 URLs HTTP 200; mining/raw/unknown show QA Ember; node_type filter unchanged |
+| Admin | read-only; Access Denied without session (not repaired) |
+| Not activated | Admin/create/edit/moderation UI, backend search, data migration, P3-B test posts |
+
+**P3-A.2 acceptance sweep completed locally.** The read-only P2 context renderer is accepted as an explicit-only detail-page renderer. It creates no actions, buttons, forms, admin/create/edit links, posts, data changes, automatic promotion, or taxonomy inference. QA baseline pages remain visually unchanged without explicit P2 context fields. P3-B can later test individual context sections with real explicit data.
+
+---

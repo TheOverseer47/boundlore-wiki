@@ -56,6 +56,8 @@
 
 **P3-A.1 context renderer:** Read-only explicit-only P2 sections on detail pages. No new relations or contribution flows.
 
+**P3-A.2 acceptance sweep:** Context renderer accepted locally. Existing Drop/Recipe/Relation UI unchanged; no new relations or contribution flows.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

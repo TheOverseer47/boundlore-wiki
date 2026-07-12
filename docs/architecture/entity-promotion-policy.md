@@ -112,6 +112,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-A.1 context renderer:** Read-only detail-page sections; explicit fields only; `shouldPromoteContextToPost` false; no automatic promotion.
 
+**P3-A.2 acceptance sweep:** Context renderer accepted locally as read-only/explicit-only detail-page baseline. No promotion, no inference, no admin/create/edit links. QA pages unchanged without explicit P2 fields.
+
 ---
 
 ## Missing Entry Queue

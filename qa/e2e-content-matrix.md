@@ -814,6 +814,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-A.2 — Read-only P2 Context Renderer Acceptance Sweep
+
+**Milestone:** P3-A acceptance sweep; read-only verification; no code/data changes; no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ContextSectionRenderer API | console on QA Staff | 46/46 normalize/policy/explicit/render/security green | `[x]` |
+| Explicit-only guards | console | source_detail no node; title no fire/weakness/requirement | `[x]` |
+| Promotion/actions | console | shouldPromote*/shouldRenderContextActions false | `[x]` |
+| Cross-registry guards | console | RN/OC/CE/RU promotion guards false | `[x]` |
+| DOM on QA pages | Staff/Ember/Ogre/Swamp | `.bl-p3-context-section` count 0 | `[x]` |
+| DOM safety | QA pages | no buttons/forms/admin/create/edit links in `.bl-p3-context` | `[x]` |
+| QA Staff / Ember / Ogre / Swamp | post slugs | visually unchanged | `[x]` |
+| Search/resources regressions | 23 URLs | HTTP 200; baseline unchanged | `[x]` |
+| Resources filters | mining/raw/unknown/node_type | QA Ember visible; no false node hits | `[x]` |
+| Wood/Forge | search/admin | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` Access Denied |
+
+**P3-A.2 acceptance sweep completed locally.** The read-only P2 context renderer is accepted as an explicit-only detail-page renderer. It creates no actions, buttons, forms, admin/create/edit links, posts, data changes, automatic promotion, or taxonomy inference. QA baseline pages remain visually unchanged without explicit P2 context fields. P3-B can later test individual context sections with real explicit data.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

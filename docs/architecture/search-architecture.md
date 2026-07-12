@@ -62,6 +62,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-A.1 context renderer:** `js/context-section-renderer.js` — read-only explicit-only P2 sections on detail pages. No search/admin/create changes.
 
+**P3-A.2 acceptance sweep:** Context renderer accepted locally. Search baseline unchanged; no backend search/index activation.
+
 ---
 
 ## Goals
