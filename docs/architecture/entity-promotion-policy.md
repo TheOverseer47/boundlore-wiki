@@ -176,6 +176,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-F.4 acceptance sweep:** Draft preview baseline accepted locally. All promotion/post policy functions remain false; no production draft preview integration.
 
+**P4-G.1 final integration gate:** P4 added no promotion flows. Missing Entries remain unresolved until a separate gate.
+
 ---
 
 ## Missing Entry Queue

@@ -1738,6 +1738,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-G.1 — P4 Final Integration Gate
+
+**Milestone:** P4-G.1 docs-only final integration gate; confirms P4-A through P4-F accepted; no productive activation, writes, SQL, deploy, or push.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| P4 sequence A–F accepted | docs | all gates documented | `[x]` |
+| P4 module pipeline | docs §84 | DataContract → Schema → Inspector → Draft Contract → Preview | `[x]` |
+| P4 Final Safety Matrix | docs | all P4 components QA-only or unchanged | `[x]` |
+| P4 Non-Activation Matrix | docs | no prod UI/flows activated | `[x]` |
+| Draft Preview harness | QA fixture | 15/15 PASS | `[x]` |
+| Draft Contract harness | QA fixture | 15/15 PASS | `[x]` |
+| Admin Inspector harness | QA fixture | 10/10 PASS | `[x]` |
+| Schema harness | QA fixture | 13/13 PASS | `[x]` |
+| P3 regression | QA harnesses | sample 10/10, contract 9/9+17/17, renderer 8/8+12/12, guard 12/12, probe 16 links | `[x]` |
+| Prod paths | wiki/post/admin | no P4 draft/inspector/schema scripts | `[x]` |
+| Policy functions | P4 modules | all `should*` false | `[x]` |
+| No writes / no posts / no search index | — | unchanged | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Not live-ready | docs | documented | `[x]` |
+| Code / data / deploy | — | docs-only gate | `[x]` |
+
+**P4-G.1 final integration gate completed locally.** P4 Foundation is accepted. P4-A through P4-F are fully documented and accepted. All P4 modules remain read-only/diagnostics-only/validates-only and QA-fixture-only with no productive admin/contribution/draft-preview integration. No code, data, SQL, Supabase, UI activation, submit/save/approve/reject/archive flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. Project remains **not live-ready**; **LAUNCH-0** mandatory before any push/deploy/live action.
+
+**STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
+
+**Next candidates:** **P5-A.1 Productive Activation Planning Gate** or **LAUNCH-0 Preflight Planning Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

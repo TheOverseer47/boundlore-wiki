@@ -70,6 +70,8 @@
 
 **P4-F.4 acceptance sweep:** Draft preview baseline accepted locally. No relation graph persistence from preview validation.
 
+**P4-G.1 final integration gate:** P4 added no derived inverse persistence. Relation changes remain a separate gate.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

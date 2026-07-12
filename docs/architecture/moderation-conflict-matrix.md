@@ -217,6 +217,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P4-F.4 acceptance sweep:** Draft preview baseline accepted locally. No moderation workflow, queue actions, or write-path activation. Pending `add_recipe` untouched.
 
+**P4-G.1 final integration gate:** P4 Foundation accepted locally. P4 added no new approval flows. Pending `add_recipe` conflict remains baseline.
+
 ---
 
 ---

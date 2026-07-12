@@ -2893,3 +2893,130 @@ The future Draft Inspector / Preview must **NOT**:
 **P4 Final Integration Gate** — not production deploy without **LAUNCH-0**.
 
 ---
+
+## 84. P4-G.1 — P4 Final Integration Gate
+
+**Milestone:** P4-G.1 docs-only final integration gate; confirms P4-A through P4-F as accepted read-only foundation; no code, SQL, data migration, productive activation, or deploy.
+
+### P4 sequence accepted
+
+| Gate | Milestone | Status |
+|------|-----------|--------|
+| P4-A.1 | Structured Context Authoring & Moderation Planning | **Accepted — docs-only** |
+| P4-A.2 | Authoring & Moderation Acceptance Sweep | **Accepted — docs-only** |
+| P4-B.1 | Structured Context Schema & Validation Baseline | **Accepted — read-only code** |
+| P4-B.2 | Schema & Validation Acceptance Sweep | **Accepted — docs-only** |
+| P4-C.1 | Admin Read-only Structured Field Inspector Planning | **Accepted — docs-only** |
+| P4-C.2 | Inspector Planning Acceptance Sweep | **Accepted — docs-only** |
+| P4-C.3 | Admin Read-only Structured Context Inspector Baseline | **Accepted — read-only code** |
+| P4-C.4 | Inspector Acceptance Sweep | **Accepted — docs-only** |
+| P4-D.1 | Structured Contribution Draft Flow Planning | **Accepted — docs-only** |
+| P4-D.2 | Draft Flow Acceptance Sweep | **Accepted — docs-only** |
+| P4-E.1 | Structured Contribution Draft Contract Baseline | **Accepted — read-only code** |
+| P4-E.2 | Draft Contract Acceptance Sweep | **Accepted — docs-only** |
+| P4-F.1 | Structured Contribution Draft Preview Planning | **Accepted — docs-only** |
+| P4-F.2 | Draft Preview Planning Acceptance Sweep | **Accepted — docs-only** |
+| P4-F.3 | Structured Contribution Draft Preview Baseline | **Accepted — read-only code** |
+| P4-F.4 | Draft Preview Acceptance Sweep | **Accepted — docs-only** |
+| **P4-G.1** | **P4 Final Integration Gate** | **Current — docs-only** |
+
+### P4 module pipeline (read-only foundation)
+
+1. **`BoundLoreContextDataContract`** (P3, existing)
+   - Extracts structured context data read-only from entry root/meta/discovery_payload/structured_context
+   - Powers P3 detail renderer and probe; no writes
+
+2. **`BoundLoreStructuredContextSchema`** (P4-B.1, `p4-b1`)
+   - Validates sections/fields against authorable/restricted/planned rules
+   - Blocks forbidden/system_only/unknown/derived/unsafe cases
+   - Writes nothing; QA-fixture-only on prod paths
+
+3. **`BoundLoreAdminStructuredContextInspector`** (P4-C.3, `p4-c3`)
+   - Renders admin-near diagnostics read-only (DataContract + Schema reports)
+   - QA-fixture-only; no admin dashboard integration
+
+4. **`BoundLoreStructuredContributionDraftContract`** (P4-E.1, `p4-e1`)
+   - Validates local draft payloads; normalizes draft states
+   - Produces conflict/validation reports; writes nothing; QA-fixture-only
+
+5. **`BoundLoreStructuredContributionDraftPreview`** (P4-F.3, `p4-f3`)
+   - Renders draft reports, field-level diffs, issues, policy flags read-only
+   - Uses Draft Contract + Schema (+ optional Inspector); QA-fixture-only; no prod integration
+
+**Pipeline flow:** Entry/Draft → DataContract resolve → Schema validate → (Inspector diagnostics) → Draft Contract report → Draft Preview render. All stages clone inputs, return reports, and keep all `should*` policy functions **false**.
+
+### P4 Final Safety Matrix
+
+| P4 component | Status | Produktiv geladen? | Writes möglich? | Accepted? |
+|--------------|--------|--------------------|-----------------|-----------|
+| ContextDataContract | Existing P3 read-only contract | Ja — P3 detail pipeline only (read-only) | Nein | Ja |
+| StructuredContextSchema | QA-only validation baseline (`p4-b1`) | Nein | Nein | Ja |
+| AdminStructuredContextInspector | QA-only read-only inspector (`p4-c3`) | Nein | Nein | Ja |
+| StructuredContributionDraftContract | QA-only draft contract (`p4-e1`) | Nein | Nein | Ja |
+| StructuredContributionDraftPreview | QA-only draft preview (`p4-f3`) | Nein | Nein | Ja |
+| ContributionIntentRegistry | Existing registry unchanged | Wie vor P4 | Keine neuen active suggest_* | Unverändert |
+| Admin Dashboard | Existing admin only | Ja — pre-P4 surfaces | Keine neuen P4-Writes | Unchanged |
+| Search Index | Unchanged | Wie vor P4 | Nein | Unchanged |
+
+### P4 Non-Activation Matrix
+
+**Nicht aktiviert in P4:**
+
+- Produktiver Admin Inspector
+- Produktive Draft Preview
+- Contribution UI / Draft UI
+- Submit / Save / Approve / Reject / Archive Flows
+- Queue Flow / Repair Flow (via P4 modules)
+- Create/Edit Structured Field UI
+- Search Index für strukturierte Context Fields
+- Backfill / DB Migration / SQL / Supabase Writes
+- Entity Promotion / Missing Entry Creation
+- Wood/Forge Post Creation
+- Taxonomy Inference / Derived inverse relation persistence
+- Deploy / Push / Launch
+
+### Verified locally (P4-G.1 sweep)
+
+| Check | Result |
+|-------|--------|
+| P4-A through P4-F documented and accepted | `[x]` |
+| P4 module pipeline consistent | `[x]` |
+| All P4 modules read-only/diagnostics/validates-only | `[x]` |
+| QA harness: Draft Preview 15/15 | `[x]` |
+| QA harness: Draft Contract 15/15 | `[x]` |
+| QA harness: Admin Inspector 10/10 | `[x]` |
+| QA harness: Schema 13/13 | `[x]` |
+| P3 regression: Sample 10/10, Contract 9/9+17/17, Renderer 8/8+12/12, Guard 12/12, Probe 16 links | `[x]` |
+| Prod paths: no P4 schema/inspector/draft/preview scripts | `[x]` |
+| QA Staff/Ember/Ogre/Swamp ohne Probe: 0 Sections/Banner/Probe | `[x]` |
+| All P4 `should*` policy functions false | `[x]` |
+| No fetch/write/Supabase in P4 modules | `[x]` |
+| `add_recipe` pending conflict baseline | `[x]` — untouched |
+| Not live-ready | `[x]` |
+| Code / data / deploy changes | `[x]` — docs-only gate |
+
+### P4 Foundation accepted
+
+**P4 Foundation is accepted locally.** P4 is **not Launch**, **not productive activation**, and **not live-ready**. P4 is a read-only / validation / preview / draft-contract foundation layer. Productive activation requires a separate **P5 Product Activation Gate**. Push/deploy requires **LAUNCH-0**.
+
+**Current safe status:**
+
+- Local only
+- No writes (via P4 modules)
+- No deploy / no live
+- No search index / no backfill
+- No admin write flow (via P4)
+- No contribution submit flow (via P4)
+
+### STOPP — before Push/Deploy/Live
+
+**STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
+
+**Next candidates (planning only, not auto-started):**
+
+- **P5-A.1 Productive Activation Planning Gate**
+- **LAUNCH-0 Preflight Planning Gate**
+
+**LAUNCH-0** mandatory before any push/deploy/live action.
+
+---

@@ -126,6 +126,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-F.4 acceptance sweep:** Draft preview baseline accepted locally. Search/index activation remains blocked.
 
+**P4-G.1 final integration gate:** P4 added no indexing/backfill. Structured draft/preview outputs are not indexed.
+
 ---
 
 ## Goals
