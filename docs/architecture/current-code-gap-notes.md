@@ -2004,3 +2004,37 @@ Vor Push/Deploy/Live ist zwingend erforderlich:
 **P3-L.1 integration gate completed locally.** Recommended next: **P3-L.2 acceptance sweep**, then **P4-A.1 Structured Context Authoring & Moderation Planning Gate**.
 
 ---
+
+## 67. P3-L.2 — P3 Read-only Context Layer Final Acceptance Sweep
+
+**Milestone:** P3-L.2 docs-only final acceptance sweep; no code, SQL, data migration, or deploy.
+
+### Acceptance statement
+
+**P3-L.2 acceptance sweep completed locally.** The P3 read-only context layer is accepted as an integrated local stack from renderer through preview, data contract, sample data gate, real-data safety planning, and real entry probe. No code, data, SQL, Supabase, admin/create/edit/moderation, search-index, migration/backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action. Next recommended area: **P4-A.1 Structured Context Authoring & Moderation Planning Gate**.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §66 P3-L.1 integration gate present | `[x]` — layer matrix A–K, accepted/not-activated matrix, pipeline, P4-A.1, STOPP/LAUNCH-0 |
+| P3-A through P3-K stack accepted | `[x]` — cohesive read-only context layer |
+| Preview/Contract/Sample/Probe integration | `[x]` — end-to-end pipeline unchanged |
+| QA Staff/Ember/Ogre/Swamp baseline | `[x]` — 0 sections/banner/probe without preview/probe |
+| Preview mini-smoke (Staff `p3_context_preview=all`) | `[x]` — 1 banner, 5 sections, 0 probe |
+| Probe mini-smoke (Staff `p3_contract_probe=1`) | `[x]` — 1 probe, 0 sections, 0 banner |
+| Preview + probe combined | `[x]` — 1 banner, 5 sections, 1 probe |
+| Sample / contract / renderer / guard / probe links | `[x]` — 10/10; 9/9 17/17; 8/8 12/12; 12/12; 16 links |
+| Standard URL smoke | `[x]` — 14/14 HTTP 200 |
+| Not activated: admin/moderation, search index, migration, deploy | `[x]` — documented in §66 |
+| Code / data / deploy changes | `[x]` — none |
+
+### P3 layer — final accepted status
+
+**P3 Read-only Context Layer: FINAL ACCEPTED locally.** Production activation remains blocked for preview/probe on non-localhost hosts, admin/create/edit/moderation, search index, migration/backfill, and deploy until separate P4/P5 gates and **LAUNCH-0**.
+
+### Next candidate
+
+**P4-A.1 — Structured Context Authoring & Moderation Planning Gate** — not production deploy without **LAUNCH-0**.
+
+---

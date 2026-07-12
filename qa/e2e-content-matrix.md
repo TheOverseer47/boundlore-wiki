@@ -1290,6 +1290,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-L.2 — P3 Read-only Context Layer Final Acceptance Sweep
+
+**Milestone:** P3-L.2 docs-only final acceptance sweep; no code, SQL, data migration, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P3-L.1 integration gate accepted | `[x]` |
+| P3-A through P3-K final stack accepted | `[x]` |
+| Preview/Contract/Sample/Probe layer complete | `[x]` |
+| Preview/Probe mini-smoke | `[x]` |
+| Harness regression green | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P3-L.2 acceptance sweep completed locally.** The P3 read-only context layer is accepted as an integrated local stack from renderer through preview, data contract, sample data gate, real-data safety planning, and real entry probe. No code, data, SQL, Supabase, admin/create/edit/moderation, search-index, migration/backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action. Next recommended area: **P4-A.1 Structured Context Authoring & Moderation Planning Gate**.
+
+**Next candidate:** **P4-A.1 Structured Context Authoring & Moderation Planning Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
