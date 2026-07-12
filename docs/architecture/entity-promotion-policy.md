@@ -142,6 +142,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-I.1 sample data gate:** `qa/p3-readonly-sample-data.html` — QA-only local sample entries prove explicit contract fields render via DataContract → Renderer pipeline. No posts, no writes, no promotion. `_derived` entries skip root extraction. P3-I.2 acceptance sweep follows.
 
+**P3-I.2 acceptance sweep:** Local read-only sample data gate accepted. Positive samples render via real pipeline; negatives and derived-only stay empty. Next: P3-J planning gate or controlled real-data read-only gate.
+
 ---
 
 ## Missing Entry Queue

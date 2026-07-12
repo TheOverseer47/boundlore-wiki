@@ -1691,3 +1691,32 @@ Read-only, explicit-only, no writes, no posts, no Supabase, no admin/create/edit
 **Next:** P3-I.2 acceptance sweep.
 
 ---
+
+## 61. P3-I.2 — Local Read-only Sample Data Acceptance Sweep
+
+**Milestone:** P3-I.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+### Acceptance statement
+
+**P3-I.2 acceptance sweep completed locally.** The QA-only local read-only sample data gate is accepted. Positive local sample entries render expected context sections through the real DataContract → ContextSectionRenderer pipeline, while source_detail-only, name-only, derived-only, and empty/unknown samples render no sections. No production navigation, data writes, posts, Supabase writes, admin/create/edit/moderation flows, search indexing, automatic promotion, or taxonomy inference were introduced.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| Sample data gate | `[x]` — 10/10 PASS; 21/21 console checks |
+| Positive A–F | `[x]` — expected sections |
+| Negative G–J | `[x]` — 0 sections |
+| `_derived` / `__derived` | `[x]` — root extraction blocked |
+| Contract fixtures | `[x]` — 9/9, 17/17 |
+| Renderer / matrix / guard | `[x]` — 8/8, 12/12; 44 links; 12/12 guard |
+| Preview layer | `[x]` — localhost-gated |
+| QA Staff/Ember/Ogre/Swamp without preview | `[x]` — 0 sections/banner |
+| Standard URL regression | `[x]` — 17+ URLs HTTP 200 |
+| Wood/Forge / pending conflict | `[x]` — untouched |
+
+### Next candidate
+
+**P3-J Planning Gate** for real data strategy, or a separately controlled Real-Data Read-only Gate — not production deploy without launch/data-safety gate.
+
+---

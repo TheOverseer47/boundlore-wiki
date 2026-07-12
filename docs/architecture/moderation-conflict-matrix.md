@@ -181,6 +181,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P3-I.1:** Sample data gate is QA-only/local; no moderation workflow, no queue actions, no conflict changes.
 
+**P3-I.2:** Sample data gate accepted locally. Pending `add_recipe` conflict remains untouched.
+
 ---
 
 ---

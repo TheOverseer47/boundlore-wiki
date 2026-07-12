@@ -1154,6 +1154,32 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-I.2 — Local Read-only Sample Data Acceptance Sweep
+
+**Milestone:** P3-I.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| P3-I.1 baseline accepted | HEAD `de834b8` | sample gate integrated | `[x]` |
+| Sample data gate | `/qa/p3-readonly-sample-data.html` | 10/10 PASS; failCount 0 | `[x]` |
+| Console API sweep | sample gate | 21/21 checks incl. derived block | `[x]` |
+| Positive A–F | sample gate | expected sections | `[x]` |
+| Negative G–J | sample gate | 0 sections | `[x]` |
+| Contract fixture regression | `/qa/p3-context-data-contract-fixtures.html` | 9/9; 17/17 | `[x]` |
+| Renderer/matrix/guard | P3 harness pages | 8/8; 12/12; 44 links; 12/12 | `[x]` |
+| Preview QA Staff | all/resource_node/negative/off/none | per-mode banner/sections | `[x]` |
+| QA Staff/Ember/Ogre/Swamp | without preview | 0 sections/banner | `[x]` |
+| Standard regression | 17+ URLs | HTTP 200 | `[x]` |
+| Wood/Forge / pending conflict | search/admin read-only | untouched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` HTTP 200 only |
+| Deploy / push / SQL | — | forbidden | `[x]` |
+
+**P3-I.2 acceptance sweep completed locally.** The QA-only local read-only sample data gate is accepted. Positive local sample entries render expected context sections through the real DataContract → ContextSectionRenderer pipeline, while source_detail-only, name-only, derived-only, and empty/unknown samples render no sections. No production navigation, data writes, posts, Supabase writes, admin/create/edit/moderation flows, search indexing, automatic promotion, or taxonomy inference were introduced.
+
+**Next candidate:** P3-J Planning Gate or controlled Real-Data Read-only Gate. Deploy remains blocked.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
