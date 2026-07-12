@@ -1603,6 +1603,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-E.2 — Structured Contribution Draft Contract Acceptance Sweep
+
+**Milestone:** P4-E.2 docs-only acceptance sweep; no code, SQL, data migration, contribution UI, submit flows, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| §78 P4-E.1 draft contract baseline present | `[x]` |
+| QA fixture A–O accepted | `[x]` — 15/15 PASS |
+| Policy functions all false | `[x]` |
+| Mutation safe | `[x]` |
+| Rendering safe | `[x]` |
+| Planned intent map read-only | `[x]` |
+| `ContributionIntentRegistry` unchanged | `[x]` |
+| Field-level conflict report accepted | `[x]` |
+| Prod paths — draft contract not loaded | `[x]` |
+| P3/P4 regression harnesses green | `[x]` |
+| No contribution UI / draft submit / save | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-E.2 acceptance sweep completed locally.** The Structured Contribution Draft Contract baseline is accepted. `BoundLoreStructuredContributionDraftContract` is read-only and validates-only, normalizes draft states, validates payloads, uses planned intent mapping read-only without mutating `ContributionIntentRegistry`, produces field-level conflict reports, mutates no inputs, and keeps all submit/save/queue/approve/reject/archive/post/missing-entry/promotion/search policy functions false. It remains QA-fixture-only with no production contribution integration. No code, data, SQL, Supabase, contribution UI, draft submit/save flows, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+**Next candidate:** **P4-F.1 Structured Contribution Draft Inspector / Preview Planning Gate** or **P4 Final Integration Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

@@ -168,6 +168,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-E.1 draft contract baseline:** `shouldPromoteFromDraft` and `shouldCreateMissingEntryFromDraft` always false. Draft validation does not promote entities or create Wood/Forge posts.
 
+**P4-E.2 acceptance sweep:** Draft contract baseline accepted locally. All promotion/post policy functions remain false; no production contribution integration.
+
 ---
 
 ## Missing Entry Queue

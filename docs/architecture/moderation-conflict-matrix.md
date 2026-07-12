@@ -207,6 +207,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P4-E.1 draft contract baseline:** `BoundLoreStructuredContributionDraftContract` validates draft payloads read-only and produces conflict reports. No queue mutation, no approval flows, no write-path activation. Pending `add_recipe` untouched.
 
+**P4-E.2 acceptance sweep:** Draft contract baseline accepted locally. No moderation workflow, queue actions, or write-path activation. Pending `add_recipe` untouched.
+
 ---
 
 ---

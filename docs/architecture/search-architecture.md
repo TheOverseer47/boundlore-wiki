@@ -118,6 +118,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-E.1 draft contract baseline:** `shouldUpdateSearchIndexFromDraft` always false. Draft reports are not indexed.
 
+**P4-E.2 acceptance sweep:** Draft contract baseline accepted locally. Search/index activation remains blocked.
+
 ---
 
 ## Goals

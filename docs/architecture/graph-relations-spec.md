@@ -62,6 +62,8 @@
 
 **P4-E.1 draft contract baseline:** Draft contract validates section-scoped field proposals only; no relation graph persistence from draft reports.
 
+**P4-E.2 acceptance sweep:** Draft contract baseline accepted locally. No relation graph persistence from draft validation.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).
