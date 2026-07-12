@@ -556,6 +556,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-D.2 — Version History & Live-Service Validity Acceptance Sweep
+
+**Milestone:** P2-D foundation block (D.1 + D.2); read-only helper/search/admin-preview baseline only; no SQL, no Patch Mode workflow, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Versioning API sweep | QA Staff post | all normalize/read/validity/history gates green | `[x]` |
+| Empty version fields | console `{}` | no badges; shouldDisplay* false | `[x]` |
+| Reserved intent/relations | add_version_change; introduced/changed/removed_in | reserved; persistence reserved | `[x]` |
+| Search parser hints | version/patch/outdated/changed/removed/introduced/superseded/historical | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/vendor/economy/parser | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no version badges/sections | `[x]` |
+| Resources mining | facet URL | QA Ember visible | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Reserved UI flows | pages | no Version/Patch/Outdated buttons | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-D.2 acceptance sweep completed; Version history and live-service validity accepted as read-only helper/search/admin-preview baseline only. No patch workflow, no SQL, no data migration.** P2-D accepted as local foundation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

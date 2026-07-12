@@ -69,3 +69,5 @@ QA data without state fields shows no new badges. Pending `add_recipe` conflict 
 | Reserved relations | `introduced_in`, `changed_in`, `removed_in` remain reserved |
 
 No automatic outdated marking. No game-version posts. QA baseline entries unchanged.
+
+**P2-D.2 acceptance sweep:** Version history and live-service validity accepted as read-only helper/search/admin-preview baseline only. No patch workflow, no SQL, no data migration. P2-D foundation block accepted locally.

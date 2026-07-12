@@ -981,3 +981,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | QA Staff/Ember/Ogre/Swamp, mining/wood/forge/vendor search, evidence/state badges | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 34. P2-D.2 — Version History & Live-Service Validity Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; read-only helper/search/admin-preview baseline only; no SQL, no Patch Mode workflow, no data migration).
+
+| Acceptance | Result |
+|------------|--------|
+| BoundLoreVersioning API (QA Staff post) | Green — normalize/read/validity/history gates |
+| Empty version fields | No badges; shouldDisplay* false |
+| Reserved intent/relations | add_version_change; introduced/changed/removed_in — persistence `reserved` |
+| Search parser hints | version/patch/outdated/changed/removed/introduced/superseded/historical — hint-only |
+| Search regressions | mining/wood/forge/vendor/economy/parser unchanged |
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged; 0 version badges/sections |
+| Resources mining | QA Ember visible |
+| Wood/Forge | Missing-entry only; no posts |
+| Admin | Session-dependent — automation not verified |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-D.2 acceptance sweep completed; Version history and live-service validity accepted as read-only helper/search/admin-preview baseline only. No patch workflow, no SQL, no data migration.** P2-D foundation block (D.1 + D.2) accepted locally. Ready for P2-E. Deployment freeze remains active.
