@@ -431,6 +431,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-A.2 — NPC / Quest / Event Model Acceptance Sweep
+
+**Milestone:** P2-A foundation block (A.1 + A.2); registry/read/search baseline only; no SQL, no UI, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ContentModelRegistry API sweep | QA Staff post | all active/reserved checks green | `[x]` |
+| create_ui / admin_flow | console | false for NPC/Quest/Event | `[x]` |
+| Reserved models | quest_chain, community_event, occurrence | reserved; no UI | `[x]` |
+| Search parser hints | npc/quest/event + compound queries | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/parser queries | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no new sections | `[x]` |
+| Resources mining | facet URL | QA Ember visible | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Reserved UI flows | pages | no NPC/Quest/Event buttons | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-A.2 acceptance sweep completed; NPC/Quest/Event models accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration.** P2-A accepted as local foundation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

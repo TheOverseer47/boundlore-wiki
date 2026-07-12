@@ -20,6 +20,8 @@
 
 **P2-A.1 content models:** NPC = BEING/npc, Quest = KNOWLEDGE/quest, Event = EVENT/event. Model registry only; no new top-level domain; create_ui/admin_flow remain false.
 
+**P2-A.2 acceptance sweep:** P2-A foundation block accepted locally. Registry/read/search baseline only; no create UI, no SQL, no data migration.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

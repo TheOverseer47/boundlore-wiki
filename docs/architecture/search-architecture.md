@@ -26,6 +26,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-A.1 code baseline:** `js/content-model-registry.js` — NPC (BEING/npc), Quest (KNOWLEDGE/quest), Event (EVENT/event) model definitions with future-safe field normalization and low-weight search signals. **No** create UI, **no** admin flows, **no** Postgres search index, **no** SQL migration.
 
+**P2-A.2 acceptance sweep:** P2-A.2 acceptance sweep completed; NPC/Quest/Event models accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration. P2-A foundation block accepted locally.
+
 ---
 
 ## Goals
