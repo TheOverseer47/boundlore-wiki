@@ -2312,7 +2312,7 @@ When integrated (not in P4-C.1):
 |-------|------|------|-------|
 | **P4-C.1** | Admin Read-only Structured Field Inspector Planning Gate | **Accepted — docs-only** | Inspector scope/pipeline planned |
 | **P4-C.2** | Planning Acceptance Sweep | docs-only | Confirms P4-C.1 plan |
-| P4-C.3 | Admin Read-only Structured Field Inspector Baseline | **Current — read-only code** | Render helpers + QA fixture; no admin HTML |
+| P4-C.3 | Admin Read-only Structured Field Inspector Baseline | **Accepted — read-only code** | Render helpers + QA fixture; no admin HTML |
 | P4-D.1 | Structured Contribution Draft Flow Planning | docs-only | No real approvals yet |
 
 **P4-C.3 baseline (when code allowed)** may add:
@@ -2397,5 +2397,34 @@ P4-C.3 does **not** modify `wiki/admin/index.html`, `admin-dashboard.js`, or oth
 **P4-C.3 activates nothing on production paths.** No admin dashboard wiring, no schema prod wiring, no moderation workflow, no search index, no deploy.
 
 **Next:** P4-C.4 acceptance sweep.
+
+---
+
+## 75. P4-C.4 — Admin Read-only Structured Field Inspector Acceptance Sweep
+
+**Milestone:** P4-C.4 docs-only acceptance sweep; no code, SQL, data migration, admin integration, or deploy.
+
+### Acceptance statement
+
+**P4-C.4 acceptance sweep completed locally.** The Admin Read-only Structured Field Inspector baseline is accepted. `BoundLoreAdminStructuredContextInspector` is read-only and diagnostics-only, combines DataContract output with StructuredContextSchema validation reports, renders safe inspection HTML, mutates no entries, and keeps all write/queue/repair/post/promotion/search policy functions false. It remains QA-fixture-only with no production admin integration. No code, data, SQL, Supabase, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §74 P4-C.3 inspector baseline present | `[x]` — module, pipeline, QA fixture, no admin HTML |
+| Inspector API (`p4-c3`) | `[x]` — policy functions all false; mutation safe |
+| QA fixture A–J | `[x]` — 10/10 PASS; `__P4AdminStructuredContextInspectorFixtures.allPass === true` |
+| Rendering safety | `[x]` — no button/form/input/approve/reject/repair/create-post/edit-post |
+| DataContract + Schema integration | `[x]` — both APIs used in fixture harness |
+| Prod script wiring | `[x]` — inspector loaded only on QA fixture; `/wiki/admin/` has no inspector script |
+| P3/P4 regression harnesses | `[x]` — schema 13/13; sample 10/10; contract 9/9 + 17/17; renderer 8/8 + 12/12; guard 12/12; probe 16 links |
+| Prod pages (Staff/Ember) | `[x]` — 0 sections/banner/probe without preview/probe |
+| Admin read-only | `[~]` — session-dependent; no inspector UI; no actions executed |
+| Code / data / deploy changes | `[x]` — docs-only sweep |
+
+### Next candidate
+
+**P4-D.1 — Structured Contribution Draft Flow Planning Gate** — docs-only planning; not production deploy without **LAUNCH-0**.
 
 ---

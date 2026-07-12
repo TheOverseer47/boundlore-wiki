@@ -201,6 +201,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P4-C.3 inspector baseline:** `BoundLoreAdminStructuredContextInspector` is read-only diagnostics only. No queue mutation, no repair triggers, no write-path activation. Pending `add_recipe` untouched.
 
+**P4-C.4 acceptance sweep:** Admin Inspector baseline accepted locally. No moderation workflow, queue actions, or write-path activation. Pending `add_recipe` untouched.
+
 ---
 
 ---

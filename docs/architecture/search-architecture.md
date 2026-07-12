@@ -112,6 +112,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-C.3 inspector baseline:** Inspector reports are display-only; `shouldUpdateSearchIndex` always false. No index activation.
 
+**P4-C.4 acceptance sweep:** Admin Inspector baseline accepted locally. Search/index activation remains blocked.
+
 ---
 
 ## Goals
