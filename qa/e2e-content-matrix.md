@@ -383,6 +383,31 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P1-H.1 — P1 Foundation Final Acceptance & P2 Readiness Gate
+
+**Milestone:** Final P1 integration gate; client-side foundation only; no SQL, no deploy, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| RelationsRegistry API | QA Staff post | persistence, reserved, symmetric dedupe | `[x]` |
+| ContributionIntentRegistry API | QA Staff post | active/reserved, preview safety | `[x]` |
+| EvidenceRank API | QA Staff post | weights, dispute badge gates | `[x]` |
+| ProfessionCapabilityRegistry API | QA Staff post | SYSTEM/profession_type, normalize kinds | `[x]` |
+| FacetBrowse API | `/wiki/resources/` | URL facet parse + active filters | `[x]` |
+| SearchQueryParser API | `/wiki/search/` | usage/crafting/mining hints; empty OK | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged | `[x]` |
+| Resources mining/raw/unknown | facet URLs | QA Ember visible | `[x]` |
+| Resources fishing | facet URL | empty state | `[x]` |
+| Search regressions | mining/wood/forge/parser/mount queries | unchanged or better | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Reserved UI flows | pages | not visible | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation Access Denied |
+
+**P1-H.1 final foundation gate completed locally. P1 registries and reader/search tolerances are accepted as client-side foundation. No SQL, no backend search, no data migration, no deploy. P2 may start from this baseline.**
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

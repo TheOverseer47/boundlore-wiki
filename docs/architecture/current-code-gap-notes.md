@@ -797,3 +797,32 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Pending `add_recipe` conflict | Not touched |
 
 **P1-G.2 acceptance sweep completed; reader/search dedupe only; no SQL, no repair, no data migration.** P1-G foundation block (G.1 + G.2) accepted locally. Ready for next P1 milestone. Deployment freeze remains active.
+
+---
+
+## 26. P1-H.1 — P1 Foundation Final Acceptance & P2 Readiness Gate
+
+**Status:** Complete (local integration gate; client-side foundation only; no SQL, no deploy, no data migration).
+
+| P1 block | Registry / module | Gate result |
+|----------|-------------------|-------------|
+| P1-A | `BoundLoreRelationsRegistry` | Green — qualifiers, reserved relations, symmetric dedupe |
+| P1-B | `BoundLoreContributionIntentRegistry` | Green — active/reserved intents, preview safety |
+| P1-C | `BoundLoreEvidenceRank` | Green — weights, dispute display gates |
+| P1-D | `BoundLoreFacetBrowse` | Green — URL facet filters (resources/browse) |
+| P1-E | `BoundLoreSearchQueryParser` | Green — hint-only parser (search page) |
+| P1-F | `BoundLoreProfessionCapabilityRegistry` | Green — SYSTEM/profession_type, no UI |
+| P1-G | Relation mirror/dedupe helpers | Green — reader/search defensive dedupe |
+
+| Regression | Result |
+|------------|--------|
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged |
+| Resources mining/raw/unknown | QA Ember visible |
+| Resources fishing | Empty state OK |
+| Search mining/wood/forge/parser queries | Unchanged or better |
+| Wood/Forge | Missing-entry only; no posts |
+| Reserved UI flows | Not visible |
+| Admin | Session-dependent — automation Access Denied |
+| Pending `add_recipe` conflict | Not touched |
+
+**P1-H.1 final foundation gate completed locally. P1 registries and reader/search tolerances are accepted as client-side foundation. No SQL, no backend search, no data migration, no deploy. P2 may start from this baseline.** Deployment freeze remains active.

@@ -22,6 +22,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P1-F.2 acceptance sweep:** P1-F.2 acceptance sweep completed; model registry only; no profession UI, no SQL, no data migration. P1-F foundation block (F.1 + F.2) accepted locally.
 
+**P1-H.1 final foundation gate:** P1 registries and reader/search tolerances accepted as client-side foundation. No SQL, no backend search, no data migration, no deploy. P2 may start from this baseline.
+
 ---
 
 ## Goals

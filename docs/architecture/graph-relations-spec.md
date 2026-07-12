@@ -16,6 +16,8 @@
 
 **P1-G.2 acceptance sweep:** P1-G.2 acceptance sweep completed; reader/search dedupe only; no SQL, no repair, no data migration. P1-G foundation block (G.1 + G.2) accepted locally.
 
+**P1-H.1 final foundation gate:** P1 registries accepted locally as client-side foundation. No SQL, no deploy. P2 may start from this baseline.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).
