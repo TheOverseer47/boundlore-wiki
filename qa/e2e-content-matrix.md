@@ -1660,6 +1660,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-F.2 — Structured Contribution Draft Preview Planning Acceptance Sweep
+
+**Milestone:** P4-F.2 docs-only acceptance sweep; no code, SQL, data migration, draft preview UI, submit flows, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| §80 P4-F.1 preview planning present | `[x]` |
+| Draft preview scope matrix (15 areas) accepted | `[x]` |
+| Draft preview pipeline accepted | `[x]` |
+| Visual diff policy accepted | `[x]` |
+| Forbidden preview functions accepted | `[x]` |
+| P4-F.3 module structure accepted | `[x]` |
+| Supporting docs consistent | `[x]` |
+| No draft preview UI activated | `[x]` |
+| No submit/save/approve/reject/archive flows activated | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| `add_recipe` pending conflict baseline | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-F.2 acceptance sweep completed locally.** The Structured Contribution Draft Inspector / Preview plan is accepted as docs-only. The Draft Preview Scope Matrix, read-only preview pipeline, Visual Diff Policy, forbidden preview functions, and future P4-F.3 module structure are accepted. No code, data, SQL, Supabase, Draft Preview UI, contribution UI, submit/save/approve/reject/archive flows, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+**Next candidate:** **P4-F.3 Structured Contribution Draft Preview Baseline** or **P4 Final Integration Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

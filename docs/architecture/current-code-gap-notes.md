@@ -2105,7 +2105,9 @@ When write flows are implemented (not in P4-A.1):
 | P4-D.2 | Acceptance Sweep | **Accepted — docs-only** | Confirms draft plan |
 | P4-E.1 | Structured Contribution Draft Contract Baseline | **Accepted — read-only code** | Draft contract module + QA fixture; no submit |
 | P4-E.2 | Acceptance Sweep | **Accepted — docs-only** | Confirms draft contract baseline |
-| P4-F.1 | Structured Contribution Draft Inspector / Preview Planning Gate | **Current — docs-only** | Draft preview scope, pipeline, diff policy; no UI |
+| P4-F.1 | Structured Contribution Draft Inspector / Preview Planning Gate | **Accepted — docs-only** | Draft preview scope, pipeline, diff policy; no UI |
+| P4-F.2 | Acceptance Sweep | **Accepted — docs-only** | Confirms preview plan |
+| P4-F.3 | Structured Contribution Draft Preview Baseline | Later read-only code | Draft preview module + QA fixture; no prod wiring |
 
 **Write flows** (admin edit, create with fields, contribution approve) come only after: schema, validation, conflict policy, evidence/audit policy, and separate data-safety gate.
 
@@ -2536,7 +2538,9 @@ A future moderator view would need read-only access to:
 | **P4-D.2** | Acceptance Sweep | **Accepted — docs-only** | Confirms draft plan |
 | **P4-E.1** | Structured Contribution Draft Contract Baseline | **Accepted — read-only code** | Draft contract module + QA fixture |
 | **P4-E.2** | Acceptance Sweep | **Accepted — docs-only** | Confirms draft contract baseline |
-| P4-F.1 | Structured Contribution Draft Inspector / Preview Planning Gate | **Current — docs-only** | Draft preview scope, pipeline, diff policy; no UI |
+| P4-F.1 | Structured Contribution Draft Inspector / Preview Planning Gate | **Accepted — docs-only** | Draft preview scope, pipeline, diff policy; no UI |
+| P4-F.2 | Acceptance Sweep | **Accepted — docs-only** | Confirms preview plan |
+| P4-F.3 | Structured Contribution Draft Preview Baseline | Later read-only code | Draft preview module + QA fixture; no prod wiring |
 
 ### Not live-ready
 
@@ -2756,9 +2760,9 @@ The future Draft Inspector / Preview must **NOT**:
 
 | Phase | Task | Type | Notes |
 |-------|------|------|-------|
-| **P4-F.1** | Structured Contribution Draft Inspector / Preview Planning Gate | **Current — docs-only** | This gate |
-| P4-F.2 | Acceptance Sweep | docs-only | Confirms preview plan |
-| P4-F.3 | Structured Contribution Draft Preview Baseline | Later read-only code | `js/structured-contribution-draft-preview.js` + QA fixture; no prod wiring |
+| **P4-F.1** | Structured Contribution Draft Inspector / Preview Planning Gate | **Accepted — docs-only** | Preview plan documented |
+| **P4-F.2** | Acceptance Sweep | **Accepted — docs-only** | This gate |
+| P4-F.3 | Structured Contribution Draft Preview Baseline | Later read-only code | Draft preview module + QA fixture |
 
 **P4-F.3 baseline (when code allowed) may add:**
 
@@ -2772,6 +2776,40 @@ The future Draft Inspector / Preview must **NOT**:
 
 **P4-F.1 activates nothing.** No draft preview UI, no draft preview module, no submit/save, no approve/reject/archive, no queue mutation, no search index, no deploy.
 
-**Next:** P4-F.2 acceptance sweep.
+**Next:** P4-F.3 Structured Contribution Draft Preview Baseline or P4 Final Integration Gate.
+
+---
+
+## 81. P4-F.2 — Structured Contribution Draft Preview Planning Acceptance Sweep
+
+**Milestone:** P4-F.2 docs-only acceptance sweep; no code, SQL, data migration, draft preview UI, submit flows, or deploy.
+
+### Acceptance statement
+
+**P4-F.2 acceptance sweep completed locally.** The Structured Contribution Draft Inspector / Preview plan is accepted as docs-only. The Draft Preview Scope Matrix, read-only preview pipeline, Visual Diff Policy, forbidden preview functions, and future P4-F.3 module structure are accepted. No code, data, SQL, Supabase, Draft Preview UI, contribution UI, submit/save/approve/reject/archive flows, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action. Next recommended step: **P4-F.3 Structured Contribution Draft Preview Baseline** or **P4 Final Integration Gate**.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §80 P4-F.1 preview planning present | `[x]` — scope matrix, pipeline, diff policy, forbidden functions, P4-F.3 outline |
+| P4-E draft contract accepted | `[x]` — referenced in §80 context |
+| Draft preview scope matrix (15 areas) | `[x]` — read-only areas yes; submit/save/approve/repair forbidden |
+| Draft preview pipeline (10 steps) | `[x]` — read-only, clone/no-mutation, no writes/queue |
+| Visual diff policy (10 statuses) | `[x]` — no merge/auto-correct/write buttons |
+| Forbidden preview functions | `[x]` — submit/save/approve/reject/archive/repair/forms/queue/SQL/index blocked |
+| P4-F.3 module structure planned | `[x]` — `structured-contribution-draft-preview.js` + QA fixture only |
+| Supporting docs consistent | `[x]` — moderation-conflict, entity-promotion, search, graph-relations |
+| No draft preview UI / submit / save | `[x]` |
+| No admin/create/edit/moderation write-flows | `[x]` |
+| No queue actions / search index / backfill | `[x]` |
+| `add_recipe` pending conflict baseline | `[x]` — untouched |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code / data / deploy changes | `[x]` — docs-only sweep |
+
+### Next candidate
+
+**P4-F.3 — Structured Contribution Draft Preview Baseline** — read-only preview render module only; not production deploy without **LAUNCH-0**.
 
 ---
