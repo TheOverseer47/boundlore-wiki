@@ -1241,6 +1241,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-K.2 — Real Existing Entry Read-only Contract Probe Acceptance Sweep
+
+**Milestone:** P3-K.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P3-K.1 real entry probe accepted | `[x]` |
+| localhost + query-param only | `[x]` |
+| read-only / diagnostics-only | `[x]` |
+| Probe panel only with `p3_contract_probe` | `[x]` |
+| QA entries without explicit contract: 0 sections | `[x]` |
+| Preview + probe combined | `[x]` |
+| Harness regression green | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+| Not live-ready | `[x]` |
+
+**P3-K.2 acceptance sweep completed locally.** The real existing entry read-only contract probe is accepted. It is localhost-only, query-param-only, read-only, diagnostics-only, and creates no data writes, posts, Supabase writes, admin/create/edit/moderation flows, search indexing, automatic promotion, or taxonomy inference. Existing QA entries without explicit contract fields remain at zero context sections. The project remains not live-ready; LAUNCH-0 is still mandatory before push/deploy.
+
+**Next candidate:** P3-L Planning Gate or Real-Data Probe Final Integration Gate. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

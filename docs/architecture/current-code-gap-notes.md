@@ -1894,3 +1894,32 @@ LAUNCH-0 must verify (when executed later):
 **Next:** P3-K.2 acceptance sweep.
 
 ---
+
+## 65. P3-K.2 — Real Existing Entry Read-only Contract Probe Acceptance Sweep
+
+**Milestone:** P3-K.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+### Acceptance statement
+
+**P3-K.2 acceptance sweep completed locally.** The real existing entry read-only contract probe is accepted. It is localhost-only, query-param-only, read-only, diagnostics-only, and creates no data writes, posts, Supabase writes, admin/create/edit/moderation flows, search indexing, automatic promotion, or taxonomy inference. Existing QA entries without explicit contract fields remain at zero context sections. The project remains not live-ready; LAUNCH-0 is still mandatory before push/deploy.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreContextRealEntryProbe` API stable | `[x]` — console acceptance on QA Staff probe page |
+| Gating (localhost only; query param `p3_contract_probe`) | `[x]` — 127.0.0.1/boundlore.com/www/preview blocked |
+| Policy guards (write/promote/actions) | `[x]` — all false |
+| Probe panel with query; none without | `[x]` |
+| QA Staff/Ember/Ogre/Swamp without explicit contract | `[x]` — 0 context sections without preview |
+| Preview + probe combined | `[x]` — banner + preview sections + probe panel; preview noted separate |
+| Probe link page | `[x]` — 4 entries × 4 modes = 16 localhost links |
+| Sample / contract / renderer / guard harnesses | `[x]` — 10/10; 9/9 17/17; 8/8 12/12; 12/12 |
+| Standard URL regression | `[x]` — 21/21 HTTP 200 |
+| Code / data / deploy changes | `[x]` — none |
+
+### Next candidate
+
+**P3-L Planning Gate** or Real-Data Probe Final Integration Gate — not production deploy without **LAUNCH-0**.
+
+---
