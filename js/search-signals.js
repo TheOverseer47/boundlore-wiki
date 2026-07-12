@@ -514,6 +514,38 @@ window.BoundLoreSearchSignals = (function() {
     return bucket.signals;
   }
 
+  function collectRequirementUnlockSearchSignals(post, meta) {
+    const bucket = { signals: [], _seen: new Set() };
+    if (typeof BoundLoreRequirementUnlockRegistry === "undefined") {
+      return bucket.signals;
+    }
+    const payload = meta && meta.discovery_payload && typeof meta.discovery_payload === "object"
+      ? meta.discovery_payload
+      : {};
+    const source = Object.assign({}, meta || {}, payload, {
+      meta: meta || {},
+      post: post || {},
+      discovery_payload: payload,
+    });
+    try {
+      const groups = [
+        BoundLoreRequirementUnlockRegistry.extractRequirementSignals(source),
+        BoundLoreRequirementUnlockRegistry.extractUnlockSignals(source),
+        BoundLoreRequirementUnlockRegistry.extractProgressionSignals(source),
+        BoundLoreRequirementUnlockRegistry.extractAccessSignals(source),
+      ];
+      groups.forEach(function(list) {
+        list.forEach(function(entry) {
+          if (!entry || !entry.raw) return;
+          pushSignal(bucket, entry.raw, { group: entry.group || "requirement_context", label: entry.label || "Requirement" });
+        });
+      });
+    } catch (err) {
+      return bucket.signals;
+    }
+    return bucket.signals;
+  }
+
   function buildDisplayLabels(post, meta, signalGroups) {
     const labels = [];
     if (typeof EntityCore !== "undefined" && EntityCore.isResourceEntry && EntityCore.isResourceEntry(meta, post)) {
@@ -561,6 +593,7 @@ window.BoundLoreSearchSignals = (function() {
       resource_node: collectResourceNodeSearchSignals(safePost, meta),
       observation_context: collectObservationContextSearchSignals(safePost, meta),
       creature_encounter: collectCreatureEncounterSearchSignals(safePost, meta),
+      requirement_unlock: collectRequirementUnlockSearchSignals(safePost, meta),
       version: collectVersionSearchSignalsForPost(safePost, meta),
       text: collectTextSignals(safePost),
     };
@@ -741,6 +774,10 @@ window.BoundLoreSearchSignals = (function() {
     if (group === "spawn_context") return WEIGHTS.weak;
     if (group === "drop_context") return WEIGHTS.weak;
     if (group === "combat_affinity") return WEIGHTS.weak;
+    if (group === "requirement_context") return WEIGHTS.weak;
+    if (group === "unlock_context") return WEIGHTS.weak;
+    if (group === "progression_context") return WEIGHTS.weak;
+    if (group === "access_context") return WEIGHTS.weak;
     if (group === "acquisition_source") return WEIGHTS.weak;
     if (group === "profession_capability") return WEIGHTS.weak;
     return WEIGHTS.text;

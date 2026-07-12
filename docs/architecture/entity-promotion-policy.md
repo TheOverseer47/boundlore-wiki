@@ -104,6 +104,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P2-G.2 acceptance sweep:** Creature encounters, spawn contexts, drop contexts, behavior, and combat affinity accepted as registry/read/search/facet baseline only. No encounter posts, no loot UI, no SQL, no data migration.
 
+**P2-H.1:** `js/requirement-unlock-registry.js` — requirements/unlocks/progression are structured fields/qualifiers, not posts. `shouldPromoteRequirementToPost` and `shouldPromoteUnlockToPost` remain false. Faction remains string/ref (no new top-level domain). Level/profession-level are values, not entities. Skilltree/progression/unlock UI deferred.
+
 ---
 
 ## Missing Entry Queue

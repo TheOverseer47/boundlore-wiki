@@ -1129,3 +1129,23 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P2-G.2 acceptance sweep completed; Creature encounters, spawn contexts, drop contexts, behavior, and combat affinity accepted as registry/read/search/facet baseline only. No encounter posts, no loot UI, no SQL, no data migration.** P2-G foundation block (G.1 + G.2) accepted locally. Deployment freeze remains active.
 
 ---
+
+## 41. P2-H.1 — Requirement, Unlock & Progression Context Baseline
+
+**Status:** Complete (local baseline; registry/read/search/facet tolerance only; no SQL, no requirement/unlock posts, no data migration).
+
+| Area | Result |
+|------|--------|
+| RequirementUnlockRegistry | `js/requirement-unlock-registry.js` — normalize/extract/signals; no name inference |
+| ContentModel integration | optional requirement/unlock fields on quest/event/npc/vendor/resource/creature/profession models |
+| Facet groups | `required_level`, `faction_req`, `unlock_type`, `access_state`, `requirement_type` — explicit-only |
+| Search parser/signals | low-weight requirement/unlock/progression/access hints; no hard filters |
+| Wiki entry layout | `requirementUnlockContext` read-only; `RENDER_SECTIONS_ENABLED` false |
+| Promotion guards | `shouldPromoteRequirementToPost` / `shouldPromoteUnlockToPost` false |
+| Reserved | `crafted_by_profession`, `gathered_via`, `add_capability_role`, `add_version_change` unchanged |
+| QA regressions | Staff/Ember/Ogre/Swamp unchanged; Wood/Forge missing-entry only |
+| Not built | Requirement/unlock create UI, skilltree, leveling, achievement system, quest tracker, SQL |
+
+**Deployment freeze remains active** — no push/deploy.
+
+---

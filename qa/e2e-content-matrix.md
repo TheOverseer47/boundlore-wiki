@@ -705,6 +705,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-H.1 — Requirement, Unlock & Progression Context Baseline
+
+**Milestone:** P2-H requirement/unlock/progression registry; client-side only; no SQL, no requirement/unlock posts, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Registry API | console on `/wiki/search/` or QA Staff | `BoundLoreRequirementUnlockRegistry` object; normalizers green | `[x]` |
+| Requirement types | console | required_level/profession/faction/tool/station_tier normalize | `[x]` |
+| Unlock/progression | console | quest_unlock/recipe_unlock/level/profession_level/locked normalize | `[x]` |
+| Record normalizers | console | requirement/unlock/progression/access/set — no crash | `[x]` |
+| Signal extractors | console | extract/get*SearchSignals — no crash | `[x]` |
+| Guards | console | hasExplicit*/shouldPromote*/shouldRender* safe | `[x]` |
+| Reserved relations/intents | console | crafted_by_profession/gathered_via/add_capability_role reserved | `[x]` |
+| Search parser hints | required level/quest prerequisite/recipe unlock/vendor access | hint-only, no crash | `[x]` |
+| Search regressions | qa ogre/qa staff/mining/wood/forge/drop/coordinates | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no requirement/unlock sections | `[x]` |
+| Wood/Forge | search/admin | missing-entry only; no posts | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-H.1:** Requirement/unlock/progression baseline only. No requirement/unlock posts, no progression UI, no SQL, no deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

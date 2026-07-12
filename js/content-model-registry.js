@@ -25,25 +25,34 @@ window.BoundLoreContentModelRegistry = (function() {
     "drop_rate", "loot", "weakness", "resistance", "creature_observations", "combat_affinities",
   ];
 
+  const REQUIREMENT_UNLOCK_FIELDS = [
+    "required_level", "profession", "profession_level", "profession_req", "faction_req",
+    "reputation_req", "quest_req", "knowledge_req", "item_req", "resource_req", "tool_req",
+    "station_tier", "unlock_type", "unlocks", "access_state", "requirements", "service_requirements",
+  ];
+
   const NPC_FIELDS = [
     "faction", "roles", "capabilities", "location_refs", "dialogue_refs",
     "vendor_inventory", "trainer_for", "quest_refs", "schedule", "economy_context",
     "observation_context", "location_ref", "coordinates", "biome_context",
     "time_condition", "weather_condition", "observed_at",
     "behavior", "encounter_type", "spawn_context", "drop_context", "creature_observations",
-    "combat_affinities", "evidence", "versioning",
+    "combat_affinities", "service_requirements", "required_level", "unlocks", "access_state",
+    "evidence", "versioning",
   ];
 
   const QUEST_FIELDS = [
     "quest_giver", "objectives", "prerequisites", "rewards", "required_level",
-    "faction_req", "starts_from", "ends_at", "related_events", "evidence", "versioning",
+    "faction_req", "reputation_req", "quest_req", "knowledge_req", "unlocks", "unlock_type",
+    "access_state", "requirements", "starts_from", "ends_at", "related_events", "evidence", "versioning",
     "observation_context", "location_ref", "coordinates", "biome_context",
     "time_condition", "weather_condition",
   ];
 
   const EVENT_FIELDS = [
     "event_type", "starts_at", "ends_at", "recurrence", "location_refs",
-    "participants", "rewards", "related_quests", "versioning", "evidence",
+    "participants", "rewards", "related_quests", "required_level", "faction_req",
+    "requirements", "unlocks", "access_state", "versioning", "evidence",
     "observation_context", "location_ref", "coordinates", "biome_context",
     "time_condition", "weather_condition",
   ];
@@ -51,13 +60,14 @@ window.BoundLoreContentModelRegistry = (function() {
   const RESOURCE_FIELDS = [
     "node_type", "source_type", "source_detail", "acquisition_method",
     "acquisition_sources", "node_observations", "biome_context", "required_tool",
+    "required_level", "requirements", "station_tier",
     "observation_context", "location_ref", "coordinates", "time_condition", "weather_condition",
     "evidence", "versioning",
   ];
 
-  const CREATURE_FIELDS = CREATURE_ENCOUNTER_FIELDS.concat(OBSERVATION_CONTEXT_FIELDS).filter(function(f, i, arr) {
-    return arr.indexOf(f) === i;
-  });
+  const CREATURE_FIELDS = CREATURE_ENCOUNTER_FIELDS.concat(OBSERVATION_CONTEXT_FIELDS)
+    .concat(["requirements", "access_state"])
+    .filter(function(f, i, arr) { return arr.indexOf(f) === i; });
 
   const MODEL_DEFINITIONS = {
     "BEING:npc": {
@@ -336,6 +346,7 @@ window.BoundLoreContentModelRegistry = (function() {
       "related_events", "participants", "related_quests",
       "acquisition_sources", "node_observations",
       "creature_observations", "combat_affinities", "loot", "weakness", "resistance",
+      "requirements", "unlocks", "service_requirements",
     ];
     if (arrayFields.indexOf(field) >= 0) return normalizeArrayField(value);
     return normalizeScalarField(value);
@@ -391,6 +402,9 @@ window.BoundLoreContentModelRegistry = (function() {
         if (typeof BoundLoreCreatureEncounterRegistry !== "undefined" &&
             (def.key === "BEING:npc" || def.key === "BEING:creature")) {
           out.creature_encounter = BoundLoreCreatureEncounterRegistry.resolveCreatureEncounterContext(source);
+        }
+        if (typeof BoundLoreRequirementUnlockRegistry !== "undefined" && out.active_model) {
+          out.requirement_unlock = BoundLoreRequirementUnlockRegistry.resolveRequirementUnlockContext(source);
         }
       } catch (err) {
         /* schema enrichment optional */

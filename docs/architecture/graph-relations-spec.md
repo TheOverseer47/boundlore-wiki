@@ -46,6 +46,8 @@
 
 **P2-G.2 acceptance sweep:** P2-G foundation block accepted locally. No encounter posts, no loot UI, no SQL, no data migration.
 
+**P2-H.1 requirement/unlock baseline:** Requirements/unlocks/progression are structured fields, not relations or posts. `crafted_by_profession`, `gathered_via` remain reserved. No new productive requirement/unlock relation. `add_requirement` / `add_unlock` reserved for future scope only.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

@@ -1671,6 +1671,18 @@ window.WikiEntryLayout = (function() {
         creatureEncounterContext = null;
       }
     }
+    let requirementUnlockContext = null;
+    if (typeof BoundLoreRequirementUnlockRegistry !== "undefined" && BoundLoreRequirementUnlockRegistry.resolveRequirementUnlockContext) {
+      try {
+        requirementUnlockContext = BoundLoreRequirementUnlockRegistry.resolveRequirementUnlockContext({
+          meta: meta,
+          post: post,
+          discovery_payload: payload,
+        });
+      } catch (err) {
+        requirementUnlockContext = null;
+      }
+    }
 
     return {
       post: post,
@@ -1701,6 +1713,7 @@ window.WikiEntryLayout = (function() {
       resourceNodeContext: resourceNodeContext,
       observationContext: observationContext,
       creatureEncounterContext: creatureEncounterContext,
+      requirementUnlockContext: requirementUnlockContext,
       supplementalHtml: "",
     };
   }

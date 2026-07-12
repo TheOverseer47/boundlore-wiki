@@ -226,6 +226,58 @@ window.BoundLoreFacetRegistry = (function() {
         "quest_only", "event_only",
       ],
     }),
+    required_level: defineGroup({
+      key: "required_level",
+      label: "Required Level",
+      description: "Explicit level requirement only (not inferred from names).",
+      applicable_domains: ENTITY_DOMAINS,
+      search_relevant: true,
+      filter_relevant: false,
+      evidence_required: "recommended",
+    }),
+    faction_req: defineGroup({
+      key: "faction_req",
+      label: "Faction Requirement",
+      description: "Explicit faction requirement ref/text (not a top-level domain).",
+      applicable_domains: ENTITY_DOMAINS,
+      search_relevant: true,
+      filter_relevant: false,
+      evidence_required: "recommended",
+    }),
+    unlock_type: defineGroup({
+      key: "unlock_type",
+      label: "Unlock Type",
+      description: "Explicit unlock classification (not inferred from quest/item names).",
+      applicable_domains: ENTITY_DOMAINS,
+      search_relevant: true,
+      filter_relevant: false,
+      values: [
+        "quest_unlock", "knowledge_unlock", "recipe_unlock", "area_access", "vendor_access",
+        "profession_unlock", "skill_unlock", "title_unlock", "mount_unlock", "event_unlock",
+        "faction_unlock", "achievement_unlock",
+      ],
+    }),
+    access_state: defineGroup({
+      key: "access_state",
+      label: "Access State",
+      description: "Explicit locked/unlocked/conditional access state.",
+      applicable_domains: ENTITY_DOMAINS,
+      search_relevant: true,
+      filter_relevant: false,
+      values: ["unlocked", "locked", "conditional", "unavailable", "deprecated"],
+    }),
+    requirement_type: defineGroup({
+      key: "requirement_type",
+      label: "Requirement Type",
+      description: "Explicit requirement kind (structured field only).",
+      applicable_domains: ENTITY_DOMAINS,
+      search_relevant: true,
+      filter_relevant: false,
+      values: [
+        "required_level", "profession", "profession_level", "faction", "reputation",
+        "quest", "knowledge", "item", "resource", "tool", "station", "station_tier",
+      ],
+    }),
     processing_stage: defineGroup({
       key: "processing_stage",
       label: "Processing Stage",
@@ -630,6 +682,33 @@ window.BoundLoreFacetRegistry = (function() {
         if (val) derived.push(normalizeFacetEntry(field, val, "explicit"));
       });
     }
+
+    const ctx = payload.creature && typeof payload.creature === "object" ? payload.creature : payload;
+    const explicitLevel = payload.required_level != null ? payload.required_level
+      : (meta.required_level != null ? meta.required_level : ctx.required_level);
+    if (explicitLevel != null && explicitLevel !== "" && !isNaN(Number(explicitLevel))) {
+      derived.push(normalizeFacetEntry("required_level", String(explicitLevel), "explicit"));
+    }
+    const explicitFaction = normalizeFacetValue("faction_req", payload.faction_req || meta.faction_req || ctx.faction_req);
+    if (explicitFaction) derived.push(normalizeFacetEntry("faction_req", explicitFaction, "explicit"));
+    const explicitUnlock = normalizeFacetValue("unlock_type", payload.unlock_type || meta.unlock_type || ctx.unlock_type);
+    if (explicitUnlock && isKnownFacetValue("unlock_type", explicitUnlock)) {
+      derived.push(normalizeFacetEntry("unlock_type", explicitUnlock, "explicit"));
+    }
+    const explicitAccess = normalizeFacetValue("access_state", payload.access_state || meta.access_state || ctx.access_state);
+    if (explicitAccess && isKnownFacetValue("access_state", explicitAccess)) {
+      derived.push(normalizeFacetEntry("access_state", explicitAccess, "explicit"));
+    }
+    const reqSources = []
+      .concat(Array.isArray(payload.requirements) ? payload.requirements : [])
+      .concat(Array.isArray(meta.requirements) ? meta.requirements : []);
+    reqSources.forEach(function(req) {
+      if (!req || typeof req !== "object") return;
+      const t = normalizeFacetValue("requirement_type", req.type);
+      if (t && isKnownFacetValue("requirement_type", t)) {
+        derived.push(normalizeFacetEntry("requirement_type", t, "explicit"));
+      }
+    });
 
     return derived.filter(Boolean);
   }

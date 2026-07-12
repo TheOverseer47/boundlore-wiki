@@ -52,6 +52,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-G.2 acceptance sweep:** P2-G foundation block accepted locally. No encounter posts, no loot UI, no SQL, no data migration.
 
+**P2-H.1 requirement/unlock baseline:** `js/requirement-unlock-registry.js` — low-weight `requirement_context`, `unlock_context`, `progression_context`, `access_context` signals. Parser hints for required level/profession/faction/reputation/prerequisite/unlock/vendor access/station tier/weather-time (hint-only). No hard filters. No inference from item/quest names. Existing QA Ogre/Staff/mining/wood/forge queries unchanged.
+
 ---
 
 ## Goals

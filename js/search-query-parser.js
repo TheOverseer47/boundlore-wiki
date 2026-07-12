@@ -114,6 +114,30 @@ window.BoundLoreSearchQueryParser = (function() {
     { pattern: /\bdrops?\b/i, group: "drop_context", value: "drop" },
   ];
 
+  const REQUIREMENT_UNLOCK_KEYWORD_HINTS = [
+    { pattern: /\brequired\s+level\b/i, group: "requirement_context", value: "required_level" },
+    { pattern: /\blevel\s+requirement\b/i, group: "requirement_context", value: "level_requirement" },
+    { pattern: /\bprofession\s+requirement\b/i, group: "requirement_context", value: "profession_requirement" },
+    { pattern: /\bprofession\s+level\b/i, group: "progression_context", value: "profession_level" },
+    { pattern: /\bfaction\s+requirement\b/i, group: "requirement_context", value: "faction_requirement" },
+    { pattern: /\breputation\s+requirement\b/i, group: "requirement_context", value: "reputation_requirement" },
+    { pattern: /\bquest\s+prerequisite\b/i, group: "requirement_context", value: "quest_prerequisite" },
+    { pattern: /\bprerequisite\b/i, group: "requirement_context", value: "prerequisite" },
+    { pattern: /\bunlock\b/i, group: "unlock_context", value: "unlock" },
+    { pattern: /\brecipe\s+unlock\b/i, group: "unlock_context", value: "recipe_unlock" },
+    { pattern: /\bknowledge\s+unlock\b/i, group: "unlock_context", value: "knowledge_unlock" },
+    { pattern: /\bvendor\s+access\b/i, group: "access_context", value: "vendor_access" },
+    { pattern: /\barea\s+access\b/i, group: "access_context", value: "area_access" },
+    { pattern: /\blocked\b/i, group: "access_context", value: "locked" },
+    { pattern: /\bunlocked\b/i, group: "access_context", value: "unlocked" },
+    { pattern: /\brequires\s+tool\b/i, group: "requirement_context", value: "requires_tool" },
+    { pattern: /\brequires\s+station\b/i, group: "requirement_context", value: "requires_station" },
+    { pattern: /\bstation\s+tier\b/i, group: "requirement_context", value: "station_tier" },
+    { pattern: /\brequires\s+nighttime\b/i, group: "requirement_context", value: "requires_nighttime" },
+    { pattern: /\brequires\s+rain\b/i, group: "requirement_context", value: "requires_rain" },
+    { pattern: /\bswamp\s+requirement\b/i, group: "requirement_context", value: "swamp_requirement" },
+  ];
+
   const MISSING_ENTRY_TERMS = ["wood", "forge"];
 
   function escapeHtml(value) {
@@ -347,6 +371,17 @@ window.BoundLoreSearchQueryParser = (function() {
     return bucket.list;
   }
 
+  function extractRequirementUnlockHints(query) {
+    const raw = String(query || "");
+    const bucket = createHintBucket();
+    REQUIREMENT_UNLOCK_KEYWORD_HINTS.forEach(function(entry) {
+      if (entry.pattern.test(raw)) {
+        addHint(bucket, entry.group, entry.value, "keyword");
+      }
+    });
+    return bucket.list;
+  }
+
   function extractEntityTypeHints(query) {
     const bucket = createHintBucket();
     const raw = String(query || "");
@@ -415,6 +450,7 @@ window.BoundLoreSearchQueryParser = (function() {
     const resourceNodeHints = extractResourceNodeHints(raw);
     const observationContextHints = extractObservationContextHints(raw);
     const creatureEncounterHints = extractCreatureEncounterHints(raw);
+    const requirementUnlockHints = extractRequirementUnlockHints(raw);
     const entityTypeHints = extractEntityTypeHints(raw);
     const acquisitionIntent = extractAcquisitionIntent(raw);
     const missingEntryIntent = extractMissingEntryIntent(raw);
@@ -426,6 +462,7 @@ window.BoundLoreSearchQueryParser = (function() {
       { list: resourceNodeHints, _seen: new Set(resourceNodeHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: observationContextHints, _seen: new Set(observationContextHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: creatureEncounterHints, _seen: new Set(creatureEncounterHints.map(function(h) { return h.group + ":" + h.value; })) },
+      { list: requirementUnlockHints, _seen: new Set(requirementUnlockHints.map(function(h) { return h.group + ":" + h.value; })) },
       { list: entityTypeHints, _seen: new Set(entityTypeHints.map(function(h) { return h.group + ":" + h.value; })) }
     );
 
@@ -440,7 +477,7 @@ window.BoundLoreSearchQueryParser = (function() {
       tokens: tokenizeSearchQuery(raw),
       residual: residual,
       free_text: residual || normalized,
-      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, resourceNodeHints, observationContextHints, creatureEncounterHints, entityTypeHints),
+      facet_hints: allFacetHints.length ? allFacetHints : facetHints.concat(questEventHints, economyHints, versionHints, resourceNodeHints, observationContextHints, creatureEncounterHints, requirementUnlockHints, entityTypeHints),
       relation_hints: relationHints,
       entity_type_hints: entityTypeHints,
       quest_event_hints: questEventHints,
@@ -449,6 +486,7 @@ window.BoundLoreSearchQueryParser = (function() {
       resource_node_hints: resourceNodeHints,
       observation_context_hints: observationContextHints,
       creature_encounter_hints: creatureEncounterHints,
+      requirement_unlock_hints: requirementUnlockHints,
       usage_intent: usageIntent,
       crafting_intent: craftingIntent,
       acquisition_intent: acquisitionIntent,
@@ -498,6 +536,9 @@ window.BoundLoreSearchQueryParser = (function() {
     });
     (parsed.creature_encounter_hints || []).forEach(function(hint) {
       if (hint.value) parts.push("Creature: " + hint.value.replace(/_/g, " "));
+    });
+    (parsed.requirement_unlock_hints || []).forEach(function(hint) {
+      if (hint.value) parts.push("Requirement: " + hint.value.replace(/_/g, " "));
     });
 
     const unique = parts.filter(function(part, index, arr) {
@@ -636,6 +677,17 @@ window.BoundLoreSearchQueryParser = (function() {
       });
     });
 
+    (parsed.requirement_unlock_hints || []).forEach(function(hint) {
+      const groups = ["requirement_unlock", "requirement_context", "unlock_context", "progression_context", "access_context"];
+      groups.forEach(function(groupName) {
+        (signals[groupName] || []).forEach(function(signal) {
+          if (signalMatchesHint(signal, hint.value)) {
+            addDetail("requirement_unlock_hint", 1, signal.raw, hint);
+          }
+        });
+      });
+    });
+
     if (parsed.free_text && document.kind === "post") {
       const residualTokens = tokenizeSearchQuery(parsed.free_text).filter(function(t) {
         return !GENERIC_TERMS.has(t);
@@ -667,6 +719,7 @@ window.BoundLoreSearchQueryParser = (function() {
     extractMissingEntryIntent: extractMissingEntryIntent,
     extractObservationContextHints: extractObservationContextHints,
     extractCreatureEncounterHints: extractCreatureEncounterHints,
+    extractRequirementUnlockHints: extractRequirementUnlockHints,
     getQueryIntentSummary: getQueryIntentSummary,
     getSearchParserDebugInfo: getSearchParserDebugInfo,
     applyParsedQueryToSignals: applyParsedQueryToSignals,

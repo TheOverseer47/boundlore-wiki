@@ -101,3 +101,21 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 | Pending `add_recipe` conflict | Not touched |
 
 **P2-G foundation block (G.1 + G.2) accepted locally.**
+
+## P2-H.1 — Requirement, Unlock & Progression Context Baseline (local)
+
+**Status:** P2-H.1 baseline; registry/read/search/facet tolerance only; no SQL, no requirement/unlock posts, no data migration.
+
+| Check | Result |
+|-------|--------|
+| RequirementUnlockRegistry | `js/requirement-unlock-registry.js` — normalize/extract/signals; no name inference |
+| ContentModel integration | optional `requirements`/`unlocks`/`access_state` fields; explicit-only enrichment |
+| Facet groups | `required_level`, `faction_req`, `unlock_type`, `access_state`, `requirement_type` — explicit-only |
+| Search parser/signals | low-weight requirement/unlock/progression/access hints; no hard filters |
+| Wiki entry layout | `requirementUnlockContext` read-only; no new sections without explicit fields |
+| Promotion guards | `shouldPromoteRequirementToPost` / `shouldPromoteUnlockToPost` false |
+| Reserved relations | `crafted_by_profession`, `gathered_via` unchanged; no new productive requirement relation |
+| QA regressions | Staff/Ember/Ogre/Swamp unchanged; Wood/Forge missing-entry only |
+| Not built | Requirement/unlock create UI, skilltree, leveling, achievement tracker, SQL |
+
+**Deployment freeze remains active** — no push/deploy.
