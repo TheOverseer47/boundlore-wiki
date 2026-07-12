@@ -124,6 +124,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-F.3 draft preview baseline:** `shouldUpdateSearchIndexFromPreview` always false. Preview reports are diagnostics-only and not indexed.
 
+**P4-F.4 acceptance sweep:** Draft preview baseline accepted locally. Search/index activation remains blocked.
+
 ---
 
 ## Goals

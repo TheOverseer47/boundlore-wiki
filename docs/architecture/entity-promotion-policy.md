@@ -174,6 +174,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-F.3 draft preview baseline:** `shouldPromoteFromPreview` and `shouldCreateMissingEntryFromPreview` always false. Preview does not promote entities, infer PLACE from coordinates, or create Wood/Forge posts.
 
+**P4-F.4 acceptance sweep:** Draft preview baseline accepted locally. All promotion/post policy functions remain false; no production draft preview integration.
+
 ---
 
 ## Missing Entry Queue

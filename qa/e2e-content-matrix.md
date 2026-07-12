@@ -1715,6 +1715,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-F.4 — Structured Contribution Draft Preview Acceptance Sweep
+
+**Milestone:** P4-F.4 docs-only acceptance sweep; confirms P4-F.3 baseline; no code, SQL, data migration, draft preview UI, submit flows, search index, backfill, posts, push, or deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| P4-F.3 baseline accepted | docs + QA | module + fixture documented | `[x]` |
+| Preview module stable | `/qa/p4-structured-contribution-draft-preview-fixtures.html` | 15/15 PASS; all policy false | `[x]` |
+| Mutation + rendering safe | console + DOM | no input mutation; no action controls | `[x]` |
+| No prod integration | wiki/admin/post | preview script not loaded | `[x]` |
+| P3/P4 harness regression | existing QA pages | prior pass counts unchanged | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Not live-ready | docs | documented | `[x]` |
+| Code changes | — | none | `[x]` |
+| Data changes | — | none | `[x]` |
+| Deploy / push | — | forbidden | `[x]` |
+
+**P4-F.4 acceptance sweep completed locally.** The Structured Contribution Draft Preview baseline is accepted. `BoundLoreStructuredContributionDraftPreview` is read-only and diagnostics-only, uses `BoundLoreStructuredContributionDraftContract` and `BoundLoreStructuredContextSchema`, renders field-level diffs, validation issues, policy flags, risk warnings, and evidence/confidence without mutating inputs. All write/submit/save/queue/approve/reject/archive/repair/post/missing-entry/promotion/auto-merge/search/registry policy functions remain false. It remains QA-fixture-only with no production Draft Preview integration. No code, data, SQL, Supabase, Draft Preview UI, contribution UI, submit/save/approve/reject/archive flows, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; **LAUNCH-0** is mandatory before any push/deploy/live action.
+
+**Next candidate:** **P4 Final Integration Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

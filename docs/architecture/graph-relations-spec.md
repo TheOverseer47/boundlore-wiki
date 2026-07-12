@@ -68,6 +68,8 @@
 
 **P4-F.3 draft preview baseline:** Preview renders section-scoped field diffs only; no relation graph persistence from preview reports.
 
+**P4-F.4 acceptance sweep:** Draft preview baseline accepted locally. No relation graph persistence from preview validation.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

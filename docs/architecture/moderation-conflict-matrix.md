@@ -215,6 +215,8 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 
 **P4-F.3 draft preview baseline:** `BoundLoreStructuredContributionDraftPreview` renders draft contract reports and field-level diffs read-only. No queue mutation, no approval flows, no write-path activation. Pending `add_recipe` untouched.
 
+**P4-F.4 acceptance sweep:** Draft preview baseline accepted locally. No moderation workflow, queue actions, or write-path activation. Pending `add_recipe` untouched.
+
 ---
 
 ---

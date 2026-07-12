@@ -2860,3 +2860,36 @@ The future Draft Inspector / Preview must **NOT**:
 **Next:** **P4-F.4 Acceptance Sweep** or **P4 Final Integration Gate**. **LAUNCH-0** mandatory before any push/deploy/live action.
 
 ---
+
+## 83. P4-F.4 — Structured Contribution Draft Preview Acceptance Sweep
+
+**Milestone:** P4-F.4 docs-only acceptance sweep; confirms P4-F.3 baseline; no code, SQL, data migration, draft preview UI, submit flows, or deploy.
+
+### Acceptance statement
+
+**P4-F.4 acceptance sweep completed locally.** The Structured Contribution Draft Preview baseline is accepted. `BoundLoreStructuredContributionDraftPreview` is read-only and diagnostics-only, uses `BoundLoreStructuredContributionDraftContract` and `BoundLoreStructuredContextSchema`, renders field-level diffs, validation issues, policy flags, risk warnings, and evidence/confidence without mutating inputs. All write/submit/save/queue/approve/reject/archive/repair/post/missing-entry/promotion/auto-merge/search/registry policy functions remain false. It remains QA-fixture-only with no production Draft Preview integration. No code, data, SQL, Supabase, Draft Preview UI, contribution UI, submit/save/approve/reject/archive flows, admin/create/edit/moderation write-flows, queue actions, search-index, backfill, posts, push, or deploy changes were introduced. The project remains not live-ready; LAUNCH-0 is mandatory before any push/deploy/live action.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| §82 P4-F.3 preview baseline present | `[x]` — module + 15-case QA fixture |
+| Preview module API (`p4-f3`) | `[x]` — `BoundLoreStructuredContributionDraftPreview` stable |
+| Draft contract + schema integration | `[x]` — read-only report pipeline |
+| Field-level diff statuses | `[x]` — unchanged/added/changed/removed/conflict/duplicate/merge_candidate/blocked/restricted_review/planned_only |
+| QA fixture 15/15 PASS | `[x]` — policy/mutation/rendering safe |
+| No prod draft preview script load | `[x]` — wiki/admin/post paths clean |
+| P3/P4 harness regression | `[x]` — contract 15/15, inspector 10/10, schema 13/13, sample 10/10, contract 9/9+17/17, renderer 8/8+12/12, guard 12/12, probe 16 links |
+| No submit/save/approve/reject/archive/repair UI | `[x]` |
+| No admin/create/edit/moderation write-flows | `[x]` |
+| No queue actions / search index / backfill | `[x]` |
+| `add_recipe` pending conflict baseline | `[x]` — untouched |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Code / data / deploy changes | `[x]` — docs-only sweep |
+
+### Next candidate
+
+**P4 Final Integration Gate** — not production deploy without **LAUNCH-0**.
+
+---
