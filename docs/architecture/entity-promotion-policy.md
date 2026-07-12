@@ -120,6 +120,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-C.1 preview adapter:** `?p3_context_preview=` on localhost post pages only; ephemeral read-only overlay; no post promotion or data writes.
 
+**P3-C.2 acceptance sweep:** Preview adapter accepted locally. localhost + query-param only; no promotion, no inference, no production activation.
+
 ---
 
 ## Missing Entry Queue

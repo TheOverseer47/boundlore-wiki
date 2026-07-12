@@ -1314,3 +1314,25 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 **P3-C.1:** Local read-only detail context preview via `?p3_context_preview=` on localhost post pages only. Before deploy, preview must remain localhost-gated or pass separate launch gate.
 
 ---
+
+## 50. P3-C.2 — Local Context Preview Adapter Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; read-only verification; no code/data changes; no deploy).
+
+| Area | Result |
+|------|--------|
+| PreviewAdapter API | 57/59 console checks green on QA Staff + `?p3_context_preview=all` |
+| Localhost + query gate | `isPreviewActive()` false without query; true only with `p3_context_preview` |
+| Positive preview modes | resource/observation/creature/requirement/versioning/all render expected sections + banner |
+| Negative preview modes | negative_source_detail/name_only/empty_unknown/off → 0 sections |
+| Entry mutation | `before === after` on original entry; preview clone is separate object |
+| Without preview | QA Staff/Ember/Ogre/Swamp: 0 `.bl-p3-context-section`, 0 `.bl-p3-preview-banner` |
+| Fixture regression | `/qa/p3-context-renderer-fixtures.html` — 8/8 fixtures, 12/12 assertions |
+| Cross-registry guards | RN/OC/CE/RU promotion guards false |
+| Production regressions | 16/16 URLs HTTP 200; baseline unchanged |
+| Admin | read-only; session-dependent (not repaired) |
+| Not activated | Production preview, Supabase writes, posts, admin/create/edit flows |
+
+**P3-C.2 acceptance sweep completed locally.** The local detail-page context preview adapter is accepted as localhost-only, query-param-only, ephemeral, read-only preview. Positive preview modes render expected sections; negative modes and no-query pages remain empty. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced. boundlore.com untouched.
+
+---

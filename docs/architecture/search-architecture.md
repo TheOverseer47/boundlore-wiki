@@ -70,6 +70,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-C.1 preview adapter:** Localhost query-param preview only; no search/index changes.
 
+**P3-C.2 acceptance sweep:** Preview adapter accepted locally. Search baseline unchanged; preview not indexed.
+
 ---
 
 ## Goals

@@ -903,6 +903,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-C.2 — Local Context Preview Adapter Acceptance Sweep
+
+**Milestone:** P3-C acceptance sweep; read-only verification; no code/data changes; no deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Preview adapter API | QA Staff + `?p3_context_preview=all` | 57/59 console checks green | `[x]` |
+| Positive preview modes | resource/observation/creature/requirement/versioning/all | banner + matching section(s) | `[x]` |
+| Negative preview modes | negative_source_detail/name_only/empty_unknown/off | 0 sections | `[x]` |
+| Entry mutation | console | original entry unchanged (`before===after`) | `[x]` |
+| Without preview query | QA Staff/Ember/Ogre/Swamp | 0 sections, 0 banner | `[x]` |
+| DOM safety | preview pages | no buttons/forms/admin/create/edit in context | `[x]` |
+| Fixture regression | `/qa/p3-context-renderer-fixtures.html` | 8/8 fixtures, 12/12 assertions | `[x]` |
+| Cross-registry guards | console | RN/OC/CE/RU promotion guards false | `[x]` |
+| Production regressions | 16+ URLs | HTTP 200; baseline unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` |
+
+**P3-C.2 acceptance sweep completed locally.** The local detail-page context preview adapter is accepted as localhost-only, query-param-only, ephemeral, read-only preview. Positive preview modes render expected sections; negative modes and no-query pages remain empty. No production navigation, data writes, posts, Supabase writes, admin/create/edit flows, automatic promotion, or taxonomy inference were introduced.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
