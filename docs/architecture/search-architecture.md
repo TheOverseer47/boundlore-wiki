@@ -88,6 +88,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-H.1 data contract baseline:** `js/context-data-contract.js` read-only normalizes explicit context fields on detail pages only. No search index, no backend field search, no query parser changes. Preview remains localhost-gated and not indexed.
 
+**P3-H.2 acceptance sweep:** Data contract accepted locally. Search baseline unchanged; no index activation; preview not indexed.
+
 ---
 
 ## Goals

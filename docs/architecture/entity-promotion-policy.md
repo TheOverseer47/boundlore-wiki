@@ -138,6 +138,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-H.1 data contract baseline:** `js/context-data-contract.js` normalizes explicit root/meta/discovery_payload/structured_context fields read-only into detail-page context entry shape. No writes, no posts, no promotion, no inference. Preview layer remains localhost-gated. P3-H.2 acceptance sweep follows.
 
+**P3-H.2 acceptance sweep:** Read-only context data contract accepted locally. Explicit fields only from root/meta/discovery_payload/structured_context; source_detail/name-only negatives stay empty; no entry mutation, no writes, no posts, no promotion/inference. Next: P3-I planning gate or controlled local read-only sample data gate.
+
 ---
 
 ## Missing Entry Queue

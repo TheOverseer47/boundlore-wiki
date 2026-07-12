@@ -176,3 +176,7 @@ No element taxonomy inference from item names (e.g. "QA Staff of Fire"). Loot-ta
 | Auto-promotion from context text | Forbidden per entity-promotion-policy |
 
 **P3-G.1:** Admin/create/edit/moderation for P2 context fields remains future work. P3-H.1 data contract is read-only normalization only.
+
+**P3-H.2:** Data contract accepted locally. No moderation/contribution workflow activation. Pending `add_recipe` conflict remains untouched.
+
+---

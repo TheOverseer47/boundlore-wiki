@@ -1542,7 +1542,7 @@ P3-H.2 (later): acceptance sweep confirming real fields render only when explici
 | Gate | Before |
 |------|--------|
 | P3-H.1 data contract baseline | Any real field binding in renderer |
-| P3-H.2 acceptance sweep | Treating data contract as accepted |
+| P3-H.2 acceptance sweep | Treating data contract as accepted | `[x]` P3-H.2 |
 | Data/fixture backfill gate | Populating real structured fields on entries |
 | Moderation/contribution gate | Admin/create/edit for context fields |
 | Search/index gate | Backend or index for P2 context fields |
@@ -1616,5 +1616,37 @@ Without explicit contract fields, QA Staff/Ember/Ogre/Swamp remain at 0 context 
 - No deploy or production preview activation
 
 **Next:** P3-H.2 acceptance sweep confirming contract + regression baseline.
+
+---
+
+## 59. P3-H.2 — Read-only Context Data Contract Acceptance Sweep
+
+**Milestone:** P3-H.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+### Acceptance statement
+
+**P3-H.2 acceptance sweep completed locally.** The read-only context data contract is accepted. It normalizes only explicit safe fields from root, meta, discovery_payload, and structured_context; preserves source_detail/name-only/empty negatives; mutates no entries; writes no data; creates no posts; activates no admin/create/edit/moderation flows; and does not enable search indexing, automatic promotion, or taxonomy inference.
+
+### Verified locally
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreContextDataContract` API stable | `[x]` — 23/23 console checks on contract fixture page |
+| Data contract fixtures | `[x]` — 9/9 fixtures, 17/17 assertions |
+| Read-only / explicit-only guards | `[x]` — writes/promotion/actions false |
+| Entry immutability | `[x]` — `before === after` on resolve |
+| Source order | `[x]` — root → meta → discovery_payload → structured_context |
+| Derived/enriched `biome_context` | `[x]` — no false observation section on QA Staff |
+| Renderer / matrix / guard regression | `[x]` — 8/8, 12/12; 44 links; 12/12 guard |
+| Preview layer | `[x]` — localhost-gated; all/resource_node/negative modes OK |
+| QA Staff/Ember/Ogre/Swamp without preview | `[x]` — 0 `.bl-p3-context-section`, 0 banner |
+| Standard URL regression | `[x]` — 24+ URLs HTTP 200 |
+| Wood/Forge | `[x]` — missing-entry only |
+| Pending conflict | `[x]` — not touched |
+| Deploy / push / SQL | `[x]` — forbidden |
+
+### Next candidate
+
+**P3-I Planning Gate** or a controlled local read-only sample data gate — not production deploy without separate launch/data-safety gate.
 
 ---

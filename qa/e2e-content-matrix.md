@@ -1106,6 +1106,34 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-H.2 — Read-only Context Data Contract Acceptance Sweep
+
+**Milestone:** P3-H.2 docs-only acceptance sweep; no code, SQL, data migration, or deploy.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| P3-H.1 baseline accepted | HEAD `1fc890f` | contract module integrated | `[x]` |
+| Contract fixture page | `/qa/p3-context-data-contract-fixtures.html` | 9/9 fixtures; 17/17 assertions | `[x]` |
+| Console API sweep | contract fixture page | 23/23 checks (writes/promotion/actions/sources/explicit-only) | `[x]` |
+| Entry immutability | console | `before === after`; resolved clone | `[x]` |
+| Derived biome_context | QA Staff without preview | 0 sections (no false observation) | `[x]` |
+| Renderer regression | `/qa/p3-context-renderer-fixtures.html` | 8/8 fixtures; 12/12 assertions | `[x]` |
+| Preview matrix | `/qa/p3-detail-preview-matrix.html` | 4×11; 44 localhost links | `[x]` |
+| Guard safety | `/qa/p3-preview-guard-safety.html` | 12/12 PASS | `[x]` |
+| Preview QA Staff | all/resource_node/negative_source_detail/off/none | per-mode banner/sections | `[x]` |
+| QA Staff/Ember/Ogre/Swamp | post slugs without preview | 0 `.bl-p3-context-section`; 0 banner | `[x]` |
+| Standard regression | 24+ URLs incl. search/admin | HTTP 200; unchanged | `[x]` |
+| Wood/Forge | search | missing-entry only | `[x]` |
+| Pending conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` HTTP 200 only |
+| Deploy / push / SQL | — | forbidden | `[x]` |
+
+**P3-H.2 acceptance sweep completed locally.** The read-only context data contract is accepted. It normalizes only explicit safe fields from root, meta, discovery_payload, and structured_context, preserves source_detail/name-only negatives, mutates no entries, writes no data, creates no posts, activates no admin/create/edit/moderation flows, and does not enable search indexing, automatic promotion, or taxonomy inference.
+
+**Next candidate:** P3-I Planning Gate or controlled local read-only sample data gate. Deploy remains blocked without launch/data-safety gate.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
