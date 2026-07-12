@@ -1180,6 +1180,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P3-J.1 — Real-Data Readiness & Safety Planning Gate
+
+**Milestone:** P3-J.1 docs-only planning gate; no code, SQL, data migration, or deploy.
+
+| Check | Result |
+|-------|--------|
+| P3-I.2 sample data gate accepted | `[x]` |
+| Real-Data Readiness Matrix documented | `[x]` |
+| P3-K.1 probe candidate defined | `[x]` |
+| LAUNCH-0 gate documented (not executed) | `[x]` |
+| Not live-ready documented | `[x]` |
+| Code changes | none |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**Next candidate:** P3-K.1 Real Existing Entry Read-only Contract Probe. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

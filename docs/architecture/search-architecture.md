@@ -94,6 +94,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P3-I.2 acceptance sweep:** Sample data gate accepted locally. Search baseline unchanged; no index activation.
 
+**P3-J.1 planning gate:** Real-data read-only probe (P3-K.1) is not a search-index gate. No backend field search or index activation until separate search gate.
+
 ---
 
 ## Goals

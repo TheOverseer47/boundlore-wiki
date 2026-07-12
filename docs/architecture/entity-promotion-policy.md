@@ -144,6 +144,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P3-I.2 acceptance sweep:** Local read-only sample data gate accepted. Positive samples render via real pipeline; negatives and derived-only stay empty. Next: P3-J planning gate or controlled real-data read-only gate.
 
+**P3-J.1 planning gate:** Real-data binding must not trigger promotion, inference, or entity creation. Explicit contract fields only; enriched/derived fields excluded. LAUNCH-0 required before any push/deploy.
+
 ---
 
 ## Missing Entry Queue

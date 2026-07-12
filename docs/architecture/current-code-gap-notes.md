@@ -1720,3 +1720,104 @@ Read-only, explicit-only, no writes, no posts, no Supabase, no admin/create/edit
 **P3-J Planning Gate** for real data strategy, or a separately controlled Real-Data Read-only Gate — not production deploy without launch/data-safety gate.
 
 ---
+
+## 62. P3-J.1 — Real-Data Readiness & Safety Planning Gate
+
+**Milestone:** P3-J.1 docs-only planning/safety gate; no code, SQL, data migration, or deploy.
+
+### Currently accepted locally
+
+| Layer | Status |
+|-------|--------|
+| P3 Preview Layer | Final accepted (P3-F.2); localhost + query-param only; production-guarded |
+| P3 Data Contract | Accepted (P3-H.2); read-only, explicit-only, no-writes |
+| P3 Local Sample Data Gate | Accepted (P3-I.2); 10/10 QA samples via real pipeline |
+| QA harnesses | Green (contract, renderer, matrix, guard, sample data) |
+| boundlore.com | Untouched; deployment freeze active |
+
+**Confirmed:** No real posts created. No Supabase writes. No admin/create/edit/moderation flows for P3 context fields. No search-index activation. No automatic promotion or taxonomy inference.
+
+### Real-Data Readiness Matrix
+
+| Bereich | Status | Nächster erlaubter Schritt | Verboten bis separates Gate |
+|---------|--------|----------------------------|-----------------------------|
+| A. Detail Context Rendering | Renderer + DataContract lokal accepted | Echte vorhandene Entry-Felder read-only erkennen/normalisieren | Write/Edit/Create/Admin-Flows |
+| B. Echte Entry-Daten | Noch nicht produktiv angebunden | Read-only inspection/normalization only (`meta`, `discovery_payload`, `structured_context`) | Migration, Backfill, Inserts, Updates |
+| C. QA Staff / Ember / Ogre / Swamp | Baseline unverändert (0 sections ohne Preview) | Weiterhin Regression Anchor | Automatische Context-Sections ohne explizite Felder |
+| D. Wood / Forge | Missing Entries only; keine Posts | Keine automatische Post-Erzeugung | Stub/Post-Erzeugung ohne separates Gate |
+| E. Pending add_recipe Conflict | Unangetastet | Weiter als Moderation-Baseline behalten | Approve/Reject/Delete |
+| F. Search | Hint-only; kein P3 Index | Später separates Search-Index-Gate | Backend/Search-Index-Aktivierung jetzt |
+| G. Admin/Create/Edit/Moderation | Nicht aktiviert für P3-Felder | Später separates Moderation-/Contribution-Gate | Formulare, Buttons, Queue-Aktionen |
+| H. Deploy/Live | Blockiert | Separater Launch-/Data-Safety-Gate (LAUNCH-0) | Push/Deploy/Live Preview |
+
+### Allowed real-data sources (read-only probe only)
+
+When **P3-K.1** runs, only these BLMETA paths may be read:
+
+| Source | Allowed explicit fields |
+|--------|-------------------------|
+| `meta.*` | Contract-allowed section fields only |
+| `discovery_payload.*` | Contract-allowed section fields only |
+| `structured_context.*` | Contract-allowed section blocks only |
+| Root safe fields | Only when not `_derived` / `__derived` |
+
+### Tabu (remain forbidden)
+
+- `source_detail` alone → no resource_node section
+- Names/titles/descriptions → no taxonomy or encounter inference
+- Enriched/derived fields (`biome_context` from normalize/enrich) → no section unless explicit in raw BLMETA
+- coordinates/location_ref → no PLACE promotion
+- requirements/unlocks → no post/entity promotion
+- Wood/Forge text mentions → no automatic stubs or posts
+- Pending conflict → no queue action
+
+### Next technical candidate: P3-K.1
+
+**P3-K.1 — Real Existing Entry Read-only Contract Probe**
+
+May only:
+
+- Inspect existing loaded entry objects read-only
+- Read `meta`, `discovery_payload`, `structured_context` from real posts
+- Normalize via `BoundLoreContextDataContract.resolveContractEntry()`
+- Render via `ContextSectionRenderer` only when explicit contract fields exist
+- Leave QA baseline unchanged when no explicit fields present
+
+May NOT:
+
+- Change Supabase data
+- Backfill new fields
+- Create posts (including Wood/Forge)
+- Touch pending conflict
+- Build search index
+- Activate admin/create/edit/moderation
+- Prepare or execute deploy
+
+### Not live-ready
+
+**Noch NICHT live-ready.** P3-J.1 is planning only; no push/deploy decision.
+
+Before any Live/Push/Deploy, a separate gate is mandatory:
+
+**LAUNCH-0 — Local Final Data Safety & Production Readiness Gate**
+
+LAUNCH-0 must verify (when executed later):
+
+- Working tree clean; intended files only staged
+- All QA harnesses green (contract, sample, renderer, matrix, guard)
+- Real-data read-only binding accepted (post P3-K.x)
+- No open SQL/migration/backfill
+- No QA data accidentally production-visible
+- Supabase project/environment unambiguous
+- Admin/moderation state safe and intentional
+- Pending conflict consciously decided or consciously unchanged
+- Cache-busting final on touched assets
+- boundlore.com impact understood
+- Rollback plan documented
+- Only then: conscious push/deploy decision
+
+**LAUNCH-0 is NOT executed in P3-J.1.** No push. No deploy.
+
+**P3-J.1 planning gate completed locally.** Recommended next step: **P3-K.1 Real Existing Entry Read-only Contract Probe**.
+
+---
