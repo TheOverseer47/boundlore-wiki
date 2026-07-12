@@ -60,6 +60,8 @@
 
 **P4-D.1 draft flow planning:** Structured context drafts must not persist derived inverse relations or mutate relation graphs directly. Proposed field changes are section-scoped; relation changes require a separate relation/contribution policy gate (`ContributionIntentRegistry` unchanged in P4-D.1).
 
+**P4-E.1 draft contract baseline:** Draft contract validates section-scoped field proposals only; no relation graph persistence from draft reports.
+
 Canonical relation types for BoundLore knowledge graph. Implementation registry: `js/relations-registry.js`.
 
 **Direction notation:** `source → target` (relation stored on source entity pointing to target).

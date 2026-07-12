@@ -2103,7 +2103,7 @@ When write flows are implemented (not in P4-A.1):
 | P4-C.1 | Admin Read-only Structured Field Inspector Planning Gate | **Accepted — docs-only** | Inspector scope/pipeline planned; no code |
 | P4-D.1 | Structured Contribution Draft Flow Planning Gate | **Accepted — docs-only** | Draft lifecycle, payload, intents, conflicts; no submit |
 | P4-D.2 | Acceptance Sweep | **Accepted — docs-only** | Confirms draft plan |
-| P4-E.1 | Structured Contribution Draft Contract Baseline | Later code possible | Draft contract module; no submit |
+| P4-E.1 | Structured Contribution Draft Contract Baseline | **Current — read-only code** | Draft contract module + QA fixture; no submit |
 
 **Write flows** (admin edit, create with fields, contribution approve) come only after: schema, validation, conflict policy, evidence/audit policy, and separate data-safety gate.
 
@@ -2531,14 +2531,15 @@ A future moderator view would need read-only access to:
 | Phase | Task | Type | Notes |
 |-------|------|------|-------|
 | **P4-D.1** | Structured Contribution Draft Flow Planning Gate | **Accepted — docs-only** | Draft plan documented |
-| **P4-D.2** | Acceptance Sweep | **Accepted — docs-only** | This gate |
-| P4-E.1 | Structured Contribution Draft Contract Baseline | Later code/docs | Separate gate |
+| **P4-D.2** | Acceptance Sweep | **Accepted — docs-only** | Confirms draft plan |
+| **P4-E.1** | Structured Contribution Draft Contract Baseline | **Current — read-only code** | Draft contract module + QA fixture; no submit |
+| P4-E.2 | Acceptance Sweep | docs-only | Confirms draft contract baseline |
 
 ### Not live-ready
 
 **P4-D.1 activates nothing.** No contribution UI, no draft submit, no save, no approve/reject, no queue mutation, no search index, no deploy.
 
-**Next:** P4-E.1 Structured Contribution Draft Contract Baseline.
+**Next:** P4-E.2 acceptance sweep.
 
 ---
 
@@ -2573,6 +2574,60 @@ A future moderator view would need read-only access to:
 
 ### Next candidate
 
-**P4-E.1 — Structured Contribution Draft Contract Baseline** — draft contract module only; not production deploy without **LAUNCH-0**.
+**P4-E.1 — Structured Contribution Draft Contract Baseline** — read-only draft contract module; not production deploy without **LAUNCH-0**.
+
+---
+
+## 78. P4-E.1 — Structured Contribution Draft Contract Baseline
+
+**Milestone:** P4-E.1 read-only draft contract validation baseline; no contribution UI, submit/save flows, queue actions, data writes, or deploy.
+
+### Context
+
+- **P4-D** Structured Contribution Draft Flow plan is **accepted** (§76–§77).
+- **P4-B** schema baseline (`BoundLoreStructuredContextSchema`) and **P4-C** inspector baseline remain QA-fixture-only on prod paths.
+- **P4-E.1 adds** `BoundLoreStructuredContributionDraftContract` — validates local draft payloads, normalizes draft states, maps planned intents read-only, and produces field-level conflict reports without persisting data.
+- **`ContributionIntentRegistry` unchanged** — seven `suggest_*_context` intents remain planned/reserved only; `add_recipe` pending conflict baseline untouched.
+- **Still not live-ready** — LAUNCH-0 mandatory before any push/deploy/live action.
+
+### Module
+
+| Artifact | Path | Notes |
+|----------|------|-------|
+| Draft contract | `js/structured-contribution-draft-contract.js` | `DRAFT_CONTRACT_VERSION`: `p4-e1` |
+| QA fixture | `qa/p4-structured-contribution-draft-contract-fixtures.html/js` | 15 cases A–O; not linked from wiki |
+
+### Draft states
+
+| State | P4-E.1 active? |
+|-------|----------------|
+| `local_draft`, `validated_draft`, `blocked_draft` | Yes — local validation only |
+| `submitted_pending`, `conflict_review`, `approved`, `rejected_archived` | **No** — `future_only` |
+
+### Planned intent map (read-only)
+
+Seven section → `suggest_*_context` mappings; all planned/reserved; registry not mutated.
+
+### API highlights
+
+- `createDraftReport(draft, existingEntry, options)` — target/section/field/evidence/state validation + schema + conflict report
+- `createFieldLevelConflictReport(draft, existingEntry, options)` — duplicate/no-op, conflict, merge-candidate
+- `renderDraftReport(report, options)` — safe HTML diagnostics only
+- All `should*` policy functions return **`false`**
+
+### QA fixture results (local)
+
+| Check | Result |
+|-------|--------|
+| Fixtures A–O | `[x]` — 15/15 PASS |
+| Policy / mutation / rendering safe | `[x]` |
+| Prod script wiring | `[x]` — QA fixture page only |
+| P3/P4 regression harnesses | `[x]` — unchanged green |
+
+### Not live-ready
+
+**P4-E.1 activates nothing on prod paths.** No contribution UI, no draft submit, no save, no approve/reject, no queue mutation, no search index, no deploy.
+
+**Next:** P4-E.2 acceptance sweep.
 
 ---

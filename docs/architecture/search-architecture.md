@@ -116,6 +116,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P4-D.1 draft flow planning:** Draft payloads and pending structured changes are not search-indexed. Search/facet activation for accepted writes remains a separate gate after moderation and write approval.
 
+**P4-E.1 draft contract baseline:** `shouldUpdateSearchIndexFromDraft` always false. Draft reports are not indexed.
+
 ---
 
 ## Goals

@@ -1573,6 +1573,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P4-E.1 — Structured Contribution Draft Contract Baseline
+
+**Milestone:** P4-E.1 read-only draft contract validation baseline; no contribution UI, submit/save flows, queue actions, search index, backfill, posts, push, or deploy.
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreStructuredContributionDraftContract` module | `[x]` |
+| Draft states + future-only states | `[x]` |
+| Draft payload validation | `[x]` |
+| Planned intent map read-only | `[x]` |
+| Field-level conflict report | `[x]` |
+| QA fixture A–O | `[x]` — 15/15 PASS |
+| Policy functions all false | `[x]` |
+| Mutation safe | `[x]` |
+| Rendering safe | `[x]` |
+| `ContributionIntentRegistry` unchanged | `[x]` |
+| No contribution UI / draft submit / save | `[x]` |
+| No write/admin/moderation/search/backfill activated | `[x]` |
+| Prod paths — draft contract not loaded | `[x]` |
+| Not live-ready documented | `[x]` |
+| LAUNCH-0 mandatory before push/deploy | `[x]` |
+| Data changes | none |
+| Deploy / push | forbidden |
+
+**P4-E.1 draft contract baseline completed locally.** `BoundLoreStructuredContributionDraftContract` validates draft payloads read-only, normalizes draft states, maps planned intents without registry mutation, and produces field-level conflict reports. QA fixture 15/15 PASS. No contribution UI, no draft submit/save, no queue actions, no search index, no data writes. Project remains not live-ready; LAUNCH-0 mandatory before push/deploy.
+
+**Next candidate:** P4-E.2 Acceptance Sweep. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

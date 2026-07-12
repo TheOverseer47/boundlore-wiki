@@ -166,6 +166,8 @@ Automatic scoring feeds the Missing Entry Queue. Moderators always approve promo
 
 **P4-D.1 draft flow planning:** Structured contribution drafts must not trigger promotion or auto-create missing entries. Wood/Forge remain missing-entry queue items until a separate promotion gate. Drafts may propose explicit structured fields only; no entity lifecycle transition from draft validation alone.
 
+**P4-E.1 draft contract baseline:** `shouldPromoteFromDraft` and `shouldCreateMissingEntryFromDraft` always false. Draft validation does not promote entities or create Wood/Forge posts.
+
 ---
 
 ## Missing Entry Queue
