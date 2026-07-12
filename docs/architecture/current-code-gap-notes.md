@@ -893,3 +893,24 @@ P0.5-A through P0.5-F are **complete** (see [roadmap.md](./roadmap.md) and P0.5-
 | Unchanged | QA Staff/Ember/Ogre/Swamp, mining/wood/forge search, create_ui/admin_flow false | Verified locally |
 
 **Deployment freeze remains active** — no push/deploy.
+
+---
+
+## 30. P2-B.2 — Quest / Event / NPC Service Acceptance Sweep
+
+**Status:** Complete (local acceptance sweep; registry/read/search baseline only; no SQL, no UI, no data migration).
+
+| Acceptance | Result |
+|------------|--------|
+| QuestEventRegistry API (post page) | Green — objective/reward/event/service normalize + signals |
+| ContentModelRegistry integration | Green — active models, create_ui/admin_flow false, supported fields |
+| Reserved relations | reward_of, occurs_during, sold_by — persistence `reserved` |
+| Search parser hints | quest reward/objective/giver, npc vendor/trainer, event schedule, world/seasonal event |
+| Search regressions | mining/wood/forge/parser/npc/quest/event unchanged |
+| QA Staff / QA Ember / Ogre / Swamp | Unchanged; no Quest/Event/NPC-Service sections |
+| Resources mining | QA Ember visible |
+| Wood/Forge | Missing-entry only; no posts |
+| Admin | Session-dependent — automation not verified |
+| Pending `add_recipe` conflict | Not touched |
+
+**P2-B.2 acceptance sweep completed; Quest objectives, rewards, event occurrences, and NPC services accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration.** P2-B foundation block (B.1 + B.2) accepted locally. Ready for P2-C. Deployment freeze remains active.

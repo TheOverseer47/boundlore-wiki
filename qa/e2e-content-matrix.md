@@ -474,6 +474,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P2-B.2 — Quest / Event / NPC Service Acceptance Sweep
+
+**Milestone:** P2-B foundation block (B.1 + B.2); registry/read/search baseline only; no SQL, no UI, no data migration.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| QuestEventRegistry API sweep | QA Staff post | all normalize/extract/signals green | `[x]` |
+| ContentModelRegistry integration | console | active models; create_ui/admin false | `[x]` |
+| Reserved relations | reward_of, occurs_during, sold_by | reserved; persistence reserved | `[x]` |
+| Search parser hints | quest reward/objective/giver, npc vendor/trainer, event schedule, world/seasonal | hint-only; no crash | `[x]` |
+| Search regressions | mining/wood/forge/parser/npc/quest/event | unchanged | `[x]` |
+| QA Staff / QA Ember / Ogre / Swamp | post slugs | unchanged; no new sections | `[x]` |
+| Resources mining | facet URL | QA Ember visible | `[x]` |
+| Wood/Forge | search | missing-entry only; no posts | `[x]` |
+| Reserved UI flows | pages | no Quest/Event/NPC-Service buttons | `[x]` |
+| Pending `add_recipe` conflict | admin read-only | not touched | `[x]` |
+| Admin optional | `/wiki/admin/` | session-dependent | `[~]` automation not verified |
+
+**P2-B.2 acceptance sweep completed; Quest objectives, rewards, event occurrences, and NPC services accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration.** P2-B accepted as local foundation.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

@@ -30,6 +30,8 @@ BoundLore search must discover entities by meaning, not only by title match. Thi
 
 **P2-B.1 code baseline:** `js/quest-event-registry.js` — quest objectives/rewards, event occurrences/schedules, NPC service roles. Structured fields only; **no** posts by default, **no** create UI, **no** SQL. Low-weight search/parser hints only.
 
+**P2-B.2 acceptance sweep:** P2-B.2 acceptance sweep completed; Quest objectives, rewards, event occurrences, and NPC services accepted as registry/read/search baseline only. No create UI, no admin flow, no SQL, no data migration. P2-B foundation block accepted locally.
+
 ---
 
 ## Goals
