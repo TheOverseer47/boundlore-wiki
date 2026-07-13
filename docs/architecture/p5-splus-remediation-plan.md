@@ -408,8 +408,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-F.2 | Fable retest handoff | Evidence bundle + prompt; see §23 |
 | **Blocked** | P5-E.5 | Staged DB apply + negative tests | **BLOCKED** — isolated staging not proven; see §24 |
 | **Complete** | P5-STAGING.1 | Staging environment plan | Docs + `.env.staging.example`; see staging plan |
-| **Complete** | P5-STAGING.2 | Environment proof & dry run | **PASS** (identity) / **PARTIAL** (tooling) |
-| **Blocked** | P5-E.5 re-run | SQL apply + negative tests | Identity ready; blocked on tooling + backup + testusers + approval |
+| **Complete** | P5-STAGING.3 | Tooling & backup dry run | **PASS** |
+| **Partial** | P5-E.5 re-run | SQL apply + negative tests | Tooling + backup ready; testusers + approval pending |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -900,7 +900,31 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Authoritative proof:** `docs/architecture/p5-staging-environment-proof.md`
 
-**Next:** Tooling + backup + testusers → explicit P5-E.5 approval. No push/deploy/launch.
+**Next:** Create staging test users → explicit P5-E.5 approval. No push/deploy/launch.
+
+---
+
+## 27. P5-STAGING.3 — Tooling & Backup Dry Run
+
+**Milestone:** P5-STAGING.3 — read-only connection + local `pg_dump`; **no SQL apply**, **no DB mutation**.
+
+| Check | Result |
+|-------|--------|
+| `psql` / `pg_dump` 18.4 | `[x]` — full path |
+| Read-only connection | `[x]` PASS (pooler) |
+| Full pre-apply dump | `[x]` — gitignored |
+| `backups/` gitignored | `[x]` |
+| Legacy ref excluded | `[x]` |
+| SQL apply / mutation | `[x]` — none |
+| Tooling Readiness | **PASS** |
+| Backup Readiness | **PASS** |
+| P5-E.5 re-run | **PARTIAL** |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Authoritative report:** `docs/architecture/p5-staging-tooling-backup-dry-run.md`
+
+**Next:** Testusers + explicit P5-E.5 approval. No push/deploy/launch.
 
 ---
 
@@ -908,6 +932,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
 | `docs/architecture/p5-staging-environment-proof.md` | P5-STAGING.2 environment proof |
 | `docs/architecture/p5-staging-environment-plan.md` | P5-STAGING.1 dedicated staging plan |
 | `docs/architecture/p5-staged-db-application-report.md` | P5-E.5 staged DB apply report (BLOCKED) |

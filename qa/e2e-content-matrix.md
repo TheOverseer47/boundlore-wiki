@@ -2212,6 +2212,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.3 — Tooling & Backup Dry Run
+
+**Milestone:** P5-STAGING.3 — read-only connection + local `pg_dump`; no SQL apply.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| `psql` / `pg_dump` | PostgreSQL 18 bin | available | `[x]` |
+| Read-only connection | staging pooler | PASS, no mutation | `[x]` |
+| Pre-apply dump | `backups/staging/` | full dump, gitignored | `[x]` |
+| Dump size | local file | > 0 bytes | `[x]` — 183,946 |
+| Legacy ref excluded | credentials | no `ohkoojpzmptdfyowdgog` | `[x]` |
+| SQL apply / mutation | ops | none | `[x]` |
+| Fixture HTTP smoke | localhost:8080 | 200 or NOT RUN | `[x]` — 200 all five |
+| Fixture pass counts | browser | NOT RUN | `[x]` |
+| Tooling Readiness | gate | PASS | `[x]` |
+| Backup Readiness | gate | PASS | `[x]` |
+| P5-E.5 re-run | gate | PARTIAL | `[x]` |
+
+**P5-STAGING.3 PASS.** Tooling + backup ready. P5-E.5 PARTIAL — testusers + explicit approval. No push/deploy.
+
+**Next:** Testusers → P5-E.5 approval. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P5-STAGING.2 — Environment Proof & Dry Run
 
 **Milestone:** P5-STAGING.2 — local proof + dry-run plan; no SQL, no DB mutation, no backup.

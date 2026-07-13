@@ -3,3 +3,6 @@
 
 # Staging secrets (P5-STAGING.1) — template is .env.staging.example
 .env.staging
+
+# Local staging backups (P5-STAGING.3) — never commit dumps
+backups/

@@ -3260,6 +3260,26 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 102. P5-STAGING.3 — Tooling & Backup Dry Run
+
+**Milestone:** P5-STAGING.3 — read-only connection + local dump; **no SQL apply**.
+
+| Check | Result |
+|-------|--------|
+| `psql` / `pg_dump` 18.4 | `[x]` |
+| Read-only connection | `[x]` PASS |
+| Full pre-apply dump | `[x]` — gitignored |
+| Legacy ref excluded | `[x]` |
+| Tooling Readiness | **PASS** |
+| Backup Readiness | **PASS** |
+| P5-E.5 re-run | **PARTIAL** |
+
+**P5-STAGING.3 complete.** Backup path proven. P5-E.5 needs testusers + explicit approval. No push/deploy/launch.
+
+**Report:** `docs/architecture/p5-staging-tooling-backup-dry-run.md`
+
+---
+
 ## 101. P5-STAGING.2 — Environment Proof & Dry Run
 
 **Milestone:** P5-STAGING.2 — environment proof + dry-run plan; **no SQL**, **no DB changes**.

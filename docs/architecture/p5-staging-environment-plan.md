@@ -186,9 +186,10 @@ Stop immediately (do not proceed to SQL apply) if:
 | 1 | **P5-STAGING.1** (this gate) | Plan + `.env.staging.example` — **complete** |
 | 2 | User creates Supabase staging project manually | Operator |
 | 3 | User fills `.env.staging` locally | Operator |
-| 4 | **P5-STAGING.2** Environment Proof & Dry Run | **PASS** (identity); **PARTIAL** (tooling) — see proof report |
-| 5 | **P5-E.5 re-run** | Blocked until tooling + backup + testusers + user approval |
-| 6 | **P5-E.6** (future) | Staging evidence acceptance |
+| 4 | **P5-STAGING.2** Environment Proof & Dry Run | **PASS** (identity) — see proof report |
+| 5 | **P5-STAGING.3** Tooling & Backup Dry Run | **PASS** — see tooling/backup report |
+| 6 | **P5-E.5 re-run** | **PARTIAL** ready — testusers + explicit approval still required |
+| 7 | **P5-E.6** (future) | Staging evidence acceptance |
 
 **Not in scope:** Push, deploy, launch, production clone, automatic project creation without explicit safe approval.
 
@@ -198,6 +199,7 @@ Stop immediately (do not proceed to SQL apply) if:
 
 | Document | Role |
 |----------|------|
+| `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup dry run |
 | `p5-staging-environment-proof.md` | P5-STAGING.2 environment proof report |
 | `p5-staged-db-application-report.md` | P5-E.5 blocked report |
 | `p5-splus-remediation-plan.md` | P5 gate sequence |
@@ -218,12 +220,27 @@ Stop immediately (do not proceed to SQL apply) if:
 | Legacy ref `ohkoojpzmptdfyowdgog` not in `.env.staging` | `[x]` |
 | `SUPABASE_STAGING_CONFIRM_ISOLATED=true` | `[x]` |
 | `.env.staging` gitignored; not committed | `[x]` |
-| Supabase CLI / psql | **Not installed** |
-| Backup/dump tested | `[ ]` — deferred |
-| P5-E.5 re-run | **Still blocked** |
+| Supabase CLI / psql | **psql/pg_dump 18.4** (full path; not in PATH) — P5-STAGING.3 |
+| Backup/dump tested | `[x]` — P5-STAGING.3 full dump |
+| P5-E.5 re-run | **PARTIAL** — testusers + explicit approval |
 
 **Authoritative proof:** `docs/architecture/p5-staging-environment-proof.md`
 
 ---
 
-*Document version: P5-STAGING.1 + P5-STAGING.2 follow-up. No SQL. No secrets committed.*
+## 11. P5-STAGING.3 Follow-up
+
+**Gate:** P5-STAGING.3 — Tooling & Backup Dry Run (HEAD `2347d08`)
+
+| Result | Status |
+|--------|--------|
+| Read-only connection (pooler) | `[x]` PASS |
+| Full pre-apply dump | `[x]` — gitignored under `backups/staging/` |
+| `backups/` in `.gitignore` | `[x]` |
+| P5-E.5 re-run | **PARTIAL** ready |
+
+**Authoritative report:** `docs/architecture/p5-staging-tooling-backup-dry-run.md`
+
+---
+
+*Document version: P5-STAGING.1 + P5-STAGING.2 + P5-STAGING.3 follow-up. No SQL apply. No secrets committed.*

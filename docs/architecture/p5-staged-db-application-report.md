@@ -223,10 +223,15 @@ All served from `http://localhost:8080`. No Supabase writes.
 
 **Authoritative proof:** `docs/architecture/p5-staging-environment-proof.md`
 
+### P5-STAGING.3 follow-up
+
+**P5-STAGING.3** tooling & backup dry run (HEAD `2347d08`). Read-only staging connection PASS (session pooler). Full `pg_dump` to gitignored `backups/staging/`. No SQL apply, no mutation. P5-E.5 re-run **PARTIAL** ready — testusers + explicit approval pending.
+
+**Report:** `docs/architecture/p5-staging-tooling-backup-dry-run.md`
+
 ### Next steps
 
 - **Do not** apply P5 SQL to `ohkoojpzmptdfyowdgog`.
-- Install Supabase CLI and/or `psql` (or approve dashboard SQL workflow); test backup on staging.
 - Create staging test users; obtain explicit P5-E.5 re-run approval.
 - **No push / deploy / launch.**
 

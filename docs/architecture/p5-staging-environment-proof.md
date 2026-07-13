@@ -165,14 +165,20 @@ P5-STAGING.2 proves that a **dedicated, isolated Supabase staging environment is
 
 P5-E.5 remains **blocked** until:
 
-1. Backup/dump tooling is available and tested on staging  
+1. ~~Backup/dump tooling is available and tested on staging~~ — **done** (P5-STAGING.3)  
 2. Staging test users exist or can be safely created  
-3. SQL execution method is chosen and approved  
+3. SQL execution method is chosen and approved — pooler path documented  
 4. User grants **new explicit P5-E.5 re-run approval**
 
-**Next:** Install Supabase CLI and/or `psql` (or approve dashboard SQL workflow) → test backup on staging → create test users → user approval → P5-E.5 re-run.
+**Next:** Create staging test users → explicit P5-E.5 approval. No push/deploy/launch.
 
-**Not in scope:** Push, deploy, launch.
+---
+
+## 8. P5-STAGING.3 Follow-up
+
+**P5-STAGING.3** (HEAD `2347d08`): `psql`/`pg_dump` 18.4; read-only connection PASS; full dump gitignored. **Tooling + backup PASS.** P5-E.5 **PARTIAL** — testusers + approval pending.
+
+**Report:** `docs/architecture/p5-staging-tooling-backup-dry-run.md`
 
 ---
 
@@ -180,6 +186,7 @@ P5-E.5 remains **blocked** until:
 
 | Document | Role |
 |----------|------|
+| `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
 | `p5-staging-environment-plan.md` | P5-STAGING.1 plan + re-entry criteria |
 | `p5-staged-db-application-report.md` | P5-E.5 original blocked report |
 | `p5-splus-remediation-plan.md` | Gate sequence |
@@ -187,4 +194,4 @@ P5-E.5 remains **blocked** until:
 
 ---
 
-*Document version: P5-STAGING.2. Environment proof only. No SQL. No DB mutation. No secrets committed.*
+*Document version: P5-STAGING.2 + P5-STAGING.3 follow-up. No SQL apply. No secrets committed.*
