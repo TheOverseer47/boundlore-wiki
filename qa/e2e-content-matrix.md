@@ -2212,7 +2212,31 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
-## P5-STAGING.5B — Legacy Schema-Only Export (BLOCKED)
+## P5-STAGING.5B Re-run — Legacy Schema-Only Export (PASS)
+
+**Milestone:** P5-STAGING.5B re-run — read-only schema-only export; **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| `.env.legacy` local | file | exists, gitignored | `[x]` |
+| Legacy ref | `ohkoojpzmptdfyowdgog` | connected | `[x]` |
+| Staging excluded | `jzzgoiwfbuwiiyvwgwri` | not used | `[x]` |
+| `--schema-only` + `--schema=public` | pg_dump | executed | `[x]` |
+| Dump path | `backups/legacy-schema-only/` | gitignored | `[x]` |
+| Dump size | local file | > 0 bytes | `[x]` — 138,895 |
+| No-data check | dump | no INSERT/COPY/data | `[x]` PASS |
+| Core CREATE TABLE | dump | 6 required tables | `[x]` all yes |
+| SQL apply / staging mutation | ops | none | `[x]` |
+| Legacy Export (5B) | gate | PASS | `[x]` |
+| P5-E.5 re-run | gate | BLOCKED | `[x]` |
+
+**P5-STAGING.5B PASS.** Schema-only public export from legacy. No data. Next: P5-STAGING.5C. Product-Activation-Ready = FAIL; Public-Launch-Ready = NO-GO.
+
+**Next:** P5-STAGING.5C Curated Core Schema Extraction. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P5-STAGING.5B — Legacy Schema-Only Export (BLOCKED — first attempt)
 
 **Milestone:** P5-STAGING.5B — user approval granted; **BLOCKED** at `.env.legacy` check.
 

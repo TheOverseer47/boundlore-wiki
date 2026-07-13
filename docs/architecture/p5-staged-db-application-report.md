@@ -470,7 +470,7 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 ### Required before next P5-E.5 attempt
 
 1. **P5-STAGING.5A:** Legacy schema-only export plan — **PASS** (Path A chosen; no export yet).
-2. **P5-STAGING.5B:** Execute schema-only `pg_dump` from legacy — **BLOCKED** (`.env.legacy` missing; no `pg_dump`).
+2. **P5-STAGING.5B:** Execute schema-only `pg_dump` from legacy — **PASS** (re-run; 138,895-byte gitignored dump).
 3. **P5-STAGING.5C:** Curate `supabase/core_schema_foundation.sql`.
 4. **P5-STAGING.6:** Apply foundation + incremental SQL to staging.
 5. Re-verify tables; P5-E.5 re-attempt with explicit approval.
@@ -487,23 +487,33 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ---
 
-### P5-STAGING.5B follow-up
+### P5-STAGING.5B follow-up (first attempt — BLOCKED)
 
-**P5-STAGING.5B** legacy schema-only export (HEAD `1f0e53e`). User approval granted. **BLOCKED** — `.env.legacy` not found locally. **No `pg_dump`, no DB access, no legacy/staging mutation.**
-
-| Item | Status |
-|------|--------|
-| User approval | `[x]` |
-| `.env.legacy` | `[ ]` — missing |
-| `--schema-only` + `--schema=public` | Planned — not executed |
-| Dump created | `[x]` — none |
-| Staging touched | `[x]` — none |
-| Legacy Export (5B) | **BLOCKED** |
+**P5-STAGING.5B** first attempt (HEAD `1f0e53e`). **BLOCKED** — `.env.legacy` not found locally.
 
 **Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
 
-**Next:** Operator creates `.env.legacy` → re-run P5-STAGING.5B → 5C → P5-STAGING.6.
+---
+
+### P5-STAGING.5B Re-run (PASS)
+
+**P5-STAGING.5B** re-run (HEAD `9ddc7f9`). User approval granted. **PASS** — read-only schema-only export from legacy `ohkoojpzmptdfyowdgog`.
+
+| Item | Status |
+|------|--------|
+| `.env.legacy` | `[x]` present, gitignored |
+| `pg_dump --schema-only --schema=public` | `[x]` |
+| Dump | `backups/legacy-schema-only/legacy-public-schema-only-20260713-192641.sql` (138,895 bytes) |
+| No-data verification | `[x]` PASS |
+| Core tables in dump | `[x]` all six required |
+| Staging touched | `[x]` — none |
+| SQL apply | `[x]` — none |
+| Legacy Export (5B) | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
+
+**Next:** P5-STAGING.5C → P5-STAGING.6 → P5-E.5 re-attempt.
 
 ---
 
-*Document version: P5-E.5 original + re-run blocked + P5-STAGING.5 plan + 5B BLOCKED. No SQL applied.*
+*Document version: P5-E.5 original + re-run blocked + P5-STAGING.5 plan + 5B PASS (re-run). No SQL applied.*

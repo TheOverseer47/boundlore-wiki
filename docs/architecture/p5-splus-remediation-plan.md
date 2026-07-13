@@ -975,11 +975,34 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-staged-db-application-report.md` (Re-run section)
 
-**Next:** Operator creates `.env.legacy` → re-run P5-STAGING.5B → 5C → P5-STAGING.6. No push/deploy/launch.
+**Next:** P5-STAGING.5C → P5-STAGING.6. No push/deploy/launch.
 
 ---
 
-## 32. P5-STAGING.5B — Legacy Schema-Only Export (BLOCKED)
+## 33. P5-STAGING.5B Re-run — Legacy Schema-Only Export (PASS)
+
+**Milestone:** P5-STAGING.5B re-run — read-only schema-only export; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| `.env.legacy` local | `[x]` |
+| Legacy ref `ohkoojpzmptdfyowdgog` | `[x]` |
+| Staging `jzzgoiwfbuwiiyvwgwri` excluded | `[x]` |
+| `pg_dump --schema-only --schema=public` | `[x]` |
+| Dump size | 138,895 bytes |
+| No-data verification | `[x]` PASS |
+| Core tables in dump | `[x]` all six |
+| SQL apply / staging mutation | `[x]` — none |
+| Legacy Export (5B) | **PASS** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
+
+**Next:** P5-STAGING.5C. No push/deploy/launch.
+
+---
+
+## 32. P5-STAGING.5B — Legacy Schema-Only Export (BLOCKED — first attempt)
 
 **Milestone:** P5-STAGING.5B — user approval granted; **BLOCKED** at `.env.legacy` check.
 
@@ -1049,7 +1072,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (BLOCKED) |
+| `docs/architecture/p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (PASS) |
 | `docs/architecture/p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
 | `docs/architecture/p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 base schema plan |
 | `docs/architecture/p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |

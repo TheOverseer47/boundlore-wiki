@@ -239,40 +239,56 @@ P5-STAGING.5B (Legacy Schema-Only Export execution) may start only when:
 | Dimension | Verdict |
 |-----------|---------|
 | **Legacy Schema-Only Export Plan (5A)** | **PASS** |
-| **Legacy Schema-Only Export (5B)** | **BLOCKED** — `.env.legacy` missing |
+| **Legacy Schema-Only Export (5B)** | **PASS** — re-run 2026-07-13 |
 | **P5-E.5 Re-run** | **BLOCKED** — until curated core schema applied to staging |
-| **P5-STAGING.5 overall** | **PARTIAL** — Phase 0 path defined via 5A→5B→5C |
+| **P5-STAGING.5 overall** | **PARTIAL** — Phase 0 export done; 5C curation next |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Summary
 
-User chose **Path A**. This gate documents a safe, read-only, schema-only export workflow from legacy `ohkoojpzmptdfyowdgog` to a gitignored local raw dump, then curation into `supabase/core_schema_foundation.sql`. **No export performed in 5A.** Staging `jzzgoiwfbuwiiyvwgwri` not touched.
+User chose **Path A**. Schema-only export from legacy `ohkoojpzmptdfyowdgog` completed in **P5-STAGING.5B re-run** (138,895-byte gitignored dump). Staging `jzzgoiwfbuwiiyvwgwri` not touched.
 
-**Next:** Operator creates `.env.legacy` locally → re-run **P5-STAGING.5B** → **P5-STAGING.5C** Curated Core Schema Extraction.
+**Next:** **P5-STAGING.5C** Curated Core Schema Extraction → **P5-STAGING.6** apply to staging.
 
 **Not in scope:** Push, deploy, launch, data export, P5-E.5.
 
 ---
 
-## 11. P5-STAGING.5B Follow-up
+## 11. P5-STAGING.5B Follow-up (first attempt — BLOCKED)
 
-**Gate:** P5-STAGING.5B — Legacy Schema-Only Export (HEAD `1f0e53e`). User approval granted. **BLOCKED** — `.env.legacy` not found locally.
+**Gate:** P5-STAGING.5B — first attempt (HEAD `1f0e53e`). **BLOCKED** — `.env.legacy` not found locally.
 
 | Item | Status |
 |------|--------|
 | User approval for 5B | `[x]` |
 | `.env.legacy` local | `[ ]` — **missing** |
-| `.env.legacy` gitignored | `[x]` — added in 5B |
-| `.env.legacy.example` | `[x]` — template added |
 | `pg_dump` executed | `[x]` — **none** |
-| Legacy DB accessed | `[x]` — **none** |
-| Staging touched | `[x]` — **none** |
 | Legacy Export (5B) | **BLOCKED** |
+
+---
+
+## 12. P5-STAGING.5B Re-run (PASS)
+
+**Gate:** P5-STAGING.5B re-run (HEAD `9ddc7f9`). User approval granted. **PASS.**
+
+| Item | Status |
+|------|--------|
+| `.env.legacy` local | `[x]` present, gitignored |
+| `SUPABASE_LEGACY_CONFIRM_IS_LEGACY` | `[x]` `true` |
+| Legacy ref `ohkoojpzmptdfyowdgog` | `[x]` |
+| Staging `jzzgoiwfbuwiiyvwgwri` excluded | `[x]` |
+| `pg_dump --schema-only --schema=public` | `[x]` |
+| Dump path | `backups/legacy-schema-only/legacy-public-schema-only-20260713-192641.sql` |
+| Dump size | 138,895 bytes |
+| No-data verification | `[x]` PASS |
+| Required core tables in dump | `[x]` all six |
+| SQL apply / staging mutation | `[x]` — none |
+| Legacy Export (5B) | **PASS** |
 
 **Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
 
-**Operator action:** Create `.env.legacy` from `.env.legacy.example` with `SUPABASE_LEGACY_DB_URL` targeting `ohkoojpzmptdfyowdgog` only (not `jzzgoiwfbuwiiyvwgwri`). Re-run P5-STAGING.5B.
+**Next:** P5-STAGING.5C → P5-STAGING.6. No push/deploy/launch.
 
 ---
 
@@ -280,11 +296,11 @@ User chose **Path A**. This gate documents a safe, read-only, schema-only export
 
 | Document | Role |
 |----------|------|
-| `p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (BLOCKED) |
+| `p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (PASS) |
 | `p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 inventory + Phase 0 |
 | `p5-staged-db-application-report.md` | P5-E.5 re-run blocked |
 | `p5-staging-environment-plan.md` | Staging gate sequence |
 
 ---
 
-*Document version: P5-STAGING.5A + 5B BLOCKED follow-up. No export. No DB access. No secrets.*
+*Document version: P5-STAGING.5A + 5B PASS (re-run). Export local/gitignored. No secrets.*
