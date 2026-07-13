@@ -675,3 +675,11 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 | Next: P5-E.7A grant/RLS | **Recommended** |
 
 **Report:** `docs/architecture/p5-staging-evidence-acceptance-gap-review.md`
+
+---
+
+## 28. P5-E.7A Follow-up (PARTIAL)
+
+**Gate:** P5-E.7A — posts INSERT grant; direct release-lock RLS PARTIAL.
+
+**Report:** `docs/architecture/p5-direct-posts-grant-rls-retest-report.md`

@@ -1017,7 +1017,23 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.7A grant/RLS decision. No push/deploy/launch.
+**Next:** P5-E.7A.2 profiles SELECT grant or P5-E.7B fixture alignment. No push/deploy/launch.
+
+---
+
+## 49. P5-E.7A — Direct Posts Grant/RLS Re-Test (PARTIAL)
+
+**Milestone:** P5-E.7A — posts INSERT grant on staging; direct RLS PARTIAL. **PARTIAL**.
+
+| Check | Result |
+|-------|--------|
+| Grant SQL created/applied | `[x]` PASS |
+| Posts INSERT grant | `[x]` true |
+| Not posts grant-denied | `[x]` |
+| Release-lock RLS isolated | `[ ]` PARTIAL |
+| P5-E.7A | **PARTIAL** |
+
+**Report:** `docs/architecture/p5-direct-posts-grant-rls-retest-report.md`
 
 ---
 

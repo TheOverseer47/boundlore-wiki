@@ -3292,7 +3292,21 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.7A grant/RLS decision. No push/deploy/launch.
+**Next:** P5-E.7A.2 profiles SELECT grant. No push/deploy/launch.
+
+---
+
+## 124. P5-E.7A — Direct Posts Grant/RLS Re-Test (PARTIAL)
+
+**Milestone:** P5-E.7A — posts grant applied; RLS isolation PARTIAL. **PARTIAL**.
+
+| Check | Result |
+|-------|--------|
+| Grant apply | `[x]` PASS |
+| Direct posts RLS | `[x]` PARTIAL |
+| P5-E.7A | **PARTIAL** |
+
+**Report:** `docs/architecture/p5-direct-posts-grant-rls-retest-report.md`
 
 ---
 

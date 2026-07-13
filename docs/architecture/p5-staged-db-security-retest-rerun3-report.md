@@ -229,4 +229,12 @@ All 11 routes returned **200**.
 
 ---
 
-*Document version: P5-E.5 Re-run 3 PARTIAL + P5-E.6 PASS. No secrets.*
+## 16. P5-E.7A Follow-up (PARTIAL)
+
+**Gate:** P5-E.7A — posts INSERT grant applied; direct RLS test PARTIAL. **PARTIAL**.
+
+**Report:** `docs/architecture/p5-direct-posts-grant-rls-retest-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL. No secrets.*

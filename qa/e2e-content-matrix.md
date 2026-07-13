@@ -2298,6 +2298,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.7A — Direct Posts Grant/RLS Re-Test (PARTIAL)
+
+**Milestone:** P5-E.7A — posts INSERT grant on staging. **PARTIAL**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Pre-write backup | staging | >0 bytes | `[x]` 290,277 |
+| Grant apply | staging | PASS | `[x]` |
+| Posts INSERT grant | authenticated | true | `[x]` |
+| Not posts grant-denied | test | yes | `[x]` |
+| Release-lock RLS isolated | test | PASS | `[ ]` PARTIAL |
+| P5-E.7A | gate | PASS | **PARTIAL** |
+
+**Report:** `docs/architecture/p5-direct-posts-grant-rls-retest-report.md`
+
+---
+
 ## P5-E.6 — Staging Evidence Acceptance + Gap Review (PASS)
 
 **Milestone:** P5-E.6 — S+ evidence acceptance review. **PASS** (docs only).

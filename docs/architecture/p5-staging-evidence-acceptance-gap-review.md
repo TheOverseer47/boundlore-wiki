@@ -236,4 +236,19 @@ P5-E.5 Re-run 3 delivered **credible staging evidence** for notification injecti
 
 ---
 
-*Document version: P5-E.6 PASS. Review only. No secrets. No DB access.*
+## 13. P5-E.7A Follow-up (PARTIAL — posts grant applied)
+
+**Gate:** P5-E.7A — direct posts INSERT grant on staging. **PARTIAL**.
+
+| Item | Result |
+|------|--------|
+| Posts INSERT grant | `[x]` PASS |
+| No longer posts grant-denied | `[x]` |
+| Release-lock RLS isolated on direct insert | `[ ]` PARTIAL — profiles SELECT gap |
+| P5-E.7A | **PARTIAL** |
+
+**Report:** `docs/architecture/p5-direct-posts-grant-rls-retest-report.md`
+
+---
+
+*Document version: P5-E.6 PASS + P5-E.7A PARTIAL. No secrets. No DB access.*
