@@ -347,6 +347,8 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 | **P5-E.9D.1** | **PASS** |
 | **P5-E.9D.2** | **PASS** |
 | **P5-E.9D.3** | **PASS** |
+| **P5-E.9D.3A** | **PASS** |
+| Entity SSG Prototype Plan | **CREATED** |
 | Entity Prerender/SSG Decision | **DECISION DOCUMENTED** — Hybrid SSG empfohlen |
 | robots/noindex Static Hardening | **STATIC_HARDENED** (33/33) |
 | Static Hub Metadata | **STATIC_HUB_METADATA_HARDENED** (100/100) |
@@ -367,10 +369,12 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9D.3** — Entity Prerender/SSG Decision~~ **PASS** — `p5-entity-prerender-ssg-decision.md`
 
-**P5-E.9D.3A** — Entity SSG Prototype Plan **oder** **P5-E.9E** Search Recall Plan
+~~**P5-E.9D.3A** — Entity SSG Prototype Plan~~ **PASS** — `p5-entity-ssg-prototype-plan.md`
+
+**P5-E.9D.3B** — Static Entity HTML Prototype **oder** **P5-E.9E** Search Recall Plan
 
 Alternativ: **P5-E.9D.4** dynamische Sitemap (nach 9D.3)
 
 ---
 
-*Dokumentversion: P5-E.9D PASS + P5-E.9D.1 PASS + P5-E.9D.2 PASS + P5-E.9D.3 PASS. Keine Secrets. Keine Search-Console-Aktion.*
+*Dokumentversion: P5-E.9D PASS + P5-E.9D.1 PASS + P5-E.9D.2 PASS + P5-E.9D.3 PASS + P5-E.9D.3A PASS. Keine Secrets. Keine Search-Console-Aktion.*

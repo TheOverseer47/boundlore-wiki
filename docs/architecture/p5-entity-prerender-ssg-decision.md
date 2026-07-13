@@ -317,9 +317,10 @@ CSR post-detail.js hydratisiert (Reactions, Comments, Auth)
 
 | Item | Detail |
 |------|--------|
-| **Ziel** | Technische Skizze: Datenquelle, Template, Output-Pfade, Alias-Map |
-| **Scope** | Dokument + Pseudocode; kein Generator-Code |
-| **Verboten** | DB-Write, Deploy |
+| **Ziel** | Technische Skizze: Daten-Contract, Template, Output-Pfade, Hydration |
+| **Scope** | `p5-entity-ssg-prototype-plan.md` |
+| **Verboten** | DB-Write, Generator, Deploy |
+| **Status** | **PASS** (9D.3A) |
 | **Freigabe** | Lokal |
 
 ### P5-E.9D.3B — Static Entity HTML Prototype
@@ -395,7 +396,9 @@ S-05 SEO/CSR wird **CLOSED** erst wenn:
 
 ### Empfohlener nächster Gate
 
-**P5-E.9D.3A** — Entity SSG Prototype Plan (technische Skizze, kein DB)
+~~**P5-E.9D.3A** — Entity SSG Prototype Plan~~ **PASS** — `p5-entity-ssg-prototype-plan.md`
+
+**P5-E.9D.3B** — Static Entity HTML Prototype (Fixture JSON + 3 Beispielseiten)
 
 Alternativ parallel: **P5-E.9E** — Search Recall Plan
 

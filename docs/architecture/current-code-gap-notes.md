@@ -3366,7 +3366,33 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9D.3A entity SSG prototype plan or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9D.3B static entity HTML prototype or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
+## 145. P5-E.9D.3A — Entity SSG Prototype Plan (PASS)
+
+**Milestone:** P5-E.9D.3A — Entity SSG Prototype Plan (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Prototype Plan | `p5-entity-ssg-prototype-plan.md` |
+| Entity Data Contract | `[x]` JSON-Schema |
+| Template Requirements | `[x]` Head/Body/JS |
+| Output Path | `[x]` `wiki/post/<canonical_slug>/index.html` |
+| Metadata + JSON-LD Strategy | `[x]` |
+| Hydration Compatibility | `[x]` dokumentiert |
+| Fixture-first Data Source | `[x]` 9D.3B → 9D.3C |
+| Generator / DB / Deploy | **Nein** |
+| Entity Sitemap URLs | **Excluded** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.3A | **PASS** |
+
+**Report:** `docs/architecture/p5-entity-ssg-prototype-plan.md`
+
+**Next:** P5-E.9D.3B static entity HTML prototype or P5-E.9E search recall. No push/deploy/launch.
 
 ---
 

@@ -2439,7 +2439,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9D.3A entity SSG prototype plan or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9D.3B static entity HTML prototype or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
+## P5-E.9D.3A — Entity SSG Prototype Plan (PASS)
+
+**Milestone:** P5-E.9D.3A — Entity SSG Prototype Plan (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Prototype plan document exists | `p5-entity-ssg-prototype-plan.md` | complete | `[x]` |
+| Entity data contract defined | plan doc | JSON schema | `[x]` |
+| Template requirements defined | plan doc | Head/Body/JS | `[x]` |
+| Output path strategy defined | plan doc | `wiki/post/<canonical_slug>/` | `[x]` |
+| Metadata strategy defined | plan doc | title/desc/OG | `[x]` |
+| JSON-LD strategy defined | plan doc | CreativeWork + BreadcrumbList | `[x]` |
+| Hydration compatibility documented | plan doc | data-bl-ssg-hydrate | `[x]` |
+| Fixture-first data source documented | plan doc | 9D.3B → 9D.3C | `[x]` |
+| No implementation performed | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| No Search Console action performed | gate | none | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Entity Sitemap URLs | status | EXCLUDED | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9D.3A | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-entity-ssg-prototype-plan.md`
+
+**Next:** P5-E.9D.3B static entity HTML prototype or P5-E.9E search recall. No push/deploy/launch.
 
 ---
 
