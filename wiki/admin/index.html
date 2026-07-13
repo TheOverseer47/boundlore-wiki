@@ -307,6 +307,7 @@
 <script src="/js/evidence-rank.js?v=2"></script>
 <script src="/js/unresolved-targets.js?v=4"></script>
 <script src="/js/avatar-utils.js"></script>
+<script src="/js/content-safety.js?v=p5-d1"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notification-url-safety.js"></script>
 <script src="/js/notifications.js"></script>
@@ -1835,7 +1836,11 @@ function openDiscoveryComposer(discoveryId) {
   refreshComposeSubcategoryOptions(sourceMeta.subcategory || "");
   document.getElementById("composeTags").value = "discovery,community";
   if (composeBodyEditor) {
-    composeBodyEditor.root.innerHTML = discovery.content || "";
+    const editorHtml = stripPostMetaA(discovery.content || "");
+    const cs = window.BoundLoreContentSafety;
+    composeBodyEditor.root.innerHTML = cs && typeof cs.sanitizeRichTextHtml === "function"
+      ? cs.sanitizeRichTextHtml(editorHtml)
+      : "";
   }
   document.getElementById("composeMsg").textContent = "Editing discovery: " + discovery.title;
 }
@@ -1849,12 +1854,18 @@ async function publishComposedCategoryPost() {
   const subcategory = document.getElementById("composeSubcategory")?.value || "";
   const tags = document.getElementById("composeTags").value.trim();
   const body = composeBodyEditor ? (composeBodyEditor.root.innerHTML || "").trim() : "";
+  const cs = window.BoundLoreContentSafety;
+  const sanitizedBody = cs && typeof cs.sanitizeRichTextHtml === "function"
+    ? cs.sanitizeRichTextHtml(body)
+    : null;
   const msg = document.getElementById("composeMsg");
   const btnPublish = document.getElementById("btnPublishComposed");
   if (btnPublish) btnPublish.disabled = true;
 
-  if (!sourceId || !title || !body) {
-    msg.textContent = "Title and body are required.";
+  if (!sourceId || !title || !sanitizedBody) {
+    msg.textContent = sanitizedBody === null
+      ? "Content safety unavailable. Publish blocked."
+      : "Title and body are required.";
     msg.style.color = "#ff8b8b";
     composePublishInFlight = false;
     if (btnPublish) btnPublish.disabled = false;
@@ -1897,7 +1908,7 @@ async function publishComposedCategoryPost() {
   const cleanTags = tags ? tags.split(",").map(function(t) { return t.trim(); }).filter(Boolean) : [];
   let composedContent = '<div class="admin-curated-post"><p><strong>Curated from community discovery.</strong></p>' +
     (cleanTags.length ? ('<p><strong>Tags:</strong> ' + escapeHtmlA(cleanTags.join(', ')) + '</p>') : '') +
-    body + '</div>';
+    sanitizedBody + '</div>';
 
   if (sourceAssets.length && !/discovery-attachments/.test(composedContent)) {
     composedContent += buildCuratedAttachmentHtmlA(sourceAssets);
@@ -1975,8 +1986,12 @@ async function publishComposedCategoryPost() {
 
 function extractDiscoveryAttachmentLinks(content) {
   if (!content) return [];
+  const cs = window.BoundLoreContentSafety;
+  const safeContent = cs && typeof cs.sanitizeRichTextHtml === "function"
+    ? cs.sanitizeRichTextHtml(content)
+    : "";
   const wrapper = document.createElement("div");
-  wrapper.innerHTML = content;
+  wrapper.innerHTML = safeContent;
   const assets = [];
 
   Array.from(wrapper.querySelectorAll("img[src]"))
@@ -1987,7 +2002,11 @@ function extractDiscoveryAttachmentLinks(content) {
         type: "image",
       };
     })
-    .filter(function(item) { return /^https?:\/\//i.test(item.href); })
+    .filter(function(item) {
+      return cs && typeof cs.isSafeContentUrl === "function"
+        ? cs.isSafeContentUrl(item.href, { allowRelative: false })
+        : /^https?:\/\//i.test(item.href);
+    })
     .forEach(function(item) { assets.push(item); });
 
   Array.from(wrapper.querySelectorAll("a[href]"))
@@ -2003,7 +2022,11 @@ function extractDiscoveryAttachmentLinks(content) {
         type: isVideo ? "video" : (isPdf ? "pdf" : (isImage ? "image" : "file")),
       };
     })
-    .filter(function(link) { return /^https?:\/\//i.test(link.href); })
+    .filter(function(link) {
+      return cs && typeof cs.isSafeContentUrl === "function"
+        ? cs.isSafeContentUrl(link.href, { allowRelative: false })
+        : /^https?:\/\//i.test(link.href);
+    })
     .forEach(function(link) {
       if (!assets.some(function(existing) { return existing.href === link.href; })) {
         assets.push(link);
@@ -2014,8 +2037,12 @@ function extractDiscoveryAttachmentLinks(content) {
 }
 
 function stripHeavyDiscoveryContent(content) {
+  const cs = window.BoundLoreContentSafety;
+  const safeContent = cs && typeof cs.sanitizeRichTextHtml === "function"
+    ? cs.sanitizeRichTextHtml(content || "")
+    : "";
   const wrapper = document.createElement("div");
-  wrapper.innerHTML = content || "";
+  wrapper.innerHTML = safeContent;
 
   Array.from(wrapper.querySelectorAll("img")).forEach(function(img) {
     const replacement = document.createElement("p");
@@ -2470,14 +2497,31 @@ function openAssetPreview(asset) {
   if (!modal || !body || !asset) return;
 
   title.textContent = asset.label || "Attachment Preview";
-  const safeUrl = escapeAttrA(asset.href || "");
+  const cs = window.BoundLoreContentSafety;
+  const safeUrl = cs && typeof cs.sanitizeContentUrl === "function"
+    ? cs.sanitizeContentUrl(asset.href || "", { allowRelative: false })
+    : "";
+
+  if (!safeUrl) {
+    body.textContent = "Preview unavailable for this attachment URL.";
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+    return;
+  }
 
   if (asset.type === "image") {
-    body.innerHTML = '<img src="' + safeUrl + '" alt="preview" style="width:100%;max-height:78vh;object-fit:contain;border-radius:10px;background:#000;" />';
+    const imgSrc = cs && typeof cs.sanitizeImageSrc === "function"
+      ? cs.sanitizeImageSrc(safeUrl)
+      : safeUrl;
+    if (!imgSrc) {
+      body.textContent = "Preview unavailable for this image URL.";
+    } else {
+      body.innerHTML = '<img src="' + escapeAttrA(imgSrc) + '" alt="preview" style="width:100%;max-height:78vh;object-fit:contain;border-radius:10px;background:#000;" />';
+    }
   } else if (asset.type === "video") {
-    body.innerHTML = '<iframe class="preview-modal-frame" src="' + safeUrl + '" allowfullscreen></iframe>';
+    body.innerHTML = '<iframe class="preview-modal-frame" src="' + escapeAttrA(safeUrl) + '" allowfullscreen></iframe>';
   } else if (asset.type === "pdf") {
-    body.innerHTML = '<iframe class="preview-modal-frame" src="' + safeUrl + '"></iframe>';
+    body.innerHTML = '<iframe class="preview-modal-frame" src="' + escapeAttrA(safeUrl) + '"></iframe>';
   } else {
     body.innerHTML = '<div style="padding:12px;color:var(--text-muted);">No inline preview available for this file type. Use Download.</div>';
   }

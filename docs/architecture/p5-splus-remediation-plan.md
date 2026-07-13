@@ -396,7 +396,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-B.2 | Test acceptance sweep | Repo baseline accepted; see §13 — Live-RLS NOT TESTED |
 | **Complete** | P5-C.1 | SQL baseline | S+-04 RPC gate baseline; see §14 |
 | **Complete** | P5-C.2 | Test acceptance sweep | Repo baseline accepted; see §15 — Live-RPC NOT TESTED |
-| **Next** | P5-D.1 | Code baseline | HTML sanitization & URL safety |
+| **Complete** | P5-D.1 | Code baseline | S+-03 sanitization baseline; see §16 |
+| **Next** | P5-D.2 | Test acceptance sweep | XSS corpus; reflected-search regression; Quill spot-check |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -550,7 +551,47 @@ For **future implementation gates** (P5-B through P5-E):
 | Product-Activation-Ready | FAIL |
 | Public-Launch-Ready | **NO-GO** |
 
-**Next candidate:** **P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
+**Next candidate:** **P5-D.2 HTML Sanitization Acceptance Sweep**. No push/deploy/launch.
+
+---
+
+## 16. P5-D.1 — HTML Sanitization & URL Safety Baseline
+
+**Milestone:** P5-D.1 code baseline for S+-03 stored/reflected XSS risk; **ready for P5-D.2 acceptance** — not production-closed.
+
+**P5-D.1 baseline implemented locally.** Central `js/content-safety.js` introduces `BoundLoreContentSafety` (`p5-d1`) with DOMParser strict allowlist sanitization (no DOMPurify dependency) and URL scheme whitelist (`http`, `https`, safe internal `/` paths). Rich-text allowlist preserves Quill basics (`p`, lists, headings, `strong`/`em`, `blockquote`, `pre`/`code`, `a`, `img`). Unsafe tags (`script`, `iframe`, `svg`, `form`, etc.), `on*` attributes, `style`, and dangerous URL schemes (`javascript:`, `data:`, `vbscript:`, `file:`, `blob:`, `ftp:`, protocol-relative) are blocked fail-closed.
+
+**Client guardrails:**
+
+- `js/post-detail.js` — post body sanitized after BLMETA strip; `source_url` href via ContentSafety; discovery media URLs filtered; image viewer src guarded
+- `js/create-post.js` — Quill HTML sanitized before submit; outgoing payload body sanitized before meta injection; `source_url` validated via ContentSafety
+- `js/edit-post.js` — Quill HTML sanitized before save; discovery body re-sanitized before meta injection; `source_url` validated
+- `js/avatar-utils.js` — `avatar_url` via `sanitizeImageSrc`; unsafe URLs fall back to initials
+- `wiki/admin/index.html` — compose load/publish sanitized; discovery attachment extraction and preview sinks sanitized; asset preview URLs gated
+- Script load order: `content-safety.js` before dependent scripts on post/create/edit/admin pages
+
+**QA:** `qa/p5-sanitization-security-fixtures.html` — 45 static checks (safe rich text, unsafe HTML/URL corpus, meta policy). No Supabase writes.
+
+| Check | Result |
+|-------|--------|
+| Central ContentSafety utility | `[x]` |
+| DOMParser allowlist (no DOMPurify) | `[x]` |
+| post-detail render sinks guarded | `[x]` |
+| create/edit outgoing HTML guarded | `[x]` |
+| avatar_url src guarded | `[x]` |
+| admin compose/preview sinks guarded | `[x]` |
+| Notification fixture unchanged | `[x]` — P5-B scope preserved |
+| Observation fixture unchanged | `[x]` — P5-C scope preserved |
+| Server-side / DB sanitizer | `[ ]` — not in P5-D.1 |
+| Existing stored content migrated | `[ ]` — not claimed |
+| S+-03 production-closed | `[ ]` — P5-D.2 + staging required |
+| Supabase writes / deploy / push | `[x]` — none |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**S+-03 status:** Baseline implemented at repo level. **Not production-closed** until P5-D.2 acceptance sweep, reflected-search regression, and staging verification of create/edit/admin paths.
+
+**Next candidate:** **P5-D.2 HTML Sanitization Acceptance Sweep**. No push/deploy/launch.
 
 ---
 
@@ -558,7 +599,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/current-code-gap-notes.md` §85–§90 | P5-A.1 / P5-A.2 / P5-B.1 / P5-B.2 / P5-C.1 / P5-C.2 gate records |
+| `docs/architecture/current-code-gap-notes.md` §85–§91 | P5-A.1 / P5-A.2 / P5-B.1 / P5-B.2 / P5-C.1 / P5-C.2 / P5-D.1 gate records |
 | `docs/architecture/moderation-conflict-matrix.md` | Conflict handling must remain untouched during P5 |
 | `docs/architecture/entity-promotion-policy.md` | No auto-promotion during security fixes |
 | `docs/architecture/graph-relations-spec.md` | Relation registry unchanged in P5 |

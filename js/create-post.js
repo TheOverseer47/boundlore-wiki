@@ -1155,7 +1155,14 @@ async function handleSubmit(e) {
   const userId = sessionData.session.user.id;
 
   const title = document.getElementById("postTitle").value.trim();
-  const content = quillEditor.root.innerHTML.trim();
+  const rawContent = quillEditor.root.innerHTML.trim();
+  const sanitizedContent = sanitizeOutgoingHtmlCP(rawContent);
+  if (sanitizedContent === null) {
+    errorEl.textContent = "Content safety unavailable. Submission blocked.";
+    errorEl.style.display = "block";
+    return;
+  }
+  const content = sanitizedContent;
   let postMeta = collectPostMetaCP();
   const mediaInput = document.getElementById("postMedia");
   const files = mediaInput && mediaInput.files ? Array.from(mediaInput.files) : [];
@@ -1467,7 +1474,14 @@ async function handleSubmit(e) {
     });
   }
 
-  payload.content = injectPostMetaCP(payload.content, postMeta);
+  const sanitizedPayloadBody = sanitizeOutgoingHtmlCP(stripPostMetaCP(payload.content || ""));
+  if (sanitizedPayloadBody === null) {
+    errorEl.textContent = "Content safety unavailable. Submission blocked.";
+    errorEl.style.display = "block";
+    if (submitBtn) submitBtn.disabled = false;
+    return;
+  }
+  payload.content = injectPostMetaCP(sanitizedPayloadBody, postMeta);
 
   if (
     currentPostType === "discovery"
@@ -3177,13 +3191,32 @@ function escapeAttrCP(value) {
   return String(value == null ? "" : value).replace(/"/g, "&quot;");
 }
 
+function getContentSafetyCP() {
+  return window.BoundLoreContentSafety || null;
+}
+
+function sanitizeOutgoingHtmlCP(value) {
+  const cs = getContentSafetyCP();
+  if (!cs || typeof cs.sanitizeRichTextHtml !== "function") return null;
+  return cs.sanitizeRichTextHtml(value);
+}
+
+function sanitizeOutgoingUrlCP(value, options) {
+  const cs = getContentSafetyCP();
+  if (!cs || typeof cs.sanitizeContentUrl !== "function") return "";
+  return cs.sanitizeContentUrl(value, options || {});
+}
+
 function collectPostMetaCP() {
   const phase = (document.getElementById("postUpdatePhase")?.value || "").trim();
   const patchTag = (document.getElementById("postPatchTag")?.value || "").trim();
-  const sourceUrl = (document.getElementById("postSourceUrl")?.value || "").trim();
+  let sourceUrl = (document.getElementById("postSourceUrl")?.value || "").trim();
 
-  if (sourceUrl && !isValidHttpUrl(sourceUrl)) {
-    return { _error: "Please provide a valid source URL (http/https)." };
+  if (sourceUrl) {
+    sourceUrl = sanitizeOutgoingUrlCP(sourceUrl, { allowRelative: false });
+    if (!sourceUrl) {
+      return { _error: "Please provide a valid source URL (http/https)." };
+    }
   }
 
   return {

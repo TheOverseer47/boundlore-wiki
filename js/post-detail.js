@@ -9,6 +9,26 @@ let currentUserId = null;
 let isAdmin = false;
 let postImageViewer = null;
 
+function getContentSafetyPD() {
+  return window.BoundLoreContentSafety || null;
+}
+
+function sanitizePostHtmlPD(value) {
+  var cs = getContentSafetyPD();
+  if (cs && typeof cs.sanitizeRichTextHtml === "function") {
+    return cs.sanitizeRichTextHtml(value);
+  }
+  return "";
+}
+
+function sanitizeContentUrlPD(value, options) {
+  var cs = getContentSafetyPD();
+  if (cs && typeof cs.sanitizeContentUrl === "function") {
+    return cs.sanitizeContentUrl(value, options || {});
+  }
+  return "";
+}
+
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
@@ -130,7 +150,7 @@ async function renderPost(post) {
     const repaired = EntityCore.normalizeEntityMeta(post, postMeta, { repairPayload: true });
     postMeta = repaired.meta;
   }
-  const cleanContent = stripPostMetaPD(post.content || "");
+  const cleanContent = sanitizePostHtmlPD(stripPostMetaPD(post.content || ""));
   const displayTitle = typeof EntityCore !== "undefined" && useWikiLayout
     ? EntityCore.getDisplayName(postMeta, post)
     : getPostDisplayTitlePD(post, postMeta);
@@ -297,9 +317,20 @@ async function renderPost(post) {
 
   const sideSource = document.getElementById("sideSource");
   if (sideSource) {
-    if (postMeta.source_url) {
-      const safeUrl = escapeHtml(postMeta.source_url);
-      sideSource.innerHTML = '<a href="' + safeUrl + '" target="_blank" rel="noopener">Source Link</a>';
+    const safeSourceUrl = sanitizeContentUrlPD(postMeta.source_url, { allowRelative: false });
+    if (safeSourceUrl) {
+      sideSource.textContent = "";
+      const sourceLink = document.createElement("a");
+      sourceLink.textContent = "Source Link";
+      const cs = getContentSafetyPD();
+      if (cs && typeof cs.applySafeLinkAttributes === "function") {
+        cs.applySafeLinkAttributes(sourceLink, safeSourceUrl, { targetBlank: true });
+      } else {
+        sourceLink.href = safeSourceUrl;
+        sourceLink.target = "_blank";
+        sourceLink.rel = "noopener noreferrer ugc";
+      }
+      sideSource.appendChild(sourceLink);
     } else {
       sideSource.textContent = "-";
     }
@@ -417,7 +448,10 @@ function renderDiscoveryArticlePD(post, postMeta, cleanContent) {
   let html = '<article class="bl-discovery-article">';
   html += '<section class="bl-discovery-hero-card">';
   if (hero) {
-    html += '<figure class="bl-discovery-hero-media"><img src="' + escapeHtml(hero.url) + '" alt="' + title + ' evidence" /><figcaption>' + escapeHtml(hero.label || "Discovery evidence") + '</figcaption></figure>';
+    const heroUrl = sanitizeContentUrlPD(hero.url, { allowRelative: true });
+    if (heroUrl) {
+      html += '<figure class="bl-discovery-hero-media"><img src="' + escapeHtml(heroUrl) + '" alt="' + title + ' evidence" /><figcaption>' + escapeHtml(hero.label || "Discovery evidence") + '</figcaption></figure>';
+    }
   }
   html += '<div class="bl-discovery-hero-copy">' +
     '<p class="bl-discovery-kicker">Community Discovery</p>' +
@@ -444,10 +478,12 @@ function renderDiscoveryArticlePD(post, postMeta, cleanContent) {
   if (media.length) {
     html += '<section class="bl-discovery-story-section"><h3>Evidence</h3><div class="bl-discovery-gallery">';
     media.forEach(function(item) {
+      const itemUrl = sanitizeContentUrlPD(item.url, { allowRelative: true });
+      if (!itemUrl) return;
       if (item.type === "image") {
-        html += '<a class="bl-discovery-gallery-item" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener"><img src="' + escapeHtml(item.url) + '" alt="' + escapeHtml(item.label || "Discovery evidence") + '" /><span>' + escapeHtml(item.label || "Evidence image") + '</span></a>';
+        html += '<a class="bl-discovery-gallery-item" href="' + escapeHtml(itemUrl) + '" target="_blank" rel="noopener noreferrer ugc"><img src="' + escapeHtml(itemUrl) + '" alt="' + escapeHtml(item.label || "Discovery evidence") + '" /><span>' + escapeHtml(item.label || "Evidence image") + '</span></a>';
       } else {
-        html += '<a class="bl-discovery-file-item" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' + escapeHtml(item.label || "Evidence file") + '</a>';
+        html += '<a class="bl-discovery-file-item" href="' + escapeHtml(itemUrl) + '" target="_blank" rel="noopener noreferrer ugc">' + escapeHtml(item.label || "Evidence file") + '</a>';
       }
     });
     html += '</div></section>';
@@ -552,14 +588,16 @@ function extractDiscoveryMediaPD(evidence, cleanContent) {
   const media = [];
   (Array.isArray(evidence) ? evidence : []).forEach(function(item) {
     if (!item || !item.url) return;
+    const safeUrl = sanitizeContentUrlPD(item.url, { allowRelative: true });
+    if (!safeUrl) return;
     const type = String(item.kind || item.file_type || "").toLowerCase().includes("image") ? "image" : "file";
-    media.push({ type: type, url: item.url, label: item.label || "Evidence" });
+    media.push({ type: type, url: safeUrl, label: item.label || "Evidence" });
   });
 
   const wrapper = document.createElement("div");
-  wrapper.innerHTML = cleanContent || "";
+  wrapper.innerHTML = sanitizePostHtmlPD(cleanContent || "");
   Array.from(wrapper.querySelectorAll("img[src]")).forEach(function(img) {
-    const url = img.getAttribute("src") || "";
+    const url = sanitizeContentUrlPD(img.getAttribute("src") || "", { allowRelative: true });
     if (!url || media.some(function(item) { return item.url === url; })) return;
     media.push({ type: "image", url: url, label: img.getAttribute("alt") || "Discovery screenshot" });
   });
@@ -1758,7 +1796,12 @@ function enhancePostImagesPD() {
     if (node.dataset.enhancedImageViewer === "1") return;
     node.dataset.enhancedImageViewer = "1";
     node.addEventListener("click", function() {
-      viewer.img.setAttribute("src", node.getAttribute("src") || "");
+      const cs = getContentSafetyPD();
+      const safeSrc = cs && typeof cs.sanitizeImageSrc === "function"
+        ? cs.sanitizeImageSrc(node.getAttribute("src") || "")
+        : "";
+      if (!safeSrc) return;
+      viewer.img.setAttribute("src", safeSrc);
       viewer.img.setAttribute("alt", node.getAttribute("alt") || "Post image");
       viewer.img.classList.remove("zoomed");
       viewer.overlay.classList.add("open");

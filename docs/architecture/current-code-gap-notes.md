@@ -3138,7 +3138,44 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
+**P5-C.1 Observation RPC Gate Fix Baseline**. No push/deploy/launch.
+
+---
+
+## 91. P5-D.1 — HTML Sanitization & URL Safety Baseline
+
+**Milestone:** P5-D.1 code baseline for S+-03 stored XSS / missing HTML sanitization; ready for P5-D.2 acceptance — **not production-closed**.
+
+### S+-03 baseline (repo only)
+
+| Item | Status |
+|------|--------|
+| `js/content-safety.js` — `BoundLoreContentSafety` (`p5-d1`) | Implemented |
+| Sanitizer engine | DOMParser strict allowlist (no DOMPurify) |
+| URL scheme whitelist | `http`/`https`/safe internal `/`; blocks `javascript:`, `data:`, etc. |
+| `js/post-detail.js` post body + source_url + media | Guarded |
+| `js/create-post.js` / `js/edit-post.js` Quill + meta URLs | Guarded |
+| `js/avatar-utils.js` avatar_url | Guarded |
+| `wiki/admin/index.html` compose/preview sinks | Guarded |
+| QA `qa/p5-sanitization-security-fixtures.*` | 45 static checks |
+| Server-side sanitizer / stored-content migration | **No** — out of scope |
+| S+-03 production-closed | **No** — P5-D.2 required |
+| Supabase writes / deploy / push | **No** |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-03 | **Baseline implemented (P5-D.1)** — not production-closed |
+
+**P5-D.1 baseline implemented locally.** HTML sanitization and URL safety guardrails added for post render, create/edit outgoing content, avatars, and admin compose/preview paths. Notification (P5-B) and Observation (P5-C) fixtures remain green. No live database mutation, no deploy, no push. BoundLore remains NOT live-ready.
+
+### Next candidate
+
+**P5-D.2 HTML Sanitization Acceptance Sweep**. No push/deploy/launch.
 
 ---
 
@@ -3177,7 +3214,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
+**P5-D.2 HTML Sanitization Acceptance Sweep**. No push/deploy/launch.
 
 ---
 

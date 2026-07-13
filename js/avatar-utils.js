@@ -29,9 +29,13 @@ function renderAvatar(profile, sizeClass) {
   const initials = blGetInitials(username);
   const avatarUrl = blGetAvatarUrl(profile);
   const cls = "bl-avatar " + (sizeClass || "bl-avatar-sm");
+  const cs = window.BoundLoreContentSafety;
+  const safeAvatarUrl = cs && typeof cs.sanitizeImageSrc === "function"
+    ? cs.sanitizeImageSrc(avatarUrl)
+    : "";
 
-  if (avatarUrl) {
-    return '<img class="' + cls + '" src="' + blEscapeAttr(avatarUrl) + '" alt="' + blEscapeAttr(username) + '" />';
+  if (safeAvatarUrl) {
+    return '<img class="' + cls + '" src="' + blEscapeAttr(safeAvatarUrl) + '" alt="' + blEscapeAttr(username) + '" />';
   }
 
   return '<span class="' + cls + ' bl-avatar-fallback">' + blEscapeHtml(initials) + "</span>";

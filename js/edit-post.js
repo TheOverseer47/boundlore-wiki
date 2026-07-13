@@ -473,7 +473,17 @@ async function handleEditSubmit(e) {
   }
 
   const title = document.getElementById("editPostTitle").value.trim();
-  const content = (editQuill.root.innerHTML || "").trim();
+  const cs = window.BoundLoreContentSafety;
+  const rawContent = (editQuill.root.innerHTML || "").trim();
+  const sanitizedContent = cs && typeof cs.sanitizeRichTextHtml === "function"
+    ? cs.sanitizeRichTextHtml(rawContent)
+    : null;
+  if (sanitizedContent === null) {
+    errEl.textContent = "Content safety unavailable. Save blocked.";
+    errEl.style.display = "block";
+    return;
+  }
+  const content = sanitizedContent;
   const meta = collectPostMetaEP();
 
   if (!title) {
@@ -677,7 +687,8 @@ async function handleEditSubmit(e) {
   if (editCurrentType !== "discovery") {
     updates.content = injectPostMetaEP(content, meta);
   } else {
-    updates.content = injectPostMetaEP(updates.content, meta);
+    const sanitizedDiscoveryBody = cs.sanitizeRichTextHtml(stripPostMetaEP(updates.content || ""));
+    updates.content = injectPostMetaEP(sanitizedDiscoveryBody, meta);
   }
 
   let updateQuery = supabase.from("posts").update(updates);
@@ -714,10 +725,16 @@ async function handleEditSubmit(e) {
 function collectPostMetaEP() {
   const phase = (document.getElementById("editPostUpdatePhase")?.value || "").trim();
   const patchTag = (document.getElementById("editPostPatchTag")?.value || "").trim();
-  const sourceUrl = (document.getElementById("editPostSourceUrl")?.value || "").trim();
+  let sourceUrl = (document.getElementById("editPostSourceUrl")?.value || "").trim();
 
-  if (sourceUrl && !isValidHttpUrlEP(sourceUrl)) {
-    return { _error: "Please provide a valid source URL (http/https)." };
+  if (sourceUrl) {
+    const cs = window.BoundLoreContentSafety;
+    sourceUrl = cs && typeof cs.sanitizeContentUrl === "function"
+      ? cs.sanitizeContentUrl(sourceUrl, { allowRelative: false })
+      : "";
+    if (!sourceUrl) {
+      return { _error: "Please provide a valid source URL (http/https)." };
+    }
   }
 
   return {

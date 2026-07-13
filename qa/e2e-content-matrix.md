@@ -1937,7 +1937,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
 
-**Next candidate:** **P5-D.1 HTML Sanitization & URL Safety Baseline**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P5-D.2 HTML Sanitization Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P5-D.1 — HTML Sanitization & URL Safety Baseline
+
+**Milestone:** P5-D.1 code baseline for S+-03; ready for P5-D.2 acceptance — not production-closed.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ContentSafety module | `js/content-safety.js` | `BoundLoreContentSafety` `p5-d1` | `[x]` |
+| Sanitizer engine | module | DOMParser allowlist; no DOMPurify | `[x]` |
+| Unsafe HTML blocked | fixture | no `script`/`on*`/`iframe`/`svg` | `[x]` |
+| Unsafe URL schemes | fixture | no `javascript:`/`data:`/`blob:`/`ftp:` | `[x]` |
+| Safe Quill basics | fixture | lists/headings/bold/links preserved | `[x]` |
+| Post render guard | `js/post-detail.js` | body sanitized after BLMETA strip | `[x]` |
+| Create/edit guard | `create-post.js` / `edit-post.js` | outgoing HTML + source_url | `[x]` |
+| Avatar guard | `avatar-utils.js` | unsafe `avatar_url` → initials | `[x]` |
+| Admin compose/preview | `wiki/admin/index.html` | sanitized load/publish/preview | `[x]` |
+| Sanitization fixture | `qa/p5-sanitization-security-fixtures.html` | 45/45 PASS | `[x]` |
+| Observation fixture regression | `qa/p5-observation-rpc-security-fixtures.html` | 17/17 PASS | `[x]` |
+| Notification fixture regression | `qa/p5-notification-security-fixtures.html` | 24/24 PASS | `[x]` |
+| Stored content migration | DB | not claimed | `[ ]` |
+| Server-side sanitizer | DB/RPC | not in P5-D.1 | `[ ]` |
+| S+-03 production-closed | acceptance | P5-D.2 required | `[ ]` |
+| Supabase writes / deploy / push | ops | none | `[x]` |
+
+**P5-D.1 baseline implemented locally.** Central ContentSafety utility with rich HTML allowlist and URL scheme whitelist. Post render, create/edit outgoing paths, avatars, and admin compose/preview sinks guarded. QA sanitization fixture 45/45 PASS; observation 17/17 and notification 24/24 remain PASS. No Supabase writes, no deploy, no push. S+-03 baseline-implemented but not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate:** **P5-D.2 HTML Sanitization Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
 
 ---
 
