@@ -195,7 +195,7 @@
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
-**Next:** Fix `core_schema_foundation.sql` ordering → re-run P5-STAGING.6. See `p5-staging-base-schema-apply-report.md`.
+**Next:** ~~Fix `core_schema_foundation.sql` ordering~~ → **done in P5-STAGING.6A** → re-run P5-STAGING.6 with explicit approval.
 
 ---
 
@@ -207,4 +207,20 @@
 
 ---
 
-*Document version: P5-STAGING.5C PASS + 5C apply dependency note. No secrets.*
+## 12. P5-STAGING.6A Follow-up (PASS — local reorder)
+
+**Gate:** P5-STAGING.6A — dependency reorder in repo. **PASS**. No SQL apply, no DB access.
+
+| Item | Status |
+|------|--------|
+| Foundation file reordered | `[x]` ~75 KB |
+| Apply order: tables → PK → indexes → FKs → functions → triggers → RLS → policies | `[x]` |
+| `wiki_relation_types` before `bl_match_entities` | `[x]` |
+| Nine required core/wiki tables present | `[x]` |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval required |
+
+**Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS (local). No secrets.*

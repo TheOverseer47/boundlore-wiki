@@ -999,6 +999,28 @@ For **future implementation gates** (P5-B through P5-E):
 
 ---
 
+## 36. P5-STAGING.6A — Core Schema Reorder Fix (PASS)
+
+**Milestone:** P5-STAGING.6A — local dependency reorder; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SQL apply / DB access | `[x]` — none |
+| `core_schema_foundation.sql` reordered | `[x]` |
+| `wiki_relation_types` before `bl_match_entities` | `[x]` |
+| Tables before functions/triggers/policies | `[x]` |
+| No INSERT/COPY/secrets/destructive SQL | `[x]` |
+| Staging unchanged | `[x]` |
+| Core Schema Reorder Fix (6A) | **PASS** |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval |
+| P5-E.5 re-run | **BLOCKED** until 6 Re-run succeeds |
+
+**Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
+
+**Next:** P5-STAGING.6 Re-run with explicit approval. No push/deploy/launch.
+
+---
+
 ## 34. P5-STAGING.5C — Curated Core Schema Extraction (PASS)
 
 **Milestone:** P5-STAGING.5C — extraction only; **PASS**.

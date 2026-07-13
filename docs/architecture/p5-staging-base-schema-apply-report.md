@@ -169,4 +169,23 @@ Re-order `core_schema_foundation.sql`: **tables → constraints → indexes → 
 
 ---
 
-*Document version: P5-STAGING.6 FAIL. Staging unchanged. Pre-apply backup preserved. No secrets.*
+## 12. P5-STAGING.6A Follow-up (PASS — local reorder)
+
+**Gate:** P5-STAGING.6A — Core Schema Reorder Fix. **PASS** (local repo only).
+
+| Item | Status |
+|------|--------|
+| SQL apply / DB access | `[x]` — none |
+| `core_schema_foundation.sql` reordered | `[x]` |
+| `wiki_relation_types` before `bl_match_entities` | `[x]` |
+| Tables before functions/triggers/policies | `[x]` |
+| No INSERT/COPY/data/secrets | `[x]` |
+| Staging `public` | `[x]` still empty (6 not re-run) |
+| Core Schema Reorder Fix (6A) | **PASS** |
+| Ready for P5-STAGING.6 Re-run | **YES** — new explicit approval required |
+
+**Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.6 FAIL + 6A PASS (local). Staging unchanged. Pre-apply backup preserved. No secrets.*

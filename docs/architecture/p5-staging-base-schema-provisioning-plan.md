@@ -277,7 +277,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `public` still empty. Pre-apply backup: `p5-staging6-preapply-20260713-193900.sql` (185,427 bytes).
 
-**Next:** Re-order foundation SQL → re-run P5-STAGING.6. No push/deploy/launch.
+**Next:** ~~Re-order foundation SQL~~ → **P5-STAGING.6A PASS** → re-run P5-STAGING.6 with explicit approval. No push/deploy/launch.
 
 ---
 
@@ -298,10 +298,27 @@ P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `publi
 
 ---
 
+## 16. P5-STAGING.6A Follow-up (PASS — local reorder)
+
+**Gate:** P5-STAGING.6A — Core Schema Reorder Fix. **PASS** (repo only).
+
+| Item | Status |
+|------|--------|
+| `core_schema_foundation.sql` dependency order fixed | `[x]` |
+| No DB access / no SQL apply | `[x]` |
+| Staging `public` still empty | `[x]` until 6 Re-run |
+| Core Schema Reorder Fix (6A) | **PASS** |
+| Ready for P5-STAGING.6 Re-run | **YES** — new explicit approval |
+
+**Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
+
+---
+
 ## Related Documents
 
 | Document | Role |
 |----------|------|
+| `p5-core-schema-reorder-fix-report.md` | P5-STAGING.6A reorder report (PASS) |
 | `p5-staging-base-schema-apply-report.md` | P5-STAGING.6 apply report (FAIL) |
 | `p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report |
 | `p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |

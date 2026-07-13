@@ -3276,6 +3276,26 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 111. P5-STAGING.6A — Core Schema Reorder Fix (PASS)
+
+**Milestone:** P5-STAGING.6A — local repo reorder; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SQL apply / DB access | `[x]` — none |
+| `core_schema_foundation.sql` dependency order fixed | `[x]` |
+| `wiki_relation_types` before `bl_match_entities` | `[x]` |
+| No data / secrets / destructive SQL | `[x]` |
+| Core Schema Reorder Fix (6A) | **PASS** |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
+
+**Next:** P5-STAGING.6 Re-run. No push/deploy/launch.
+
+---
+
 ## 109. P5-STAGING.5C — Curated Core Schema Extraction (PASS)
 
 **Milestone:** P5-STAGING.5C — extraction only; **PASS**.

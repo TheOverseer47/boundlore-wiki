@@ -546,8 +546,25 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 **Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
 
-**Next:** Re-order foundation SQL → re-run P5-STAGING.6 → P5-E.5 with explicit approval.
+**Next:** ~~Re-order foundation SQL~~ → **P5-STAGING.6A PASS** → re-run P5-STAGING.6 → P5-E.5 with explicit approval.
 
 ---
 
-*Document version: P5-E.5 blocked + 5C PASS + 6 FAIL. Staging unchanged.*
+### P5-STAGING.6A follow-up (PASS — local reorder)
+
+**P5-STAGING.6A** core schema reorder (HEAD `4341f30` base). **PASS** — local repo fix only.
+
+| Item | Status |
+|------|--------|
+| SQL apply / DB access | `[x]` — none |
+| `core_schema_foundation.sql` reordered | `[x]` |
+| `wiki_relation_types` before `bl_match_entities` | `[x]` |
+| Tables before functions/policies | `[x]` |
+| Core Schema Reorder Fix (6A) | **PASS** |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval required |
+
+**Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
+
+---
+
+*Document version: P5-E.5 blocked + 5C PASS + 6 FAIL + 6A PASS (local). Staging unchanged.*
