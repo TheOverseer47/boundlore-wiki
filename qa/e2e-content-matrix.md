@@ -2298,6 +2298,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9A — S+-03 Runtime XSS Evidence Plan (PASS)
+
+**Milestone:** P5-E.9A — S+-03 Runtime XSS Evidence Plan (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| XSS-Surface-Matrix documented | docs | complete | `[x]` |
+| Repo/fixture sanitization | S+-03 | CLOSED (45/45) | `[x]` |
+| Runtime S+-03 | status | PARTIAL until runtime evidence | `[x]` PARTIAL |
+| No stored payloads written | gate | none | `[x]` |
+| Staging evidence | later | requires explicit approval (9A.2 STOPP) | `[x]` documented |
+| SQL / DB / Storage / Push / Deploy | gate | none | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9A | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-splus03-runtime-xss-evidence-plan.md`
+
+**Next:** P5-E.9A.1 Local/Mocked Runtime Evidence. No push/deploy/launch.
+
+---
+
 ## P5-E.9 — Production Closure Plan (PASS)
 
 **Milestone:** P5-E.9 — Production Closure Plan (planning/acceptance only). **PASS**.

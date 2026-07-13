@@ -3292,7 +3292,32 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.9A S+-03 Runtime XSS Evidence Plan. No push/deploy/launch.
+**Next:** P5-E.9A.1 Local/Mocked Runtime Evidence. No push/deploy/launch.
+
+---
+
+## 134. P5-E.9A — S+-03 Runtime XSS Evidence Plan (PASS)
+
+**Milestone:** P5-E.9A — S+-03 Runtime XSS Evidence Plan (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Evidence Plan | `p5-splus03-runtime-xss-evidence-plan.md` |
+| XSS-Surface-Matrix | `[x]` 18+ Surfaces dokumentiert |
+| S+-03 Repo/Fixture | **CLOSED** (45/45) |
+| S+-03 Runtime | **PARTIAL** — Fixture ≠ Runtime |
+| Fehlende Runtime-Beweise | post-detail stored render, roundtrip, legacy content |
+| P5-E.9A.1 empfohlen | Local/mocked fixture — kein DB |
+| P5-E.9A.2 | Staging stored payload — **STOPP** bis Freigabe |
+| Warum nicht vollständig CLOSED | Kriterien 4–8 in Evidence Plan offen |
+| SQL apply / DB access | **None** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9A | **PASS** |
+
+**Report:** `docs/architecture/p5-splus03-runtime-xss-evidence-plan.md`
+
+**Next:** P5-E.9A.1. No push/deploy/launch.
 
 ---
 

@@ -82,7 +82,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-01 Storage Upload Frontend** | S+ Critical | **CLOSED** | P5-E.8C; fixture 24/24 | — (DB layer separate) | — | Nein | Nein | Nein | Ja | Ja |
 | **S+-02 Notification Injection** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3 staging RLS; fixture 24/24 | Production apply + foreign insert test | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S+-03 Sanitization — Repo** | S+ Critical | **CLOSED** | `BoundLoreContentSafety` p5-d1; fixture 45/45 | Server-side sanitizer optional | — | Nein | Nein | Nein | Ja | Ja |
-| **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture only | Stored XSS auf Staging/App NOT RUN | **P5-E.9A** | Nein | Nein* | Nein | Nein | Ja |
+| **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture only; P5-E.9A Evidence Plan | Stored XSS Runtime NOT RUN; **kein CLOSED ohne 9A.1/9A.2** | **P5-E.9A.1** → **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | Appendix B; kein prerender | Entity-URLs nicht indexierbar | **P5-E.9D** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
@@ -303,10 +303,30 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ### Empfohlener nächster Gate
 
-**P5-E.9A** — S+-03 Runtime XSS Evidence Plan
+~~**P5-E.9A** — S+-03 Runtime XSS Evidence Plan~~ **PASS** — siehe `p5-splus03-runtime-xss-evidence-plan.md`
+
+**P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence
 
 Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS. Keine Secrets. Kein DB-Zugriff.*
+## 14. P5-E.9A Follow-up (PASS — S+-03 Runtime XSS Evidence Plan)
+
+**Gate:** P5-E.9A — S+-03 Runtime XSS Evidence Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| XSS-Surface-Matrix | `[x]` dokumentiert |
+| S+-03 Repo/Fixture | **CLOSED** (45/45) |
+| S+-03 Runtime | **PARTIAL** — kein CLOSED ohne Runtime-Beweis |
+| P5-E.9A.1 geplant | Local/mocked evidence |
+| P5-E.9A.2 geplant | Staging stored payload — **STOPP** |
+| SQL apply / DB access | **None** |
+| P5-E.9A | **PASS** |
+
+**Report:** `docs/architecture/p5-splus03-runtime-xss-evidence-plan.md`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS. Keine Secrets. Kein DB-Zugriff.*

@@ -125,9 +125,10 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ### Empfohlener nächster Gate
 
-1. ~~**P5-E.9** — Production Closure Plan~~ **PASS** — siehe `p5-production-closure-plan.md`
-2. **P5-E.9A** — S+-03 Runtime XSS Evidence Plan
-3. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
+1. ~~**P5-E.9** — Production Closure Plan~~ **PASS**
+2. ~~**P5-E.9A** — S+-03 Runtime XSS Evidence Plan~~ **PASS** — `p5-splus03-runtime-xss-evidence-plan.md`
+3. **P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence
+4. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
 
 ---
 
@@ -147,4 +148,20 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS. Keine Secrets. Kein DB-Zugriff.*
+## 13. P5-E.9A Follow-up (PASS — S+-03 Runtime XSS Evidence Plan)
+
+**Gate:** P5-E.9A — S+-03 Runtime XSS Evidence Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| S+-03 Repo/Fixture | **CLOSED** |
+| S+-03 Runtime | **PARTIAL** |
+| P5-E.9A.1 / 9A.2 geplant | `[x]` |
+| SQL apply / DB access | **None** |
+| P5-E.9A | **PASS** |
+
+**Report:** `docs/architecture/p5-splus03-runtime-xss-evidence-plan.md`
+
+---
+
+*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS. Keine Secrets. Kein DB-Zugriff.*
