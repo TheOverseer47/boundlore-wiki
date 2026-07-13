@@ -142,7 +142,8 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 15. ~~**P5-E.9D.3** — Entity Prerender/SSG Decision~~ **PASS** — `p5-entity-prerender-ssg-decision.md`
 16. ~~**P5-E.9D.3A** — Entity SSG Prototype Plan~~ **PASS** — `p5-entity-ssg-prototype-plan.md`
 17. ~~**P5-E.9D.3B** — Static Entity HTML Prototype~~ **PASS** — 84/84 fixture
-18. **P5-E.9D.3C** — Entity SSG Generator Implementation (Fixture JSON zuerst)
+18. ~~**P5-E.9D.3C** — Entity SSG Generator Implementation~~ **PASS** — FIXTURE_GENERATOR_PASS
+19. **P5-E.9D.3D** — Entity Sitemap Integration
 19. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
 20. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
 
@@ -428,4 +429,23 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9D.3A PASS + P5-E.9D.3B PASS. Keine Secrets.*
+## 27. P5-E.9D.3C Follow-up (PASS — Entity SSG Generator Implementation)
+
+**Gate:** P5-E.9D.3C — Entity SSG Generator Implementation. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Generator | `scripts/build-entity-ssg-fixtures.mjs` |
+| Fixture-only | keine DB, keine echte published Datenquelle |
+| QA | Browser-Fixture + `p5-entity-ssg-generator-check.mjs` PASS |
+| Entity SSG Fixture Generator | **FIXTURE_GENERATOR_PASS** |
+| Entity Detail SEO | **OPEN_BLOCKING** |
+| Sitemap Entity URLs | **Excluded** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.3C | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9D.3C PASS. Keine Secrets. Keine Sitemap-Entity-URLs.*

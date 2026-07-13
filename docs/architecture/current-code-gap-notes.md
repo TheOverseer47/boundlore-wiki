@@ -3366,7 +3366,36 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9D.3C entity SSG generator or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9D.3D entity sitemap integration or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
+## 147. P5-E.9D.3C — Entity SSG Generator Implementation (PASS)
+
+**Milestone:** P5-E.9D.3C — Entity SSG Generator Implementation. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Generator Script | `scripts/build-entity-ssg-fixtures.mjs` — Node-Core only |
+| Fixture JSON Input | `qa/fixtures/p5-entity-ssg-fixtures.json` — 3 entities |
+| Generated Pages | `wiki/post/qa-ssg-*-prototype/index.html` × 3 |
+| Node QA | `qa/p5-entity-ssg-generator-check.mjs` — PASS |
+| Browser Fixture | `p5-entity-ssg-prototype-fixtures.*` — PASS |
+| Generator Marker | `data-bl-ssg-source="fixture-generator"` |
+| Hydration Hook | `data-bl-ssg-hydrate="1"` |
+| Sitemap | Prototype URLs **excluded** |
+| CSR Fallback | `/wiki/post/` unverändert |
+| DB / Supabase / Deploy | **Nein** |
+| Entity SSG Fixture Generator | **FIXTURE_GENERATOR_PASS** |
+| Entity Detail SEO | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.3C | **PASS** |
+
+**Report:** `scripts/build-entity-ssg-fixtures.mjs`, `qa/p5-entity-ssg-generator-check.mjs`
+
+**Next:** P5-E.9D.3D entity sitemap integration or P5-E.9E search recall. No push/deploy/launch.
 
 ---
 

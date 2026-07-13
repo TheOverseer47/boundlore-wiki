@@ -1,4 +1,4 @@
-// QA-only Entity SSG prototype harness (P5-E.9D.3B).
+// QA-only Entity SSG prototype harness (P5-E.9D.3B / P5-E.9D.3C).
 // Local fetch + DOMParser only. No Supabase. No Search Console.
 
 (function() {
@@ -139,6 +139,9 @@
       return FORBIDDEN_PROVIDER.some(function(p) { return src.indexOf(p) !== -1; });
     }), "ok"));
 
+    results.push(record(proto.label + " generator marker", html.indexOf("build-entity-ssg-fixtures.mjs") !== -1, "ok"));
+    results.push(record(proto.label + " data-bl-ssg-source", html.indexOf('data-bl-ssg-source="fixture-generator"') !== -1, "ok"));
+
     return results;
   }
 
@@ -150,6 +153,19 @@
     results.push(record("fixture JSON exists", fixtureData && Array.isArray(fixtureData.entities), "entities=" + (fixtureData.entities ? fixtureData.entities.length : 0)));
     results.push(record("fixture has 3 entities", fixtureData.entities && fixtureData.entities.length === 3, "ok"));
     results.push(record("all fixtures published", fixtureData.entities.every(function(e) { return e.status === "published"; }), "ok"));
+    results.push(record("all fixtures prototype_fixture origin", fixtureData.entities.every(function(e) { return e.content_origin === "prototype_fixture"; }), "ok"));
+
+    try {
+      var genRes = await fetch("/scripts/build-entity-ssg-fixtures.mjs", { cache: "no-store" });
+      results.push(record("generator script exists", genRes.ok, "HTTP " + genRes.status));
+    } catch (genErr) {
+      results.push(record("generator script exists", false, String(genErr && genErr.message ? genErr.message : genErr)));
+    }
+
+    fixtureData.entities.forEach(function(ent) {
+      var expectedPath = "/wiki/post/" + ent.canonical_slug + "/";
+      results.push(record("fixture slug has output path " + ent.canonical_slug, PROTOTYPES.some(function(p) { return p.slug === ent.canonical_slug; }), expectedPath));
+    });
 
     for (var i = 0; i < PROTOTYPES.length; i += 1) {
       var proto = PROTOTYPES[i];

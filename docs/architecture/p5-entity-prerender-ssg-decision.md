@@ -400,10 +400,12 @@ S-05 SEO/CSR wird **CLOSED** erst wenn:
 
 ~~**P5-E.9D.3B** — Static Entity HTML Prototype~~ **PASS** — 84/84 fixture
 
-**P5-E.9D.3C** — Entity SSG Generator Implementation
+~~**P5-E.9D.3C** — Entity SSG Generator Implementation~~ **PASS** — `scripts/build-entity-ssg-fixtures.mjs`
+
+**P5-E.9D.3D** — Entity Sitemap Integration
 
 Alternativ parallel: **P5-E.9E** — Search Recall Plan
 
 ---
 
-*Dokumentversion: P5-E.9D.3 PASS. Keine Secrets. Keine Search-Console-Aktion. Keine Umsetzung.*
+*Dokumentversion: P5-E.9D.3 PASS + P5-E.9D.3C PASS. Keine Secrets. Keine Search-Console-Aktion. Keine Sitemap-Entity-URLs.*

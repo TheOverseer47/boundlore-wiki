@@ -2439,7 +2439,41 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9D.3C entity SSG generator or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9D.3D entity sitemap integration or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
+## P5-E.9D.3C — Entity SSG Generator Implementation (PASS)
+
+**Milestone:** P5-E.9D.3C — Entity SSG Generator Implementation. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fixture generator exists | `scripts/build-entity-ssg-fixtures.mjs` | present | `[x]` |
+| Generator uses only fixture JSON | script | no DB/Supabase | `[x]` |
+| Generator produces 3 prototype entity pages | `wiki/post/qa-ssg-*-prototype/` | present | `[x]` |
+| Generated pages pass entity SEO checks | HTML | title/desc/canonical/OG | `[x]` |
+| Generated pages include CreativeWork and BreadcrumbList JSON-LD | HTML | present | `[x]` |
+| Generated pages have exactly one H1 | HTML | count=1 | `[x]` |
+| Generated pages do not render BLMETA | HTML | absent | `[x]` |
+| Generated pages do not rely on Loading post shell | HTML | absent | `[x]` |
+| Generated pages include hydration hook | HTML | data-bl-ssg-hydrate | `[x]` |
+| Generated pages include generator marker | HTML | data-bl-ssg-source=fixture-generator | `[x]` |
+| Prototype entity URLs are not in sitemap | `sitemap.xml` | absent | `[x]` |
+| Node generator check | `p5-entity-ssg-generator-check.mjs` | PASS | `[x]` |
+| Fixture checks | `p5-entity-ssg-prototype-fixtures.*` | PASS | `[x]` |
+| No DB/Supabase access | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| No Search Console action performed | gate | none | `[x]` |
+| Entity Detail SEO | status | OPEN_BLOCKING | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9D.3C | gate | PASS | **PASS** |
+
+**Report:** `scripts/build-entity-ssg-fixtures.mjs`, `qa/p5-entity-ssg-generator-check.mjs`, `qa/p5-entity-ssg-prototype-fixtures.html`
+
+**Next:** P5-E.9D.3D entity sitemap integration or P5-E.9E search recall. No push/deploy/launch.
 
 ---
 

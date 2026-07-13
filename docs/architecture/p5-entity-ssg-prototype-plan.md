@@ -567,6 +567,19 @@ Statisches HTML (SSG)
 
 S-05 wird **CLOSED** erst nach: 9D.3B (Template proof) + 9D.3C (Generator) + 9D.3D (Sitemap) + 9D.5 (Runtime PASS).
 
+### P5-E.9D.3C — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Generator | `scripts/build-entity-ssg-fixtures.mjs` |
+| Input | `qa/fixtures/p5-entity-ssg-fixtures.json` |
+| Output | 3 × `wiki/post/qa-ssg-*-prototype/index.html` |
+| Node QA | `qa/p5-entity-ssg-generator-check.mjs` — PASS |
+| Browser QA | `p5-entity-ssg-prototype-fixtures.*` — **95/95 PASS** |
+| Marker | `data-bl-ssg-source="fixture-generator"` |
+| Sitemap | Entity-URLs **excluded** |
+| DB / Deploy | **Nein** |
+
 ---
 
 ## Verdict
@@ -575,10 +588,10 @@ S-05 wird **CLOSED** erst nach: 9D.3B (Template proof) + 9D.3C (Generator) + 9D.
 |-----------|---------|
 | **P5-E.9D.3A** | **PASS** |
 | **P5-E.9D.3B** | **PASS** |
+| **P5-E.9D.3C** | **PASS** |
 | Static Entity HTML Prototype | **PROTOTYPE_PASS** (84/84) |
-| Entity SSG Implementation | **NOT IMPLEMENTED** |
-| Entity SSG Prototype Plan | **CREATED** |
-| Entity SSG Implementation | **NOT IMPLEMENTED** |
+| Entity SSG Fixture Generator | **FIXTURE_GENERATOR_PASS** |
+| Entity SSG Implementation | **PARTIAL** (fixture-only; keine echte Datenquelle) |
 | Entity Detail SEO | **OPEN_BLOCKING** |
 | Sitemap Entity URLs | **EXCLUDED** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
@@ -589,10 +602,12 @@ S-05 wird **CLOSED** erst nach: 9D.3B (Template proof) + 9D.3C (Generator) + 9D.
 
 ~~**P5-E.9D.3B** — Static Entity HTML Prototype~~ **PASS** — 3 pages + `p5-entity-ssg-prototype-fixtures.*` (84/84)
 
-**P5-E.9D.3C** — Entity SSG Generator Implementation
+~~**P5-E.9D.3C** — Entity SSG Generator Implementation~~ **PASS** — `scripts/build-entity-ssg-fixtures.mjs` + Fixture QA
+
+**P5-E.9D.3D** — Entity Sitemap Integration (nach Freigabe)
 
 Alternativ parallel: **P5-E.9E** — Search Recall Plan
 
 ---
 
-*Dokumentversion: P5-E.9D.3A PASS + P5-E.9D.3B PASS. Keine Secrets. Keine Umsetzung des Generators.*
+*Dokumentversion: P5-E.9D.3A PASS + P5-E.9D.3B PASS + P5-E.9D.3C PASS. Keine Secrets. Kein DB-Zugriff. Keine Sitemap-Entity-URLs.*

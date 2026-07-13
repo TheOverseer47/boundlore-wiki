@@ -349,14 +349,16 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 | **P5-E.9D.3** | **PASS** |
 | **P5-E.9D.3A** | **PASS** |
 | **P5-E.9D.3B** | **PASS** |
+| **P5-E.9D.3C** | **PASS** |
 | Static Entity HTML Prototype | **PROTOTYPE_PASS** (84/84 Fixture) |
-| Entity SSG Implementation | **NOT IMPLEMENTED** (kein Generator) |
+| Entity SSG Fixture Generator | **FIXTURE_GENERATOR_PASS** |
+| Entity SSG Implementation | **PARTIAL** (fixture-only; kein Generator für echte Daten) |
 | Entity SSG Prototype Plan | **CREATED** |
 | Entity Prerender/SSG Decision | **DECISION DOCUMENTED** — Hybrid SSG empfohlen |
 | robots/noindex Static Hardening | **STATIC_HARDENED** (33/33) |
 | Static Hub Metadata | **STATIC_HUB_METADATA_HARDENED** (100/100) |
 | robots / noindex | **STATIC_HARDENED** |
-| S-05 SEO/CSR | **OPEN_BLOCKING** (CSR Entity-Details) |
+| S-05 SEO/CSR | **OPEN_BLOCKING** (CSR Entity-Details; keine Runtime-Verifikation) |
 | S-06 Search Recall | **OPEN_BLOCKING** (P5-E.9E) |
 | Sitemap | **STATIC_SITEMAP_HUBS_UPDATED** — Entity-URLs weiter ausgeschlossen |
 | Structured Data | **PARTIAL** |
@@ -366,20 +368,14 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ### Empfohlener nächster Gate
 
-~~**P5-E.9D.1** — robots/noindex Static Hardening~~ **PASS** — `robots.txt` + HTML noindex (33/33)
-
-~~**P5-E.9D.2** — Static Hub Metadata Cleanup~~ **PASS** — canonical, description, Sitemap-Hubs (100/100)
-
-~~**P5-E.9D.3** — Entity Prerender/SSG Decision~~ **PASS** — `p5-entity-prerender-ssg-decision.md`
-
-~~**P5-E.9D.3A** — Entity SSG Prototype Plan~~ **PASS** — `p5-entity-ssg-prototype-plan.md`
-
 ~~**P5-E.9D.3B** — Static Entity HTML Prototype~~ **PASS** — 3 QA prototype pages + Fixture 84/84
 
-**P5-E.9D.3C** — Entity SSG Generator Implementation **oder** **P5-E.9E** Search Recall Plan
+~~**P5-E.9D.3C** — Entity SSG Generator Implementation~~ **PASS** — `scripts/build-entity-ssg-fixtures.mjs` + QA
 
-Alternativ: **P5-E.9D.4** dynamische Sitemap (nach 9D.3)
+**P5-E.9D.3D** — Entity Sitemap Integration **oder** **P5-E.9E** Search Recall Plan
+
+Alternativ: **P5-E.9D.5** Runtime Verification (nach Deploy-Freigabe)
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9D.3A PASS + P5-E.9D.3B PASS. Keine Secrets. Keine Search-Console-Aktion.*
+*Dokumentversion: P5-E.9D … + P5-E.9D.3C PASS. Keine Secrets. Keine Search-Console-Aktion. Keine Sitemap-Entity-URLs.*
