@@ -87,7 +87,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | Appendix B; kein prerender | Entity-URLs nicht indexierbar | **P5-E.9D** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
-| **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C Plan** | Client + DB alerting + Integration | **P5-E.9C.1** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
+| **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1** Decision | Client integration + alerting | **P5-E.9C.2** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
 | **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
 | **S-10 Base RLS Production** | S | **NOT_TESTED** | Repo SQL; staging partial | Live RLS matrix auf Production | **P5-E.9F** | Nein**** | Nein | Nein | Nein | Ja |
 | **Storage Closure (gesamt)** | S+ | **DEFERRED_ACCEPTED** | P5-E.8A.2/8C | DB vor Unlock | P5-E.8A.4+ | Ja | Ja | Ja | Nein | Ja |
@@ -315,6 +315,10 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9B.2** — Staging Backup Evidence~~ **PASS** — `p5-staging-backup-evidence-report.md`
 
+~~**P5-E.9C.1** — Monitoring Provider Decision~~ **PASS** — `p5-monitoring-provider-decision.md`
+
+**P5-E.9C.2** — Local Error Capture Stub (`BoundLoreErrorReporter` ohne Provider-Key)
+
 **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Freigabe für Writes)
 
 Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
@@ -449,4 +453,29 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9B.2 PASS + P5-E.9C PASS. Keine Secrets. Kein DB-Zugriff.*
+## 20. P5-E.9C.1 Follow-up (PASS — Monitoring Provider Decision)
+
+**Gate:** P5-E.9C.1 — Monitoring Provider Decision. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Provider Decision | `p5-monitoring-provider-decision.md` |
+| Provider Comparison Matrix | `[x]` Sentry, OTel, Supabase, Uptime, Manuell |
+| Minimal Pre-Launch + Full Launch Stack | `[x]` |
+| Privacy / GDPR Guardrails | `[x]` |
+| Later Secrets / Gates 9C.2–9C.4 | `[x]` |
+| Provider aktiviert / SDK / Keys | **Nein** |
+| Monitoring Provider Decision | **DECISION DOCUMENTED** |
+| Monitoring Evidence | **OPEN** |
+| Error Tracking / Alerting | **OPEN** |
+| Restore Evidence | **OPEN** |
+| P5-E.9A.2 | **Separate Freigabe** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9C.1 | **PASS** |
+
+**Report:** `docs/architecture/p5-monitoring-provider-decision.md`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9B.2 PASS + P5-E.9C PASS + P5-E.9C.1 PASS. Keine Secrets. Kein DB-Zugriff.*

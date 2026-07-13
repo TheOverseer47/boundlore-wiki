@@ -3338,7 +3338,35 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
 
-**Next:** P5-E.9C.1 or P5-E.9B.2. No push/deploy/launch/provider-keys.
+**Next:** P5-E.9C.2 Local Error Capture Stub. No push/deploy/launch/provider-keys.
+
+---
+
+## 139. P5-E.9C.1 — Monitoring Provider Decision (PASS)
+
+**Milestone:** P5-E.9C.1 — Monitoring Provider Decision (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Provider Decision | `p5-monitoring-provider-decision.md` |
+| Provider Comparison Matrix | `[x]` Sentry, OTel, Supabase, Uptime, Manuell |
+| Minimal Pre-Launch + Full Launch Stack | `[x]` |
+| Privacy / GDPR Guardrails | `[x]` |
+| Later Gates 9C.2–9C.4 | `[x]` |
+| Provider aktiviert / SDK / Keys | **Nein** |
+| Monitoring Provider Decision | **DECISION DOCUMENTED** |
+| Monitoring Evidence | **OPEN** |
+| Error Tracking / Alerting | **OPEN** |
+| Restore Evidence | **OPEN** |
+| P5-E.9A.2 | **Separate Freigabe** |
+| S-08 | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9C.1 | **PASS** |
+
+**Report:** `docs/architecture/p5-monitoring-provider-decision.md`
+
+**Next:** P5-E.9C.2 Local Error Capture Stub. No push/deploy/launch/provider-keys.
 
 ---
 
@@ -3473,7 +3501,7 @@ The future Draft Inspector / Preview must **NOT**:
 | Production Closure (S+-01…04 auf Prod) | OPEN_BLOCKING |
 | S+-03 Runtime XSS | PARTIAL (9A.1 local mock PASS; Staging offen) |
 | S-07 Backup/Restore | PARTIAL (Staging backup PASS; Restore offen) |
-| S-08 Monitoring | OPEN_BLOCKING (P5-E.9C Plan; keine Integration) |
+| S-08 Monitoring | OPEN_BLOCKING (P5-E.9C + 9C.1 Decision; keine Integration) |
 | Incident Response | OPEN_BLOCKING |
 
 ### Public Launch Blocker (zusätzlich)

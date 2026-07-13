@@ -2350,7 +2350,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
 
-**Next:** P5-E.9C.1 Provider Decision or P5-E.9B.2. No push/deploy/launch/provider-keys.
+**Next:** P5-E.9C.2 Local Error Capture Stub. No push/deploy/launch/provider-keys.
+
+---
+
+## P5-E.9C.1 — Monitoring Provider Decision (PASS)
+
+**Milestone:** P5-E.9C.1 — Monitoring Provider Decision (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Provider decision document exists | `p5-monitoring-provider-decision.md` | complete | `[x]` |
+| No provider activated | gate | none | `[x]` |
+| No SDK installed | gate | none | `[x]` |
+| No keys added | gate | none | `[x]` |
+| No env changes | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy | gate | none | `[x]` |
+| No restore performed | gate | none | `[x]` |
+| No payloads written | gate | none | `[x]` |
+| Technical integration | policy | explicit later approval required | `[x]` |
+| Monitoring Provider Decision | status | DECISION DOCUMENTED | `[x]` |
+| Monitoring Evidence | status | OPEN | `[x]` OPEN |
+| Error Tracking / Alerting | status | OPEN | `[x]` OPEN |
+| Restore Evidence | status | OPEN | `[x]` OPEN |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9C.1 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-monitoring-provider-decision.md`
+
+**Next:** P5-E.9C.2 Local Error Capture Stub. No push/deploy/launch/provider-keys.
 
 ---
 

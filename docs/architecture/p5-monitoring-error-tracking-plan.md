@@ -20,7 +20,7 @@ BoundLore hat **keine aktive Monitoring- oder Error-Tracking-Integration** im Re
 
 **Dieser Plan** definiert Monitoring-Scope, Fehlerklassen, Alert-Matrix, Minimal-Pre-Launch vs. Full-Launch-Anforderungen, Privacy-Constraints und Folge-Gates — **ohne** Provider-Aktivierung, SDK-Installation, Keys oder Deploy.
 
-**S-08 Monitoring / Error Tracking** bleibt **OPEN_BLOCKING** für Product Activation und Public Launch.
+**P5-E.9C.1** (Monitoring Provider Decision) — **PASS** — siehe `p5-monitoring-provider-decision.md`.
 
 ---
 
@@ -222,20 +222,23 @@ Zusätzlich zu Minimal — **vor Public Launch**:
 
 | Phase | Gate | Lieferung | Provider-Key? |
 |-------|------|-----------|---------------|
-| 1 | **P5-E.9C.1** | Provider-Entscheidung (Sentry vs. self-hosted OTel vs. Logflare) | **Nein** |
+| 1 | **P5-E.9C.1** | Provider-Entscheidung — **PASS** — Sentry (EU) primär; siehe `p5-monitoring-provider-decision.md` | **Nein** |
 | 2 | **P5-E.9C.2** | `BoundLoreErrorReporter` Stub — lokal, Ring-Buffer, Klassifikation | **Nein** |
 | 3 | **P5-E.9C.3** | Staging-Integration mit Provider DSN | **Ja** — STOPP |
 | 4 | **P5-E.9C.4** | Production-Verifikation + Alert-Routing | **Ja** — STOPP |
 | 5 | Post-Launch | IR-Runbook + Escalation + Quarterly Review | **Ja** |
 
-### Provider-Kandidaten (neutral, keine Entscheidung in diesem Gate)
+### Provider-Entscheidung (P5-E.9C.1 — PASS)
 
-| Kandidat | Stärke | Schwäche | DSGVO |
-|----------|--------|----------|-------|
-| **Sentry** | JS SDK, Source Maps, Alerts | Kosten, US-Hosting (EU verfügbar) | DPA erforderlich |
-| **Supabase Logflare** | Nahe an DB/Auth | Weniger Client-RUM | In Supabase-Plan |
-| **Self-hosted OTel** | Volle Kontrolle | Ops-Aufwand | Einfacher |
-| **UptimeRobot** | Einfacher Uptime | Kein JS-Errors | Minimal PII |
+Siehe **`p5-monitoring-provider-decision.md`** für vollständige Matrix. Kurz:
+
+| Kandidat | Rolle |
+|----------|-------|
+| **Sentry (EU)** | **Primär** — Frontend Error Tracking |
+| **Supabase Dashboard/Alerts** | DB/Auth/RLS |
+| **Better Stack / UptimeRobot** | Uptime (ab 9C.3) |
+| **BoundLoreErrorReporter Stub** | Übergang (9C.2) |
+| **OpenTelemetry** | Deferred / Exit-Strategie |
 
 ---
 
@@ -310,7 +313,7 @@ Zusätzlich zu Minimal — **vor Public Launch**:
 ```
 P5-E.9C (dieses Gate) — Plan                         [PASS]
     ↓
-P5-E.9C.1 Provider Decision                          [Plan]
+P5-E.9C.1 Provider Decision                          [PASS]
     ↓
 P5-E.9C.2 Local Error Capture Stub                   [Code, kein Deploy]
     ↓
@@ -325,7 +328,8 @@ P5-E.9C.4 Production Verification                    [STOPP]
 
 | Dimension | Verdict |
 |-----------|---------|
-| **P5-E.9C (dieses Gate)** | **PASS** |
+| **P5-E.9C.1 (Provider Decision)** | **PASS** |
+| Monitoring Provider Decision | **DECISION DOCUMENTED** |
 | Monitoring Evidence | **OPEN** |
 | Error Tracking | **OPEN** |
 | Alerting | **OPEN** |
@@ -336,12 +340,16 @@ P5-E.9C.4 Production Verification                    [STOPP]
 
 ### Empfohlener nächster Gate
 
-**P5-E.9B.2** — Staging Backup Evidence (**STOPP** — parallel Ops-Pfad)
+~~**P5-E.9B.2** — Staging Backup Evidence~~ **PASS**
 
-oder **P5-E.9C.1** — Monitoring Provider Decision (Plan only)
+~~**P5-E.9C.1** — Monitoring Provider Decision~~ **PASS** — `p5-monitoring-provider-decision.md`
+
+**P5-E.9C.2** — Local Error Capture Stub (`BoundLoreErrorReporter` ohne Provider-Key)
+
+Alternativ Ops-Pfad: **P5-E.9A.2** (STOPP) oder **P5-E.9B.3** Restore Drill
 
 Weiterhin: **kein Push, kein Deploy, kein Launch, keine Provider-Keys.**
 
 ---
 
-*Dokumentversion: P5-E.9C PASS. Keine Secrets. Keine Provider-Aktivierung.*
+*Dokumentversion: P5-E.9C PASS + P5-E.9C.1 PASS. Keine Secrets. Keine Provider-Aktivierung.*
