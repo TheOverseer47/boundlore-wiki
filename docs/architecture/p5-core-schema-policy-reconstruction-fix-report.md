@@ -128,16 +128,32 @@ Replaced foundation tail from `-- === Row level security ===` through `commit;` 
 | Dimension | Verdict |
 |-----------|---------|
 | **Core Schema Policy Reconstruction Fix (6C)** | **PASS** |
-| **Ready for P5-STAGING.6 Re-run** | **YES** (requires new explicit user approval) |
+| **Ready for P5-STAGING.6 Re-run** | **YES** — completed in Re-run 3 (**PASS**) |
+| **Ready for P5-E.5 Re-run** | **YES** — requires new explicit user approval |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Recommendation
 
-- **P5-STAGING.6 Re-run** may proceed only with **new explicit user approval**.
-- Staging `public` remains empty until apply succeeds.
+- **P5-STAGING.6 Re-run 3** completed — base schema applied to staging.
+- **P5-E.5 Re-run** may proceed only with **new explicit user approval**.
 - **No push, deploy, or launch** until full gate sequence passes.
 
 ---
 
-*Document version: P5-STAGING.6C PASS. Local policy reconstruction only. No secrets.*
+## 10. P5-STAGING.6 Re-run 3 Follow-up (PASS)
+
+**Gate:** P5-STAGING.6 Re-run 3 — base schema apply. **PASS**.
+
+| Item | Status |
+|------|--------|
+| SQL apply to staging | `[x]` PASS |
+| Core 9 tables present | `[x]` |
+| 84 policies | `[x]` |
+| P5 security deferred | `[x]` |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
+
+---
+
+*Document version: P5-STAGING.6C PASS + Re-run 3 PASS. Staging base schema provisioned. No secrets.*

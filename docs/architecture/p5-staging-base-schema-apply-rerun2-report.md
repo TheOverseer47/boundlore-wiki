@@ -188,4 +188,20 @@ No passwords or user IDs documented.
 
 ---
 
-*Document version: P5-STAGING.6 Re-run 2 FAIL + 6C PASS (local). Staging unchanged. No secrets.*
+## 13. P5-STAGING.6 Re-run 3 Follow-up (PASS)
+
+**Gate:** P5-STAGING.6 Re-run 3 — base schema apply. **PASS**.
+
+| Item | Status |
+|------|--------|
+| SQL apply | `[x]` PASS |
+| Core 9 tables | `[x]` |
+| 84 policies | `[x]` |
+| P5 security deferred | `[x]` |
+| Ready for P5-E.5 | **YES** — explicit approval |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
+
+---
+
+*Document version: P5-STAGING.6 Re-run 2 FAIL + 6C PASS + Re-run 3 PASS. No secrets.*

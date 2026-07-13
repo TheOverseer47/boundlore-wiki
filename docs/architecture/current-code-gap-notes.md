@@ -3292,7 +3292,27 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** Re-run P5-STAGING.6 with explicit approval. No push/deploy/launch.
+**Next:** P5-E.5 Re-run with explicit approval. No push/deploy/launch.
+
+---
+
+## 116. P5-STAGING.6 Re-run 3 — Base Schema Apply (PASS)
+
+**Milestone:** P5-STAGING.6 Re-run 3 — staging apply; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Pre-apply backup | `[x]` 185,427 bytes |
+| 6A/6B/6C validated | `[x]` |
+| SQL apply | `[x]` PASS |
+| Core 9 tables in `public` | `[x]` |
+| 84 policies | `[x]` |
+| Test users A/B confirmed | `[x]` |
+| P5 security deferred | `[x]` |
+| P5-E.5 re-run | **READY** — explicit approval |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
 
 ---
 

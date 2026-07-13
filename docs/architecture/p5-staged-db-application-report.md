@@ -558,4 +558,19 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ---
 
-*Document version: P5-E.5 blocked + 6 Re-run 2 FAIL + 6C PASS. Staging unchanged.*
+### P5-STAGING.6 Re-run 3 follow-up (PASS)
+
+**P5-STAGING.6 Re-run 3** — `core_schema_foundation.sql` applied to staging. **PASS**.
+
+| Item | Status |
+|------|--------|
+| Core 9 tables in `public` | `[x]` |
+| 84 policies | `[x]` |
+| P5 security deferred | `[x]` |
+| P5-E.5 re-run | **READY** — explicit approval |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
+
+---
+
+*Document version: P5-E.5 blocked + 6 Re-run 3 PASS. Staging base schema provisioned.*

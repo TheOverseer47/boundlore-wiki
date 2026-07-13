@@ -118,31 +118,24 @@ Static scan of `supabase/core_schema_foundation.sql`:
 | Dimension | Verdict |
 |-----------|---------|
 | **Core Schema Extension Fix (6B)** | **PASS** |
-| **Ready for P5-STAGING.6 Re-run** | **YES** → **Re-run 2 attempted (FAIL)** |
+| **Ready for P5-STAGING.6 Re-run** | **YES** → **Re-run 3 PASS** |
+| **Ready for P5-E.5 Re-run** | **YES** — explicit approval |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Recommendation
 
-- **P5-STAGING.6 Re-run 2** attempted; **FAIL** (truncated policies). **P5-STAGING.6C PASS** — policies reconstructed.
-- Staging `public` is still empty until apply succeeds.
+- **P5-STAGING.6 Re-run 3** completed — base schema applied to staging.
+- **P5-E.5 Re-run** next with explicit approval.
 
 ---
 
-## 9. P5-STAGING.6 Re-run 2 Follow-up (FAIL)
+## 11. P5-STAGING.6 Re-run 3 Follow-up (PASS)
 
-**Gate:** P5-STAGING.6 Re-run 2 — apply attempted after 6B. **FAIL** — truncated policies.
+**Gate:** P5-STAGING.6 Re-run 3 — base schema apply. **PASS**.
 
-**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
-
----
-
-## 10. P5-STAGING.6C Follow-up (PASS — local policy reconstruction)
-
-**Gate:** P5-STAGING.6C — 84 policies reconstructed from legacy dump. **PASS**.
-
-**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
 
 ---
 
-*Document version: P5-STAGING.6B PASS + Re-run 2 FAIL + 6C PASS. No secrets.*
+*Document version: P5-STAGING.6B PASS + Re-run 2 FAIL + 6C PASS + Re-run 3 PASS. No secrets.*

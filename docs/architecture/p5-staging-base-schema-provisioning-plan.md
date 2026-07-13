@@ -277,7 +277,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `public` still empty. Pre-apply backup: `p5-staging6-preapply-20260713-193900.sql` (185,427 bytes).
 
-**Next:** ~~Repair truncated policies (P5-STAGING.6C)~~ → **6C PASS** → re-run P5-STAGING.6. No push/deploy/launch.
+**Next:** ~~Re-run P5-STAGING.6~~ → **6 Re-run 3 PASS** → P5-E.5 Re-run (explicit approval). No push/deploy/launch.
 
 ---
 
@@ -368,11 +368,30 @@ P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `publi
 
 ---
 
+## 21. P5-STAGING.6 Re-run 3 Follow-up (PASS)
+
+**Gate:** P5-STAGING.6 Re-run 3 — user approval granted. **PASS** — base schema applied.
+
+| Item | Status |
+|------|--------|
+| Pre-apply backup | `[x]` 185,427 bytes |
+| 6A/6B/6C validated on apply | `[x]` |
+| SQL apply | `[x]` PASS |
+| Core 9 tables in `public` | `[x]` |
+| 84 policies | `[x]` |
+| Test users A/B confirmed | `[x]` |
+| P5 security deferred | `[x]` |
+| P5-E.5 | **READY** — explicit approval |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
+
+---
+
 ## Related Documents
 
 | Document | Role |
 |----------|------|
-| `p5-core-schema-policy-reconstruction-fix-report.md` | P5-STAGING.6C policy fix (PASS) |
+| `p5-staging-base-schema-apply-rerun3-report.md` | P5-STAGING.6 Re-run 3 report (PASS) |
 | `p5-staging-base-schema-apply-rerun2-report.md` | P5-STAGING.6 Re-run 2 report (FAIL) |
 | `p5-core-schema-extension-fix-report.md` | P5-STAGING.6B extension fix (PASS) |
 | `p5-staging-base-schema-apply-rerun-report.md` | P5-STAGING.6 Re-run report (FAIL) |
@@ -402,4 +421,4 @@ P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `publi
 
 ---
 
-*Document version: P5-STAGING.5 + 5C PASS + 6 FAIL. Foundation in repo; staging empty.*
+*Document version: P5-STAGING.6 Re-run 3 PASS. Staging base schema provisioned. No secrets.*

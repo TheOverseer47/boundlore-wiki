@@ -255,4 +255,12 @@
 
 ---
 
-*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS + Re-run 2 FAIL + 6C PASS. No secrets.*
+## 17. P5-STAGING.6 Re-run 3 Follow-up (PASS)
+
+**Gate:** P5-STAGING.6 Re-run 3 — base schema apply. **PASS**.
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
+
+---
+
+*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS + Re-run 2 FAIL + 6C PASS + Re-run 3 PASS. No secrets.*
