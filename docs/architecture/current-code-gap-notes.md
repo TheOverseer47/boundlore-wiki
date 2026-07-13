@@ -3338,7 +3338,33 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
 
-**Next:** P5-E.9C.2 Local Error Capture Stub. No push/deploy/launch/provider-keys.
+**Next:** P5-E.9C.3 (STOPP) or P5-E.9A.2. No push/deploy/launch/provider-keys.
+
+---
+
+## 140. P5-E.9C.2 — Local Error Capture Stub (PASS)
+
+**Milestone:** P5-E.9C.2 — Local Error Capture Stub. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Error Reporter | `js/error-reporter.js` |
+| QA Fixture | `qa/p5-error-reporter-fixtures.*` — **21/21 PASS** |
+| HTML Integration | index, browse, search, post, create-post, support, admin |
+| Guard Hooks | release-gate-client, content-safety, notifications |
+| Provider / SDK / Keys | **Nein** |
+| Network reports | **Kein** |
+| Monitoring Local Stub | **PASS** |
+| Monitoring Evidence | **LOCAL_STUB_PASS** |
+| Error Tracking / Alerting | **OPEN** |
+| P5-E.9C.3 | **STOPP** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9C.2 | **PASS** |
+
+**Report:** `js/error-reporter.js`, `qa/p5-error-reporter-fixtures.html`
+
+**Next:** P5-E.9C.3 (STOPP) or P5-E.9A.2. No push/deploy/launch/provider-keys.
 
 ---
 
@@ -3501,7 +3527,7 @@ The future Draft Inspector / Preview must **NOT**:
 | Production Closure (S+-01…04 auf Prod) | OPEN_BLOCKING |
 | S+-03 Runtime XSS | PARTIAL (9A.1 local mock PASS; Staging offen) |
 | S-07 Backup/Restore | PARTIAL (Staging backup PASS; Restore offen) |
-| S-08 Monitoring | OPEN_BLOCKING (P5-E.9C + 9C.1 Decision; keine Integration) |
+| S-08 Monitoring | OPEN_BLOCKING (P5-E.9C + 9C.1 + 9C.2 Stub; keine Provider-Integration) |
 | Incident Response | OPEN_BLOCKING |
 
 ### Public Launch Blocker (zusätzlich)

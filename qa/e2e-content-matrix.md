@@ -2350,7 +2350,40 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
 
-**Next:** P5-E.9C.2 Local Error Capture Stub. No push/deploy/launch/provider-keys.
+**Next:** P5-E.9C.3 (STOPP) or P5-E.9A.2. No push/deploy/launch/provider-keys.
+
+---
+
+## P5-E.9C.2 — Local Error Capture Stub (PASS)
+
+**Milestone:** P5-E.9C.2 — Local Error Capture Stub. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Error reporter script exists | `js/error-reporter.js` | present | `[x]` |
+| Reporter global available | `BoundLoreErrorReporter` | present | `[x]` |
+| Runtime error captured locally | fixture | buffered | `[x]` |
+| Promise rejection captured locally | fixture | buffered | `[x]` |
+| Security event captured locally | fixture | buffered | `[x]` |
+| PII redaction works | fixture | email/token redacted | `[x]` |
+| Querystrings masked | fixture | `[redacted-query]` | `[x]` |
+| No post body stored | fixture | allowlist only | `[x]` |
+| No provider activated | gate | none | `[x]` |
+| No SDK installed | gate | none | `[x]` |
+| No keys added | gate | none | `[x]` |
+| No env changes | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy | gate | none | `[x]` |
+| Fixture checks | `p5-error-reporter-fixtures.*` | 21/21 PASS | `[x]` |
+| Monitoring Local Stub | status | PASS | `[x]` PASS |
+| Monitoring Evidence | status | LOCAL_STUB_PASS | `[x]` |
+| Error Tracking / Alerting | status | OPEN | `[x]` OPEN |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9C.2 | gate | PASS | **PASS** |
+
+**Report:** `js/error-reporter.js`, `qa/p5-error-reporter-fixtures.html`
+
+**Next:** P5-E.9C.3 (STOPP). No push/deploy/launch/provider-keys.
 
 ---
 

@@ -20,7 +20,7 @@ BoundLore hat **keine aktive Monitoring- oder Error-Tracking-Integration** im Re
 
 **Dieser Plan** definiert Monitoring-Scope, Fehlerklassen, Alert-Matrix, Minimal-Pre-Launch vs. Full-Launch-Anforderungen, Privacy-Constraints und Folge-Gates — **ohne** Provider-Aktivierung, SDK-Installation, Keys oder Deploy.
 
-**P5-E.9C.1** (Monitoring Provider Decision) — **PASS** — siehe `p5-monitoring-provider-decision.md`.
+**P5-E.9C.2** (Local Error Capture Stub) — **PASS** — `js/error-reporter.js` + QA-Fixture 21/21.
 
 ---
 
@@ -45,7 +45,9 @@ BoundLore hat **keine aktive Monitoring- oder Error-Tracking-Integration** im Re
 
 | Dimension | Status |
 |-----------|--------|
-| **Monitoring Evidence** | **OPEN** |
+| **Monitoring Evidence** | **LOCAL_STUB_PASS** |
+| **Monitoring Local Stub** | **PASS** (21/21) |
+| **Error Tracking** | **OPEN** — keine Provider-Integration |
 | **Error Tracking** | **OPEN** |
 | **Alerting** | **OPEN** |
 | **Incident Response** | **OPEN** (kein Runbook) |
@@ -315,7 +317,7 @@ P5-E.9C (dieses Gate) — Plan                         [PASS]
     ↓
 P5-E.9C.1 Provider Decision                          [PASS]
     ↓
-P5-E.9C.2 Local Error Capture Stub                   [Code, kein Deploy]
+P5-E.9C.2 Local Error Capture Stub                   [PASS]
     ↓
 P5-E.9C.3 Staging Integration                        [STOPP]
     ↓
@@ -330,7 +332,9 @@ P5-E.9C.4 Production Verification                    [STOPP]
 |-----------|---------|
 | **P5-E.9C.1 (Provider Decision)** | **PASS** |
 | Monitoring Provider Decision | **DECISION DOCUMENTED** |
-| Monitoring Evidence | **OPEN** |
+| Monitoring Evidence | **LOCAL_STUB_PASS** |
+| Monitoring Local Stub | **PASS** |
+| Error Tracking | **OPEN** |
 | Error Tracking | **OPEN** |
 | Alerting | **OPEN** |
 | S-08 (Ops) | **OPEN_BLOCKING** |
@@ -344,7 +348,9 @@ P5-E.9C.4 Production Verification                    [STOPP]
 
 ~~**P5-E.9C.1** — Monitoring Provider Decision~~ **PASS** — `p5-monitoring-provider-decision.md`
 
-**P5-E.9C.2** — Local Error Capture Stub (`BoundLoreErrorReporter` ohne Provider-Key)
+~~**P5-E.9C.2** — Local Error Capture Stub~~ **PASS** — `js/error-reporter.js` (21/21)
+
+**P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
 
 Alternativ Ops-Pfad: **P5-E.9A.2** (STOPP) oder **P5-E.9B.3** Restore Drill
 
@@ -352,4 +358,4 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, keine Provider-Keys.**
 
 ---
 
-*Dokumentversion: P5-E.9C PASS + P5-E.9C.1 PASS. Keine Secrets. Keine Provider-Aktivierung.*
+*Dokumentversion: P5-E.9C PASS + P5-E.9C.1 PASS + P5-E.9C.2 PASS. Keine Secrets. Keine Provider-Aktivierung.*

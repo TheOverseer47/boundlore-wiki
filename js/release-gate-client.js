@@ -20,6 +20,15 @@ window.BoundLoreReleaseGateClient = (function() {
   var cacheTs = 0;
   var lastReadError = null;
 
+  function emitReleaseGateReport(code, ctx) {
+    try {
+      var rep = window.BoundLoreErrorReporter;
+      if (rep && typeof rep.captureReleaseGateEvent === "function") {
+        rep.captureReleaseGateEvent(code, ctx || {});
+      }
+    } catch (ignore) {}
+  }
+
   function escapeHtml(value) {
     return String(value == null ? "" : value)
       .replace(/&/g, "&amp;")
@@ -124,6 +133,7 @@ window.BoundLoreReleaseGateClient = (function() {
     if (!client) {
       cachedState = getDefaultLockedState(UNKNOWN_LOCKED_COPY, "no_client");
       cacheTs = Date.now();
+      emitReleaseGateReport("E-03", { source_type: "no_client", blocked: true });
       return Object.assign({}, cachedState);
     }
 
@@ -138,6 +148,7 @@ window.BoundLoreReleaseGateClient = (function() {
         lastReadError = result.error;
         cachedState = mapReadErrorToState(result.error);
         cacheTs = Date.now();
+        emitReleaseGateReport("E-03", { source_type: "read_error", blocked: true });
         return Object.assign({}, cachedState);
       }
 
@@ -158,6 +169,7 @@ window.BoundLoreReleaseGateClient = (function() {
       lastReadError = err;
       cachedState = getDefaultLockedState(UNKNOWN_LOCKED_COPY, "read_error");
       cacheTs = Date.now();
+      emitReleaseGateReport("E-03", { source_type: "read_error", blocked: true });
       return Object.assign({}, cachedState);
     }
   }
@@ -179,6 +191,7 @@ window.BoundLoreReleaseGateClient = (function() {
     if (!isLockedState(state)) {
       return { ok: true, context: ctx, state: state };
     }
+    emitReleaseGateReport("E-03", { source_type: "contribution_locked", blocked: true, context: ctx });
     return {
       ok: false,
       blocked: true,
@@ -370,6 +383,7 @@ window.BoundLoreReleaseGateClient = (function() {
     if (!isStorageUploadsDeferred()) {
       return { ok: true, context: ctx, deferred: false };
     }
+    emitReleaseGateReport("E-08", { deferred: true, blocked: true, context: ctx });
     return {
       ok: false,
       blocked: true,

@@ -2,6 +2,15 @@
   let notificationsTableAvailable = null;
   const CLEAR_PREFIX = "bl_notifications_cleared_at_";
 
+  function emitSecurityReport(code, ctx) {
+    try {
+      const rep = window.BoundLoreErrorReporter;
+      if (rep && typeof rep.captureSecurityEvent === "function") {
+        rep.captureSecurityEvent(code, ctx || {});
+      }
+    } catch (ignore) {}
+  }
+
   function getClearKey(userId) {
     return CLEAR_PREFIX + userId;
   }
@@ -138,6 +147,7 @@
     const safety = getUrlSafety();
     if (payload.target_url && safety && typeof safety.isSafeNotificationTargetUrl === "function") {
       if (!safety.isSafeNotificationTargetUrl(payload.target_url)) {
+        emitSecurityReport("E-07", { reason_code: "unsafe_target_url", blocked: true, feature: "notifications" });
         return { ok: false, blocked: true, reason: "unsafe_target_url" };
       }
     }

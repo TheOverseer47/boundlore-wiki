@@ -72,7 +72,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **S-05 CSR / SEO Entity Pages** | Open | **BLOCKING** (Launch) | `p5-splus-remediation-plan.md` Appendix B | Keine CSR-Shells für Entities | **Ja** (Public Launch) | Post-S+ Produktgate |
 | **S-06 Search Recall (`monster`)** | Open | **BLOCKING** (Launch) | Bekannter Recall-Gap; Smoke lädt ohne Crash | 0 Treffer für bekannte Entities | **Ja** (Public Launch) | Search-Index-Gate |
 | **S-07 Backup/Restore Evidence** | PARTIAL | **PARTIAL** (Staging backup PASS) | **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **Ja** (Launch/Ops) | **P5-E.9B.3** |
-| **S-08 Monitoring / Error Tracking** | Missing | **BLOCKING** (Ops) | **P5-E.9C + 9C.1 Decision** | Keine Integration/Evidence | **Ja** (Launch/Ops) | **P5-E.9C.2** → 9C.4 |
+| **S-08 Monitoring / Error Tracking** | Missing | **BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Keine Provider/Alerting-Integration | **Ja** (Launch/Ops) | **P5-E.9C.3** → 9C.4 |
 | **S-09 Patch Mode fail-open** | Partial | **PARTIAL** | Release Gate ersetzt Patch Mode für Writes | Patch Mode noch im Repo | Nein (wenn Gate locked) | Dokumentation |
 | **S-10 Base RLS live verification** | NOT TESTED | **NOT TESTED** | Repo SQL vorhanden | Vollständige Live-RLS-Matrix | **Ja** (Production) | P5-E.9 |
 | **Admin unlock/relock journey** | NOT RUN | **NOT TESTED** | UI vorbereitet (`p5-e3`) | Kein Staging-Admin-Test | **Ja** (vor Unlock) | Staging Admin Gate |
@@ -135,8 +135,9 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 8. **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Write-Freigabe)
 9. **P5-E.9B.3** — Isolated Restore Drill (**STOPP**)
 10. ~~**P5-E.9C.1** — Monitoring Provider Decision~~ **PASS** — `p5-monitoring-provider-decision.md`
-11. **P5-E.9C.2** — Local Error Capture Stub (`BoundLoreErrorReporter` ohne Provider-Key)
-12. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
+11. ~~**P5-E.9C.2** — Local Error Capture Stub~~ **PASS** — `js/error-reporter.js` (21/21)
+12. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
+13. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
 
 ---
 
@@ -289,4 +290,24 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9B.2 PASS + P5-E.9C PASS + P5-E.9C.1 PASS. Keine Secrets.*
+## 20. P5-E.9C.2 Follow-up (PASS — Local Error Capture Stub)
+
+**Gate:** P5-E.9C.2 — Local Error Capture Stub. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Error Reporter | `js/error-reporter.js` |
+| QA Fixture | 21/21 PASS |
+| Guard Integration | release-gate, content-safety, notifications |
+| Provider / Keys / env | **Keine Änderungen** |
+| Monitoring Local Stub | **PASS** |
+| Monitoring Evidence | **LOCAL_STUB_PASS** |
+| Error Tracking / Alerting | **OPEN** |
+| P5-E.9C.3 | **STOPP** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9C.2 | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9B.2 PASS + P5-E.9C PASS + P5-E.9C.1 PASS + P5-E.9C.2 PASS. Keine Secrets.*

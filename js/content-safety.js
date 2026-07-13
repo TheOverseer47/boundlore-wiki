@@ -31,6 +31,15 @@
     img: { src: true, alt: true, title: true, width: true, height: true }
   };
 
+  function emitSecurityReport(code, ctx) {
+    try {
+      var rep = window.BoundLoreErrorReporter;
+      if (rep && typeof rep.captureSecurityEvent === "function") {
+        rep.captureSecurityEvent(code, ctx || {});
+      }
+    } catch (ignore) {}
+  }
+
   function toStringValue(value) {
     if (value == null) return "";
     return String(value);
@@ -304,7 +313,11 @@
       var outDoc = document.implementation.createHTMLDocument("");
       var outRoot = outDoc.createElement("div");
       sanitizeNodeTree(sourceRoot, outRoot, outDoc);
-      return outRoot.innerHTML;
+      var result = outRoot.innerHTML;
+      if (/<script\b|on\w+\s*=|javascript:|data:/i.test(raw) && result !== raw) {
+        emitSecurityReport("E-07", { had_dangerous_tags: true, stripped: true, feature: "sanitizeRichTextHtml" });
+      }
+      return result;
     } catch (err) {
       return "";
     }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>QA-only P5 Error Reporter Fixtures - BoundLore</title>
+<link rel="stylesheet" href="/css/style.css" />
+<style>
+  .qa-guard-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+  .qa-guard-banner {
+    background: #1a2332;
+    border: 1px solid #3d5166;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .qa-guard-banner h1 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+  }
+  .qa-guard-banner p {
+    margin: 4px 0;
+    color: #b8c5d4;
+    font-size: 0.95rem;
+  }
+  .qa-guard-summary {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+  }
+  .qa-guard-summary.pass { border-color: #2d6a4f; }
+  .qa-guard-summary.fail { border-color: #9b2c2c; }
+  .qa-guard-status-pass { color: #6ee7a0; font-weight: 600; }
+  .qa-guard-status-fail { color: #f87171; font-weight: 600; }
+  .bl-qa-guard-table td.pass-cell { color: #6ee7a0; }
+  .bl-qa-guard-table td.fail-cell { color: #f87171; }
+</style>
+</head>
+<body>
+<div class="qa-guard-page bl-qa-error-reporter">
+  <header class="qa-guard-banner">
+    <h1>QA-only Local Error Reporter — P5-E.9C.2</h1>
+    <p><strong>Not linked from wiki navigation.</strong> In-memory reporter only. No Supabase. No provider. No network reports.</p>
+    <p>Validates <code>BoundLoreErrorReporter</code> stub, PII redaction, and global handlers.</p>
+  </header>
+
+  <div id="fixtureSummary" class="qa-guard-summary">Running error reporter fixtures…</div>
+  <div id="fixtureRoot"></div>
+</div>
+
+<script src="/js/error-reporter.js?v=p5-e9c2"></script>
+<script src="/qa/p5-error-reporter-fixtures.js?v=1"></script>
+</body>
+</html>
