@@ -314,9 +314,11 @@ Per `qa/e2e-content-matrix.md` cross-gate invariants:
 - No S-blocker retest yet
 - No launch-ready claim
 
-**Handoff package (P5-F.2):**
+**Handoff package (P5-F.2):** **Complete** — see `docs/architecture/p5-fable-splus-retest-handoff.md`
 
 - Gate reports P5-B.2, P5-C.2, P5-D.2, P5-E.4, P5-F.1
+- Copy-paste prompt: `docs/architecture/p5-fable-splus-retest-prompt.md`
+- Checklist: `docs/architecture/p5-fable-splus-retest-checklist.md`
 - SQL migration files (read-only diff)
 - JS diff summary
 - Test corpus results
@@ -403,7 +405,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-E.3 | Frontend/Admin UX | Release lock client + admin panel; see §20 — no DB apply |
 | **Complete** | P5-E.4 | Acceptance sweep | Release gate baseline accepted; see §21 — Live-RLS NOT TESTED |
 | **Complete** | P5-F.1 | Combined S+ retest | All four S+ fixtures + regression; see §22 — not production-closed |
-| **Next** | P5-F.2 | Fable retest handoff | Evidence bundle for independent Fable security retest |
+| **Complete** | P5-F.2 | Fable retest handoff | Evidence bundle + prompt; see §23 — no Fable retest executed |
+| **Next** | Fable Retest 1 | External S+ audit | Use `p5-fable-splus-retest-prompt.md` |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -785,7 +788,35 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Authoritative report:** `docs/architecture/p5-splus-combined-retest.md`
 
-**Next candidate:** **P5-F.2 Fable Retest Handoff Package**. No push/deploy/launch.
+**Next candidate (historical):** **P5-F.2 Fable Retest Handoff Package** — **complete**. See §23.
+
+---
+
+## 23. P5-F.2 — Fable Retest Handoff Package
+
+**Milestone:** P5-F.2 docs-only handoff — evidence bundle for independent Fable S+ Security Retest; **no Fable retest executed in this gate**.
+
+**P5-F.2 Fable retest handoff package created.** Handoff document, copy-paste prompt, and checklist prepared. S+ combined baseline retest (P5-F.1) handed off for independent verification. No code, SQL, Supabase, data, fixture, push, deploy, or launch changes.
+
+| Check | Result |
+|-------|--------|
+| `p5-fable-splus-retest-handoff.md` created | `[x]` |
+| `p5-fable-splus-retest-prompt.md` created | `[x]` |
+| `p5-fable-splus-retest-checklist.md` created | `[x]` |
+| S+ status matrix in handoff | `[x]` |
+| Evidence file map in handoff | `[x]` |
+| Fixture map in handoff | `[x]` |
+| Fable test procedure in handoff | `[x]` |
+| Required verdict format in handoff | `[x]` |
+| Explicit non-claims in handoff | `[x]` |
+| SQL executed / Supabase writes | `[x]` — none |
+| Fable retest executed | `[x]` — none (handoff only) |
+| S+-01..04 production-closed | `[ ]` |
+| Live-RLS / Live-RPC | `[x]` — NOT TESTED |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Next candidate:** **Fable Retest 1** (S+ only) using `docs/architecture/p5-fable-splus-retest-prompt.md`. No push/deploy/launch.
 
 ---
 
@@ -793,6 +824,9 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-fable-splus-retest-handoff.md` | P5-F.2 Fable S+ retest handoff (authoritative for F.2) |
+| `docs/architecture/p5-fable-splus-retest-prompt.md` | Copy-paste prompt for Fable Retest 1 |
+| `docs/architecture/p5-fable-splus-retest-checklist.md` | Short Fable execution checklist |
 | `docs/architecture/p5-splus-combined-retest.md` | P5-F.1 combined S+ retest report (authoritative for F.1) |
 | `docs/architecture/p5-release-lock-plan.md` | P5-E.1 release lock architecture (authoritative for E.2+) |
 | `docs/architecture/current-code-gap-notes.md` §85–§93 | P5-A through P5-E.1 gate records |

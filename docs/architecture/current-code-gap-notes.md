@@ -3260,6 +3260,47 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 98. P5-F.2 — Fable Retest Handoff Package
+
+**Milestone:** P5-F.2 docs-only handoff — Fable S+ Security Retest evidence bundle; **no Fable retest executed**.
+
+### P5-F.2 handoff package
+
+| Check | Result |
+|-------|--------|
+| Handoff document created | `[x]` — `p5-fable-splus-retest-handoff.md` |
+| Fable prompt created | `[x]` — `p5-fable-splus-retest-prompt.md` |
+| Fable checklist created | `[x]` — `p5-fable-splus-retest-checklist.md` |
+| S+ status matrix | `[x]` |
+| Evidence file map | `[x]` |
+| Fixture map | `[x]` |
+| Recommended Fable procedure | `[x]` |
+| Required verdict format | `[x]` |
+| Explicit non-claims | `[x]` |
+| S+ combined baseline handed off | `[x]` — P5-F.1 |
+| Code / SQL / data changes | `[x]` — none |
+| SQL executed / Supabase writes | `[x]` — none |
+| Fable retest executed | `[x]` — none |
+| S+-01..04 production-closed | `[ ]` |
+| Live-RLS / Live-RPC | `[x]` — NOT TESTED |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-01..04 | Combined baseline retested — **not production-closed** |
+
+**P5-F.2 Fable retest handoff package created.** No code, SQL, or data changes. No push, no deploy.
+
+### Next candidate
+
+**Fable Retest 1** (S+ only) with `docs/architecture/p5-fable-splus-retest-prompt.md`. No push/deploy/launch.
+
+---
+
 ## 97. P5-F.1 — Combined S+ Security Retest Gate
 
 **Milestone:** P5-F.1 local combined retest — all four S+ baselines **combined baseline retested**; **not production-closed**.

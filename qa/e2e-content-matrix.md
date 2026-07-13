@@ -2157,6 +2157,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-F.2 — Fable Retest Handoff Package
+
+**Milestone:** P5-F.2 docs-only handoff — evidence bundle for independent Fable S+ Security Retest; **no Fable retest executed**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Handoff document | `p5-fable-splus-retest-handoff.md` | full package | `[x]` |
+| Fable prompt | `p5-fable-splus-retest-prompt.md` | copy-paste ready (DE) | `[x]` |
+| Fable checklist | `p5-fable-splus-retest-checklist.md` | short checkbox list | `[x]` |
+| S+ status matrix | handoff §4 | four findings | `[x]` |
+| Evidence file map | handoff §5 | all S+ files | `[x]` |
+| Fixture map | handoff §6 | 5 fixtures | `[x]` |
+| Fable test procedure | handoff §7 | A–E steps | `[x]` |
+| Verdict format | handoff §8 | PASS/PARTIAL/FAIL discipline | `[x]` |
+| Explicit non-claims | handoff §9 | no production claims | `[x]` |
+| Next gate options | handoff §10 | A/B/C documented | `[x]` |
+| S+ combined baseline handed off | P5-F.1 | retest evidence referenced | `[x]` |
+| Code / SQL / fixture changes | ops | none | `[x]` |
+| SQL executed / Supabase writes | ops | none | `[x]` |
+| Fable retest executed | ops | none | `[x]` |
+| S+-01..04 production-closed | acceptance | staging + Fable | `[ ]` |
+| Live-RLS / Live-RPC | ops | NOT TESTED | `[x]` documented |
+
+**P5-F.2 Fable retest handoff package created.** Handoff, prompt, and checklist prepared. S+ combined baseline retest handed off for independent Fable verification. No code, SQL, data, push, or deploy changes. S+ production closure remains NOT TESTED. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate:** **Fable Retest 1** (S+ only) using `docs/architecture/p5-fable-splus-retest-prompt.md`. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.
