@@ -3292,7 +3292,28 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.8 Storage Closure Plan. No push/deploy/launch.
+**Next:** P5-E.8A — explicit approval required. No push/deploy/launch.
+
+---
+
+## 127. P5-E.8 — Storage Closure Plan (PASS)
+
+**Milestone:** P5-E.8 — Storage Closure Plan (planning/review only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Deferred SQL static review | `[x]` PASS |
+| Owner-capable paths evaluated | `[x]` |
+| Preferred apply path | Dashboard SQL Editor (staging) |
+| psql pooler | **Rejected** |
+| P5-E.8A apply gate designed | `[x]` |
+| SQL apply / DB access | **None** |
+| Storage closure | **DEFERRED** |
+| Product-Activation-Ready | **FAIL** (unchanged) |
+| Public-Launch-Ready | **NO-GO** (unchanged) |
+| P5-E.8 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-closure-plan.md`
 
 ---
 

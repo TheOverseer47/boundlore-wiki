@@ -202,7 +202,8 @@ P5-E.6 does **not** revise Product-Activation to PASS.
 |-------|------|---------|----------|
 | A | **P5-E.7A** — Direct Posts Grant/RLS Decision | Confirm grants; re-test S+-01 direct posts RLS on staging | Staging only, explicit approval |
 | B | **P5-E.7B** — Release Lock Fixture Alignment | Fix 32/34 expected state for storage defer | Docs/fixture only |
-| C | **P5-E.8** — Storage Closure Plan | Owner-capable apply path for deferred storage policy | Staging only, explicit approval |
+| C | **P5-E.8A** — Storage Policy Owner-Capable Apply | Apply deferred storage policy on staging | Staging only, explicit approval |
+| D | **P5-E.8B** — Storage Fixture Re-Enablement | Restore storage checks from DEFERRED to PASS | Fixture only, after P5-E.8A |
 | D | **P5-E.9** — Production Closure Plan | Plan only — no apply | None |
 | E | Product-Activation Gap Remediation | After S+ closure milestones | Per sub-gate |
 
@@ -275,4 +276,19 @@ P5-E.5 Re-run 3 delivered **credible staging evidence** for notification injecti
 
 ---
 
-*Document version: P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS. No secrets. No DB access.*
+## 16. P5-E.8 Follow-up (PASS — storage closure plan)
+
+**Gate:** P5-E.8 — Storage Closure Plan (planning only). **PASS**.
+
+| Item | Result |
+|------|--------|
+| P5-E.8A apply gate designed | `[x]` |
+| Storage closure | **DEFERRED** until P5-E.8A |
+| P5-E.8B fixture re-enable planned | `[x]` |
+| P5-E.8 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-closure-plan.md`
+
+---
+
+*Document version: P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS. No secrets. No DB access.*

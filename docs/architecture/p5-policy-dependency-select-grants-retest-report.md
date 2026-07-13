@@ -200,7 +200,7 @@ Local server on port 8080 was unreachable during P5-E.7A.2. **P5-E.7B** aligned 
 
 P5-E.7A.2 closed the **profiles/acks SELECT grant gap** on staging. Direct posts INSERT with tutorial ack and email verification prerequisites is now blocked by **`posts_release_gate_insert_restrictive`** while release gate is locked — not by table privilege denial. Transactional unlock control confirms the enforcement layer is release gate RLS.
 
-**Recommended next:** P5-E.8 Storage Closure Plan.
+**Recommended next:** P5-E.8A Storage Policy Apply (explicit approval).
 
 ---
 
@@ -220,4 +220,19 @@ P5-E.7A.2 closed the **profiles/acks SELECT grant gap** on staging. Direct posts
 
 ---
 
-*Document version: P5-E.7A.2 PASS + P5-E.7B PASS. No secrets.*
+## 14. P5-E.8 Follow-up (PASS — storage closure plan)
+
+**Gate:** P5-E.8 — Storage Closure Plan (planning only). **PASS**.
+
+| Item | Result |
+|------|--------|
+| Closure plan | `p5-storage-closure-plan.md` |
+| Apply gate P5-E.8A | Documented |
+| Storage still DEFERRED | **YES** |
+| P5-E.8 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-closure-plan.md`
+
+---
+
+*Document version: P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS. No secrets.*

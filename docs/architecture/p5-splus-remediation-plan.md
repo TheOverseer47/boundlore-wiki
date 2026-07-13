@@ -1036,6 +1036,28 @@ For **future implementation gates** (P5-B through P5-E):
 
 ---
 
+## 52. P5-E.8 — Storage Closure Plan (PASS)
+
+**Milestone:** P5-E.8 — Storage Closure Plan (planning/review only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Deferred SQL static review | `[x]` PASS |
+| Owner-capable path evaluated | `[x]` |
+| Preferred path | Dashboard SQL Editor (staging) |
+| psql pooler rejected | `[x]` — owner error |
+| P5-E.8A apply gate designed | `[x]` |
+| P5-E.8B fixture re-enable planned | `[x]` |
+| SQL apply / DB access | **None** |
+| Storage closure | **DEFERRED** |
+| P5-E.8 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-closure-plan.md`
+
+**Next:** P5-E.8A — only with new explicit approval. No push/deploy/launch.
+
+---
+
 ## 51. P5-E.7B — Release Lock Fixture Alignment (PASS)
 
 **Milestone:** P5-E.7B — Release Lock DB fixture aligned for storage defer. **PASS** (fixture/docs only).
@@ -1051,7 +1073,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
 
-**Next:** P5-E.8 Storage Closure Plan. No push/deploy/launch.
+**Next:** P5-E.8A Storage Policy Apply (explicit approval). No push/deploy/launch.
 
 ---
 

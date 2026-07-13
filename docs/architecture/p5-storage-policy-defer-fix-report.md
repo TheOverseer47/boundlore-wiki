@@ -192,4 +192,21 @@ Requires **new explicit user approval** before any DB-touching step.
 
 ---
 
-*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS. No secrets.*
+## 15. P5-E.8 Follow-up (PASS — storage closure plan)
+
+**Gate:** P5-E.8 — Storage Closure Plan (planning only). **PASS**.
+
+| Item | Result |
+|------|--------|
+| Closure plan documented | `[x]` |
+| Preferred path | Dashboard SQL Editor (staging) |
+| psql pooler | **Rejected** — owner error |
+| Proposed apply gate | **P5-E.8A** |
+| SQL apply this gate | **None** |
+| P5-E.8 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-closure-plan.md`
+
+---
+
+*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS. No secrets.*

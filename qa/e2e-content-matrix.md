@@ -2298,6 +2298,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.8 — Storage Closure Plan (PASS)
+
+**Milestone:** P5-E.8 — Storage Closure Plan (planning/review only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Deferred SQL static review | `release_gate_storage_policy_deferred.sql` | safe | `[x]` |
+| Owner-capable path plan | docs | documented | `[x]` |
+| Preferred path | staging | Dashboard SQL Editor | `[x]` |
+| P5-E.8A apply gate | plan | designed | `[x]` |
+| No SQL apply / DB access | gate | none | `[x]` |
+| Storage closure | status | DEFERRED | `[x]` |
+| P5-E.8 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-closure-plan.md`
+
+---
+
 ## P5-E.7B — Release Lock Fixture Alignment (PASS)
 
 **Milestone:** P5-E.7B — Release Lock DB fixture storage defer alignment. **PASS**.

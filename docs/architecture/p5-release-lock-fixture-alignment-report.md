@@ -114,7 +114,7 @@ No crash. No production connection. No push/deploy.
 
 | Gap | Status |
 |-----|--------|
-| Storage Closure | **DEFERRED** — P5-E.8 |
+| Storage Closure | **DEFERRED** — P5-E.8A |
 | S+-03 stored-content runtime / production | **NOT CLOSED** |
 | Production Closure | **NOT CLOSED** |
 | Product-Activation-Ready | **FAIL** |
@@ -137,8 +137,24 @@ No crash. No production connection. No push/deploy.
 
 P5-E.7B aligned the Release Lock DB fixture with the P5-E.5C storage defer design. Core release-lock checks pass independently; storage policy checks are visibly **DEFERRED**, not FAIL or PASS. Local evidence re-run confirms all P5 fixtures green with explicit storage defer semantics. No database access occurred.
 
-**Recommended next:** **P5-E.8** Storage Closure Plan (owner-capable apply path) or S+-03 runtime closure plan. Continue **no push / deploy / launch** without explicit approval.
+**Recommended next:** **P5-E.8A** Storage Policy Apply (explicit approval) or S+-03 runtime closure plan. Continue **no push / deploy / launch** without explicit approval.
 
 ---
 
-*Document version: P5-E.7B PASS. No secrets.*
+## 7. P5-E.8 Follow-up (PASS — storage closure plan)
+
+**Gate:** P5-E.8 — Storage Closure Plan (planning only). **PASS**.
+
+| Item | Result |
+|------|--------|
+| Storage closure plan | **Created** — `p5-storage-closure-plan.md` |
+| SQL apply / DB access | **None** |
+| Storage still DEFERRED | **YES** |
+| Recommended path | Dashboard SQL Editor on staging `jzzgoiwfbuwiiyvwgwri` |
+| P5-E.8 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-closure-plan.md`
+
+---
+
+*Document version: P5-E.7B PASS + P5-E.8 PASS. No secrets.*

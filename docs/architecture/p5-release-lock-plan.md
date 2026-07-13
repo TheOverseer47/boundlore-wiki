@@ -709,4 +709,20 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 
 **Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
 
-**Next:** P5-E.8 Storage Closure Plan. No push/deploy/launch.
+**Next:** P5-E.8A Storage Policy Apply (explicit approval). No push/deploy/launch.
+
+---
+
+## 31. P5-E.8 Follow-up (PASS — storage closure plan)
+
+**Gate:** P5-E.8 — Storage Closure Plan (planning only). **PASS**.
+
+| Item | Result |
+|------|--------|
+| Closure plan | `p5-storage-closure-plan.md` |
+| P5-E.8A apply gate | Documented — Dashboard preferred |
+| P5-E.8B fixture re-enable | Planned after live apply |
+| Storage closure | **DEFERRED** |
+| P5-E.8 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-closure-plan.md`
