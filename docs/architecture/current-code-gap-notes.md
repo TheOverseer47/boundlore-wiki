@@ -3292,7 +3292,24 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
+**Next:** P5-E.9 Production Closure Plan. No push/deploy/launch.
+
+---
+
+## 132. P5-E.8D — Runtime / Product-Activation Gap Review (PASS)
+
+**Milestone:** P5-E.8D — docs/analysis only. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Product-Activation Gap Review | `p5-product-activation-gap-review.md` |
+| Runtime Closure Plan | `p5-runtime-closure-plan.md` |
+| SQL apply / DB access | **None** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.8D | **PASS** |
+
+**Next:** P5-E.9 Production Closure Plan. No push/deploy/launch.
 
 ---
 

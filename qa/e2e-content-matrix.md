@@ -2298,6 +2298,31 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.8D — Runtime / Product-Activation Review (PASS)
+
+**Milestone:** P5-E.8D — Runtime Closure & Product-Activation Gap Review (docs/analysis only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Release lock core (staging evidence) | S+-01 | CLOSED on staging | `[x]` CLOSED |
+| Upload inputs disabled while storage deferred | frontend | disabled + notice | `[x]` P5-E.8C |
+| No storage upload call reachable while deferred | JS | fail-closed | `[x]` grep + fixture |
+| Core pages load (smoke) | local 8081 | 200, no crash | `[x]` |
+| S+-02 notification (staging) | staging | PASS | `[x]` |
+| S+-04 observation RPC (staging) | staging | PASS | `[x]` |
+| S+-03 sanitization runtime | staging/prod | NOT RUN | `[ ]` PARTIAL |
+| Production closure | all S+ | NOT CLOSED | `[x]` BLOCKING |
+| Product activation | status | FAIL until blockers closed | `[x]` FAIL |
+| Public launch | status | NO-GO | `[x]` NO-GO |
+| SQL apply / DB / storage action | gate | none | `[x]` |
+| P5-E.8D | gate | PASS | **PASS** |
+
+**Reports:** `docs/architecture/p5-product-activation-gap-review.md`, `docs/architecture/p5-runtime-closure-plan.md`
+
+**Next:** P5-E.9 Production Closure Plan. No push/deploy/launch.
+
+---
+
 ## P5-E.8C — Upload Path Disablement Review (PASS)
 
 **Milestone:** P5-E.8C — frontend upload hardening while storage deferred. **PASS**.
