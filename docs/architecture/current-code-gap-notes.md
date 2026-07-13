@@ -3100,7 +3100,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-C.1 Observation RPC Gate Fix Baseline**. No push/deploy/launch.
+**P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
 
 ---
 
@@ -3138,7 +3138,42 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-C.1 Observation RPC Gate Fix Baseline**. No push/deploy/launch.
+**P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
+
+---
+
+## 89. P5-C.1 — Observation RPC Gate Fix Baseline
+
+**Milestone:** P5-C.1 SQL baseline for S+-04 RPC gate bypass; ready for P5-C.2 acceptance — **not production-closed**.
+
+### S+-04 baseline (file/repo only)
+
+| Item | Status |
+|------|--------|
+| Ack schema | `user_submission_acks` (`user_id` PK) — from `fix_tutorial_ack_rls.sql` |
+| `bl_register_observation` checks `auth.uid()` | Prepared in SQL file |
+| Tutorial-ack gate before writes | `user_submission_acks` + admin bypass |
+| P5-E release-lock hook | Documented in RPC; not implemented |
+| `SECURITY DEFINER` + `search_path = public` | Retained with rationale |
+| `release_gate` table | **Not built** — P5-E |
+| QA fixture `qa/p5-observation-rpc-security-fixtures.*` | 17 static SQL checks |
+| SQL executed / Live-RPC tested | **No** |
+| Supabase writes / deploy / push | **No** |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-04 | **Baseline implemented** — not production-closed |
+
+**P5-C.1 baseline implemented locally.** `bl_register_observation` tutorial-ack gate and P5-E hook prepared in repo SQL only. No live database mutation, no RPC calls, no deploy, no push. BoundLore remains NOT live-ready.
+
+### Next candidate
+
+**P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
 
 ---
 

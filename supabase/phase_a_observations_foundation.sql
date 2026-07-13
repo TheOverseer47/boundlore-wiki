@@ -11,7 +11,7 @@
 --   wiki_entity_claims
 --   posts.canonical_entity_id, posts.is_entity_view
 --   bl_match_entities()
---   bl_register_observation()
+--   bl_register_observation() — P5-C.1: tutorial-ack gate + P5-E release-lock hook (file only)
 
 begin;
 
@@ -344,6 +344,9 @@ $$;
 
 -- -----------------------------------------------------
 -- Register observation + pending discovery post
+-- SECURITY DEFINER retained: cross-table writes (wiki_observations, posts) require
+-- elevated privileges; invoker would still hit restrictive posts RLS inconsistently.
+-- P5-C.1 gates: auth.uid(), user_submission_acks (or admin), P5-E release_lock hook.
 -- -----------------------------------------------------
 create or replace function public.bl_register_observation(
   p_category_slug text,
@@ -376,13 +379,30 @@ declare
   v_rel jsonb;
 begin
   if v_user_id is null then
-    raise exception 'Authentication required';
+    raise exception 'Authentication required to register observation'
+      using errcode = '42501';
   end if;
 
   select exists (
     select 1 from public.profiles
     where id = v_user_id and role = 'admin'
   ) into v_is_admin;
+
+  -- P5-C.1 (S+-04): Tutorial acknowledgement gate — mirrors posts_insert_requires_tutorial_ack.
+  -- SECURITY DEFINER must not bypass this server-side ack requirement.
+  if not v_is_admin and not exists (
+    select 1
+    from public.user_submission_acks usa
+    where usa.user_id = v_user_id
+  ) then
+    raise exception 'Tutorial acknowledgement required before registering observation'
+      using errcode = '42501';
+  end if;
+
+  -- P5-E RELEASE GATE HOOK:
+  -- Before production application, this RPC must also check the server-side
+  -- release_gate/contribution lock. Missing/locked config must block writes.
+  -- Do not allow this SECURITY DEFINER RPC to bypass the release lock.
 
   if length(btrim(coalesce(p_entity_name, ''))) < 2 then
     raise exception 'Entity name is required';
@@ -537,6 +557,10 @@ end;
 $$;
 
 grant execute on function public.bl_match_entities(text, text, text, text, text, integer) to authenticated;
+
+-- P5-C.1: GRANT to authenticated is safe only because bl_register_observation enforces
+-- auth.uid() + tutorial-ack (or admin) before any write. P5-E release_gate enforcement
+-- must be added before DB application / production use.
 grant execute on function public.bl_register_observation(text, text, text, text, text, jsonb, text, text, text, jsonb) to authenticated;
 
 commit;

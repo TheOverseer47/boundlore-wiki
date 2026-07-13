@@ -1880,7 +1880,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
 
-**Next candidate:** **P5-C.1 Observation RPC Gate Fix Baseline**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P5-C.2 Observation RPC Gate Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P5-C.1 — Observation RPC Gate Fix Baseline
+
+**Milestone:** P5-C.1 SQL baseline for S+-04; ready for P5-C.2 acceptance — not production-closed.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Ack schema | `fix_tutorial_ack_rls.sql` | `user_submission_acks.user_id` | `[x]` |
+| RPC auth.uid() gate | `phase_a_observations_foundation.sql` | null actor blocked (`42501`) | `[x]` file only |
+| Tutorial-ack gate | RPC body | before `INSERT INTO public.posts` | `[x]` file only |
+| P5-E release hook | RPC comment | documented; no `release_gate` DDL | `[x]` |
+| SECURITY DEFINER | RPC | retained + `search_path = public` | `[x]` |
+| SQL not executed | — | no live RPC change | `[x]` |
+| QA fixture | `/qa/p5-observation-rpc-security-fixtures.html` | 17/17 PASS; `allPass === true` | `[x]` |
+| Live-RPC negative test | Supabase | no ack → no post row | `[ ]` P5-C.2 + DB gate |
+| S+-04 production-closed | docs | not until DB apply + RPC test | `[ ]` |
+| Supabase writes / deploy / push | — | none | `[x]` |
+| Product Activation FAIL | docs | documented | `[x]` |
+| Public Launch NO-GO | docs | documented | `[x]` |
+| Pending conflict | — | not touched | `[x]` |
+
+**P5-C.1 baseline implemented locally.** `bl_register_observation` now gates on `auth.uid()` and `user_submission_acks` in repo SQL; P5-E release-lock hook documented. SQL not executed; Live-RPC NOT TESTED. QA static fixture 17/17 PASS. No Supabase writes, no deploy, no push. S+-04 baseline-implemented but not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
+
+**Next candidate:** **P5-C.2 Observation RPC Gate Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
 
 ---
 
