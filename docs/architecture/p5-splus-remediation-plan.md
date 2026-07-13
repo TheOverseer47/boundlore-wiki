@@ -399,7 +399,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-D.1 | Code baseline | S+-03 sanitization baseline; see §16 |
 | **Complete** | P5-D.2 | Test acceptance sweep | S+-03 baseline accepted; see §17 |
 | **Complete** | P5-E.1 | Planning gate | Release lock plan; see §18 + `p5-release-lock-plan.md` |
-| **Next** | P5-E.2 | SQL baseline | `release_gate` DB/RLS/RPC (not executed) |
+| **Complete** | P5-E.2 | SQL baseline | `release_gate` DB/RLS/RPC baseline; see §19 — not executed |
+| **Next** | P5-E.3 | Frontend/Admin UX | Release lock UI; no DB apply |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -658,6 +659,39 @@ For **future implementation gates** (P5-B through P5-E):
 **S+-01 status:** Planning completed. **Not implemented.** **Not baseline-accepted.** **Not production-closed.**
 
 **Next candidate:** **P5-E.2 Release Gate DB/RLS/RPC Baseline**. No push/deploy/launch.
+
+---
+
+## 19. P5-E.2 — Release Gate DB/RLS/RPC Baseline
+
+**Milestone:** P5-E.2 SQL baseline for S+-01 in repo — **not executed**, **not applied**, **not baseline-accepted** (P5-E.4), **not production-closed**.
+
+**P5-E.2 baseline implemented locally.** `supabase/release_gate_lock.sql` defines singleton `release_gate` (default locked), `release_gate_audit`, fail-closed helpers (`bl_is_release_unlocked`, `bl_can_create_user_content`, `bl_assert_can_create_user_content`), admin RPC `bl_set_release_gate_locked`, restrictive RLS on posts/reactions/storage, and documents NOT TESTED gaps (comments, reports, report-screenshots). `phase_a_observations_foundation.sql` calls `bl_assert_can_create_user_content` before posts INSERT. QA static fixture 34/34 PASS. No Supabase writes, no SQL execution, no deploy, no push.
+
+| Check | Result |
+|-------|--------|
+| `release_gate_lock.sql` created | `[x]` |
+| Default locked / missing config = locked | `[x]` |
+| `release_gate_audit` planned in SQL | `[x]` |
+| Fail-closed helpers | `[x]` |
+| `bl_is_admin_actor` via `profiles.role = 'admin'` | `[x]` |
+| Posts INSERT restrictive policy | `[x]` |
+| Posts UPDATE restrictive policy | `[x]` — admin bypass via helper |
+| `bl_register_observation` release assert | `[x]` |
+| Discovery storage restrictive (bucket-aware) | `[x]` |
+| Comments/reports/report-screenshots | `[ ]` — NOT TESTED; live-RLS export required |
+| `rpc_sync_discovery_submission` | `[x]` — admin-only; documented |
+| SQL executed / DB migration | `[x]` — none |
+| Frontend/Admin release lock UX | `[ ]` — P5-E.3 |
+| QA fixture PASS | `[x]` — 34 checks |
+| S+-01 baseline accepted | `[ ]` — P5-E.4 |
+| S+-01 production-closed | `[ ]` |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**S+-01 status:** **DB/RLS/RPC baseline implemented** in repo. **Not baseline-accepted.** **Not production-closed.**
+
+**Next candidate:** **P5-E.3 Release Gate Frontend/Admin UX Baseline**. No push/deploy/launch.
 
 ---
 

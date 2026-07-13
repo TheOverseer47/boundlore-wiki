@@ -2029,6 +2029,40 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.2 — Release Gate DB/RLS/RPC Baseline
+
+**Milestone:** P5-E.2 SQL baseline for S+-01 — **not executed**, **not applied**, **not baseline-accepted** (P5-E.4).
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| `release_gate_lock.sql` | `supabase/` | singleton table, default locked, audit, helpers | `[x]` |
+| Missing config = locked | `bl_is_release_unlocked` | no row / exception → false | `[x]` |
+| Fail-closed helpers | SQL | no fail-open, no service_role client | `[x]` |
+| Admin helper | `bl_is_admin_actor` | `profiles.role = 'admin'` | `[x]` |
+| Posts INSERT restrictive | `posts_release_gate_insert_restrictive` | `bl_can_create_user_content` | `[x]` |
+| Posts UPDATE restrictive | `posts_release_gate_update_restrictive` | user edits blocked; admin bypass | `[x]` |
+| `bl_register_observation` | `phase_a_observations_foundation.sql` | assert before posts INSERT | `[x]` |
+| P5-C Tutorial-Ack | observation RPC | still present | `[x]` |
+| Discovery storage | `storage_discovery_uploads_release_gate_insert_restrictive` | bucket-aware | `[x]` |
+| Comments / reports | repo | NOT TESTED — no policies in repo | `[x]` documented |
+| Report-screenshots | repo | NOT TESTED — no bucket policy | `[x]` documented |
+| Patch Mode | `wiki_patch_mode.sql` | maintenance-only, not release lock | `[x]` |
+| Frontend release lock | app JS/HTML | not wired in P5-E.2 | `[x]` |
+| QA fixture | `p5-release-lock-db-security-fixtures` | 34/34 PASS | `[x]` |
+| Sanitization regression | `p5-sanitization-security-fixtures` | PASS | `[x]` |
+| Observation regression | `p5-observation-rpc-security-fixtures` | PASS | `[x]` |
+| Notification regression | `p5-notification-security-fixtures` | PASS | `[x]` |
+| SQL executed / DB migration | ops | none | `[x]` |
+| Supabase writes / deploy / push | ops | none | `[x]` |
+| S+-01 baseline accepted | acceptance | P5-E.4 | `[ ]` |
+| S+-01 production-closed | acceptance | staging + Fable | `[ ]` |
+
+**P5-E.2 baseline implemented locally.** `release_gate_lock.sql` and related SQL prepared; `bl_register_observation` release assert added. QA static fixture 34/34 PASS. No SQL execution, no data changes, no deploy, no push. S+-01 **DB/RLS/RPC baseline implemented** — not baseline-accepted, not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate:** **P5-E.3 Release Gate Frontend/Admin UX Baseline**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

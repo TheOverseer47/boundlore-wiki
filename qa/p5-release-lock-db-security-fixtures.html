@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>QA-only P5 Release Lock DB Security Fixtures - BoundLore</title>
+<link rel="stylesheet" href="/css/style.css" />
+<style>
+  .qa-guard-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+  .qa-guard-banner {
+    background: #1a2332;
+    border: 1px solid #3d5166;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .qa-guard-banner h1 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+  }
+  .qa-guard-banner p {
+    margin: 4px 0;
+    color: #b8c5d4;
+    font-size: 0.95rem;
+  }
+  .qa-guard-summary {
+    background: #121820;
+    border: 1px solid #2a3544;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+  }
+  .qa-guard-summary.pass { border-color: #2d6a4f; }
+  .qa-guard-summary.fail { border-color: #9b2c2c; }
+  .qa-guard-status-pass { color: #6ee7a0; font-weight: 600; }
+  .qa-guard-status-fail { color: #f87171; font-weight: 600; }
+  .bl-qa-guard-table td.pass-cell { color: #6ee7a0; }
+  .bl-qa-guard-table td.fail-cell { color: #f87171; }
+</style>
+</head>
+<body>
+<div class="qa-guard-page bl-qa-release-lock-db-security">
+  <header class="qa-guard-banner">
+    <h1>QA-only release lock DB/RLS baseline — P5-E.2</h1>
+    <p><strong>Not linked from wiki navigation.</strong> Static SQL pattern checks only. No Supabase. No auth. No RPC calls. No SQL execution. No data writes.</p>
+    <p>Validates <code>release_gate_lock.sql</code> and related enforcement hooks in repo SQL files.</p>
+  </header>
+
+  <div id="fixtureSummary" class="qa-guard-summary">Running release lock DB security fixtures…</div>
+  <div id="fixtureRoot"></div>
+</div>
+
+<script src="/qa/p5-release-lock-db-security-fixtures.js?v=2"></script>
+</body>
+</html>

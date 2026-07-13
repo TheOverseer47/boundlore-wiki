@@ -28,6 +28,7 @@
 
     var postsInsertIdx = fnLower.indexOf("insert into public.posts");
     var ackIdx = fnLower.indexOf("user_submission_acks");
+    var releaseGateIdx = fnLower.indexOf("bl_assert_can_create_user_content");
     var authNullBlock = /if\s+v_user_id\s+is\s+null\s+then[\s\S]*?raise\s+exception/i.test(fnBlock);
     var hasRoleOnlyGate = /auth\.role\(\)\s*=\s*'authenticated'/.test(fnLower) &&
       ackIdx < 0;
@@ -103,9 +104,11 @@
       },
       {
         id: 12,
-        label: "P5-E release gate hook comment present",
-        pass: /p5-e release gate hook/i.test(fnBlock),
-        detail: "P5-E RELEASE GATE HOOK",
+        label: "P5-E release gate assert before writes",
+        pass: /bl_assert_can_create_user_content\s*\(\s*'bl_register_observation'\s*\)/i.test(fnBlock) &&
+          releaseGateIdx >= 0 && ackIdx >= 0 && releaseGateIdx > ackIdx &&
+          (postsInsertIdx < 0 || releaseGateIdx < postsInsertIdx),
+        detail: "bl_assert_can_create_user_content before posts INSERT",
       },
       {
         id: 13,

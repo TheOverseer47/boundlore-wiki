@@ -1,9 +1,9 @@
 # P5-E Server-side Release Lock Plan
 
-**Version:** P5-E.1 planning baseline  
-**Status:** Planning only — **not implemented**  
+**Version:** P5-E.2 DB/RLS/RPC baseline  
+**Status:** SQL baseline implemented — **not applied to DB**, not baseline-accepted, not production-closed  
 **Finding:** S+-01 — Kein serverseitiger, fail-closed Pre-Release-Content-Lock  
-**HEAD reference:** `0009206` (post P5-D.2 acceptance)
+**HEAD reference:** `49097cc` (pre P5-E.2); post-gate commit pending
 
 ---
 
@@ -454,3 +454,36 @@ Stop and escalate if:
 ---
 
 **P5-E.1 verdict:** Release Lock implementation plan **accepted for planning purposes**. S+-01 remains **open**. Next: **P5-E.2 Release Gate DB/RLS/RPC Baseline**. No push/deploy/launch.
+
+---
+
+## 16. P5-E.2 — Release Gate DB/RLS/RPC Baseline (implemented in repo)
+
+**Milestone:** SQL baseline in repo — **not executed**, **not applied to production/staging**, **not baseline-accepted** (P5-E.4).
+
+| Item | Status |
+|------|--------|
+| `supabase/release_gate_lock.sql` | **Created** — singleton `release_gate`, `release_gate_audit`, RLS, helpers, admin RPC |
+| Default locked | `contribution_locked boolean not null default true`; seed row `Pre-release default locked` |
+| Missing config = locked | `bl_is_release_unlocked()` — no row / exception → `false` |
+| Fail-closed helpers | `bl_is_admin_actor`, `bl_is_release_unlocked`, `bl_can_bypass_release_gate`, `bl_can_create_user_content`, `bl_assert_can_create_user_content` |
+| Admin helper | `bl_is_admin_actor` via `profiles.role = 'admin'` (canonical in repo) |
+| Admin RPC | `bl_set_release_gate_locked(p_locked, p_reason)` — audit + `lock_version` increment |
+| Posts INSERT restrictive | `posts_release_gate_insert_restrictive` — uses `bl_can_create_user_content` |
+| Posts UPDATE restrictive | `posts_release_gate_update_restrictive` — user edits blocked; admin bypass via helper |
+| `bl_register_observation` | `bl_assert_can_create_user_content('bl_register_observation')` before writes |
+| Discovery storage | `storage_discovery_uploads_release_gate_insert_restrictive` — bucket-aware in `release_gate_lock.sql` |
+| Post reactions | Restrictive INSERT/UPDATE policies in `release_gate_lock.sql` |
+| Comments / reports | **NOT TESTED** — no INSERT policies in repo; live-RLS export required |
+| Report-screenshots bucket | **NOT TESTED** — no storage policy in repo |
+| `rpc_sync_discovery_submission` | Admin-only (`v_is_admin`); no change; admin bypass documented |
+| `discovery_storage.sql` | Unchanged; restrictive policy lives in `release_gate_lock.sql` |
+| Patch Mode | Remains maintenance-only client UX — not release lock |
+| Frontend/Admin UX lock | **Not in P5-E.2** — P5-E.3 |
+| SQL execution / DB migration | **None** |
+| QA fixture | `qa/p5-release-lock-db-security-fixtures.html/js` — 34 static checks |
+| S+-01 | **DB/RLS/RPC baseline implemented** — not accepted, not production-closed |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+
+**P5-E.2 verdict:** Release Gate DB/RLS/RPC baseline **implemented in repo SQL**. Ready for P5-E.3 frontend/admin UX baseline and later staged DB application (P5-E.5). S+-01 **not** production-closed. No push/deploy/launch.

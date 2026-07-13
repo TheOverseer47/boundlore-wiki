@@ -3179,6 +3179,50 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 94. P5-E.2 — Release Gate DB/RLS/RPC Baseline
+
+**Milestone:** P5-E.2 SQL baseline for S+-01 — **implemented in repo**, **not applied to DB**, **not baseline-accepted** (P5-E.4).
+
+### S+-01 DB/RLS/RPC baseline (repo only)
+
+| Item | Status |
+|------|--------|
+| `supabase/release_gate_lock.sql` | **Created** |
+| `release_gate` singleton table | **Planned in SQL** — default `contribution_locked = true` |
+| `release_gate_audit` | **Planned in SQL** |
+| Fail-closed helpers | **In SQL** — missing row / error → locked |
+| `bl_is_admin_actor` | **In SQL** — `profiles.role = 'admin'` |
+| Posts INSERT/UPDATE restrictive RLS | **In SQL** |
+| Post reactions restrictive RLS | **In SQL** |
+| Discovery storage restrictive RLS | **In SQL** — bucket-aware |
+| `bl_register_observation` assert | **In SQL** — `bl_assert_can_create_user_content` |
+| Comments / reports INSERT RLS | **NOT TESTED** — not in repo |
+| Report-screenshots storage | **NOT TESTED** — not in repo |
+| `discovery_storage.sql` | Unchanged |
+| Patch Mode | Client-only maintenance — not release lock |
+| Frontend/Admin UX | **Not in P5-E.2** — P5-E.3 |
+| SQL execution / Supabase deploy | **None** |
+| QA fixture | `p5-release-lock-db-security-fixtures` — 34 PASS |
+| S+-01 implemented | **DB/RLS/RPC baseline** — not accepted |
+| S+-01 production-closed | **No** |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-01 | **DB/RLS/RPC baseline implemented** — not accepted, not production-closed |
+
+**P5-E.2 baseline implemented locally.** SQL files changed but not executed. No data changes, no deploy, no push. BoundLore remains NOT live-ready.
+
+### Next candidate
+
+**P5-E.3 Release Gate Frontend/Admin UX Baseline**. No push/deploy/launch.
+
+---
+
 ## 92. P5-D.2 — HTML Sanitization & URL Safety Acceptance Sweep
 
 **Milestone:** P5-D.2 acceptance sweep; confirms P5-D.1 repo baseline is **baseline-accepted** — **not production-closed**.

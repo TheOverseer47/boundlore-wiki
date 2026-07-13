@@ -11,7 +11,7 @@
 --   wiki_entity_claims
 --   posts.canonical_entity_id, posts.is_entity_view
 --   bl_match_entities()
---   bl_register_observation() — P5-C.1: tutorial-ack gate + P5-E release-lock hook (file only)
+--   bl_register_observation() — P5-C.1: tutorial-ack gate + P5-E.2: release-lock assert (file only)
 
 begin;
 
@@ -399,10 +399,8 @@ begin
       using errcode = '42501';
   end if;
 
-  -- P5-E RELEASE GATE HOOK:
-  -- Before production application, this RPC must also check the server-side
-  -- release_gate/contribution lock. Missing/locked config must block writes.
-  -- Do not allow this SECURITY DEFINER RPC to bypass the release lock.
+  -- P5-E.2 (S+-01): Server-side release gate — fail-closed before contribution writes.
+  perform public.bl_assert_can_create_user_content('bl_register_observation');
 
   if length(btrim(coalesce(p_entity_name, ''))) < 2 then
     raise exception 'Entity name is required';
