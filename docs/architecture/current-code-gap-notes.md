@@ -3292,7 +3292,24 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-STAGING.6 Re-run. No push/deploy/launch.
+**Next:** Add `pg_trgm` to foundation → re-run P5-STAGING.6. No push/deploy/launch.
+
+---
+
+## 112. P5-STAGING.6 Re-run — Base Schema Apply (FAIL)
+
+**Milestone:** P5-STAGING.6 Re-run — staging apply; **FAIL**.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Pre-apply backup | `[x]` 185,427 bytes |
+| 6A order validated on apply | `[x]` |
+| SQL apply | `[ ]` FAIL — `pg_trgm` line 660 |
+| Staging unchanged | `[x]` |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun-report.md`
 
 ---
 

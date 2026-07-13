@@ -2233,6 +2233,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.6 Re-run — Base Schema Apply to Staging (FAIL)
+
+**Milestone:** P5-STAGING.6 Re-run — staging apply; **FAIL**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Staging ref only | `jzzgoiwfbuwiiyvwgwri` | no legacy | `[x]` |
+| Pre-apply backup | `backups/staging/` | > 0 bytes | `[x]` 185,427 |
+| 6A dependency order on apply | staging | PASS | `[x]` |
+| `core_schema_foundation.sql` apply | staging | success | `[ ]` **FAIL** line 660 |
+| Core tables on staging | public | 9 present | `[ ]` — none |
+| Test users A/B | auth.users | exist, confirmed | `[x]` |
+| Base Schema Apply Re-run | gate | PASS | **FAIL** |
+| P5-E.5 re-run | gate | BLOCKED | `[x]` |
+
+**P5-STAGING.6 Re-run FAIL.** Missing `pg_trgm` extension for GIN index; staging unchanged.
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun-report.md`
+
+---
+
 ## P5-STAGING.6A — Core Schema Reorder Fix (PASS)
 
 **Milestone:** P5-STAGING.6A — local repo reorder; **PASS**.

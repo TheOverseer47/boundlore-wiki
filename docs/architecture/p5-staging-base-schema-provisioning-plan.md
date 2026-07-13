@@ -277,7 +277,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `public` still empty. Pre-apply backup: `p5-staging6-preapply-20260713-193900.sql` (185,427 bytes).
 
-**Next:** ~~Re-order foundation SQL~~ → **P5-STAGING.6A PASS** → re-run P5-STAGING.6 with explicit approval. No push/deploy/launch.
+**Next:** Add `pg_trgm` to foundation → re-run P5-STAGING.6. No push/deploy/launch.
 
 ---
 
@@ -314,10 +314,27 @@ P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `publi
 
 ---
 
+## 17. P5-STAGING.6 Re-run Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 Re-run — user approval granted. **FAIL** — missing `pg_trgm` for GIN index.
+
+| Item | Status |
+|------|--------|
+| Pre-apply backup | `[x]` 185,427 bytes |
+| 6A order fix validated on apply | `[x]` |
+| Apply blocked at line 660 | `[x]` |
+| Staging `public` | `[x]` still empty |
+| P5-E.5 | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun-report.md`
+
+---
+
 ## Related Documents
 
 | Document | Role |
 |----------|------|
+| `p5-staging-base-schema-apply-rerun-report.md` | P5-STAGING.6 Re-run report (FAIL) |
 | `p5-core-schema-reorder-fix-report.md` | P5-STAGING.6A reorder report (PASS) |
 | `p5-staging-base-schema-apply-report.md` | P5-STAGING.6 apply report (FAIL) |
 | `p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report |

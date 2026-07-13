@@ -223,4 +223,12 @@
 
 ---
 
-*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS (local). No secrets.*
+## 13. P5-STAGING.6 Re-run Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 Re-run — **FAIL** (`pg_trgm` at line 660). 6A order validated on apply; staging `public` unchanged.
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun-report.md`
+
+---
+
+*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL. No secrets.*

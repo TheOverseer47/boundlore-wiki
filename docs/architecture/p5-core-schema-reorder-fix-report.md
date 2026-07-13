@@ -119,16 +119,25 @@ Note: `auth.users` appears only as FK references and inside function bodies (sch
 | Dimension | Verdict |
 |-----------|---------|
 | **Core Schema Reorder Fix (6A)** | **PASS** |
-| **Ready for P5-STAGING.6 Re-run** | **YES** (requires new explicit user approval) |
+| **Ready for P5-STAGING.6 Re-run** | **YES** → **attempted (6 Re-run FAIL)** |
+| **P5-E.5 Re-run** | **BLOCKED** — staging apply failed (`pg_trgm`) |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Recommendation
 
-- **P5-STAGING.6 Re-run** may proceed only with **new explicit user approval** — not automatic.
-- Staging `public` is still empty until 6 Re-run succeeds.
+- **P5-STAGING.6 Re-run** may proceed only with **new explicit user approval** — 6 Re-run attempted; **FAIL** (`pg_trgm`).
+- Staging `public` is still empty until apply succeeds.
 - **No push, deploy, or launch** until full gate sequence passes.
 
 ---
 
-*Document version: P5-STAGING.6A PASS. Local reorder only. No secrets.*
+## 8. P5-STAGING.6 Re-run Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 Re-run — apply attempted after 6A reorder. **FAIL** at GIN trigram index (missing `pg_trgm` extension).
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun-report.md`
+
+---
+
+*Document version: P5-STAGING.6A PASS + 6 Re-run FAIL. Local reorder only. No secrets.*

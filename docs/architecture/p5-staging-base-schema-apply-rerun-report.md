@@ -1,10 +1,10 @@
-# P5-STAGING.6 Base Schema Apply to Staging Report
+# P5-STAGING.6 Re-run Base Schema Apply to Staging Report
 
-**Gate:** P5-STAGING.6 — Base Schema Apply to Staging  
+**Gate:** P5-STAGING.6 Re-run — Base Schema Apply to Staging  
 **Date:** 2026-07-13  
-**HEAD at gate start:** `c986af2` — Add curated core schema foundation  
+**HEAD at gate start:** `91aae1c` — Fix core schema dependency order  
 **User approval:** **YES** — staging only `jzzgoiwfbuwiiyvwgwri`  
-**Verdict:** **FAIL** — `core_schema_foundation.sql` apply aborted (dependency order)  
+**Verdict:** **FAIL** — apply aborted at `pg_trgm` GIN index  
 **Not P5-E.5:** `[x]` — no P5 security SQL applied
 
 ---
@@ -13,7 +13,7 @@
 
 | Item | Status |
 |------|--------|
-| User approval for P5-STAGING.6 | `[x]` |
+| User approval for P5-STAGING.6 Re-run | `[x]` |
 | Staging only | `[x]` |
 | Legacy `ohkoojpzmptdfyowdgog` excluded | `[x]` |
 | Production excluded | `[x]` |
@@ -41,7 +41,7 @@
 
 | Item | Value |
 |------|-------|
-| Path | `backups/staging/p5-staging6-preapply-20260713-193900.sql` |
+| Path | `backups/staging/p5-staging6-rerun-preapply-20260713-195028.sql` |
 | Size | **185,427 bytes** |
 | Gitignored | `[x]` |
 | Staged | `[x]` — not staged |
@@ -58,8 +58,12 @@
 | Destructive SQL (`TRUNCATE`, `DROP SCHEMA`, `DROP TABLE posts`) | **No** |
 | Secrets / DB URLs / `service_role` | **No** |
 | `pre_release_test_data_reset` | **No** |
-| Required core `CREATE TABLE IF NOT EXISTS` | **Yes** — all six |
+| Required core `CREATE TABLE IF NOT EXISTS` (9 tables) | **Yes** |
+| Dependency order (`wiki_relation_types` before `bl_match_entities`) | **PASS** |
+| Tables before functions/triggers/policies | **PASS** |
 | Static safety verdict | **PASS** |
+
+**Apply-time gap (not static-safety):** `idx_wiki_observations_entity_name_trgm` requires `pg_trgm` extension; extension not present in file or on staging (`pg_extension` count 0).
 
 ---
 
@@ -68,31 +72,25 @@
 | Item | Value |
 |------|-------|
 | File applied | `supabase/core_schema_foundation.sql` only |
-| Method | `psql -v ON_ERROR_STOP=1 -f ...` via staging pooler |
+| Method | `psql -v ON_ERROR_STOP=1 -f ...` via staging session pooler |
 | Result | **FAIL** |
-| Error | `relation "public.wiki_relation_types" does not exist` at ~line 315 |
-| Root cause | Function `bl_match_entities` created **before** tables; body references `wiki_relation_types` |
-| Transaction | Rolled back — `BEGIN`/`COMMIT` wrapper; no partial commit |
+| Error | `operator class "public.gin_trgm_ops" does not exist for access method "gin"` at line **660** |
+| Root cause | GIN trigram index on `wiki_observations.entity_name` without `CREATE EXTENSION pg_trgm` |
+| Prior blocker (6A) | **Resolved** — apply progressed past `bl_match_entities` |
+| Transaction | Rolled back — `BEGIN`/`COMMIT` wrapper; staging `public` still empty |
 | Other SQL files | **Not applied** |
 
 ### Not applied (deferred to P5-E.5)
 
 | File | Status |
 |------|--------|
-| `admin_dashboard_notifications.sql` | **Not applied** |
-| `release_gate_lock.sql` | **Not applied** |
-| `phase_a_observations_foundation.sql` | **Not applied** |
+| `admin_dashboard_notifications.sql` | **Deferred** |
+| `release_gate_lock.sql` | **Deferred** |
+| `phase_a_observations_foundation.sql` | **Deferred** |
 
 ---
 
-## 6. Pre-Apply / Post-Fail Schema State
-
-| Phase | `public` tables |
-|-------|-----------------|
-| Pre-apply | **0** (empty) |
-| Post-fail | **0** (empty — rollback) |
-
-### Required tables post-apply
+## 6. Post-Apply Schema Verification
 
 | Table | Present |
 |-------|---------|
@@ -102,18 +100,22 @@
 | `notifications` | **No** |
 | `user_submission_acks` | **No** |
 | `wiki_entities` | **No** |
+| `wiki_relation_types` | **No** |
 | `wiki_entity_relations` | **No** |
 | `wiki_observations` | **No** |
+
+**Public table count:** 0 (rollback confirmed)
 
 ---
 
 ## 7. RLS / Policy / Function Signal
 
-| Signal | Post-fail |
-|--------|-----------|
+| Signal | Result |
+|--------|--------|
 | RLS on core tables | **N/A** — tables not created |
-| Policies | **N/A** |
-| Core functions | **N/A** — rolled back |
+| Policies on core tables | **N/A** |
+| Public functions | **N/A** — apply aborted before completion |
+| `bl_match_entities` | **Not present** (rollback) |
 
 ---
 
@@ -128,14 +130,19 @@ No passwords or user IDs documented.
 
 ---
 
-## 9. P5-Security Not Applied (verified)
+## 9. Not Applied / Deferred
 
-| Check | Result |
-|-------|--------|
+| Item | Status |
+|------|--------|
+| `admin_dashboard_notifications.sql` | Deferred to P5-E.5 |
+| `release_gate_lock.sql` | Deferred to P5-E.5 |
+| `phase_a_observations_foundation.sql` | Deferred to P5-E.5 |
 | `release_gate` table | **Absent** (count 0) |
-| P5 notification hardening | **Not applied** |
-| P5 observation RPC hardening | **Not applied** |
-| P5-E.5 still required | **Yes** |
+| `bl_is_release_unlocked` | **Absent** (count 0) |
+| `bl_assert_can_create_user_content` | **Absent** (count 0) |
+| Negative RLS/RPC tests | **Not run** |
+
+**P5-E.5 remains required** after base schema apply succeeds.
 
 ---
 
@@ -156,52 +163,17 @@ No local writes. Not staging-connected.
 
 | Dimension | Verdict |
 |-----------|---------|
-| **Base Schema Apply (6)** | **FAIL** |
+| **Base Schema Apply Re-run (6)** | **FAIL** |
 | **Ready for P5-E.5 Re-run** | **NO** |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Remediation
 
-Re-order `core_schema_foundation.sql`: **tables → constraints → indexes → functions → triggers → policies** (or split apply phases). Re-run P5-STAGING.6 with explicit approval after fix.
+Add `CREATE EXTENSION IF NOT EXISTS pg_trgm` (before GIN trigram indexes) to `core_schema_foundation.sql`, then re-run P5-STAGING.6 with explicit approval. Legacy schema-only dump also omitted `pg_trgm` (extension lives outside `public` schema-only export).
 
 **Not in scope:** Push, deploy, launch, legacy/production touch, P5-E.5 apply.
 
 ---
 
-## 12. P5-STAGING.6A Follow-up (PASS — local reorder)
-
-**Gate:** P5-STAGING.6A — Core Schema Reorder Fix. **PASS** (local repo only).
-
-| Item | Status |
-|------|--------|
-| SQL apply / DB access | `[x]` — none |
-| `core_schema_foundation.sql` reordered | `[x]` |
-| `wiki_relation_types` before `bl_match_entities` | `[x]` |
-| Tables before functions/triggers/policies | `[x]` |
-| No INSERT/COPY/data/secrets | `[x]` |
-| Staging `public` | `[x]` still empty (6 not re-run) |
-| Core Schema Reorder Fix (6A) | **PASS** |
-| Ready for P5-STAGING.6 Re-run | **YES** — new explicit approval required |
-
-**Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
-
----
-
-## 13. P5-STAGING.6 Re-run Follow-up (FAIL)
-
-**Gate:** P5-STAGING.6 Re-run — user approval granted. **FAIL** — `pg_trgm` GIN index at line 660.
-
-| Item | Status |
-|------|--------|
-| Pre-apply backup | `[x]` 185,427 bytes |
-| 6A dependency order on apply | `[x]` PASS |
-| Apply error | `gin_trgm_ops` operator class missing |
-| Staging `public` post-fail | `[x]` empty (rollback) |
-| Base Schema Apply Re-run | **FAIL** |
-
-**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun-report.md`
-
----
-
-*Document version: P5-STAGING.6 FAIL + 6A PASS + 6 Re-run FAIL. Staging unchanged. No secrets.*
+*Document version: P5-STAGING.6 Re-run FAIL. Staging `public` unchanged. Pre-apply backup preserved. No secrets.*
