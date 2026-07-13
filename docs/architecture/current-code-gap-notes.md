@@ -3260,6 +3260,27 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 104. P5-E.5 Re-run — Staged DB Application (BLOCKED)
+
+**Milestone:** P5-E.5 Re-run — explicit approval; **BLOCKED** at base schema check.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Staging only | `[x]` |
+| Pre-apply backup | `[x]` |
+| Base tables (posts, profiles, …) | `[ ]` — missing |
+| SQL apply | `[x]` — none |
+| Negative live tests | `[x]` — NOT RUN |
+| Local fixtures | `[x]` — all PASS |
+| P5-E.5 Re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staged-db-application-report.md`
+
+**Next:** P5-STAGING.5. No push/deploy/launch.
+
+---
+
 ## 103. P5-STAGING.4 — Staging Test User Provisioning
 
 **Milestone:** P5-STAGING.4 — docs-only test user record; **no SQL**.

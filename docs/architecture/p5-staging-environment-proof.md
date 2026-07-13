@@ -170,11 +170,15 @@ P5-E.5 remains **blocked** until:
 3. SQL execution method is chosen and approved — pooler path documented  
 4. User grants **new explicit P5-E.5 re-run approval**
 
-**Next:** Explicit P5-E.5 re-run approval from operator. No push/deploy/launch.
+**P5-E.5 Re-run BLOCKED** (2026-07-13): base schema missing on staging. **Next:** P5-STAGING.5.
 
 ---
 
-## 9. P5-STAGING.4 Follow-up
+## 10. P5-E.5 Re-run Follow-up
+
+Re-run with user approval stopped at schema check. Local fixtures remain PASS.
+
+**Report:** `docs/architecture/p5-staged-db-application-report.md` (Re-run section)
 
 **P5-STAGING.4** (HEAD `dcff65d`): Users `p5_e5_user_a@example.com` and `p5_e5_user_b@example.com` documented in `boundlore-staging` only. No passwords/keys in repo. **P5-E.5 READY FOR USER APPROVAL.**
 

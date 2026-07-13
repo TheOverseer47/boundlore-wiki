@@ -238,9 +238,243 @@ All served from `http://localhost:8080`. No Supabase writes.
 ### Next steps
 
 - **Do not** apply P5 SQL to `ohkoojpzmptdfyowdgog`.
-- Obtain **explicit P5-E.5 re-run approval** from operator.
+- **P5-STAGING.5:** Provision BoundLore base schema on `boundlore-staging` before P5-E.5 re-attempt.
 - **No push / deploy / launch.**
 
 ---
 
-*Document version: P5-E.5 blocked report. Docs-only gate outcome. No SQL executed. No remote data changes.*
+# P5-E.5 Re-run — Staged DB Application & Negative RLS/RPC Tests
+
+**Gate:** P5-E.5 Re-run  
+**Date:** 2026-07-13  
+**HEAD at gate start:** `b3c64e7` — Document staging test user provisioning  
+**User approval:** **YES** — staging `jzzgoiwfbuwiiyvwgwri` only  
+**Verdict:** **BLOCKED** — BoundLore base schema not provisioned on staging  
+**SQL applied:** **NONE**  
+**Negative live tests:** **NOT RUN**
+
+---
+
+## Re-run 1. Scope / Approval
+
+| Item | Status |
+|------|--------|
+| Explicit user approval for P5-E.5 re-run | `[x]` — staging only |
+| Staging ref `jzzgoiwfbuwiiyvwgwri` | `[x]` |
+| Legacy `ohkoojpzmptdfyowdgog` excluded | `[x]` |
+| Production / boundlore.com | **untouched** |
+| Push / Deploy / Launch | **none** |
+| `service_role` in client | **not used** |
+
+**Hard stop at Step 5 (Pre-Apply Schema Check).** Pre-apply backup created; no SQL apply; no negative RLS/RPC/storage tests.
+
+---
+
+## Re-run 2. Environment Proof
+
+| Field | Staging | Legacy (forbidden) |
+|-------|---------|-------------------|
+| Project ref | `jzzgoiwfbuwiiyvwgwri` | `ohkoojpzmptdfyowdgog` |
+| API URL | `https://jzzgoiwfbuwiiyvwgwri.supabase.co` | `https://ohkoojpzmptdfyowdgog.supabase.co` |
+| DB host | `db.jzzgoiwfbuwiiyvwgwri.supabase.co` | `db.ohkoojpzmptdfyowdgog.supabase.co` |
+| Project name | `boundlore-staging` | TheOverseer47's Project |
+
+| Check | Result |
+|-------|--------|
+| `.env.staging` local + gitignored | `[x]` |
+| `SUPABASE_STAGING_CONFIRM_ISOLATED=true` | `[x]` |
+| Anon key `sb_publishable_*` (not secret) | `[x]` |
+| No legacy ref in `.env.staging` | `[x]` |
+| Connection via session pooler (IPv4) | `[x]` PASS |
+
+**Environment proof: PASS** for isolated staging identity.
+
+### Pre-apply backup (this re-run)
+
+| Item | Value |
+|------|-------|
+| Created | **Yes** |
+| Path | `backups/staging/p5-e5-rerun-preapply-20260713-185457.sql` |
+| Size | **169,075 bytes** |
+| Gitignored | `[x]` |
+| Production | **not used** |
+
+---
+
+## Re-run 3. Pre-Apply Schema Check
+
+**Result: FAIL — BLOCKED**
+
+Query against staging `information_schema.tables`:
+
+| Required | Present |
+|----------|---------|
+| `public.posts` | **NO** |
+| `public.profiles` | **NO** |
+| `public.notifications` | **NO** |
+| `public.user_submission_acks` | **NO** |
+| `public.post_reactions` | **NO** |
+| `public.wiki_entities` | **NO** |
+| `public.release_gate` | **NO** |
+| `storage.objects` | `[x]` |
+| `storage.buckets` | `[x]` |
+| `auth.users` | `[x]` |
+
+**Public schema table count: 0** (empty fresh Supabase project).
+
+### Test users (read-only)
+
+| Email | Confirmed |
+|-------|-----------|
+| `p5_e5_user_a@example.com` | `[x]` |
+| `p5_e5_user_b@example.com` | `[x]` |
+
+Users exist in `auth.users` but **no `public.profiles`** rows/tables — P5 SQL cannot be safely applied.
+
+**Block statement:** **P5-E.5 Re-run blocked — staging project exists, but BoundLore base schema is not provisioned.**
+
+**Recommendation:** **P5-STAGING.5 Base Schema Provisioning** — apply foundational migrations (e.g. `discovery_entity_backbone.sql`, `sprint1_knowledge_graph_foundation.sql`, posts/profiles baseline) to staging before P5-E.5 re-attempt.
+
+---
+
+## Re-run 4. SQL Apply Log
+
+| File | Order | Applied | Result |
+|------|-------|---------|--------|
+| `supabase/admin_dashboard_notifications.sql` | 1 | **NO** | BLOCKED — schema missing |
+| `supabase/release_gate_lock.sql` | 2 | **NO** | BLOCKED |
+| `supabase/phase_a_observations_foundation.sql` | 3 | **NO** | BLOCKED |
+
+### Static pre-apply review (repo files — unchanged)
+
+| Check | Result |
+|-------|--------|
+| No production URL / `service_role` | `[x]` |
+| S+-02 `user_id = auth.uid()` on notifications insert | `[x]` |
+| S+-01 fail-closed release gate default locked | `[x]` |
+| S+-04 `bl_assert_can_create_user_content` before posts INSERT in RPC | `[x]` |
+| Idempotent DROP POLICY IF EXISTS patterns | `[x]` |
+
+**SQL Apply: BLOCKED**
+
+---
+
+## Re-run 5. S+-02 Test Results
+
+| Test | Result |
+|------|--------|
+| Foreign `user_id` notification insert | **NOT RUN** |
+| Own-user control insert | **NOT RUN** |
+| Local fixture | **24/24 PASS** (browser) |
+
+**Verdict: NOT RUN**
+
+---
+
+## Re-run 6. S+-04 Test Results
+
+| Test | Result |
+|------|--------|
+| Anon / no auth RPC | **NOT RUN** |
+| Auth without tutorial ack | **NOT RUN** |
+| Auth with ack but locked | **NOT RUN** |
+| No post created on block | **NOT RUN** |
+| Local fixture | **17/17 PASS** (browser) |
+
+**Verdict: NOT RUN**
+
+---
+
+## Re-run 7. S+-01 Test Results
+
+| Test | Result |
+|------|--------|
+| `release_gate` locked after apply | **NOT RUN** |
+| Direct `posts` INSERT blocked | **NOT RUN** |
+| `post_reactions` | **NOT RUN** |
+| `discovery-uploads` storage | **NOT RUN** |
+| Missing `release_gate` row | **NOT RUN** |
+| Admin unlock/relock | **NOT RUN** — no admin test user |
+| Final `contribution_locked = true` | **N/A** — no apply |
+| Local DB fixture | **34/34 PASS** (browser) |
+| Local UI fixture | **30/30 PASS** (browser) |
+
+**Verdict: NOT RUN**
+
+---
+
+## Re-run 8. S+-03 Runtime Results
+
+| Test | Result |
+|------|--------|
+| Local sanitization fixture | **45/45 PASS** (browser; failCount 0) |
+| Staging stored-content XSS runtime | **NOT RUN** — no base schema; app not pointed at staging |
+
+**Verdict: NOT RUN** (staging runtime); local **PASS**
+
+---
+
+## Re-run 9. Fixtures / Regression (local)
+
+Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
+
+| Fixture / Route | Result |
+|-----------------|--------|
+| Notification | **24/24 PASS** |
+| Observation RPC | **17/17 PASS** |
+| Sanitization | **45/45 PASS** |
+| Release Lock DB | **34/34 PASS** |
+| Release Lock UI | **30/30 PASS** |
+| `/`, `/wiki/browse/`, search, create-post, admin | HTTP **200** |
+
+---
+
+## Re-run 10. Cleanup
+
+| Item | Status |
+|------|--------|
+| SQL applied to staging | **None** |
+| `p5_e5_*` test posts/notifications | **None created** |
+| `release_gate` on staging | **Unchanged** (table absent) |
+| Legacy production project | **Untouched** |
+| Backups / `.env.staging` staged | **No** |
+
+---
+
+## Re-run 11. Remaining NOT TESTED
+
+- Live-RLS negative tests (all S+ findings)
+- Live-RPC negative tests
+- Storage policy real enforcement on staging
+- Staging admin unlock/relock audit
+- S+-03 stored-content runtime on staging
+- Production closure (all)
+- Production security headers
+- Monitoring / broader backup-restore ops
+
+---
+
+## Re-run 12. Verdict
+
+| Dimension | Verdict |
+|-----------|---------|
+| **P5-E.5 Re-run gate** | **BLOCKED** |
+| **SQL Apply** | **BLOCKED** |
+| **Negative RLS/RPC Tests** | **NOT RUN** |
+| **S+ Staging Evidence** | **BLOCKED** (base schema missing) |
+| **S+ repo baseline** | **PASS** (fixtures green) |
+| **Production Closure** | **NOT CLOSED** |
+| **Product-Activation-Ready** | **FAIL** |
+| **Public-Launch-Ready** | **NO-GO** |
+
+### Required before next P5-E.5 attempt
+
+1. **P5-STAGING.5:** Provision BoundLore base schema on `jzzgoiwfbuwiiyvwgwri` (posts, profiles, wiki_entities, user_submission_acks, etc.).
+2. Verify required tables exist (same checklist as Step 5).
+3. Re-create pre-apply backup.
+4. Obtain explicit user approval for next P5-E.5 attempt.
+5. Apply P5 SQL files in order on staging only.
+
+---
+
+*Document version: P5-E.5 original blocked + P5-E.5 re-run blocked (base schema). No P5 SQL applied. Legacy production untouched.*

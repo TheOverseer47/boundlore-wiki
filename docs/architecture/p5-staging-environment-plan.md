@@ -189,8 +189,9 @@ Stop immediately (do not proceed to SQL apply) if:
 | 4 | **P5-STAGING.2** Environment Proof & Dry Run | **PASS** (identity) — see proof report |
 | 5 | **P5-STAGING.3** Tooling & Backup Dry Run | **PASS** — see tooling/backup report |
 | 6 | **P5-STAGING.4** Test user provisioning | **PASS** — see test user report |
-| 7 | **P5-E.5 re-run** | **READY FOR USER APPROVAL** |
-| 8 | **P5-E.6** (future) | Staging evidence acceptance |
+| 7 | **P5-E.5 re-run** | **BLOCKED** — base schema missing (2026-07-13) |
+| 8 | **P5-STAGING.5** | Base schema provisioning — **next** |
+| 9 | **P5-E.6** (future) | Staging evidence acceptance |
 
 **Not in scope:** Push, deploy, launch, production clone, automatic project creation without explicit safe approval.
 
@@ -255,10 +256,18 @@ Stop immediately (do not proceed to SQL apply) if:
 | User B `p5_e5_user_b@example.com` | `[x]` — boundlore-staging only |
 | Passwords/keys in repo | `[x]` — none |
 | `service_role` for provisioning | `[x]` — not used |
-| P5-E.5 re-run | **READY FOR USER APPROVAL** |
+| P5-E.5 re-run | **BLOCKED** — base schema |
 
 **Authoritative report:** `docs/architecture/p5-staging-test-user-provisioning.md`
 
 ---
 
-*Document version: P5-STAGING.1–4 follow-up. No SQL apply. No secrets committed.*
+## 13. P5-E.5 Re-run Follow-up
+
+**Gate:** P5-E.5 Re-run (HEAD `b3c64e7`) — user approval YES; **BLOCKED** at schema check. No P5 SQL applied.
+
+**Next:** P5-STAGING.5 base schema provisioning.
+
+---
+
+*Document version: P5-STAGING.1–4 + P5-E.5 re-run follow-up. No P5 SQL applied.*

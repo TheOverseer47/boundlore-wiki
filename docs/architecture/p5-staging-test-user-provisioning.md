@@ -98,15 +98,21 @@ When P5-E.5 re-run is **explicitly approved**, these users support staged negati
 | Dimension | Verdict |
 |-----------|---------|
 | **Test User Provisioning** | **PASS** |
-| **P5-E.5 Re-run Readiness** | **READY FOR USER APPROVAL** |
+| **P5-E.5 Re-run Readiness** | **BLOCKED** — base schema missing (re-run 2026-07-13) |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
-All documented prerequisites for P5-E.5 staging re-run are satisfied except **explicit operator approval**. P5-E.5 must not start until that approval is granted.
-
-**Next:** User grants explicit P5-E.5 re-run approval → P5-E.5 on staging only.
+**P5-E.5 Re-run (2026-07-13) blocked** at schema check despite user approval. See re-run section in `p5-staged-db-application-report.md`. **Next:** P5-STAGING.5 base schema → P5-E.5 re-attempt.
 
 **Not in scope:** Push, deploy, launch.
+
+---
+
+## 7. P5-E.5 Re-run Follow-up
+
+**Gate:** P5-E.5 Re-run (HEAD `b3c64e7`) — **BLOCKED**. Staging `public` schema empty; P5 SQL not applied. Test users exist in `auth.users` only.
+
+**Next:** P5-STAGING.5.
 
 ---
 

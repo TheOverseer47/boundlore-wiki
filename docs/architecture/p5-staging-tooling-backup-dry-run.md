@@ -157,9 +157,15 @@ Still required:
 - `[ ]` User **explicit P5-E.5 re-run approval**
 - `[x]` SQL apply runbook (pooler vs direct host documented)
 
-**Next:** Obtain explicit P5-E.5 approval → P5-E.5 re-run on staging only.
+| **P5-E.5 Re-run Readiness** | **BLOCKED** — base schema missing |
 
-**Not in scope:** Push, deploy, launch.
+**Next:** P5-STAGING.5 → P5-E.5 re-attempt.
+
+---
+
+## 10. P5-E.5 Re-run Follow-up
+
+Re-run blocked: staging `public` schema empty. Backup `p5-e5-rerun-preapply-20260713-185457.sql` created; no SQL apply.
 
 ---
 

@@ -572,19 +572,27 @@ Stop and escalate if:
 
 ## 20. P5-E.5 — Staged DB Application (BLOCKED)
 
-**Milestone:** P5-E.5 staging apply + negative RLS/RPC tests — **BLOCKED**; no SQL applied to any remote DB.
+**Milestone:** P5-E.5 staging apply + negative RLS/RPC tests — **BLOCKED** (original: no isolated staging; re-run: base schema missing).
 
 | Item | Result |
 |------|--------|
-| Isolated staging proven | `[ ]` — **BLOCKED** |
-| Only Supabase project matches `supabase-config.js` | `[x]` documented — not staging-isolated |
-| SQL apply (`notifications`, `release_gate_lock`, observation RPC) | `[ ]` — none |
+| Isolated staging proven | `[x]` — P5-STAGING.2+ |
+| BoundLore base schema on staging | `[ ]` — **BLOCKED** (re-run 2026-07-13) |
+| SQL apply | `[ ]` — none |
 | Negative RLS/RPC/storage tests | `[ ]` — NOT RUN |
-| Local fixtures regression | `[x]` — still PASS |
+| Local fixtures regression | `[x]` — 24/24, 17/17, 45/45, 34/34, 30/30 |
 | S+-01 production-closed | `[ ]` |
 | Product-Activation-Ready | FAIL |
 | Public-Launch-Ready | **NO-GO** |
 
-**Report:** `docs/architecture/p5-staged-db-application-report.md`
+**Report:** `docs/architecture/p5-staged-db-application-report.md` (original + Re-run section)
 
-**Next:** Dedicated staging project required; re-run P5-E.5. No push/deploy/launch.
+**Next:** P5-STAGING.5 base schema provisioning → P5-E.5 re-attempt. No push/deploy/launch.
+
+---
+
+## 21. P5-E.5 Re-run Follow-up (BLOCKED)
+
+**Date:** 2026-07-13 · **HEAD:** `b3c64e7` · User approval: **YES** (staging only)
+
+Re-run stopped at pre-apply schema check: staging `public` schema empty. Pre-apply backup `p5-e5-rerun-preapply-20260713-185457.sql` (169,075 bytes). Test users confirmed. No SQL applied.

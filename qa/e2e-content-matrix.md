@@ -2212,6 +2212,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.5 Re-run — Staged DB Application (BLOCKED)
+
+**Milestone:** P5-E.5 Re-run with user approval; blocked at schema check.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Staging ref only | `jzzgoiwfbuwiiyvwgwri` | no legacy | `[x]` |
+| Pre-apply backup | `backups/staging/` | created, gitignored | `[x]` — 169,075 bytes |
+| Base schema | public tables | posts, profiles, … | `[ ]` — **0 public tables** |
+| SQL apply | 3 P5 files | none if blocked | `[x]` — none |
+| S+-02/04/01 live | staging | NOT RUN | `[x]` |
+| Local fixtures | 5 pages | all PASS | `[x]` — 24/24, 17/17, 45/45, 34/34, 30/30 |
+| P5-E.5 Re-run | gate | BLOCKED | `[x]` |
+
+**P5-E.5 Re-run BLOCKED** — BoundLore base schema not on staging. Product-Activation-Ready = FAIL; Public-Launch-Ready = NO-GO.
+
+**Next:** P5-STAGING.5 base schema provisioning.
+
+---
+
 ## P5-STAGING.4 — Staging Test User Provisioning
 
 **Milestone:** P5-STAGING.4 — document staging test users; no SQL, no further provisioning.

@@ -409,7 +409,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Blocked** | P5-E.5 | Staged DB apply + negative tests | **BLOCKED** — isolated staging not proven; see §24 |
 | **Complete** | P5-STAGING.1 | Staging environment plan | Docs + `.env.staging.example`; see staging plan |
 | **Complete** | P5-STAGING.4 | Test user provisioning | **PASS** |
-| **Ready** | P5-E.5 re-run | SQL apply + negative tests | **READY FOR USER APPROVAL** |
+| **Blocked** | P5-E.5 re-run | SQL apply + negative tests | **BLOCKED** — base schema missing; see re-run report |
+| **Next** | P5-STAGING.5 | Base schema provisioning | Required before P5-E.5 re-attempt |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -947,7 +948,32 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Authoritative report:** `docs/architecture/p5-staging-test-user-provisioning.md`
 
-**Next:** Explicit P5-E.5 approval. No push/deploy/launch.
+**Next:** P5-STAGING.5 base schema on staging → P5-E.5 re-attempt. No push/deploy/launch.
+
+---
+
+## 29. P5-E.5 Re-run — Staged DB Application (BLOCKED)
+
+**Milestone:** P5-E.5 Re-run with explicit user approval — **BLOCKED** at pre-apply schema check.
+
+**P5-E.5 Re-run blocked — BoundLore base schema not provisioned on staging.** Environment proof PASS; pre-apply backup created (`p5-e5-rerun-preapply-20260713-185457.sql`, 169,075 bytes). Staging `public` schema empty (0 tables). Test users confirmed in `auth.users`. No P5 SQL applied. Local fixtures 24/24, 17/17, 45/45, 34/34, 30/30 PASS.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Staging ref only | `[x]` |
+| Legacy excluded | `[x]` |
+| Pre-apply backup | `[x]` |
+| Required base tables | `[ ]` — **missing** |
+| SQL apply | `[x]` — none |
+| Negative live tests | `[x]` — NOT RUN |
+| P5-E.5 Re-run | **BLOCKED** |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Report:** `docs/architecture/p5-staged-db-application-report.md` (Re-run section)
+
+**Next:** P5-STAGING.5. No push/deploy/launch.
 
 ---
 
