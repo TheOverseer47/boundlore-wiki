@@ -3292,7 +3292,30 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.9B.2 (STOPP) or P5-E.9C.1. No push/deploy/launch.
+**Next:** P5-E.9A.2 (STOPP) or P5-E.9B.3. No push/deploy/launch/restore.
+
+---
+
+## 139. P5-E.9B.2 — Staging Backup Evidence (PASS)
+
+**Milestone:** P5-E.9B.2 — Staging Backup Evidence. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Evidence Report | `p5-staging-backup-evidence-report.md` |
+| Staging Ref | `jzzgoiwfbuwiiyvwgwri` — verifiziert |
+| Dump | 382,985 bytes; SHA256 dokumentiert |
+| Archive-Listing | 13/14 PRESENT; `storage.objects` NOT_VERIFIED |
+| Restore | **Nein** |
+| Dump committed | **Nein** |
+| Backup Evidence (Staging) | **PASS** |
+| Restore Evidence | **OPEN** |
+| P5-E.9A.2 | **Vorbereitet** — separate Freigabe |
+| P5-E.9B.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-backup-evidence-report.md`
+
+**Next:** P5-E.9A.2 or P5-E.9B.3. No push/deploy/launch/restore.
 
 ---
 
@@ -3449,7 +3472,7 @@ The future Draft Inspector / Preview must **NOT**:
 |---------|--------|
 | Production Closure (S+-01…04 auf Prod) | OPEN_BLOCKING |
 | S+-03 Runtime XSS | PARTIAL (9A.1 local mock PASS; Staging offen) |
-| S-07 Backup/Restore | OPEN_BLOCKING (P5-E.9B Plan; kein Drill) |
+| S-07 Backup/Restore | PARTIAL (Staging backup PASS; Restore offen) |
 | S-08 Monitoring | OPEN_BLOCKING (P5-E.9C Plan; keine Integration) |
 | Incident Response | OPEN_BLOCKING |
 

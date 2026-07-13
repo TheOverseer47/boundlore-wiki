@@ -86,7 +86,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | Appendix B; kein prerender | Entity-URLs nicht indexierbar | **P5-E.9D** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
-| **S-07 Backup/Restore** | S | **OPEN_BLOCKING** (Ops) | P5-STAGING.3 + **P5-E.9B/9B.1** Inventory | Frischer Backup + Restore drill | **P5-E.9B.2** → **9B.3** | Nein | Nein** | Nein | Nein | Ja |
+| **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C Plan** | Client + DB alerting + Integration | **P5-E.9C.1** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
 | **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
 | **S-10 Base RLS Production** | S | **NOT_TESTED** | Repo SQL; staging partial | Live RLS matrix auf Production | **P5-E.9F** | Nein**** | Nein | Nein | Nein | Ja |
@@ -313,9 +313,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9C** — Monitoring/Error Tracking Plan~~ **PASS** — `p5-monitoring-error-tracking-plan.md`
 
-**P5-E.9B.2** — Staging Backup Evidence (**STOPP** — frischer Dump/Snapshot)
+~~**P5-E.9B.2** — Staging Backup Evidence~~ **PASS** — `p5-staging-backup-evidence-report.md`
 
-**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — blockiert bis 9B.2 + Freigabe)
+**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Freigabe für Writes)
 
 Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
@@ -427,4 +427,26 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9C PASS. Keine Secrets. Kein DB-Zugriff.*
+## 19. P5-E.9B.2 Follow-up (PASS — Staging Backup Evidence)
+
+**Gate:** P5-E.9B.2 — Staging Backup Evidence. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Evidence Report | `p5-staging-backup-evidence-report.md` |
+| Staging Ref | `jzzgoiwfbuwiiyvwgwri` — verifiziert |
+| Dump | `p5-e9b2-staging-jzzgoiwfbuwiiyvwgwri-20260714-004034.dump` (382,985 bytes) |
+| SHA256 | dokumentiert (nicht wiederholt — siehe Report) |
+| Archive-Listing | 13/14 Tabellen PRESENT; `storage.objects` NOT_VERIFIED |
+| Restore | **Nein** |
+| Dump committed | **Nein** |
+| Backup Evidence (Staging) | **PASS** |
+| Restore Evidence | **OPEN** |
+| P5-E.9A.2 | **Vorbereitet** — separate Write-Freigabe |
+| P5-E.9B.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-backup-evidence-report.md`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9B.2 PASS + P5-E.9C PASS. Keine Secrets. Kein DB-Zugriff.*

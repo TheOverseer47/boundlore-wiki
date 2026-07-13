@@ -2298,6 +2298,38 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9B.2 — Staging Backup Evidence (PASS)
+
+**Milestone:** P5-E.9B.2 — Staging Backup Evidence. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fresh staging backup evidence | report | documented | `[x]` |
+| Target ref | staging | `jzzgoiwfbuwiiyvwgwri` | `[x]` |
+| Legacy ref not used | policy | forbidden | `[x]` |
+| Production not touched | policy | none | `[x]` |
+| Dump/hash/listing documented | report | yes | `[x]` |
+| Dump size | artifact | > 0 bytes | `[x]` 382,985 |
+| SHA256 documented | report | yes | `[x]` |
+| Archive listing checked | verification | yes | `[x]` 13/14 tables |
+| No restore executed | gate | none | `[x]` |
+| No SQL apply / DB write | gate | none | `[x]` |
+| No Storage apply | gate | none | `[x]` |
+| No Push/Deploy/Launch | gate | none | `[x]` |
+| Dump not committed | gitignore | yes | `[x]` |
+| Backup Evidence (Staging) | status | PASS | `[x]` PASS |
+| Restore Evidence | status | OPEN | `[x]` OPEN |
+| P5-E.9A.2 explicit approval | policy | still required | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9B.2 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-backup-evidence-report.md`
+
+**Next:** P5-E.9A.2 (STOPP) or P5-E.9B.3. No push/deploy/launch/restore.
+
+---
+
 ## P5-E.9C — Monitoring Error Tracking Plan (PASS)
 
 **Milestone:** P5-E.9C — Monitoring/Error Tracking Plan (planning only). **PASS**.

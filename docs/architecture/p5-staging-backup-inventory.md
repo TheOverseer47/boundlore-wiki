@@ -197,7 +197,7 @@ Aus P5-E.9B + `pre_release_reset_dry_run.sql` — für riskante Tests (9A.2) abz
 
 | Bereich | Gefundene Evidence | Reicht für Payload-Test? | Fehlender Nachweis | Risiko | Nächster Gate |
 |---------|-------------------|--------------------------|--------------------|--------|---------------|
-| **Staging DB Backup/Dump** | P5-STAGING.3 historischer `pg_dump`; `backups/` gitignored | **Nein** — nicht frisch, nicht verifiziert | Frischer Dump oder Dashboard-Snapshot mit Timestamp | **Hoch** | **P5-E.9B.2** |
+| **Staging DB Backup/Dump** | P5-STAGING.3 + **P5-E.9B.2** frischer Dump (382 KiB, SHA256) | **Ja** (Staging) | Restore-Drill | Mittel | **P5-E.9B.3** |
 | **Staging Restore-Fähigkeit** | Plan in P5-E.9B; kein Drill | **Nein** | Isolierter Restore-Drill | **Hoch** | **P5-E.9B.3** |
 | **Staging Cleanup-Fähigkeit** | `pre_release_reset_dry_run.sql`; `qa-splus03-xss-*` Skizze | **Nein** — nur Plan | Cleanup-Drill + Readback | **Hoch** | **P5-E.9B.4** |
 | **Staging Storage Backup** | Bucket-Namen in Docs; Bucket fehlt auf Staging | **Nein** | Storage-Objekt-Inventar | Mittel | P5-E.8A.4+ |
@@ -342,20 +342,18 @@ P5-E.9B.3 Isolated Restore Drill         [STOPP — parallel möglich nach 9B.2]
 |-----------|---------|
 | **P5-E.9B.1 (dieses Gate)** | **PASS** |
 | Backup Inventory | **PASS** (dokumentiert) |
-| Backup Evidence | **OPEN** |
+| Backup Evidence (Staging) | **PASS** |
 | Restore Evidence | **OPEN** |
-| P5-E.9A.2 | **BLOCKED / STOPP** |
+| P5-E.9A.2 | **Vorbereitet** — separate Write-Freigabe |
 | Production Closure | **NOT CLOSED** |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Empfohlener nächster Gate
 
-**P5-E.9B.2** — Staging Backup Evidence (**STOPP** — explizite Freigabe für frischen Dump/Snapshot)
+**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Write-Freigabe)
 
-Alternativ parallel (Plan only): **P5-E.9C** — Monitoring/Error Tracking Plan
-
-Weiterhin: **kein Push, kein Deploy, kein Launch, kein Dump, kein Restore.**
+Weiterhin: **kein Push, kein Deploy, kein Launch, kein Restore.**
 
 ---
 

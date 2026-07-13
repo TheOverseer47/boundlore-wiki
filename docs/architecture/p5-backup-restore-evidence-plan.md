@@ -49,9 +49,9 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 
 | Dimension | Status |
 |-----------|--------|
-| **Backup Evidence** | **OPEN** — Tooling PASS (P5-STAGING.3); kein operativer Schedule + kein Restore-Nachweis |
+| **Backup Evidence** | **PASS** (Staging) — P5-E.9B.2 frischer Dump 2026-07-14 |
 | **Restore Evidence** | **OPEN** — kein Drill dokumentiert |
-| **Staging Payload Tests (P5-E.9A.2)** | **BLOCKED** — bis P5-E.9B.2 (frischer Backup) + Freigabe |
+| **Staging Payload Tests (P5-E.9A.2)** | **Vorbereitet** — Backup erfüllt; separate Write-Freigabe nötig |
 | **S+-03 Staging Runtime** | **OPEN / STOPP** |
 | **S-07 Backup/Restore (Ops)** | **OPEN_BLOCKING** |
 | **Production Closure** | **NOT CLOSED** |
@@ -78,7 +78,8 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 
 | # | Fehlender Nachweis | Schwere | Blockiert |
 |---|-------------------|---------|-----------|
-| 1 | Staging **Backup-Inventar** (welche Methoden: `pg_dump`, Dashboard Snapshot, PITR) | Hoch | P5-E.9A.2, S-07 | **PASS** (P5-E.9B.1) — frischer Dump weiterhin offen |
+| 1 | Staging **Backup-Inventar** | Hoch | P5-E.9A.2, S-07 | **PASS** (P5-E.9B.1) |
+| 1b | Frischer Staging-Dump | Hoch | P5-E.9A.2 | **PASS** (P5-E.9B.2) |
 | 2 | **Restore-Drill** in isolierter Umgebung | Hoch | S-07, Launch |
 | 3 | **RPO/RTO-Ziele** dokumentiert und mit Drill abgeglichen | Mittel | Launch |
 | 4 | Production **automatische Backups** verifiziert | Hoch | Launch |
@@ -253,15 +254,11 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 
 ### P5-E.9B.2 — Staging Backup Evidence
 
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  STOPP — P5-E.9B.2 DARF NICHT OHNE EXPLIZITE FREIGABE STARTEN    ║
-╚══════════════════════════════════════════════════════════════════╝
-```
-
 | Item | Detail |
 |------|--------|
 | **Ziel** | Frischer Backup-/Snapshot-/Dump-Nachweis für Staging |
+| **Status** | **PASS** (2026-07-14) — siehe `p5-staging-backup-evidence-report.md` |
+| **Artefakt** | `p5-e9b2-staging-jzzgoiwfbuwiiyvwgwri-20260714-004034.dump` (gitignored) |
 | **Erlaubt** | `pg_dump` via Pooler **oder** Dashboard Snapshot (mit Freigabe) |
 | **Verboten** | Production; Legacy; Dump committen |
 | **Akzeptanz** | Timestamp + Größe + Methode dokumentiert |
@@ -321,7 +318,7 @@ P5-E.9B (Plan)                              [PASS]
     ↓
 P5-E.9B.1 Staging Backup Inventory          [PASS]
     ↓
-P5-E.9B.2 Staging Backup Evidence           [STOPP — frischer Dump/Snapshot]
+P5-E.9B.2 Staging Backup Evidence           [PASS — 2026-07-14]
     ↓
 P5-E.9A.2 Staging XSS Payload Evidence      [STOPP — braucht 9B.2 + Freigabe]
     ↓
@@ -340,7 +337,8 @@ P5-E.9B.5 Production Backup/Restore           [STOPP]
 |-----------|---------|
 | **P5-E.9B (Planungs-Gate)** | **PASS** |
 | **P5-E.9B.1 (Inventory)** | **PASS** |
-| Backup Evidence | **OPEN** |
+| **P5-E.9B.2 (Staging Backup)** | **PASS** |
+| Backup Evidence (Staging) | **PASS** |
 | Restore Evidence | **OPEN** |
 | P5-E.9A.2 Staging Payloads | **BLOCKED** |
 | S-07 Backup/Restore | **OPEN_BLOCKING** |
@@ -350,14 +348,12 @@ P5-E.9B.5 Production Backup/Restore           [STOPP]
 
 ### Empfohlener nächster Gate
 
-**P5-E.9B.2** — Staging Backup Evidence (**STOPP** — frischer Dump/Snapshot)
+**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Write-Freigabe)
 
-Alternativ parallel (Plan only): **P5-E.9C** — Monitoring/Error Tracking Plan
-
-**P5-E.9A.2** erst nach **9B.2 PASS** + expliziter Nutzerfreigabe.
+oder **P5-E.9B.3** — Isolated Restore Drill (**STOPP**)
 
 Weiterhin: **kein Push, kein Deploy, kein Launch, kein Restore, keine Dumps.**
 
 ---
 
-*Dokumentversion: P5-E.9B PASS + P5-E.9B.1 PASS. Keine Secrets. Kein DB-Zugriff.*
+*Dokumentversion: P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9B.2 PASS. Keine Secrets. Kein Restore.*
