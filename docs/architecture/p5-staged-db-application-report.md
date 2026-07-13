@@ -469,12 +469,20 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ### Required before next P5-E.5 attempt
 
-1. **P5-STAGING.5:** Provision BoundLore base schema on `jzzgoiwfbuwiiyvwgwri` (posts, profiles, wiki_entities, user_submission_acks, etc.).
-2. Verify required tables exist (same checklist as Step 5).
-3. Re-create pre-apply backup.
-4. Obtain explicit user approval for next P5-E.5 attempt.
+1. **P5-STAGING.5:** Base schema provisioning plan — **PARTIAL** (see plan doc; `posts`/`profiles` DDL missing in repo).
+2. **P5-STAGING.6:** Apply Phase 0 + foundation SQL to staging (explicit approval).
+3. Re-create pre-apply backup; verify required tables.
+4. Obtain explicit user approval for P5-E.5 re-attempt.
 5. Apply P5 SQL files in order on staging only.
+
+**Authoritative plan:** `docs/architecture/p5-staging-base-schema-provisioning-plan.md`
 
 ---
 
-*Document version: P5-E.5 original blocked + P5-E.5 re-run blocked (base schema). No P5 SQL applied. Legacy production untouched.*
+### P5-STAGING.5 follow-up
+
+**P5-STAGING.5** base schema inventory complete (HEAD `2aa9317`). **No SQL.** Critical blocker: `CREATE TABLE public.posts` and `CREATE TABLE public.profiles` **not found in repo**. Plan is **PARTIAL**; schema export or new foundation migration required before P5-STAGING.6.
+
+---
+
+*Document version: P5-E.5 original + re-run blocked + P5-STAGING.5 plan. No SQL applied.*

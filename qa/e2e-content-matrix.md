@@ -2212,6 +2212,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.5 — Base Schema Provisioning Plan
+
+**Milestone:** P5-STAGING.5 — SQL inventory + plan; no SQL, no DB mutation.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| SQL inventory | `supabase/*.sql` | 21 files classified | `[x]` |
+| `CREATE TABLE posts` | repo | found or blocker | `[ ]` — **not found** |
+| `CREATE TABLE profiles` | repo | found or blocker | `[ ]` — **not found** |
+| `CREATE TABLE notifications` | repo | found | `[x]` |
+| `CREATE TABLE user_submission_acks` | repo | found | `[x]` |
+| `CREATE TABLE wiki_entities` | repo | found | `[x]` |
+| Destructive SQL excluded | plan | documented | `[x]` |
+| Apply order proposed | plan | yes | `[x]` |
+| Base Schema Plan | gate | PARTIAL | `[x]` |
+| P5-E.5 re-run | gate | BLOCKED | `[x]` |
+
+**P5-STAGING.5 PARTIAL.** Core DDL (`posts`, `profiles`, `post_reactions`) not in repo. Phase 0 required before P5-STAGING.6. No SQL. Product-Activation-Ready = FAIL; Public-Launch-Ready = NO-GO.
+
+**Next:** Phase 0 DDL resolution → P5-STAGING.6. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P5-E.5 Re-run — Staged DB Application (BLOCKED)
 
 **Milestone:** P5-E.5 Re-run with user approval; blocked at schema check.

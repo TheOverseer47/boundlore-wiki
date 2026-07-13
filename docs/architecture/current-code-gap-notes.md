@@ -3260,6 +3260,23 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 105. P5-STAGING.5 — Base Schema Provisioning Plan
+
+**Milestone:** P5-STAGING.5 — planning/inventory only; **no SQL**.
+
+| Check | Result |
+|-------|--------|
+| SQL files inventoried | `[x]` — 21 files |
+| `posts`/`profiles` CREATE in repo | `[ ]` — **blocker** |
+| Apply order proposed | `[x]` |
+| Dangerous SQL excluded | `[x]` |
+| Base Schema Plan | **PARTIAL** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-provisioning-plan.md`
+
+---
+
 ## 104. P5-E.5 Re-run — Staged DB Application (BLOCKED)
 
 **Milestone:** P5-E.5 Re-run — explicit approval; **BLOCKED** at base schema check.

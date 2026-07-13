@@ -190,8 +190,10 @@ Stop immediately (do not proceed to SQL apply) if:
 | 5 | **P5-STAGING.3** Tooling & Backup Dry Run | **PASS** — see tooling/backup report |
 | 6 | **P5-STAGING.4** Test user provisioning | **PASS** — see test user report |
 | 7 | **P5-E.5 re-run** | **BLOCKED** — base schema missing (2026-07-13) |
-| 8 | **P5-STAGING.5** | Base schema provisioning — **next** |
-| 9 | **P5-E.6** (future) | Staging evidence acceptance |
+| 8 | **P5-STAGING.5** | Base schema provisioning plan | **PARTIAL** — see plan doc |
+| 9 | **P5-STAGING.6** | Base schema apply to staging | After Phase 0 DDL |
+| 10 | **P5-E.5 re-run** | **BLOCKED** |
+| 11 | **P5-E.6** (future) | Staging evidence acceptance |
 
 **Not in scope:** Push, deploy, launch, production clone, automatic project creation without explicit safe approval.
 
@@ -201,6 +203,7 @@ Stop immediately (do not proceed to SQL apply) if:
 
 | Document | Role |
 |----------|------|
+| `p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 base schema plan |
 | `p5-staging-test-user-provisioning.md` | P5-STAGING.4 test user provisioning |
 | `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup dry run |
 | `p5-staging-environment-proof.md` | P5-STAGING.2 environment proof report |
@@ -266,8 +269,16 @@ Stop immediately (do not proceed to SQL apply) if:
 
 **Gate:** P5-E.5 Re-run (HEAD `b3c64e7`) — user approval YES; **BLOCKED** at schema check. No P5 SQL applied.
 
-**Next:** P5-STAGING.5 base schema provisioning.
+**Next:** Resolve Phase 0 (`posts`/`profiles` DDL) → P5-STAGING.6. No push/deploy/launch.
 
 ---
 
-*Document version: P5-STAGING.1–4 + P5-E.5 re-run follow-up. No P5 SQL applied.*
+## 14. P5-STAGING.5 Follow-up
+
+**Gate:** P5-STAGING.5 — Base Schema Provisioning Plan (HEAD `2aa9317`). Inventory complete; **PARTIAL** — core DDL not in repo. No SQL.
+
+**Report:** `docs/architecture/p5-staging-base-schema-provisioning-plan.md`
+
+---
+
+*Document version: P5-STAGING.1–5 follow-up. No SQL apply.*

@@ -112,13 +112,17 @@ When P5-E.5 re-run is **explicitly approved**, these users support staged negati
 
 **Gate:** P5-E.5 Re-run (HEAD `b3c64e7`) — **BLOCKED**. Staging `public` schema empty; P5 SQL not applied. Test users exist in `auth.users` only.
 
-**Next:** P5-STAGING.5.
+**Next:** Phase 0 → P5-STAGING.6 → P5-E.5 re-attempt.
+
+---
+
+## 8. P5-STAGING.5 Follow-up
+
+Base schema provisioning plan created. Core blocker: no `posts`/`profiles` CREATE in repo. No SQL.
 
 ---
 
 ## Related Documents
-
-| Document | Role |
 |----------|------|
 | `p5-staging-environment-plan.md` | Staging setup + re-entry criteria |
 | `p5-staging-environment-proof.md` | P5-STAGING.2 identity proof |

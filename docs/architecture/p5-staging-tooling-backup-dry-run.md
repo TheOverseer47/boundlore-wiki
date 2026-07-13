@@ -165,7 +165,13 @@ Still required:
 
 ## 10. P5-E.5 Re-run Follow-up
 
-Re-run blocked: staging `public` schema empty. Backup `p5-e5-rerun-preapply-20260713-185457.sql` created; no SQL apply.
+**Next:** P5-STAGING.6 after Phase 0 DDL resolved.
+
+---
+
+## 11. P5-STAGING.5 Follow-up
+
+Base schema plan **PARTIAL** — posts/profiles DDL missing from repo. No SQL in this gate.
 
 ---
 

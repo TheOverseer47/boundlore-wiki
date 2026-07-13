@@ -409,8 +409,9 @@ For **future implementation gates** (P5-B through P5-E):
 | **Blocked** | P5-E.5 | Staged DB apply + negative tests | **BLOCKED** — isolated staging not proven; see §24 |
 | **Complete** | P5-STAGING.1 | Staging environment plan | Docs + `.env.staging.example`; see staging plan |
 | **Complete** | P5-STAGING.4 | Test user provisioning | **PASS** |
-| **Blocked** | P5-E.5 re-run | SQL apply + negative tests | **BLOCKED** — base schema missing; see re-run report |
-| **Next** | P5-STAGING.5 | Base schema provisioning | Required before P5-E.5 re-attempt |
+| **Blocked** | P5-E.5 re-run | SQL apply + negative tests | **BLOCKED** — base schema missing |
+| **Partial** | P5-STAGING.5 | Base schema provisioning plan | **PARTIAL** — posts/profiles DDL not in repo |
+| **Next** | P5-STAGING.6 | Base schema apply | After Phase 0 resolution |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -973,7 +974,27 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-staged-db-application-report.md` (Re-run section)
 
-**Next:** P5-STAGING.5. No push/deploy/launch.
+**Next:** Phase 0 DDL → P5-STAGING.6. No push/deploy/launch.
+
+---
+
+## 30. P5-STAGING.5 — Base Schema Provisioning Plan
+
+**Milestone:** P5-STAGING.5 — SQL inventory + dependency map; **no SQL**.
+
+| Check | Result |
+|-------|--------|
+| 21 SQL files inventoried | `[x]` |
+| `CREATE TABLE public.posts` | `[ ]` — **not in repo** |
+| `CREATE TABLE public.profiles` | `[ ]` — **not in repo** |
+| `CREATE TABLE notifications` | `[x]` |
+| `CREATE TABLE user_submission_acks` | `[x]` |
+| `CREATE TABLE wiki_entities` | `[x]` |
+| Destructive SQL excluded | `[x]` |
+| Base Schema Plan | **PARTIAL** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-provisioning-plan.md`
 
 ---
 
@@ -981,6 +1002,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 base schema plan |
 | `docs/architecture/p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |
 | `docs/architecture/p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
 | `docs/architecture/p5-staging-environment-proof.md` | P5-STAGING.2 environment proof |
