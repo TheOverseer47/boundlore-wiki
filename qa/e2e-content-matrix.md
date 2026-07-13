@@ -2212,6 +2212,32 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.2 — Environment Proof & Dry Run
+
+**Milestone:** P5-STAGING.2 — local proof + dry-run plan; no SQL, no DB mutation, no backup.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| `.env.staging` local | gitignored file | exists, not committed | `[x]` |
+| Staging ref | `jzzgoiwfbuwiiyvwgwri` | ≠ `ohkoojpzmptdfyowdgog` | `[x]` |
+| Staging URL/host | staging project | distinct from legacy | `[x]` |
+| `CONFIRM_ISOLATED` | `.env.staging` | `true` | `[x]` |
+| Anon key type | client key | `sb_publishable_*`; not secret | `[x]` |
+| `.env.staging.example` | template | no real secrets | `[x]` |
+| Supabase CLI | PATH | version or documented absent | `[x]` — not installed |
+| `psql` | PATH | version or documented absent | `[x]` — not installed |
+| Backup/dump | ops | not executed | `[x]` |
+| SQL / RPC / data | ops | none | `[x]` |
+| Environment Proof | gate | PASS | `[x]` |
+| Dry Run Readiness | gate | PARTIAL (tooling) | `[x]` |
+| P5-E.5 re-run | gate | blocked | `[x]` |
+
+**P5-STAGING.2 environment proof PASS; dry-run readiness PARTIAL.** Staging identity isolated from `ohkoojpzmptdfyowdgog`. CLI/psql missing; backup untested. P5-E.5 remains blocked. No SQL, no data changes, no push/deploy. Product-Activation-Ready = FAIL; Public-Launch-Ready = NO-GO.
+
+**Next:** Install CLI/psql → test backup → testusers → explicit P5-E.5 approval. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P5-STAGING.1 — Dedicated Supabase Staging Provisioning Gate
 
 **Milestone:** P5-STAGING.1 docs-only — staging requirements plan; no SQL, no project creation, no secrets.

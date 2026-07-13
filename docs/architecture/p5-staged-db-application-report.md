@@ -213,14 +213,21 @@ All served from `http://localhost:8080`. No Supabase writes.
 4. Create pre-apply backup on **proven staging only**.
 5. Re-run P5-E.5 with environment proof section completed before any `execute_sql` / `psql` / migration apply.
 
-### P5-STAGING.1 follow-up (this gate)
+### P5-STAGING.1 follow-up
 
 **P5-STAGING.1** created `docs/architecture/p5-staging-environment-plan.md` and `.env.staging.example`. No SQL, no project creation, no secrets committed. `ohkoojpzmptdfyowdgog` remains forbidden for P5-E.5 apply.
 
+### P5-STAGING.2 follow-up
+
+**P5-STAGING.2** environment proof completed (HEAD `8290920`). Local `.env.staging` confirms isolated staging ref `jzzgoiwfbuwiiyvwgwri` — distinct from legacy `ohkoojpzmptdfyowdgog`. No SQL, no DB mutation, no backup executed. Supabase CLI and `psql` not installed. **Environment Proof: PASS.** **Dry Run Readiness: PARTIAL.** P5-E.5 re-run remains **blocked** until tooling, backup test, testusers, and explicit user approval.
+
+**Authoritative proof:** `docs/architecture/p5-staging-environment-proof.md`
+
 ### Next steps
 
-- **Do not** apply P5 SQL to `ohkoojpzmptdfyowdgog` until isolation is proven.
-- **PARTIAL/FAIL path:** remain in P5-E staging subgate; no Product-Activation advance.
+- **Do not** apply P5 SQL to `ohkoojpzmptdfyowdgog`.
+- Install Supabase CLI and/or `psql` (or approve dashboard SQL workflow); test backup on staging.
+- Create staging test users; obtain explicit P5-E.5 re-run approval.
 - **No push / deploy / launch.**
 
 ---

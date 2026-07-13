@@ -186,8 +186,8 @@ Stop immediately (do not proceed to SQL apply) if:
 | 1 | **P5-STAGING.1** (this gate) | Plan + `.env.staging.example` — **complete** |
 | 2 | User creates Supabase staging project manually | Operator |
 | 3 | User fills `.env.staging` locally | Operator |
-| 4 | **P5-STAGING.2** Environment Proof & Dry Run | Prove isolation + test dump |
-| 5 | **P5-E.5 re-run** | SQL apply + negative tests on staging only |
+| 4 | **P5-STAGING.2** Environment Proof & Dry Run | **PASS** (identity); **PARTIAL** (tooling) — see proof report |
+| 5 | **P5-E.5 re-run** | Blocked until tooling + backup + testusers + user approval |
 | 6 | **P5-E.6** (future) | Staging evidence acceptance |
 
 **Not in scope:** Push, deploy, launch, production clone, automatic project creation without explicit safe approval.
@@ -198,6 +198,7 @@ Stop immediately (do not proceed to SQL apply) if:
 
 | Document | Role |
 |----------|------|
+| `p5-staging-environment-proof.md` | P5-STAGING.2 environment proof report |
 | `p5-staged-db-application-report.md` | P5-E.5 blocked report |
 | `p5-splus-remediation-plan.md` | P5 gate sequence |
 | `p5-release-lock-plan.md` | S+-01 staging apply notes |
@@ -205,4 +206,24 @@ Stop immediately (do not proceed to SQL apply) if:
 
 ---
 
-*Document version: P5-STAGING.1. Docs-only. No SQL. No Supabase project created. No secrets committed.*
+---
+
+## 10. P5-STAGING.2 Follow-up
+
+**Gate:** P5-STAGING.2 — Environment Proof & Dry Run (2026-07-13, HEAD `8290920`)
+
+| Result | Status |
+|--------|--------|
+| Staging ref `jzzgoiwfbuwiiyvwgwri` confirmed | `[x]` |
+| Legacy ref `ohkoojpzmptdfyowdgog` not in `.env.staging` | `[x]` |
+| `SUPABASE_STAGING_CONFIRM_ISOLATED=true` | `[x]` |
+| `.env.staging` gitignored; not committed | `[x]` |
+| Supabase CLI / psql | **Not installed** |
+| Backup/dump tested | `[ ]` — deferred |
+| P5-E.5 re-run | **Still blocked** |
+
+**Authoritative proof:** `docs/architecture/p5-staging-environment-proof.md`
+
+---
+
+*Document version: P5-STAGING.1 + P5-STAGING.2 follow-up. No SQL. No secrets committed.*

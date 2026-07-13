@@ -408,8 +408,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-F.2 | Fable retest handoff | Evidence bundle + prompt; see §23 |
 | **Blocked** | P5-E.5 | Staged DB apply + negative tests | **BLOCKED** — isolated staging not proven; see §24 |
 | **Complete** | P5-STAGING.1 | Staging environment plan | Docs + `.env.staging.example`; see staging plan |
-| **Next** | P5-STAGING.2 | Environment proof & dry run | After user creates staging project |
-| **Not now** | P5-E.5 re-run | SQL apply | Blocked until P5-STAGING.2 PASS |
+| **Complete** | P5-STAGING.2 | Environment proof & dry run | **PASS** (identity) / **PARTIAL** (tooling) |
+| **Blocked** | P5-E.5 re-run | SQL apply + negative tests | Identity ready; blocked on tooling + backup + testusers + approval |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -870,7 +870,37 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Authoritative plan:** `docs/architecture/p5-staging-environment-plan.md`
 
-**Next:** User creates dedicated Supabase staging project manually → **P5-STAGING.2 Environment Proof & Dry Run**. No push/deploy/launch.
+**Next:** Install CLI/psql or approve dashboard SQL; test backup; create test users; explicit P5-E.5 approval. No push/deploy/launch.
+
+---
+
+## 26. P5-STAGING.2 — Environment Proof & Dry Run
+
+**Milestone:** P5-STAGING.2 — local environment proof + dry-run plan; **no SQL**, **no DB mutation**, **no backup/dump**.
+
+**Staging identity proven.** Local `.env.staging` (gitignored) confirms ref `jzzgoiwfbuwiiyvwgwri`, URL `https://jzzgoiwfbuwiiyvwgwri.supabase.co`, DB host `db.jzzgoiwfbuwiiyvwgwri.supabase.co`, `CONFIRM_ISOLATED=true`. No overlap with forbidden `ohkoojpzmptdfyowdgog`. Anon key is `sb_publishable_*` (not `service_role` / `sb_secret_`). No secrets committed.
+
+| Check | Result |
+|-------|--------|
+| `.env.staging` exists locally | `[x]` |
+| `.env.staging` gitignored | `[x]` |
+| Staging ref ≠ `ohkoojpzmptdfyowdgog` | `[x]` |
+| `CONFIRM_ISOLATED=true` | `[x]` |
+| `.env.staging.example` safe | `[x]` |
+| Supabase CLI | `[ ]` — not installed |
+| `psql` | `[ ]` — not installed |
+| Backup/dump tested | `[ ]` — deferred |
+| Test users in staging | `[ ]` — not created |
+| SQL / RPC / data changes | `[x]` — none |
+| Environment Proof | **PASS** |
+| Dry Run Readiness | **PARTIAL** |
+| P5-E.5 re-run | **BLOCKED** (tooling + prerequisites) |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Authoritative proof:** `docs/architecture/p5-staging-environment-proof.md`
+
+**Next:** Tooling + backup + testusers → explicit P5-E.5 approval. No push/deploy/launch.
 
 ---
 
@@ -878,6 +908,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-staging-environment-proof.md` | P5-STAGING.2 environment proof |
 | `docs/architecture/p5-staging-environment-plan.md` | P5-STAGING.1 dedicated staging plan |
 | `docs/architecture/p5-staged-db-application-report.md` | P5-E.5 staged DB apply report (BLOCKED) |
 | `docs/architecture/p5-fable-splus-retest-handoff.md` | P5-F.2 Fable S+ retest handoff (authoritative for F.2) |

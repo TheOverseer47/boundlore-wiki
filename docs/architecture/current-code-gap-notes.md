@@ -3260,6 +3260,29 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 101. P5-STAGING.2 — Environment Proof & Dry Run
+
+**Milestone:** P5-STAGING.2 — environment proof + dry-run plan; **no SQL**, **no DB changes**.
+
+| Check | Result |
+|-------|--------|
+| `.env.staging` local + gitignored | `[x]` |
+| Staging ref `jzzgoiwfbuwiiyvwgwri` | `[x]` |
+| Legacy ref `ohkoojpzmptdfyowdgog` excluded | `[x]` |
+| `CONFIRM_ISOLATED=true` | `[x]` |
+| No `service_role` / `sb_secret` client key | `[x]` |
+| Supabase CLI / psql | `[ ]` — not installed |
+| Backup/dump tested | `[ ]` |
+| Environment Proof | **PASS** |
+| Dry Run Readiness | **PARTIAL** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**P5-STAGING.2 complete.** Isolated staging identity proven locally. P5-E.5 blocked on tooling, backup, testusers, user approval. No push/deploy/launch.
+
+**Report:** `docs/architecture/p5-staging-environment-proof.md`
+
+---
+
 ## 100. P5-STAGING.1 — Dedicated Supabase Staging Provisioning Gate
 
 **Milestone:** P5-STAGING.1 docs-only — staging plan + config example; **no SQL**, **no DB changes**.
