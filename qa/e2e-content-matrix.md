@@ -2387,6 +2387,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9D.2 — Static Hub Metadata Cleanup (PASS)
+
+**Milestone:** P5-E.9D.2 — Static Hub Metadata Cleanup. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Static hub metadata fixture PASS | `p5-seo-hub-metadata-fixtures.*` | 100/100 PASS | `[x]` |
+| Indexable hubs have title and description | hub HTML | present | `[x]` |
+| Indexable hubs are not noindex | hub HTML | indexable | `[x]` |
+| Sitemap includes allowed static hubs | `sitemap.xml` | 14 routes | `[x]` |
+| Sitemap excludes admin/auth/create/edit/search/qa/public-admin | `sitemap.xml` | absent | `[x]` |
+| Homepage JSON-LD remains present | `/` | WebSite schema | `[x]` |
+| Entity detail pages remain CSR OPEN_BLOCKING | `/wiki/post/` | CSR shell | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| No Search Console action performed | gate | none | `[x]` |
+| Static Hub Metadata | status | STATIC_HUB_METADATA_HARDENED | `[x]` |
+| Sitemap (static hubs) | status | STATIC_SITEMAP_HUBS_UPDATED | `[x]` |
+| S-05 SEO/CSR | status | OPEN_BLOCKING | `[x]` |
+| Structured Data | status | PARTIAL | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9D.2 | gate | PASS | **PASS** |
+
+**Report:** `sitemap.xml`, `qa/p5-seo-hub-metadata-fixtures.html`
+
+**Next:** P5-E.9D.3 entity prerender decision or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
 ## P5-E.9D.1 — robots noindex Static Hardening (PASS)
 
 **Milestone:** P5-E.9D.1 — robots/noindex Static Hardening. **PASS**.

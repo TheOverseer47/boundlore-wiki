@@ -3338,7 +3338,34 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
 
-**Next:** P5-E.9D.2 hub metadata. No push/deploy/launch.
+**Next:** P5-E.9D.3 entity prerender decision or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
+## 143. P5-E.9D.2 — Static Hub Metadata Cleanup (PASS)
+
+**Milestone:** P5-E.9D.2 — Static Hub Metadata Cleanup. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Hub HTML metadata | canonical + description + OG/Twitter auf indexierbaren Hubs |
+| Sitemap | 14 statische Routen (`sitemap.xml`) |
+| QA Fixture | `p5-seo-hub-metadata-fixtures.*` — **100/100 PASS** |
+| Homepage JSON-LD | `[x]` WebSite schema erhalten |
+| post detail CSR shell | **OPEN** — S-05 OPEN_BLOCKING |
+| search noindex | `[x]` von 9D.1 unverändert |
+| Deploy / Search Console | **Nein** |
+| Static Hub Metadata | **STATIC_HUB_METADATA_HARDENED** |
+| Sitemap (statische Hubs) | **STATIC_SITEMAP_HUBS_UPDATED** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Structured Data | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.2 | **PASS** |
+
+**Report:** `sitemap.xml`, `qa/p5-seo-hub-metadata-fixtures.html`
+
+**Next:** P5-E.9D.3 entity prerender decision or P5-E.9E search recall. No push/deploy/launch.
 
 ---
 

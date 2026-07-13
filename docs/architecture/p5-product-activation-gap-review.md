@@ -78,7 +78,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **Admin unlock/relock journey** | NOT RUN | **NOT TESTED** | UI vorbereitet (`p5-e3`) | Kein Staging-Admin-Test | **Ja** (vor Unlock) | Staging Admin Gate |
 | **post_reactions live block** | NOT RUN | **NOT TESTED** | SQL in `release_gate_lock.sql` | Kein FK-Target auf Staging | Nein (locked MVP) | Optional Staging |
 | **Incident Response** | Docs only | **BLOCKING** (Ops) | Kein Runbook im Repo | Kein dokumentierter IR-Prozess | **Ja** (Launch/Ops) | Ops-Dokumentation |
-| **robots.txt / sitemap.xml** | Present | **PARTIAL** | robots STATIC_HARDENED (9D.1); Sitemap 9 URLs | Hubs + dynamische URLs fehlen | **Ja** (SEO Launch) | **P5-E.9D.2** → 9D.4 |
+| **robots.txt / sitemap.xml** | Present | **STATIC_SITEMAP_HUBS_UPDATED** (9D.2) | robots STATIC_HARDENED; 14 statische URLs | Entity-URLs dynamisch | **Ja** (SEO Launch) | **P5-E.9D.3** → 9D.4 |
 
 ---
 
@@ -138,9 +138,10 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 11. ~~**P5-E.9C.2** — Local Error Capture Stub~~ **PASS** — `js/error-reporter.js` (21/21)
 12. ~~**P5-E.9D** — SEO/CSR Closure Plan~~ **PASS** — `p5-seo-csr-closure-plan.md`
 13. ~~**P5-E.9D.1** — robots/noindex Static Hardening~~ **PASS** — 33/33 fixture
-14. **P5-E.9D.2** — Static Hub Metadata Cleanup (lokale HTML-Meta, kein Deploy)
-15. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
-16. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
+14. ~~**P5-E.9D.2** — Static Hub Metadata Cleanup~~ **PASS** — 100/100 fixture
+15. **P5-E.9D.3** — Entity Prerender/SSG Decision (lokale Planung, kein Deploy)
+16. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
+17. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
 
 ---
 
@@ -348,4 +349,26 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9D PASS + P5-E.9D.1 PASS. Keine Secrets.*
+## 23. P5-E.9D.2 Follow-up (PASS — Static Hub Metadata Cleanup)
+
+**Gate:** P5-E.9D.2 — Static Hub Metadata Cleanup. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Hub metadata hardened | `[x]` title, description, canonical, OG/Twitter |
+| Sitemap static hubs | `[x]` 14 URLs; forbidden routes excluded |
+| QA Fixture | 100/100 PASS |
+| Homepage JSON-LD | `[x]` preserved |
+| post detail CSR | **OPEN** — nicht SEO-closed |
+| Deploy / Search Console | **Nein** |
+| Static Hub Metadata | **STATIC_HUB_METADATA_HARDENED** |
+| Sitemap | **STATIC_SITEMAP_HUBS_UPDATED** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Structured Data | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.2 | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9D PASS + P5-E.9D.1 PASS + P5-E.9D.2 PASS. Keine Secrets.*

@@ -84,7 +84,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-03 Sanitization — Repo** | S+ Critical | **CLOSED** | `BoundLoreContentSafety` p5-d1; fixture 45/45 | Server-side sanitizer optional | — | Nein | Nein | Nein | Ja | Ja |
 | **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
-| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.1** | Entity-URLs CSR-Shell; robots hardened | **P5-E.9D.2** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
+| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.1 + 9D.2** | Entity-URLs CSR-Shell; Hubs gehärtet | **P5-E.9D.3** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Provider integration + alerting | **P5-E.9C.3** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
@@ -96,7 +96,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **Admin unlock/relock** | — | **NOT_TESTED** | UI `p5-e3` | Staging admin journey | Post-staging gate | Nein | Ja (staging) | Nein | Nein | Ja |
 | **post_reactions live block** | — | **NOT_TESTED** | SQL in repo | Kein FK-Target staging | Optional | Nein | Nein | Nein | Nein | Ja |
 | **Incident Response** | Ops | **OPEN_BLOCKING** | In P5-E.9C Plan skizziert | Runbook + Escalation | P5-E.9C.4+ | Nein | Nein | Nein | Nein | Ja |
-| **robots.txt / sitemap.xml** | SEO | **PARTIAL** | robots STATIC_HARDENED (9D.1); Sitemap 9 URLs | Hubs + dynamische URLs | **P5-E.9D.2** → **9D.4** | Nein | Nein | Nein | Ja | Ja |
+| **robots.txt / sitemap.xml** | SEO | **STATIC_SITEMAP_HUBS_UPDATED** (9D.2) | robots STATIC_HARDENED; 14 statische Hub-URLs | Entity-URLs dynamisch | **P5-E.9D.3** → **9D.4** | Nein | Nein | Nein | Ja | Ja |
 | **report-screenshots Storage** | — | **OUT_OF_SCOPE_FOR_MVP** | Support disabled P5-E.8C | Policy wenn Support reaktiviert | Später | Ja | Ja | Ja | Nein | Ja |
 
 \* P5-E.9A: Read-only Staging smoke mit **bestehenden** Testposts erlaubt; keine neuen Payload-Writes ohne Gate.  
@@ -323,7 +323,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9D.1** — robots/noindex Static Hardening~~ **PASS** — `robots.txt` + HTML noindex (33/33)
 
-**P5-E.9D.2** — Static Hub Metadata Cleanup (lokale HTML-Meta, kein Deploy)
+~~**P5-E.9D.2** — Static Hub Metadata Cleanup~~ **PASS** — Hub-Meta + Sitemap (100/100)
+
+**P5-E.9D.3** — Entity Prerender/SSG Decision **oder** **P5-E.9E** Search Recall Plan
 
 **P5-E.9C.3** — Staging Monitoring Integration (**STOPP** — Provider-Key + Freigabe)
 
@@ -557,4 +559,28 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + … + P5-E.9D PASS + P5-E.9D.1 PASS. Keine Secrets. Kein DB-Zugriff.*
+## 24. P5-E.9D.2 Follow-up (PASS — Static Hub Metadata Cleanup)
+
+**Gate:** P5-E.9D.2 — Static Hub Metadata Cleanup. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Hub HTML metadata | canonical + description + OG/Twitter auf indexierbaren Hubs |
+| Sitemap | 14 statische Routen; keine Admin/Auth/Search/QA |
+| QA Fixture | `p5-seo-hub-metadata-fixtures.*` — **100/100 PASS** |
+| Homepage JSON-LD | **Unverändert** vorhanden |
+| post detail CSR shell | **OPEN** — S-05 bleibt OPEN_BLOCKING |
+| Deploy / Search Console | **Nein** |
+| Static Hub Metadata | **STATIC_HUB_METADATA_HARDENED** |
+| Sitemap (statische Hubs) | **STATIC_SITEMAP_HUBS_UPDATED** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Structured Data | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.2 | **PASS** |
+
+**Report:** `sitemap.xml`, `qa/p5-seo-hub-metadata-fixtures.html`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + … + P5-E.9D PASS + P5-E.9D.1 PASS + P5-E.9D.2 PASS. Keine Secrets. Kein DB-Zugriff.*
