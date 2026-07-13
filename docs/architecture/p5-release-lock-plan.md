@@ -630,3 +630,18 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 | P5-E.5 Re-run 2 | **BLOCKED** |
 
 **Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`
+
+---
+
+## 25. P5-E.5C Follow-up (PASS — storage policy deferred)
+
+**Gate:** P5-E.5C — `storage.objects` policy deferred; `release_gate_lock.sql` can retry without storage owner. **PASS** (repo only).
+
+| Item | Result |
+|------|--------|
+| Storage DDL removed from default apply | `[x]` |
+| Deferred file | `release_gate_storage_policy_deferred.sql` |
+| Ready for P5-E.5 Re-run 3 | **YES** (explicit approval) |
+| Storage closure | **DEFERRED** |
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`

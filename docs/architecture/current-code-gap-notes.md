@@ -3292,7 +3292,22 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5C → Re-run. No push/deploy/launch.
+**Next:** P5-E.5 Re-run 3 with explicit approval. No push/deploy/launch.
+
+---
+
+## 121. P5-E.5C — Storage Policy Defer Fix (PASS)
+
+**Milestone:** P5-E.5C — storage policy deferred; release gate apply path unblocked in repo. **PASS** (repo only).
+
+| Check | Result |
+|-------|--------|
+| Storage DDL removed from default apply | `[x]` |
+| Deferred file created | `[x]` |
+| Ready for P5-E.5 Re-run 3 | **YES** (explicit approval) |
+| P5-E.5C | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
 
 ---
 

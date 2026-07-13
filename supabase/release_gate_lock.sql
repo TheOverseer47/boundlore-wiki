@@ -1,6 +1,7 @@
 -- =============================================================================
 -- P5-E.2 — Release Gate DB/RLS/RPC Baseline (S+-01)
 --   + P5-E.5A dependency order fix (functions before policies)
+--   + P5-E.5C storage policy deferred (see release_gate_storage_policy_deferred.sql)
 -- =============================================================================
 -- DO NOT APPLY TO PRODUCTION WITHOUT EXPLICIT STAGING TEST (P5-E.5).
 -- SQL baseline only — not executed in P5-E.2 gate.
@@ -12,6 +13,10 @@
 --   - No service_role in client
 --   - Tutorial-ack remains separate (fix_tutorial_ack_rls.sql)
 --   - Patch Mode (wiki_patch_mode) remains maintenance-only
+--
+-- Storage discovery-uploads policy: DEFERRED — not in this file.
+--   Apply via release_gate_storage_policy_deferred.sql only with separate
+--   explicit approval and storage.objects owner-capable execution path.
 --
 -- Apply order (staging): after profiles + user_submission_acks exist.
 -- Rollback: set contribution_locked = true; revert migration commit.
@@ -356,34 +361,17 @@ create policy post_reactions_release_gate_update_restrictive
   );
 
 -- ---------------------------------------------------------------------------
--- I) Storage discovery-uploads restrictive INSERT (bucket-aware)
+-- I) NOT TESTED / DEFERRED — Live-RLS export required before production closure
 -- ---------------------------------------------------------------------------
-
-drop policy if exists storage_discovery_uploads_release_gate_insert_restrictive on storage.objects;
-
-create policy storage_discovery_uploads_release_gate_insert_restrictive
-  on storage.objects
-  as restrictive
-  for insert
-  to authenticated
-  with check (
-    bucket_id <> 'discovery-uploads'
-    or public.bl_can_create_user_content(auth.uid())
-  );
-
-comment on policy storage_discovery_uploads_release_gate_insert_restrictive on storage.objects is
-  'P5-E.2 blocks discovery-uploads INSERT when contribution locked. Other buckets unaffected.';
-
--- ---------------------------------------------------------------------------
--- J) NOT TESTED — Live-RLS export required before production closure
--- ---------------------------------------------------------------------------
+-- storage discovery-uploads: deferred to release_gate_storage_policy_deferred.sql
+--   (requires storage.objects owner-capable execution path — not default P5-E.5)
 -- comments: no INSERT policy in repo — NOT TESTED; add restrictive policy after live export
 -- reports: no INSERT policy in repo — NOT TESTED; add restrictive policy after live export
 -- report-screenshots bucket: no storage policy in repo — NOT TESTED
 -- ratings: table not found in repo SQL — NOT TESTED
 
 -- ---------------------------------------------------------------------------
--- K) Grants
+-- J) Grants
 -- ---------------------------------------------------------------------------
 
 grant execute on function public.bl_is_admin_actor(uuid) to authenticated;

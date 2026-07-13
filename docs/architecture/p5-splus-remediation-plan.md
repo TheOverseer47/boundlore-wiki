@@ -1017,7 +1017,24 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5C storage policy fix → Re-run. No push/deploy/launch.
+**Next:** P5-E.5 Re-run 3 with explicit approval. No push/deploy/launch.
+
+---
+
+## 46. P5-E.5C — Storage Policy Defer Fix (PASS)
+
+**Milestone:** P5-E.5C — split/defer storage policy from `release_gate_lock.sql`; **PASS** (repo only).
+
+| Check | Result |
+|-------|--------|
+| `storage.objects` removed from `release_gate_lock.sql` | `[x]` |
+| Deferred file created | `[x]` |
+| Public-schema path preserved | `[x]` |
+| SQL apply / DB access | `[x]` — none |
+| Ready for P5-E.5 Re-run 3 | **YES** (explicit approval) |
+| P5-E.5C | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
 
 ---
 

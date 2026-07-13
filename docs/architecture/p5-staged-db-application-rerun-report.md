@@ -238,4 +238,18 @@ All routes returned **200** (home, browse, search including XSS probe, QA slugs,
 
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS + P5-E.5B PASS + Re-run 2 BLOCKED. No secrets.*
+## 16. P5-E.5C Follow-up (PASS — storage policy deferred)
+
+**Gate:** P5-E.5C — `storage.objects` policy split from `release_gate_lock.sql`. **PASS** (repo only).
+
+| Item | Result |
+|------|--------|
+| Storage DDL removed from default apply path | `[x]` |
+| `release_gate_storage_policy_deferred.sql` created | `[x]` |
+| Ready for P5-E.5 Re-run 3 | **YES** (explicit approval) |
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS + P5-E.5B PASS + Re-run 2 BLOCKED + 5C PASS. No secrets.*

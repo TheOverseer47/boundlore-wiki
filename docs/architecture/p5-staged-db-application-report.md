@@ -610,4 +610,12 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED + 5A/5B PASS + Re-run 2 BLOCKED. No secrets.*
+### P5-E.5C follow-up (PASS — storage policy deferred)
+
+**P5-E.5C** — storage policy removed from `release_gate_lock.sql`; deferred file created. Repo only.
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run BLOCKED + 5A/5B PASS + Re-run 2 BLOCKED + 5C PASS. No secrets.*

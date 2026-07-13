@@ -212,4 +212,21 @@ All 11 routes returned **200**.
 
 ---
 
-*Document version: P5-E.5 Re-run 2 BLOCKED. Storage policy owner error. No secrets.*
+## 14. P5-E.5C Follow-up (PASS — storage policy deferred)
+
+**Gate:** P5-E.5C — storage policy removed from `release_gate_lock.sql`; deferred to `release_gate_storage_policy_deferred.sql`. **PASS** (repo only).
+
+| Item | Result |
+|------|--------|
+| `storage.objects` removed from `release_gate_lock.sql` | `[x]` |
+| Deferred file created | `[x]` |
+| Public-schema path preserved | `[x]` |
+| SQL apply / DB access | `[x]` — none |
+| Ready for P5-E.5 Re-run 3 | **YES** (explicit approval) |
+| Storage closure | **DEFERRED** |
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run 2 BLOCKED + P5-E.5C PASS. No secrets.*

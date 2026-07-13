@@ -2298,6 +2298,22 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.5C — Storage Policy Defer Fix (PASS)
+
+**Milestone:** P5-E.5C — storage policy deferred from `release_gate_lock.sql`; **PASS** (repo only).
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| SQL apply / DB access | ops | none | `[x]` |
+| `storage.objects` removed from `release_gate_lock.sql` | file | PASS | `[x]` |
+| Deferred file created | repo | PASS | `[x]` |
+| Ready for P5-E.5 Re-run 3 | gate | YES (explicit approval) | `[x]` |
+| P5-E.5C | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
+
+---
+
 ## P5-E.5 Re-run 2 — Staged DB Security Retest (BLOCKED)
 
 **Milestone:** P5-E.5 Re-run 2 — release gate apply blocked on `storage.objects` policy; **BLOCKED**.

@@ -134,4 +134,12 @@ From P5-E.5 Re-run report (no DB access in this gate):
 
 ---
 
-*Document version: P5-E.5A PASS + P5-E.5B PASS + Re-run 2 BLOCKED. No secrets.*
+## 11. P5-E.5C Follow-up (PASS — storage policy deferred)
+
+**Gate:** P5-E.5C — storage policy split from `release_gate_lock.sql`. **PASS** (repo only).
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
+
+---
+
+*Document version: P5-E.5A PASS + P5-E.5B PASS + Re-run 2 BLOCKED + 5C PASS. No secrets.*

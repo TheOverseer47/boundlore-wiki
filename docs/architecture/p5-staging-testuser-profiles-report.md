@@ -148,4 +148,12 @@ Transactional upsert for exactly two test users:
 
 ---
 
-*Document version: P5-E.5B PASS + Re-run 2 BLOCKED. No secrets.*
+## 10. P5-E.5C Follow-up (PASS — storage policy deferred)
+
+**Gate:** P5-E.5C — storage policy split. **PASS** (repo only).
+
+**Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
+
+---
+
+*Document version: P5-E.5B PASS + Re-run 2 BLOCKED + 5C PASS. No secrets.*
