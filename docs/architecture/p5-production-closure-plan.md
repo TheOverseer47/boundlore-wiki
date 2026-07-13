@@ -84,7 +84,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-03 Sanitization — Repo** | S+ Critical | **CLOSED** | `BoundLoreContentSafety` p5-d1; fixture 45/45 | Server-side sanitizer optional | — | Nein | Nein | Nein | Ja | Ja |
 | **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
-| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.1 + 9D.2** | Entity-URLs CSR-Shell; Hubs gehärtet | **P5-E.9D.3** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
+| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.1 + 9D.2 + 9D.3** | CSR-Shell; SSG-Entscheidung dokumentiert | **P5-E.9D.3A** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Provider integration + alerting | **P5-E.9C.3** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
@@ -325,7 +325,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9D.2** — Static Hub Metadata Cleanup~~ **PASS** — Hub-Meta + Sitemap (100/100)
 
-**P5-E.9D.3** — Entity Prerender/SSG Decision **oder** **P5-E.9E** Search Recall Plan
+~~**P5-E.9D.3** — Entity Prerender/SSG Decision~~ **PASS** — `p5-entity-prerender-ssg-decision.md`
+
+**P5-E.9D.3A** — Entity SSG Prototype Plan **oder** **P5-E.9E** Search Recall Plan
 
 **P5-E.9C.3** — Staging Monitoring Integration (**STOPP** — Provider-Key + Freigabe)
 
@@ -583,4 +585,29 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + … + P5-E.9D PASS + P5-E.9D.1 PASS + P5-E.9D.2 PASS. Keine Secrets. Kein DB-Zugriff.*
+## 25. P5-E.9D.3 Follow-up (PASS — Entity Prerender/SSG Decision)
+
+**Gate:** P5-E.9D.3 — Entity Prerender/SSG Decision. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Decision Document | `p5-entity-prerender-ssg-decision.md` |
+| CSR Detail Risk | `[x]` dokumentiert |
+| Option Matrix A–F | `[x]` verglichen |
+| Pre-Launch + Full Launch Empfehlung | `[x]` Hybrid SSG |
+| URL/Canonical Strategy | `[x]` `/wiki/post/<canonical_slug>/` empfohlen |
+| Folge-Gates 9D.3A–9D.5 | `[x]` definiert |
+| Implementation | **Nein** |
+| Deploy / Search Console | **Nein** |
+| Entity Detail SEO | **OPEN_BLOCKING** |
+| Sitemap Entity URLs | **Excluded** (korrekt bis SSG) |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.3 | **PASS** |
+
+**Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + … + P5-E.9D.2 PASS + P5-E.9D.3 PASS. Keine Secrets. Kein DB-Zugriff.*

@@ -3338,7 +3338,35 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
 
-**Next:** P5-E.9D.3 entity prerender decision or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9D.3 entity prerender decision. No push/deploy/launch.
+
+---
+
+## 144. P5-E.9D.3 — Entity Prerender/SSG Decision (PASS)
+
+**Milestone:** P5-E.9D.3 — Entity Prerender/SSG Decision (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Decision Document | `p5-entity-prerender-ssg-decision.md` |
+| CSR Detail Risk | `[x]` dokumentiert |
+| Option Matrix A–F | `[x]` |
+| Pre-Launch + Full Launch Strategy | `[x]` Hybrid SSG |
+| URL/Canonical Empfehlung | `[x]` `/wiki/post/<canonical_slug>/` |
+| Folge-Gates 9D.3A–9D.5 | `[x]` |
+| Implementation | **Nein** |
+| Deploy / Search Console | **Nein** |
+| Entity Detail SEO | **OPEN_BLOCKING** |
+| Sitemap Entity URLs | **Excluded** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Structured Data | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.3 | **PASS** |
+
+**Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
+
+**Next:** P5-E.9D.3A entity SSG prototype plan or P5-E.9E search recall. No push/deploy/launch.
 
 ---
 

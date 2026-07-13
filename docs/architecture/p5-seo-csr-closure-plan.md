@@ -22,6 +22,8 @@ BoundLore ist eine **statische CSR-Wiki-App** ohne Prerender/SSR/SSG. Für Crawl
 
 **P5-E.9D.2** (Static Hub Metadata Cleanup) — **PASS** — Hub canonical/description/OG/Twitter + Sitemap-Hubs + QA-Fixture **100/100**.
 
+**P5-E.9D.3** (Entity Prerender/SSG Decision) — **PASS** — Architekturentscheidung dokumentiert; **keine** Umsetzung.
+
 **Kernentscheidung:** Entity-Detail-URLs sind **NO-GO für Public SEO**, solange sie CSR-Shells bleiben. Public Launch erfordert Prerender/SSG/SSR **oder** bewusstes Ausschließen aus Index/Sitemap bis P5-E.9D.3+.
 
 **S-06 Search Recall** bleibt **separater OPEN_BLOCKING Gate** (P5-E.9E) — nicht Teil dieses Plans.
@@ -344,6 +346,8 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 |-----------|---------|
 | **P5-E.9D.1** | **PASS** |
 | **P5-E.9D.2** | **PASS** |
+| **P5-E.9D.3** | **PASS** |
+| Entity Prerender/SSG Decision | **DECISION DOCUMENTED** — Hybrid SSG empfohlen |
 | robots/noindex Static Hardening | **STATIC_HARDENED** (33/33) |
 | Static Hub Metadata | **STATIC_HUB_METADATA_HARDENED** (100/100) |
 | robots / noindex | **STATIC_HARDENED** |
@@ -361,10 +365,12 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9D.2** — Static Hub Metadata Cleanup~~ **PASS** — canonical, description, Sitemap-Hubs (100/100)
 
-**P5-E.9D.3** — Entity Prerender/SSG Decision **oder** **P5-E.9E** Search Recall Plan
+~~**P5-E.9D.3** — Entity Prerender/SSG Decision~~ **PASS** — `p5-entity-prerender-ssg-decision.md`
+
+**P5-E.9D.3A** — Entity SSG Prototype Plan **oder** **P5-E.9E** Search Recall Plan
 
 Alternativ: **P5-E.9D.4** dynamische Sitemap (nach 9D.3)
 
 ---
 
-*Dokumentversion: P5-E.9D PASS + P5-E.9D.1 PASS + P5-E.9D.2 PASS. Keine Secrets. Keine Search-Console-Aktion.*
+*Dokumentversion: P5-E.9D PASS + P5-E.9D.1 PASS + P5-E.9D.2 PASS + P5-E.9D.3 PASS. Keine Secrets. Keine Search-Console-Aktion.*

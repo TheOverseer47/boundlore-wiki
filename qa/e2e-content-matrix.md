@@ -2416,6 +2416,33 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9D.3 — Entity Prerender SSG Decision (PASS)
+
+**Milestone:** P5-E.9D.3 — Entity Prerender/SSG Decision (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Decision document exists | `p5-entity-prerender-ssg-decision.md` | complete | `[x]` |
+| CSR detail risk documented | decision doc | Thin-Content-Shell | `[x]` |
+| SSG/prerender/SSR options compared | decision doc | Matrix A–F | `[x]` |
+| URL/canonical strategy documented | decision doc | path-based canonical | `[x]` |
+| Sitemap entity exclusion remains documented | decision doc | excluded until SSG | `[x]` |
+| No implementation performed | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| No Search Console action performed | gate | none | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Sitemap (hubs) | status | STATIC_SITEMAP_HUBS_UPDATED | `[x]` |
+| Structured Data | status | PARTIAL | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9D.3 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
+
+**Next:** P5-E.9D.3A entity SSG prototype plan or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
 ## P5-E.9D.1 — robots noindex Static Hardening (PASS)
 
 **Milestone:** P5-E.9D.1 — robots/noindex Static Hardening. **PASS**.

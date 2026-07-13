@@ -69,7 +69,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **Upload Path Disablement** | OPEN (pre-8C) | **CLOSED** | P5-E.8C; `p5-upload-path-disablement-review.md` | — | Nein (locked MVP) | — |
 | **Storage Closure (gesamt)** | DEFERRED | **DEFERRED (akzeptabel für locked MVP)** | P5-E.8A.2 Hybrid; P5-E.8C Hardening | DB-Policy + Bucket vor Unlock | **Ja** (vor Unlock) | P5-E.8A.4 → P5-E.8A.3 → P5-E.8A retry |
 | **Production Closure** | NOT CLOSED | **BLOCKING** | Kein Production-Apply | Alle S+ auf Production | **Ja** | **P5-E.9** |
-| **S-05 CSR / SEO Entity Pages** | Open | **BLOCKING** (Launch) | **P5-E.9D Plan** | CSR-Shells; kein Prerender | **Ja** (Public Launch) | **P5-E.9D.1** → 9D.5 |
+| **S-05 CSR / SEO Entity Pages** | Open | **BLOCKING** (Launch) | **P5-E.9D + 9D.3 Decision** | CSR-Shell; SSG Hybrid empfohlen | **Ja** (Public Launch) | **P5-E.9D.3A** → 9D.5 |
 | **S-06 Search Recall (`monster`)** | Open | **BLOCKING** (Launch) | Bekannter Recall-Gap; Smoke lädt ohne Crash | 0 Treffer für bekannte Entities | **Ja** (Public Launch) | Search-Index-Gate |
 | **S-07 Backup/Restore Evidence** | PARTIAL | **PARTIAL** (Staging backup PASS) | **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **Ja** (Launch/Ops) | **P5-E.9B.3** |
 | **S-08 Monitoring / Error Tracking** | Missing | **BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Keine Provider/Alerting-Integration | **Ja** (Launch/Ops) | **P5-E.9C.3** → 9C.4 |
@@ -139,9 +139,10 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 12. ~~**P5-E.9D** — SEO/CSR Closure Plan~~ **PASS** — `p5-seo-csr-closure-plan.md`
 13. ~~**P5-E.9D.1** — robots/noindex Static Hardening~~ **PASS** — 33/33 fixture
 14. ~~**P5-E.9D.2** — Static Hub Metadata Cleanup~~ **PASS** — 100/100 fixture
-15. **P5-E.9D.3** — Entity Prerender/SSG Decision (lokale Planung, kein Deploy)
-16. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
-17. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
+15. ~~**P5-E.9D.3** — Entity Prerender/SSG Decision~~ **PASS** — `p5-entity-prerender-ssg-decision.md`
+16. **P5-E.9D.3A** — Entity SSG Prototype Plan (kein DB, kein Deploy)
+17. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
+18. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
 
 ---
 
@@ -371,4 +372,23 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9D PASS + P5-E.9D.1 PASS + P5-E.9D.2 PASS. Keine Secrets.*
+## 24. P5-E.9D.3 Follow-up (PASS — Entity Prerender/SSG Decision)
+
+**Gate:** P5-E.9D.3 — Entity Prerender/SSG Decision. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Decision Document | `p5-entity-prerender-ssg-decision.md` |
+| Empfehlung | Hybrid — Build-time SSG für published canonical entries |
+| URL-Canonical | `/wiki/post/<canonical_slug>/` (Full Launch) |
+| Implementation / Deploy / Search Console | **Nein** |
+| Entity Detail SEO | **OPEN_BLOCKING** |
+| Sitemap Entity URLs | **Excluded** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.3 | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9D.2 PASS + P5-E.9D.3 PASS. Keine Secrets.*
