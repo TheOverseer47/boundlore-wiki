@@ -214,18 +214,18 @@ All routes returned **200** (home, browse, search including XSS probe, QA slugs,
 ### Recommendation
 
 1. ~~**P5-E.5A (repo fix):** Reorder `release_gate_lock.sql`~~ → **P5-E.5A PASS** (local reorder).
-2. **P5-E.5B:** Ensure `profiles` rows exist for test users on staging.
-3. **Re-run P5-E.5** only with new explicit user approval after 5B.
+2. ~~**P5-E.5B:** Ensure `profiles` rows exist~~ → **P5-E.5B PASS**
+3. **Re-run P5-E.5** only with new explicit user approval.
 4. **No push, deploy, or launch.**
 
 ---
 
-## 13. P5-E.5A Follow-up (PASS — local dependency reorder)
+## 14. P5-E.5B Follow-up (PASS — testuser profiles)
 
-**Gate:** P5-E.5A — `release_gate_lock.sql` functions before policies. **PASS** (repo only).
+**Gate:** P5-E.5B — `profiles` for A/B provisioned on staging. **PASS**.
 
-**Report:** `docs/architecture/p5-release-gate-sql-order-fix-report.md`
+**Report:** `docs/architecture/p5-staging-testuser-profiles-report.md`
 
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS. No secrets.*
+*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS + P5-E.5B PASS. No secrets.*

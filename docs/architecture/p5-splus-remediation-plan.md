@@ -1017,7 +1017,22 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5B testuser profiles → P5-E.5 Re-run (explicit approval). No push/deploy/launch.
+**Next:** P5-E.5 Re-run with explicit approval. No push/deploy/launch.
+
+---
+
+## 44. P5-E.5B — Staging Testuser Profiles Provisioning (PASS)
+
+**Milestone:** P5-E.5B — two `profiles` on staging; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Pre-write backup | `[x]` 271,784 bytes |
+| Profiles A/B | `[x]` role `user` |
+| P5-E.5 Re-run | **READY** — explicit approval |
+
+**Report:** `docs/architecture/p5-staging-testuser-profiles-report.md`
 
 ---
 

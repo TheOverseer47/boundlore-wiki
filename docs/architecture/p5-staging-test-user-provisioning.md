@@ -114,7 +114,22 @@ When P5-E.5 re-run is **explicitly approved**, these users support staged negati
 
 **Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
 
-**Next:** Profiles for test users + fix `release_gate_lock.sql` ordering → re-run P5-E.5.
+**Next:** P5-E.5 Re-run with explicit approval. No push/deploy/launch.
+
+---
+
+## 9. P5-E.5B Follow-up (PASS — testuser profiles)
+
+**Gate:** P5-E.5B — two staging `profiles` rows for A/B. **PASS**.
+
+| Item | Status |
+|------|--------|
+| User A profile | `[x]` `p5_e5_user_a`, role `user` |
+| User B profile | `[x]` `p5_e5_user_b`, role `user` |
+| Admin role | `[x]` — none |
+| P5-E.5 Re-run | **READY** — explicit approval |
+
+**Report:** `docs/architecture/p5-staging-testuser-profiles-report.md`
 
 ---
 
@@ -130,7 +145,8 @@ Base schema provisioning plan created. Core blocker: no `posts`/`profiles` CREAT
 | `p5-staging-environment-proof.md` | P5-STAGING.2 identity proof |
 | `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
 | `p5-staged-db-application-rerun-report.md` | P5-E.5 Re-run blocked report |
+| `p5-staging-testuser-profiles-report.md` | P5-E.5B profiles report (PASS) |
 
 ---
 
-*Document version: P5-STAGING.4 + P5-E.5 Re-run BLOCKED. No SQL. No secrets.*
+*Document version: P5-STAGING.4 + P5-E.5B PASS. No secrets.*

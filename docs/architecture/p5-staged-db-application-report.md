@@ -594,4 +594,12 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS. Partial apply 1 only. No secrets.*
+### P5-E.5B follow-up (PASS — testuser profiles)
+
+**P5-E.5B** — `profiles` rows for A/B provisioned on staging. **PASS**.
+
+**Report:** `docs/architecture/p5-staging-testuser-profiles-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS + P5-E.5B PASS. No secrets.*

@@ -112,10 +112,18 @@ From P5-E.5 Re-run report (no DB access in this gate):
 
 ### Recommendation
 
-1. **P5-E.5B** — provision `profiles` rows for `p5_e5_user_a@example.com` / `p5_e5_user_b@example.com` on staging.
+1. ~~**P5-E.5B** — provision `profiles` rows~~ → **P5-E.5B PASS**
 2. **P5-E.5 Re-run** — only with new explicit user approval after 5B.
 3. **No push, deploy, or launch.**
 
 ---
 
-*Document version: P5-E.5A PASS. Local dependency reorder only. No secrets.*
+## 9. P5-E.5B Follow-up (PASS — testuser profiles)
+
+**Gate:** P5-E.5B — two `profiles` rows provisioned on staging. **PASS**.
+
+**Report:** `docs/architecture/p5-staging-testuser-profiles-report.md`
+
+---
+
+*Document version: P5-E.5A PASS + P5-E.5B PASS. No secrets.*

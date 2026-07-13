@@ -2298,6 +2298,23 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.5B — Staging Testuser Profiles Provisioning (PASS)
+
+**Milestone:** P5-E.5B — profiles for test users A/B; **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Pre-write backup | staging | >0 bytes | `[x]` 271,784 |
+| User A profile | public.profiles | exists, role user | `[x]` |
+| User B profile | public.profiles | exists, role user | `[x]` |
+| P5-E.5 Re-run | gate | READY (explicit approval) | `[x]` |
+| P5-E.5B | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-testuser-profiles-report.md`
+
+---
+
 ## P5-E.5A — Release Gate SQL Dependency Order Fix (PASS)
 
 **Milestone:** P5-E.5A — local `release_gate_lock.sql` reorder; **PASS**.

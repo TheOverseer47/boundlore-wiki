@@ -3292,7 +3292,21 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5B testuser profiles → P5-E.5 Re-run. No push/deploy/launch.
+**Next:** P5-E.5 Re-run with explicit approval. No push/deploy/launch.
+
+---
+
+## 119. P5-E.5B — Staging Testuser Profiles Provisioning (PASS)
+
+**Milestone:** P5-E.5B — profiles for A/B on staging; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Pre-write backup | `[x]` 271,784 bytes |
+| Profiles A/B | `[x]` role `user` |
+| P5-E.5 Re-run | **READY** — explicit approval |
+
+**Report:** `docs/architecture/p5-staging-testuser-profiles-report.md`
 
 ---
 
