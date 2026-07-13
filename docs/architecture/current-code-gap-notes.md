@@ -3100,7 +3100,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
+**P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
 
 ---
 
@@ -3138,7 +3138,46 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
+**P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
+
+---
+
+## 90. P5-C.2 — Observation RPC Gate Acceptance Sweep
+
+**Milestone:** P5-C.2 docs-only acceptance sweep; confirms P5-C.1 repository baseline is accepted at repo level — **not production-closed**.
+
+### P5-C.2 acceptance sweep
+
+| Check | Result |
+|-------|--------|
+| Ack schema accepted | `[x]` — `user_submission_acks.user_id` |
+| `auth.uid()` gate accepted | `[x]` |
+| Tutorial-ack before posts INSERT accepted | `[x]` |
+| P5-E release-lock hook documented | `[x]` |
+| `SECURITY DEFINER` + `search_path` accepted | `[x]` |
+| `release_gate` not built | `[x]` |
+| SQL not executed | `[x]` |
+| QA fixture 17/17 PASS | `[x]` |
+| Notification fixture 24/24 PASS | `[x]` |
+| Standard regression smoke | `[x]` |
+| Live-RPC NOT TESTED | `[x]` documented |
+| S+-04 production-closed | `[ ]` |
+| Code / SQL / data changes in P5-C.2 | `[x]` — docs only |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-04 | **Baseline accepted** — not production-closed |
+
+**P5-C.2 acceptance sweep completed locally.** Observation RPC gate baseline accepted at repository level. SQL not executed; Live-RPC NOT TESTED. Release-lock remains P5-E scope. No Supabase writes, no deploy, no push. BoundLore remains NOT live-ready.
+
+### Next candidate
+
+**P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
 
 ---
 
@@ -3157,7 +3196,9 @@ The future Draft Inspector / Preview must **NOT**:
 | `SECURITY DEFINER` + `search_path = public` | Retained with rationale |
 | `release_gate` table | **Not built** — P5-E |
 | QA fixture `qa/p5-observation-rpc-security-fixtures.*` | 17 static SQL checks |
-| SQL executed / Live-RPC tested | **No** |
+| SQL executed / Live-RPC tested | **No** — Live-RPC NOT TESTED |
+| S+-04 repo baseline accepted | **Yes** — P5-C.2 |
+| S+-04 production-closed | **No** — DB gate required |
 | Supabase writes / deploy / push | **No** |
 
 ### Verdict unchanged
@@ -3167,13 +3208,13 @@ The future Draft Inspector / Preview must **NOT**:
 | Foundation-Ready | PASS |
 | Product-Activation-Ready | FAIL |
 | Public-Launch-Ready | **NO-GO** |
-| S+-04 | **Baseline implemented** — not production-closed |
+| S+-04 | **Baseline accepted (P5-C.2)** — not production-closed |
 
-**P5-C.1 baseline implemented locally.** `bl_register_observation` tutorial-ack gate and P5-E hook prepared in repo SQL only. No live database mutation, no RPC calls, no deploy, no push. BoundLore remains NOT live-ready.
+**P5-C.1 baseline implemented locally.** `bl_register_observation` tutorial-ack gate and P5-E hook prepared in repo SQL only. Accepted at repo level by P5-C.2 sweep. No live database mutation, no RPC calls, no deploy, no push. BoundLore remains NOT live-ready.
 
-### Next candidate
+### Next candidate (historical)
 
-**P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
+**P5-C.2 Observation RPC Gate Acceptance Sweep** — **complete**. See §90.
 
 ---
 

@@ -1904,11 +1904,40 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Public Launch NO-GO | docs | documented | `[x]` |
 | Pending conflict | — | not touched | `[x]` |
 
-**P5-C.1 baseline implemented locally.** `bl_register_observation` now gates on `auth.uid()` and `user_submission_acks` in repo SQL; P5-E release-lock hook documented. SQL not executed; Live-RPC NOT TESTED. QA static fixture 17/17 PASS. No Supabase writes, no deploy, no push. S+-04 baseline-implemented but not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+**P5-C.1 baseline implemented locally.** `bl_register_observation` now gates on `auth.uid()` and `user_submission_acks` in repo SQL; P5-E release-lock hook documented. SQL not executed; Live-RPC NOT TESTED. QA static fixture 17/17 PASS. Accepted at repo level by P5-C.2 (see below). BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate (historical):** P5-C.2 — **complete**.
+
+---
+
+## P5-C.2 — Observation RPC Gate Acceptance Sweep
+
+**Milestone:** P5-C.2 docs-only acceptance sweep; confirms P5-C.1 repo baseline — not production-closed.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Ack schema accepted | `fix_tutorial_ack_rls.sql` | `user_submission_acks.user_id` | `[x]` |
+| RPC auth.uid() gate | `phase_a_observations_foundation.sql` | null actor blocked (`42501`) | `[x]` accepted |
+| Tutorial-ack gate | RPC body | before `INSERT INTO public.posts` | `[x]` accepted |
+| P5-E release hook | RPC comment | documented; no `release_gate` DDL | `[x]` |
+| SECURITY DEFINER | RPC | retained + `search_path = public` | `[x]` accepted |
+| SQL not executed | — | no live RPC change | `[x]` |
+| QA fixture | `/qa/p5-observation-rpc-security-fixtures.html` | 17/17 PASS; `allPass === true` | `[x]` |
+| Notification fixture | `/qa/p5-notification-security-fixtures.html` | 24/24 PASS; no regression | `[x]` |
+| Regression smoke | homepage/browse/search/post/admin | no crash | `[x]` |
+| Live-RPC negative test | Supabase | no ack → no post row | `[ ]` DB gate |
+| S+-04 production-closed | docs | not until DB apply + RPC test | `[ ]` |
+| Release-lock enforcement | docs | remains P5-E scope | `[x]` |
+| Supabase writes / deploy / push | — | none | `[x]` |
+| Product Activation FAIL | docs | documented | `[x]` |
+| Public Launch NO-GO | docs | documented | `[x]` |
+| Pending conflict | — | not touched | `[x]` |
+
+**P5-C.2 acceptance sweep completed locally.** The Observation RPC gate baseline is accepted at repository level. `bl_register_observation` checks `auth.uid()` and requires `user_submission_acks` for the actor before writes in repo SQL. SECURITY DEFINER guarded with search_path; P5-E release_gate hook documented. SQL not executed; Live-RPC NOT TESTED. QA fixture 17/17 PASS; notification fixture 24/24 PASS. No Supabase writes, no deploy, no push. S+-04 baseline-accepted but not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
 
 **STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
 
-**Next candidate:** **P5-C.2 Observation RPC Gate Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P5-D.1 HTML Sanitization & URL Safety Baseline**. **LAUNCH-0** required before any push/deploy.
 
 ---
 

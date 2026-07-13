@@ -37,7 +37,7 @@
 | ID | Titel | Business Priority | Technical Severity | Status | Betroffene Bereiche | Launch Blocker | Zielzustand |
 |----|-------|-------------------|--------------------|--------|---------------------|----------------|-------------|
 | **S+-02** | Cross-User-Notification-Injection | S+ | HIGH | **BASELINE ACCEPTED (P5-B.2)** — production not closed; Live-RLS NOT TESTED | `supabase/admin_dashboard_notifications.sql`, `js/notifications.js`, `js/auth-nav.js`, `js/notification-url-safety.js` | **Ja** | INSERT nur eigene `user_id`; `target_url` scheme-safe |
-| **S+-04** | RPC Gate Bypass (`bl_register_observation`) | S+ | MEDIUM–HIGH | **BASELINE IMPLEMENTED (P5-C.1)** — acceptance pending P5-C.2; Live-RPC NOT TESTED | `supabase/phase_a_observations_foundation.sql`, `js/discovery-core.js` | **Ja** | Tutorial-Ack + Release-Lock in RPC; kein Definer-Write ohne Gate |
+| **S+-04** | RPC Gate Bypass (`bl_register_observation`) | S+ | MEDIUM–HIGH | **BASELINE ACCEPTED (P5-C.2)** — production not closed; Live-RPC NOT TESTED | `supabase/phase_a_observations_foundation.sql`, `js/discovery-core.js` | **Ja** | Tutorial-Ack + Release-Lock in RPC; kein Definer-Write ohne Gate |
 | **S+-03** | Stored-XSS / fehlende HTML-Sanitization | S+ | HIGH | VERIFIED FAIL (code) | `js/post-detail.js`, `js/create-post.js`, `js/edit-post.js`, `wiki/admin/index.html`, URL sinks (`avatar-utils.js`, `auth-nav.js`) | **Ja** | Zentrale Sanitization-Policy; URL-Scheme-Whitelist; XSS-Korpus PASS |
 | **S+-01** | Kein serverseitiger fail-closed Pre-Release-Content-Lock | S+ | HIGH | VERIFIED FAIL (code + behavior) | `js/patch-mode.js`, `supabase/wiki_patch_mode.sql`, alle Write-Oberflächen, posts INSERT, Storage, RPC Writes | **Ja** | `release_gate` Default LOCKED; RLS/RPC/Storage-Enforcement; Admin Unlock/Re-Lock + Audit |
 
@@ -112,8 +112,8 @@ P5-A.1 (this plan)
 
 | Gate | Titel | Type | Scope |
 |------|-------|------|-------|
-| **P5-C.1** | Observation RPC Gate Fix Baseline | SQL | **Baseline implemented** — tutorial-ack gate in `bl_register_observation`; P5-E release-lock hook; `search_path` verified |
-| **P5-C.2** | Observation RPC Gate Acceptance Sweep | Test | RPC negative tests — **next**; release-lock test after P5-E |
+| **P5-C.1** | Observation RPC Gate Fix Baseline | SQL | **Complete** — baseline implemented |
+| **P5-C.2** | Observation RPC Gate Acceptance Sweep | Test | **Complete** — repo baseline accepted; Live-RPC NOT TESTED |
 
 **Betroffene Dateien (P5-C.1):**
 
@@ -394,8 +394,9 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-A.2 | Docs-only acceptance sweep | Plan accepted; see §11 below |
 | **Complete** | P5-B.1 | Code + SQL baseline | S+-02 baseline implemented; see §12 |
 | **Complete** | P5-B.2 | Test acceptance sweep | Repo baseline accepted; see §13 — Live-RLS NOT TESTED |
-| **Complete** | P5-C.1 | SQL baseline | S+-04 RPC gate baseline; see §14 — Live-RPC NOT TESTED |
-| **Next** | P5-C.2 | Test acceptance sweep | Static + negative RPC tests when DB gate allows |
+| **Complete** | P5-C.1 | SQL baseline | S+-04 RPC gate baseline; see §14 |
+| **Complete** | P5-C.2 | Test acceptance sweep | Repo baseline accepted; see §15 — Live-RPC NOT TESTED |
+| **Next** | P5-D.1 | Code baseline | HTML sanitization & URL safety |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -464,7 +465,7 @@ For **future implementation gates** (P5-B through P5-E):
 | Product-Activation-Ready | FAIL |
 | Public-Launch-Ready | **NO-GO** |
 
-**Next candidate:** **P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
+**Next candidate:** **P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
 
 ---
 
@@ -492,7 +493,7 @@ For **future implementation gates** (P5-B through P5-E):
 | Product-Activation-Ready | FAIL |
 | Public-Launch-Ready | **NO-GO** |
 
-**Next candidate:** **P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
+**Next candidate:** **P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
 
 ---
 
@@ -512,13 +513,44 @@ For **future implementation gates** (P5-B through P5-E):
 | `release_gate` built | `[ ]` — P5-E only |
 | SQL file changed, not executed | `[x]` |
 | QA static fixture | `[x]` — 17/17 |
-| Live-RPC / negative RPC test | `[ ]` — P5-C.2 + DB gate |
-| S+-04 production-closed | `[ ]` |
+| Live-RPC / negative RPC test | `[ ]` — NOT TESTED; deferred to explicit DB/staging gate |
+| S+-04 repo baseline accepted | `[x]` — P5-C.2 |
+| S+-04 production-closed | `[ ]` — requires DB application + negative RPC test |
 | Push / deploy / Supabase writes | `[x]` — none |
 | Product-Activation-Ready | FAIL |
 | Public-Launch-Ready | **NO-GO** |
 
-**Next candidate:** **P5-C.2 Observation RPC Gate Acceptance Sweep**. No push/deploy/launch.
+**Next candidate:** **P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
+
+---
+
+## 15. P5-C.2 — Observation RPC Gate Acceptance Sweep
+
+**Milestone:** P5-C.2 docs-only acceptance sweep; confirms P5-C.1 repository baseline is accepted at repo level — **not production-closed**.
+
+**P5-C.2 acceptance sweep completed locally.** The Observation RPC gate baseline is accepted at repository level. `bl_register_observation` now checks `auth.uid()` and requires a `user_submission_acks` row for the actor (or admin bypass) before any writes in the repo SQL file. `SECURITY DEFINER` remains guarded with `SET search_path = public`, and a P5-E `release_gate` hook is documented before writes. The SQL has **not been executed**; **Live-RPC/RLS remains NOT TESTED**. The `release_gate` itself is not implemented in P5-C and remains in scope for P5-E. QA static fixture passes locally (17/17). Notification fixture remains 24/24 PASS. Standard regression smoke shows no regressions. No Supabase writes, no RPC calls, no data changes.
+
+**S+-04 status:** Baseline-accepted at repo level. **Not production-closed** until DB application and negative RPC testing occur in an explicit staging/live gate. Release-lock enforcement remains open until P5-E.
+
+| Check | Result |
+|-------|--------|
+| Ack schema (`user_submission_acks.user_id`) accepted | `[x]` |
+| `auth.uid()` gate accepted | `[x]` |
+| Tutorial-ack before posts INSERT accepted | `[x]` |
+| P5-E release-lock hook documented | `[x]` |
+| `SECURITY DEFINER` + `search_path` accepted | `[x]` |
+| `release_gate` not built | `[x]` |
+| SQL not executed | `[x]` |
+| QA fixture 17/17 PASS | `[x]` |
+| Notification fixture 24/24 PASS | `[x]` |
+| Standard regression smoke | `[x]` |
+| Live-RPC negative test | `[ ]` — DB/staging gate |
+| S+-04 production-closed | `[ ]` |
+| Supabase writes / deploy / push | `[x]` — none |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Next candidate:** **P5-D.1 HTML Sanitization & URL Safety Baseline**. No push/deploy/launch.
 
 ---
 
@@ -526,7 +558,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/current-code-gap-notes.md` §85–§89 | P5-A.1 / P5-A.2 / P5-B.1 / P5-B.2 / P5-C.1 gate records |
+| `docs/architecture/current-code-gap-notes.md` §85–§90 | P5-A.1 / P5-A.2 / P5-B.1 / P5-B.2 / P5-C.1 / P5-C.2 gate records |
 | `docs/architecture/moderation-conflict-matrix.md` | Conflict handling must remain untouched during P5 |
 | `docs/architecture/entity-promotion-policy.md` | No auto-promotion during security fixes |
 | `docs/architecture/graph-relations-spec.md` | Relation registry unchanged in P5 |
