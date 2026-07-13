@@ -166,19 +166,19 @@ P5-STAGING.2 proves that a **dedicated, isolated Supabase staging environment is
 P5-E.5 remains **blocked** until:
 
 1. ~~Backup/dump tooling is available and tested on staging~~ — **done** (P5-STAGING.3)  
-2. Staging test users exist or can be safely created  
+2. ~~Staging test users exist or can be safely created~~ — **done** (P5-STAGING.4)  
 3. SQL execution method is chosen and approved — pooler path documented  
 4. User grants **new explicit P5-E.5 re-run approval**
 
-**Next:** Create staging test users → explicit P5-E.5 approval. No push/deploy/launch.
+**Next:** Explicit P5-E.5 re-run approval from operator. No push/deploy/launch.
 
 ---
 
-## 8. P5-STAGING.3 Follow-up
+## 9. P5-STAGING.4 Follow-up
 
-**P5-STAGING.3** (HEAD `2347d08`): `psql`/`pg_dump` 18.4; read-only connection PASS; full dump gitignored. **Tooling + backup PASS.** P5-E.5 **PARTIAL** — testusers + approval pending.
+**P5-STAGING.4** (HEAD `dcff65d`): Users `p5_e5_user_a@example.com` and `p5_e5_user_b@example.com` documented in `boundlore-staging` only. No passwords/keys in repo. **P5-E.5 READY FOR USER APPROVAL.**
 
-**Report:** `docs/architecture/p5-staging-tooling-backup-dry-run.md`
+**Report:** `docs/architecture/p5-staging-test-user-provisioning.md`
 
 ---
 
@@ -186,6 +186,7 @@ P5-E.5 remains **blocked** until:
 
 | Document | Role |
 |----------|------|
+| `p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |
 | `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
 | `p5-staging-environment-plan.md` | P5-STAGING.1 plan + re-entry criteria |
 | `p5-staged-db-application-report.md` | P5-E.5 original blocked report |
@@ -194,4 +195,4 @@ P5-E.5 remains **blocked** until:
 
 ---
 
-*Document version: P5-STAGING.2 + P5-STAGING.3 follow-up. No SQL apply. No secrets committed.*
+*Document version: P5-STAGING.2–4 follow-up. No SQL apply. No secrets committed.*

@@ -3260,6 +3260,25 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 103. P5-STAGING.4 — Staging Test User Provisioning
+
+**Milestone:** P5-STAGING.4 — docs-only test user record; **no SQL**.
+
+| Check | Result |
+|-------|--------|
+| `p5_e5_user_a@example.com` in staging | `[x]` |
+| `p5_e5_user_b@example.com` in staging | `[x]` |
+| No passwords/keys in repo | `[x]` |
+| `service_role` not used | `[x]` |
+| Test User Provisioning | **PASS** |
+| P5-E.5 re-run | **READY FOR USER APPROVAL** |
+
+**P5-STAGING.4 complete.** No push/deploy/launch.
+
+**Report:** `docs/architecture/p5-staging-test-user-provisioning.md`
+
+---
+
 ## 102. P5-STAGING.3 — Tooling & Backup Dry Run
 
 **Milestone:** P5-STAGING.3 — read-only connection + local dump; **no SQL apply**.

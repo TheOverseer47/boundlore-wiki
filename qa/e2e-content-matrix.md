@@ -2212,6 +2212,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.4 — Staging Test User Provisioning
+
+**Milestone:** P5-STAGING.4 — document staging test users; no SQL, no further provisioning.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User A | `p5_e5_user_a@example.com` | boundlore-staging only | `[x]` |
+| User B | `p5_e5_user_b@example.com` | boundlore-staging only | `[x]` |
+| Auto-confirmed | dashboard | yes | `[x]` |
+| Passwords/keys in repo | docs | none | `[x]` |
+| `service_role` | ops | not used | `[x]` |
+| SQL / gate data changes | ops | none | `[x]` |
+| Test User Provisioning | gate | PASS | `[x]` |
+| P5-E.5 re-run | gate | READY FOR USER APPROVAL | `[x]` |
+
+**P5-STAGING.4 PASS.** P5-E.5 awaits explicit operator approval. No push/deploy. Product-Activation-Ready = FAIL; Public-Launch-Ready = NO-GO.
+
+**Next:** Explicit P5-E.5 re-run approval. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P5-STAGING.3 — Tooling & Backup Dry Run
 
 **Milestone:** P5-STAGING.3 — read-only connection + local `pg_dump`; no SQL apply.

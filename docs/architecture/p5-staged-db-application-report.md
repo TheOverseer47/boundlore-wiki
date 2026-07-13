@@ -229,10 +229,16 @@ All served from `http://localhost:8080`. No Supabase writes.
 
 **Report:** `docs/architecture/p5-staging-tooling-backup-dry-run.md`
 
+### P5-STAGING.4 follow-up
+
+**P5-STAGING.4** test user provisioning documented (HEAD `dcff65d`). Users `p5_e5_user_a@example.com` and `p5_e5_user_b@example.com` in `boundlore-staging` only. No passwords/keys in repo. **P5-E.5 READY FOR USER APPROVAL.**
+
+**Report:** `docs/architecture/p5-staging-test-user-provisioning.md`
+
 ### Next steps
 
 - **Do not** apply P5 SQL to `ohkoojpzmptdfyowdgog`.
-- Create staging test users; obtain explicit P5-E.5 re-run approval.
+- Obtain **explicit P5-E.5 re-run approval** from operator.
 - **No push / deploy / launch.**
 
 ---

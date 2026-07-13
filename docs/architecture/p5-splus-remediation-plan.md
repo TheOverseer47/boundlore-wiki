@@ -408,8 +408,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-F.2 | Fable retest handoff | Evidence bundle + prompt; see §23 |
 | **Blocked** | P5-E.5 | Staged DB apply + negative tests | **BLOCKED** — isolated staging not proven; see §24 |
 | **Complete** | P5-STAGING.1 | Staging environment plan | Docs + `.env.staging.example`; see staging plan |
-| **Complete** | P5-STAGING.3 | Tooling & backup dry run | **PASS** |
-| **Partial** | P5-E.5 re-run | SQL apply + negative tests | Tooling + backup ready; testusers + approval pending |
+| **Complete** | P5-STAGING.4 | Test user provisioning | **PASS** |
+| **Ready** | P5-E.5 re-run | SQL apply + negative tests | **READY FOR USER APPROVAL** |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -928,10 +928,34 @@ For **future implementation gates** (P5-B through P5-E):
 
 ---
 
+## 28. P5-STAGING.4 — Staging Test User Provisioning
+
+**Milestone:** P5-STAGING.4 — document staging test users; **no SQL**, **no further user creation**.
+
+| Check | Result |
+|-------|--------|
+| User A `p5_e5_user_a@example.com` | `[x]` — boundlore-staging |
+| User B `p5_e5_user_b@example.com` | `[x]` — boundlore-staging |
+| Auto-confirmed | `[x]` |
+| Passwords/keys in repo | `[x]` — none |
+| `service_role` | `[x]` — not used |
+| SQL / data changes in gate | `[x]` — none |
+| Test User Provisioning | **PASS** |
+| P5-E.5 re-run | **READY FOR USER APPROVAL** |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Authoritative report:** `docs/architecture/p5-staging-test-user-provisioning.md`
+
+**Next:** Explicit P5-E.5 approval. No push/deploy/launch.
+
+---
+
 ## Appendix A — Related architecture docs
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |
 | `docs/architecture/p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
 | `docs/architecture/p5-staging-environment-proof.md` | P5-STAGING.2 environment proof |
 | `docs/architecture/p5-staging-environment-plan.md` | P5-STAGING.1 dedicated staging plan |

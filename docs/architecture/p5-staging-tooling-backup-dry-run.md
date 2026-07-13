@@ -138,7 +138,7 @@ Fixture pages reached:
 |-----------|---------|-------|
 | **Tooling Readiness** | **PASS** | `psql`/`pg_dump` 18.4 via full path; PATH not set (minor) |
 | **Backup Readiness** | **PASS** | Full pre-apply dump created and gitignored |
-| **P5-E.5 Re-run Readiness** | **PARTIAL** | Tooling + backup ready; testusers + explicit user approval still required |
+| **P5-E.5 Re-run Readiness** | **READY FOR USER APPROVAL** | All prerequisites met; explicit approval pending |
 | **P5-STAGING.3 overall** | **PASS** | With documented direct-host IPv6 caveat |
 | Product-Activation-Ready | **FAIL** | Unchanged |
 | Public-Launch-Ready | **NO-GO** | Unchanged |
@@ -153,13 +153,21 @@ Fixture pages reached:
 
 Still required:
 
-- `[ ]` Staging test users (`p5_e5_*` or approved creation path)
+- `[x]` Staging test users (`p5_e5_user_a@example.com`, `p5_e5_user_b@example.com`) — P5-STAGING.4
 - `[ ]` User **explicit P5-E.5 re-run approval**
-- `[ ]` SQL apply runbook (pooler vs direct host documented)
+- `[x]` SQL apply runbook (pooler vs direct host documented)
 
-**Next:** Create staging test users → obtain explicit P5-E.5 approval → P5-E.5 re-run on staging only.
+**Next:** Obtain explicit P5-E.5 approval → P5-E.5 re-run on staging only.
 
 **Not in scope:** Push, deploy, launch.
+
+---
+
+## 9. P5-STAGING.4 Follow-up
+
+**P5-STAGING.4** (HEAD `dcff65d`): Two staging test users documented; created only in `boundlore-staging`. No passwords/keys in repo. **P5-E.5 READY FOR USER APPROVAL.**
+
+**Report:** `docs/architecture/p5-staging-test-user-provisioning.md`
 
 ---
 
@@ -167,10 +175,10 @@ Still required:
 
 | Document | Role |
 |----------|------|
-| `p5-staging-environment-plan.md` | Staging setup + re-entry criteria |
+| `p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |
 | `p5-staging-environment-proof.md` | P5-STAGING.2 identity proof |
 | `p5-staged-db-application-report.md` | P5-E.5 blocked report |
 
 ---
 
-*Document version: P5-STAGING.3. Read-only connection + local dump only. No SQL apply. No secrets committed.*
+*Document version: P5-STAGING.3 + P5-STAGING.4 follow-up. No SQL apply. No secrets committed.*

@@ -188,8 +188,9 @@ Stop immediately (do not proceed to SQL apply) if:
 | 3 | User fills `.env.staging` locally | Operator |
 | 4 | **P5-STAGING.2** Environment Proof & Dry Run | **PASS** (identity) — see proof report |
 | 5 | **P5-STAGING.3** Tooling & Backup Dry Run | **PASS** — see tooling/backup report |
-| 6 | **P5-E.5 re-run** | **PARTIAL** ready — testusers + explicit approval still required |
-| 7 | **P5-E.6** (future) | Staging evidence acceptance |
+| 6 | **P5-STAGING.4** Test user provisioning | **PASS** — see test user report |
+| 7 | **P5-E.5 re-run** | **READY FOR USER APPROVAL** |
+| 8 | **P5-E.6** (future) | Staging evidence acceptance |
 
 **Not in scope:** Push, deploy, launch, production clone, automatic project creation without explicit safe approval.
 
@@ -199,6 +200,7 @@ Stop immediately (do not proceed to SQL apply) if:
 
 | Document | Role |
 |----------|------|
+| `p5-staging-test-user-provisioning.md` | P5-STAGING.4 test user provisioning |
 | `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup dry run |
 | `p5-staging-environment-proof.md` | P5-STAGING.2 environment proof report |
 | `p5-staged-db-application-report.md` | P5-E.5 blocked report |
@@ -237,10 +239,26 @@ Stop immediately (do not proceed to SQL apply) if:
 | Read-only connection (pooler) | `[x]` PASS |
 | Full pre-apply dump | `[x]` — gitignored under `backups/staging/` |
 | `backups/` in `.gitignore` | `[x]` |
-| P5-E.5 re-run | **PARTIAL** ready |
+| P5-E.5 re-run | **READY FOR USER APPROVAL** — P5-STAGING.4 |
 
 **Authoritative report:** `docs/architecture/p5-staging-tooling-backup-dry-run.md`
 
 ---
 
-*Document version: P5-STAGING.1 + P5-STAGING.2 + P5-STAGING.3 follow-up. No SQL apply. No secrets committed.*
+## 12. P5-STAGING.4 Follow-up
+
+**Gate:** P5-STAGING.4 — Staging Test User Provisioning (HEAD `dcff65d`)
+
+| Result | Status |
+|--------|--------|
+| User A `p5_e5_user_a@example.com` | `[x]` — boundlore-staging only |
+| User B `p5_e5_user_b@example.com` | `[x]` — boundlore-staging only |
+| Passwords/keys in repo | `[x]` — none |
+| `service_role` for provisioning | `[x]` — not used |
+| P5-E.5 re-run | **READY FOR USER APPROVAL** |
+
+**Authoritative report:** `docs/architecture/p5-staging-test-user-provisioning.md`
+
+---
+
+*Document version: P5-STAGING.1–4 follow-up. No SQL apply. No secrets committed.*
