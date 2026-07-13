@@ -82,7 +82,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-01 Storage Upload Frontend** | S+ Critical | **CLOSED** | P5-E.8C; fixture 24/24 | — (DB layer separate) | — | Nein | Nein | Nein | Ja | Ja |
 | **S+-02 Notification Injection** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3 staging RLS; fixture 24/24 | Production apply + foreign insert test | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S+-03 Sanitization — Repo** | S+ Critical | **CLOSED** | `BoundLoreContentSafety` p5-d1; fixture 45/45 | Server-side sanitizer optional | — | Nein | Nein | Nein | Ja | Ja |
-| **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture only; P5-E.9A Evidence Plan | Stored XSS Runtime NOT RUN; **kein CLOSED ohne 9A.1/9A.2** | **P5-E.9A.1** → **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
+| **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | Appendix B; kein prerender | Entity-URLs nicht indexierbar | **P5-E.9D** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
@@ -305,7 +305,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9A** — S+-03 Runtime XSS Evidence Plan~~ **PASS** — siehe `p5-splus03-runtime-xss-evidence-plan.md`
 
-**P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence
+~~**P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence~~ **PASS** — `qa/p5-splus03-runtime-xss-fixtures.*` (25/25)
+
+**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP**)
 
 Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
@@ -329,4 +331,26 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS. Keine Secrets. Kein DB-Zugriff.*
+## 15. P5-E.9A.1 Follow-up (PASS — S+-03 Local/Mocked Runtime XSS Evidence)
+
+**Gate:** P5-E.9A.1 — S+-03 Runtime XSS Local/Mocked Evidence. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Fixture | `qa/p5-splus03-runtime-xss-fixtures.html` + `.js` |
+| Checks | **25/25 PASS** |
+| `__boundloreXssRuntimeHit` | `false` nach allen Render-Operationen |
+| Lokal bewiesen | post body mock, BLMETA strip, URLs (avatar/source/notification), search escape, card excerpt |
+| Offen | Staging stored payloads, wiki layout, comments, admin inspector, production |
+| Gespeicherte Payloads geschrieben | **Nein** |
+| SQL apply / DB access | **None** |
+| S+-03 Runtime (gesamt) | **PARTIAL** — lokale Evidence ≠ vollständiger CLOSED |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9A.1 | **PASS** |
+
+**Report:** `docs/architecture/p5-splus03-runtime-xss-evidence-plan.md` (§ P5-E.9A.1)
+
+---
+
+*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS. Keine Secrets. Kein DB-Zugriff.*

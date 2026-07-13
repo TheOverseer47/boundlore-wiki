@@ -63,7 +63,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **S+-01 Storage Upload Paths (Frontend)** | Ungeschützt | **CLOSED** (frontend) | P5-E.8C PASS; Upload fixture 24/24 | DB-Layer fehlt weiterhin | Nein (locked + disabled) | Akzeptanz dokumentiert in P5-E.8D |
 | **S+-02 Notification Injection** | PASS (staging) | **CLOSED** (staging) | P5-E.5 Re-run 3 live RLS; fixture 24/24 | Production NOT CLOSED; `target_url` constraint optional | **Ja** (Production) | P5-E.9 |
 | **S+-03 Sanitization — Repo/Fixture** | PASS (local) | **CLOSED** (repo) | `BoundLoreContentSafety` p5-d1; fixture 45/45 | Kein server-side sanitizer | Nein (Baseline) | — |
-| **S+-03 Sanitization — Runtime** | NOT RUN | **PARTIAL** | Fixture only | Stored-content XSS auf Staging/Prod NOT RUN | **Ja** | **P5-E.8D.1** oder dediziertes S+-03 Runtime Gate |
+| **S+-03 Sanitization — Runtime** | PARTIAL (local mock PASS) | **PARTIAL** | Fixture 45/45 + 9A.1 25/25; Staging stored NOT RUN | Stored-content XSS auf Staging/Prod NOT RUN | **Ja** | **P5-E.9A.2** (STOPP) |
 | **S+-04 Observation RPC Gate** | PASS (staging) | **CLOSED** (staging) | P5-E.5 Re-run 3; fixture 17/17 | Production NOT CLOSED | **Ja** (Production) | P5-E.9 |
 | **Release Lock DB Fixture** | CORE_PASS_STORAGE_DEFERRED | **CLOSED** (repo) | P5-E.7B; 32/32 core + 2 DEFERRED | Storage checks bleiben DEFERRED | Nein | P5-E.8B nach Storage-Apply |
 | **Upload Path Disablement** | OPEN (pre-8C) | **CLOSED** | P5-E.8C; `p5-upload-path-disablement-review.md` | — | Nein (locked MVP) | — |
@@ -127,8 +127,9 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 1. ~~**P5-E.9** — Production Closure Plan~~ **PASS**
 2. ~~**P5-E.9A** — S+-03 Runtime XSS Evidence Plan~~ **PASS** — `p5-splus03-runtime-xss-evidence-plan.md`
-3. **P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence
-4. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
+3. ~~**P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence~~ **PASS** — 25/25 fixture
+4. **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP**)
+5. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
 
 ---
 
@@ -164,4 +165,24 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS. Keine Secrets. Kein DB-Zugriff.*
+## 14. P5-E.9A.1 Follow-up (PASS — S+-03 Local/Mocked Runtime XSS Evidence)
+
+**Gate:** P5-E.9A.1 — S+-03 Runtime XSS Local/Mocked Evidence. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Fixture | `qa/p5-splus03-runtime-xss-fixtures.*` — 25/25 PASS |
+| Runtime flag | `__boundloreXssRuntimeHit` bleibt `false` |
+| S+-03 Local/Mocked Runtime | **PASS** (Evidence) |
+| S+-03 Runtime (gesamt) | **PARTIAL** — Staging stored payloads offen |
+| Gespeicherte Payloads | **Keine** |
+| SQL apply / DB access | **None** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9A.1 | **PASS** |
+
+**Report:** `docs/architecture/p5-splus03-runtime-xss-evidence-plan.md`
+
+---
+
+*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS. Keine Secrets. Kein DB-Zugriff.*

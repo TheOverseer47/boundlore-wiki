@@ -3,7 +3,8 @@
 **Gate:** P5-E.9A — S+-03 Runtime XSS Evidence Plan (Planung/Abnahme only)  
 **Datum:** 2026-07-14  
 **HEAD (Start):** `e3dca22` — Document production closure plan after runtime gap review  
-**Verdict:** **PASS** (Planungs-Gate) — S+-03 Runtime bleibt **PARTIAL**
+**HEAD (nach P5-E.9A.1):** siehe Commit `Add local runtime XSS evidence fixture`  
+**Verdict:** **PASS** (Planungs-Gate) — S+-03 Runtime bleibt **PARTIAL** (lokale Evidence ergänzt, Staging offen)
 
 ---
 
@@ -42,7 +43,7 @@ Dieser Plan definiert:
 | Dimension | Status |
 |-----------|--------|
 | S+-03 Repo/Fixture | **CLOSED** |
-| S+-03 Runtime (lokal mock) | **OPEN** — P5-E.9A.1 geplant |
+| S+-03 Runtime (lokal mock) | **PARTIAL** — P5-E.9A.1 **PASS** (25/25); kein vollständiger Runtime-CLOSED |
 | S+-03 Runtime (Staging stored) | **OPEN** — P5-E.9A.2 mit STOPP |
 | S+-03 Production | **NOT CLOSED** |
 | Production Closure (gesamt) | **NOT CLOSED** |
@@ -55,24 +56,24 @@ Dieser Plan definiert:
 
 | Surface | Datei / Funktion | Sink-Typ | Sanitizer/Guard | Repo-Fixture | Runtime-Beweis | Restrisiko | Nächster Beweis |
 |---------|------------------|----------|-----------------|--------------|----------------|------------|-----------------|
-| **Post body render** | `post-detail.js` → `renderPost()` → `#postBody.innerHTML` | `innerHTML` | `sanitizePostHtmlPD()` → `BoundLoreContentSafety.sanitizeRichTextHtml` | Ja (45/45 corpus) | **Nein** (kein stored post smoke) | Legacy DB content ungetestet | P5-E.9A.1 mock + 9A.2 staging |
+| **Post body render** | `post-detail.js` → `renderPost()` → `#postBody.innerHTML` | `innerHTML` | `sanitizePostHtmlPD()` → `BoundLoreContentSafety.sanitizeRichTextHtml` | Ja (45/45 corpus) | **Ja** (9A.1 mock pipeline 6 checks) | Legacy DB content ungetestet | P5-E.9A.2 staging |
 | **Wiki entity layout body** | `post-detail.js` → `WikiEntryLayout.render()`; `wiki-entry-layout.js` | `innerHTML` | Eingang bereits `cleanContent` sanitized | Indirekt (safe-html cases) | **Nein** | Layout re-parses HTML lokal | 9A.1 mit wiki layout probe |
 | **Structured discovery render** | `post-detail.js` structured branch | `innerHTML` | `sanitizePostHtmlPD` vor Branch | Ja (unsafe cases) | **Nein** | Discovery-spezifische Felder | 9A.2 |
-| **Post excerpt / browse card** | `render-posts.js` → `plainText` strip + `escapeHtmlRP()` | `text` in HTML template | Tag-strip + `escapeHtmlRP` | Nein (dediziert) | **Nein** | Strip-regex bypass theoretisch | 9A.1 card render probe |
+| **Post excerpt / browse card** | `render-posts.js` → `plainText` strip + `escapeHtmlRP()` | `text` in HTML template | Tag-strip + `escapeHtmlRP` | Nein (dediziert) | **Ja** (9A.1 card excerpt probe) | Strip-regex bypass theoretisch | 9A.2 |
 | **Guild card + discord iframe** | `render-posts.js` → `extractDiscordWidget` | `iframe src` | `escapeHtmlRP` on src string | Nein | **Nein** | Widget URL validation | 9A.1 URL corpus |
 | **Create-post outgoing** | `create-post.js` → `sanitizeOutgoingHtmlCP()` vor INSERT | Quill `innerHTML` → DB | Fail-closed wenn CS fehlt (`null` blockiert submit) | Ja (Quill meta check 44) | **Nein** (kein E2E submit) | Outbound only tested in fixture | 9A.1 outbound mock |
 | **Create-post preview overlay** | `create-post.js` overlay `innerHTML` | `innerHTML` | Mix: eigene `escapeHtmlCP` für Labels; Preview-Body? | Teilweise | **Nein** | Preview may show unsanitized quill | 9A.1 preview probe |
 | **Edit-post outgoing** | `edit-post.js` → `sanitizeRichTextHtml` | Quill → DB | Fail-closed | Ja | **Nein** | Wie create-post | 9A.1 |
 | **Edit-post source_url** | `edit-post.js` → `sanitizeContentUrl` | Meta field | `sanitizeContentUrl` | Ja (unsafe-url cases) | **Nein** | — | 9A.1 |
-| **Avatar URL render** | `avatar-utils.js` → `renderAvatar()` | `img src` attr | `sanitizeImageSrc` + `blEscapeAttr` | Indirekt (img src cases 36–37) | **Nein** | Profil-avatar aus DB | 9A.1 avatar probe |
+| **Avatar URL render** | `avatar-utils.js` → `renderAvatar()` | `img src` attr | `sanitizeImageSrc` + `blEscapeAttr` | Indirekt (img src cases 36–37) | **Ja** (9A.1 avatar probe) | Profil-avatar aus DB | 9A.2 |
 | **Source URL / external link** | `post-detail.js` → `sanitizeContentUrlPD` | `href` in rendered links | `sanitizeContentUrl` | Ja | **Nein** | Stored `postMeta.source_url` | 9A.2 read existing posts |
 | **Attachment / hero URLs** | `post-detail.js` attachment loops | `href`, `img src` | `sanitizeContentUrlPD` | Ja | **Nein** | — | 9A.2 |
-| **Notification target_url** | `notifications.js`, `auth-nav.js` | `href` in nav dropdown | `BoundLoreNotificationUrlSafety` + insert guard | Ja (notification fixture 24/24) | **Nein** (kein live render smoke) | Stored notifications in DB | 9A.2 read-only render |
+| **Notification target_url** | `notifications.js`, `auth-nav.js` | `href` in nav dropdown | `BoundLoreNotificationUrlSafety` + insert guard | Ja (notification fixture 24/24) | **Ja** (9A.1 URL guard probe) | Stored notifications in DB | 9A.2 read-only render |
 | **Notification insert** | `notifications.js` → `assertNotificationInsert` | DB write path | Blocks foreign `user_id` + unsafe URL | Ja | Staging PASS (S+-02) | XSS via `message` title? text nodes | 9A.1 message escape check |
 | **Admin structured inspector** | `admin-structured-context-inspector.js` | `innerHTML` | **Unklar** — inspector panel | Nein | **Nein** | Admin-only surface | Separate admin gate |
-| **BLMETA strip boundary** | `stripPostMetaPD/CP`, `parsePostMeta*` | Comment stripped pre-sanitize | Regex `<!--BLMETA ...-->` | Nein (dediziert) | **Nein** | Malformed BLMETA in comment | 9A.1 BLMETA cases |
+| **BLMETA strip boundary** | `stripPostMetaPD/CP`, `parsePostMeta*` | Comment stripped pre-sanitize | Regex `<!--BLMETA ...-->` | Nein (dediziert) | **Ja** (9A.1 BLMETA probe) | Malformed BLMETA in comment | 9A.2 |
 | **BLMETA JSON fields** | `parsePostMetaPD` → meta used in UI | `textContent` / URLs | `source_url` sanitized; titles escaped | Teilweise | **Nein** | JSON injection in meta display | 9A.1 meta display probe |
-| **Search query reflected** | `search.js` → `escapeHtml(query)` in empty state | `innerHTML` template | `escapeHtml` / `BoundLoreSearchSignals` | XSS search smoke (manual) | **Ja** (smoke `q=<img onerror>`) | Structured search paths | Bereits smoke OK |
+| **Search query reflected** | `search.js` → `escapeHtml(query)` in empty state | `innerHTML` template | `escapeHtml` / `BoundLoreSearchSignals` | XSS search smoke (manual) | **Ja** (9A.1 + früherer smoke) | Structured search paths | Bereits smoke OK |
 | **Search result titles** | `search.js` | `innerHTML` | `escapeHtml` on titles | Nein dediziert | **Nein** | DB-stored titles | 9A.2 |
 | **Comments display** | `post-detail.js` → `renderComment` | `innerHTML` | `escapeHtml(c.content)` | Nein | **Nein** | Comment submit sanitization? | 9A.2 |
 | **Comment edit textarea** | `post-detail.js` | `innerHTML` + textarea value | `escapeHtml` in textarea | Nein | **Nein** | Update path unsanitized? | Review comment write gate |
@@ -96,6 +97,7 @@ Dieser Plan definiert:
 |---------|------|--------|--------|-------|
 | **P5 Sanitization** | `qa/p5-sanitization-security-fixtures.js` | **45/45 PASS** | **CLOSED** | `BoundLoreContentSafety` — safe/unsafe HTML, unsafe URLs, Quill basics, meta flags |
 | **P5 Notification URL** | `qa/p5-notification-security-fixtures.js` | **24/24 PASS** | **CLOSED** (URL policy) | `BoundLoreNotificationUrlSafety` — separater S+-02 Pfad |
+| **P5 S+-03 Runtime XSS (local mock)** | `qa/p5-splus03-runtime-xss-fixtures.js` | **25/25 PASS** | **PASS** (lokal) | Mocked post-detail/render-posts/search/avatar/notification pipelines; `__boundloreXssRuntimeHit` bleibt `false` |
 | **Release Lock UI** | `qa/p5-release-lock-ui-fixtures.js` | 30/30 | N/A für S+-03 | — |
 
 ### Was die Fixture beweist (und was nicht)
@@ -115,7 +117,7 @@ Dieser Plan definiert:
 | Gap | Schwere | Blockiert S+-03 CLOSED? |
 |-----|---------|-------------------------|
 | Kein post-detail Runtime-Smoke mit XSS-artigem **gespeichertem** HTML | Hoch | **Ja** |
-| Kein Roundtrip Create/Edit → Read (ohne DB: mock) | Mittel | **Ja** für 9A.1 |
+| Kein Roundtrip Create/Edit → Read (ohne DB: mock) | Mittel | **Ja** — 9A.1 deckt nur Sanitizer-Pipeline ab, nicht Quill-Roundtrip |
 | Kein Staging-Nachweis für pre-P5-D Content | Hoch | **Ja** für Staging closure |
 | Kein Production-Runtime-Nachweis | Hoch | **Ja** für Production closure |
 | Admin inspector nicht in Fixture | Mittel | Nein (admin-only, separat) |
@@ -125,7 +127,84 @@ Dieser Plan definiert:
 
 ---
 
-## Safe Local Evidence Plan (P5-E.9A.1 — noch nicht ausgeführt)
+## P5-E.9A.1 — Local/Mocked Runtime Evidence (PASS)
+
+**Gate:** P5-E.9A.1 — S+-03 Runtime XSS Local/Mocked Evidence  
+**Datum:** 2026-07-14  
+**HEAD (Start):** `afc3a1f` — Document S+03 runtime XSS evidence plan  
+**Verdict:** **PASS** — lokale Evidence; S+-03 Runtime gesamt bleibt **PARTIAL**
+
+### Fixture
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `qa/p5-splus03-runtime-xss-fixtures.html` | QA-only Seite, nicht in Wiki-Navigation verlinkt |
+| `qa/p5-splus03-runtime-xss-fixtures.js` | 25 Checks, kein Supabase, kein DB, kein Login |
+
+### Geladene Produktmodule
+
+- `js/content-safety.js` — `BoundLoreContentSafety`
+- `js/notification-url-safety.js` — `BoundLoreNotificationUrlSafety`
+- `js/avatar-utils.js` — `renderAvatar()`
+
+`post-detail.js` / `render-posts.js` / `search.js` exportieren ihre Render-Helfer nicht; die Fixture repliziert die dokumentierte Pipeline inline (`stripPostMeta` → `sanitizeRichTextHtml` → DOM-Probe; card excerpt tag-strip + escape; search `escapeHtml`).
+
+### Runtime-Ausführungsflag
+
+`window.__boundloreXssRuntimeHit = false` — Testvektoren versuchen das Flag per `<script>`, `onerror`, `onload`, `onclick`, `javascript:` zu setzen. Nach allen Render-Operationen: **`false (safe)`**.
+
+### Ergebnis (25/25 PASS)
+
+| Kategorie | Checks | Ergebnis |
+|-----------|--------|----------|
+| Core (CS, NS, renderAvatar, no supabase) | 4 | PASS |
+| Post body (script, onerror, svg onload, onclick, javascript href, data img, iframe, safe formatting) | 8 | PASS |
+| BLMETA boundary | 1 | PASS |
+| URL surfaces (source_url, avatar, notification) | 6 | PASS |
+| Search reflected escape | 1 | PASS |
+| Card excerpt tag-strip + escape | 1 | PASS |
+| Meta (XSS flag, no DB, no storage) | 3 | PASS |
+
+### Lokal bewiesene Surfaces
+
+| Surface | Methode | Status |
+|---------|---------|--------|
+| Post body render (mocked post-detail pipeline) | Sanitizer + innerHTML DOM probe | **PASS** |
+| BLMETA strip + body sanitize | Mock payload mit BLMETA-Kommentar | **PASS** |
+| source_url / content URL | `sanitizeContentUrl` | **PASS** |
+| Avatar `img src` | `renderAvatar()` | **PASS** |
+| Notification `target_url` | `BoundLoreNotificationUrlSafety` | **PASS** |
+| Search reflected query | `escapeHtml` replica | **PASS** |
+| Browse card excerpt | tag-strip + escape replica | **PASS** |
+
+### Weiterhin Staging/Production Evidence nötig
+
+| Surface | Grund |
+|---------|-------|
+| Gespeicherte Post-Inhalte (Legacy/pre-P5-D) | Kein DB-Read; nur Mock-Strings |
+| WikiEntryLayout mit echtem HTML | Nicht in 9A.1 abgedeckt |
+| Create/Edit Quill → Submit → Read Roundtrip | Outbound-only indirekt |
+| Create-post preview overlay | Nicht in 9A.1 |
+| Stored notification message/title render | Nur URL-Guard, kein DB |
+| Search result titles aus DB | Nur reflected query |
+| Comments display/update | Nicht in 9A.1 |
+| Admin structured inspector | Admin-only, separat |
+| Production-Inhalte | P5-E.10+ |
+
+### No-Apply-Bestätigung (P5-E.9A.1)
+
+| Prüfung | Ergebnis |
+|---------|----------|
+| SQL Apply / DB-Write | **Nein** |
+| Storage-Apply | **Nein** |
+| Gespeicherte XSS-Payloads | **Nein** |
+| Supabase-Initialisierung | **Nein** (`window.supabase` undefined) |
+| Push / Deploy / Launch / Production | **Nein** |
+| Lokaler Server | `localhost:8081` — Fixture PASS, keine Console-Crashes |
+
+---
+
+## Safe Local Evidence Plan (P5-E.9A.1 — ausgeführt)
 
 ### Ziel
 
@@ -135,7 +214,7 @@ Runtime-ähnlicher Nachweis **ohne DB**, **ohne Supabase**, **ohne gespeicherte 
 
 | Komponente | Beschreibung |
 |------------|--------------|
-| **Neue Fixture-Seite** | `qa/p5-splus03-runtime-xss-mocked-fixtures.html` + `.js` (in P5-E.9A.1 implementieren) |
+| **Neue Fixture-Seite** | `qa/p5-splus03-runtime-xss-fixtures.html` + `.js` — **implementiert, 25/25 PASS** |
 | **Mock post payloads** | Inline JS-Array mit gefährlichen HTML-Strings — nie in DB geschrieben |
 | **Render probes** | Funktionen aus `post-detail.js` / `render-posts.js` **nicht** direkt laden (zu schwer); stattdessen gleiche Sanitizer-Pipeline + simulierte `#postBody.innerHTML` Zuweisung |
 | **BLMETA cases** | `<!--BLMETA {"source_url":"javascript:alert(1)"}--><p>test</p>` → strip + sanitize + URL check |
@@ -216,13 +295,13 @@ S+-03 darf **nur** als **CLOSED** markiert werden, wenn **alle** Kriterien erfü
 | 1 | `BoundLoreContentSafety` p5-d1 im Repo | **PASS** | P5-D (done) |
 | 2 | Sanitization fixture 45/45 PASS | **PASS** | P5-D (done) |
 | 3 | Outbound create/edit blockiert bei fehlendem CS | **PASS** (code review) | P5-D (done) |
-| 4 | Mocked runtime render fixture PASS | **OFFEN** | **P5-E.9A.1** |
+| 4 | Mocked runtime render fixture PASS | **PASS** (25/25) | **P5-E.9A.1** (done) |
 | 5 | Staging stored-payload read smoke PASS | **OFFEN** | **P5-E.9A.2** (STOPP) |
 | 6 | Production stored-payload read smoke PASS | **OFFEN** | P5-E.10+ |
 | 7 | Keine ungehärteten `innerHTML` Sinks auf User-Content ohne Sanitize/Escape | **PARTIAL** (admin inspector) | Review |
 | 8 | Dokumentierter Restrisiko-Accept für Admin-only surfaces | **OFFEN** | Admin gate |
 
-**Aktueller S+-03 Status:** Kriterien 1–3 **CLOSED**; 4–8 **OFFEN** → **PARTIAL**.
+**Aktueller S+-03 Status:** Kriterien 1–4 **CLOSED/PASS**; 5–8 **OFFEN** → **PARTIAL** (kein vollständiger CLOSED ohne Staging/Production).
 
 ---
 
@@ -257,16 +336,18 @@ S+-03 darf **nur** als **CLOSED** markiert werden, wenn **alle** Kriterien erfü
 
 | Dimension | Verdict |
 |-----------|---------|
-| **P5-E.9A (dieses Gate)** | **PASS** |
+| **P5-E.9A (Planungs-Gate)** | **PASS** |
+| **P5-E.9A.1 (lokale Evidence)** | **PASS** |
 | S+-03 Repo/Fixture | **CLOSED** |
-| S+-03 Runtime | **PARTIAL / OPEN** |
+| S+-03 Runtime (lokal mock) | **PARTIAL** — 25/25 PASS, kein CLOSED |
+| S+-03 Runtime (Staging stored) | **OPEN** |
 | Production Closure | **NOT CLOSED** |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Empfohlener nächster Gate
 
-**P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence (Fixture implementieren + PASS)
+**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — explizite Freigabe + Backup erforderlich)
 
 Alternativ parallel (Plan only): **P5-E.9B** Backup/Restore Evidence Plan
 
@@ -274,4 +355,4 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, keine Payloads.**
 
 ---
 
-*Dokumentversion: P5-E.9A PASS. Keine Secrets. Kein DB-Zugriff.*
+*Dokumentversion: P5-E.9A PASS + P5-E.9A.1 PASS. Keine Secrets. Kein DB-Zugriff.*

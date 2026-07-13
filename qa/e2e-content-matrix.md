@@ -2298,6 +2298,33 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9A.1 — S+-03 Local/Mocked Runtime XSS Evidence (PASS)
+
+**Milestone:** P5-E.9A.1 — S+-03 Runtime XSS Local/Mocked Evidence. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Runtime XSS fixture | `qa/p5-splus03-runtime-xss-fixtures.*` | 25/25 PASS | `[x]` **25/25 PASS** |
+| XSS runtime flag | `__boundloreXssRuntimeHit` | remains `false` | `[x]` false (safe) |
+| Post body mock pipeline | post-detail replica | script/on*/javascript/data blocked | `[x]` |
+| BLMETA boundary | strip + sanitize | not visible/executable | `[x]` |
+| URL surfaces | avatar, source, notification | javascript/data blocked; https allowed | `[x]` |
+| Search reflected escape | search.js replica | escaped, no execution | `[x]` |
+| Card excerpt | render-posts replica | tag-strip + escape | `[x]` |
+| No supabase / DB / storage | fixture | none | `[x]` |
+| No stored payloads | gate | none written | `[x]` |
+| S+-03 local/mock runtime | status | PASS evidence | `[x]` PASS |
+| S+-03 staging runtime | status | still OPEN | `[x]` OPEN |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9A.1 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-splus03-runtime-xss-evidence-plan.md`
+
+**Next:** P5-E.9A.2 Staging Stored Payload (**STOPP**). No push/deploy/launch.
+
+---
+
 ## P5-E.9A — S+-03 Runtime XSS Evidence Plan (PASS)
 
 **Milestone:** P5-E.9A — S+-03 Runtime XSS Evidence Plan (planning only). **PASS**.
@@ -2354,7 +2381,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Core pages load (smoke) | local 8081 | 200, no crash | `[x]` |
 | S+-02 notification (staging) | staging | PASS | `[x]` |
 | S+-04 observation RPC (staging) | staging | PASS | `[x]` |
-| S+-03 sanitization runtime | staging/prod | NOT RUN | `[ ]` PARTIAL |
+| S+-03 sanitization runtime | staging/prod | NOT RUN (local mock 25/25 PASS) | `[ ]` PARTIAL |
 | Production closure | all S+ | NOT CLOSED | `[x]` BLOCKING |
 | Product activation | status | FAIL until blockers closed | `[x]` FAIL |
 | Public launch | status | NO-GO | `[x]` NO-GO |

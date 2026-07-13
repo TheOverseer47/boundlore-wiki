@@ -3292,7 +3292,33 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.9A.1 Local/Mocked Runtime Evidence. No push/deploy/launch.
+**Next:** P5-E.9A.2 (STOPP) or P5-E.9B. No push/deploy/launch.
+
+---
+
+## 135. P5-E.9A.1 — S+-03 Local/Mocked Runtime XSS Evidence (PASS)
+
+**Milestone:** P5-E.9A.1 — S+-03 Runtime XSS Local/Mocked Evidence. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Fixture | `qa/p5-splus03-runtime-xss-fixtures.html` + `.js` |
+| Checks | **25/25 PASS** (localhost:8081) |
+| Runtime flag | `__boundloreXssRuntimeHit` = `false` |
+| Mocked surfaces | post body, BLMETA, source_url, avatar, notification URL, search escape, card excerpt |
+| Nicht exportierte Helfer | `post-detail.js`/`render-posts.js`/`search.js` — Pipeline inline repliziert |
+| Gespeicherte Payloads | **Keine** |
+| Supabase / DB / Storage | **Keine** |
+| S+-03 Local/Mocked Runtime | **PASS** |
+| S+-03 Runtime (gesamt) | **PARTIAL** |
+| S+-03 Staging Runtime | **OPEN** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9A.1 | **PASS** |
+
+**Report:** `docs/architecture/p5-splus03-runtime-xss-evidence-plan.md`
+
+**Next:** P5-E.9A.2 (STOPP). No push/deploy/launch.
 
 ---
 
@@ -3350,7 +3376,7 @@ The future Draft Inspector / Preview must **NOT**:
 | Blocker | Klasse |
 |---------|--------|
 | Production Closure (S+-01…04 auf Prod) | OPEN_BLOCKING |
-| S+-03 Runtime XSS | PARTIAL |
+| S+-03 Runtime XSS | PARTIAL (9A.1 local mock PASS; Staging offen) |
 | S-07 Backup/Restore | OPEN_BLOCKING |
 | S-08 Monitoring | OPEN_BLOCKING |
 | Incident Response | OPEN_BLOCKING |
