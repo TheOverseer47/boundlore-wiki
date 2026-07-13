@@ -975,7 +975,31 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-staged-db-application-report.md` (Re-run section)
 
-**Next:** P5-STAGING.5B → 5C → P5-STAGING.6. No push/deploy/launch.
+**Next:** Operator creates `.env.legacy` → re-run P5-STAGING.5B → 5C → P5-STAGING.6. No push/deploy/launch.
+
+---
+
+## 32. P5-STAGING.5B — Legacy Schema-Only Export (BLOCKED)
+
+**Milestone:** P5-STAGING.5B — user approval granted; **BLOCKED** at `.env.legacy` check.
+
+| Check | Result |
+|-------|--------|
+| User approval for 5B | `[x]` |
+| `.env.legacy` local | `[ ]` — **missing** |
+| `.env.legacy` gitignored | `[x]` |
+| `.env.legacy.example` | `[x]` |
+| Legacy ref `ohkoojpzmptdfyowdgog` | Intended — not connected |
+| Staging `jzzgoiwfbuwiiyvwgwri` excluded | `[x]` |
+| `pg_dump --schema-only --schema=public` | `[x]` — **not run** |
+| Dump under `backups/legacy-schema-only/` | N/A |
+| SQL apply / data export | `[x]` — none |
+| Legacy Export (5B) | **BLOCKED** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
+
+**Next:** Create `.env.legacy` locally → re-run P5-STAGING.5B → 5C → P5-STAGING.6. No push/deploy/launch.
 
 ---
 
@@ -1025,6 +1049,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (BLOCKED) |
 | `docs/architecture/p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
 | `docs/architecture/p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 base schema plan |
 | `docs/architecture/p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |

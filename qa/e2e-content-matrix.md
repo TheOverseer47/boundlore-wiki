@@ -2212,6 +2212,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.5B — Legacy Schema-Only Export (BLOCKED)
+
+**Milestone:** P5-STAGING.5B — user approval granted; **BLOCKED** at `.env.legacy` check.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| `.env.legacy` local | file | exists, gitignored | `[ ]` — **missing** |
+| `.env.legacy.example` | template | no secrets | `[x]` |
+| Legacy ref | `ohkoojpzmptdfyowdgog` | source only | `[x]` intended |
+| Staging excluded | `jzzgoiwfbuwiiyvwgwri` | not used | `[x]` |
+| `--schema-only` + `--schema=public` | pg_dump | required | `[x]` — not run |
+| Dump gitignored | `backups/legacy-schema-only/` | yes | `[x]` — N/A |
+| `pg_dump` executed | ops | none if blocked | `[x]` — none |
+| SQL apply / data export | ops | none | `[x]` |
+| Legacy Export (5B) | gate | PASS or BLOCKED | **BLOCKED** |
+| P5-E.5 re-run | gate | BLOCKED | `[x]` |
+
+**P5-STAGING.5B BLOCKED.** `.env.legacy` missing. No `pg_dump`, no DB access. Create `.env.legacy` from `.env.legacy.example` → re-run 5B. Product-Activation-Ready = FAIL; Public-Launch-Ready = NO-GO.
+
+**Next:** P5-STAGING.5B re-run after `.env.legacy` → P5-STAGING.5C. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P5-STAGING.5A — Legacy Schema-Only Export Plan
 
 **Milestone:** P5-STAGING.5A — Path A export plan; no export, no DB access.

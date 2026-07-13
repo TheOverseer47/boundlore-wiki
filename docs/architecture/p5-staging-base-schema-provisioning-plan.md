@@ -211,11 +211,33 @@
 | `--schema-only` required | `[x]` |
 | Raw path `backups/legacy-schema-only/` | `[x]` gitignored via `backups/` |
 | Curated target `core_schema_foundation.sql` | Planned (5C) |
-| P5-STAGING.5B approval | `[ ]` required |
+| P5-STAGING.5B approval | `[x]` granted |
+| P5-STAGING.5B export | `[ ]` **BLOCKED** — `.env.legacy` missing |
 
-**Report:** `docs/architecture/p5-legacy-schema-only-export-plan.md`
+**Report:** `docs/architecture/p5-legacy-schema-only-export-plan.md`, `docs/architecture/p5-legacy-schema-only-export-report.md`
 
-**Next:** Explicit approval → P5-STAGING.5B export → P5-STAGING.5C curation → P5-STAGING.6.
+**Next:** Operator creates `.env.legacy` → re-run P5-STAGING.5B → P5-STAGING.5C curation → P5-STAGING.6.
+
+---
+
+## 12. P5-STAGING.5B Follow-up
+
+**Gate:** P5-STAGING.5B — Legacy Schema-Only Export. User approval granted. **BLOCKED** at Step 3.
+
+| Item | Status |
+|------|--------|
+| `.env.legacy` | **NOT FOUND** |
+| `.env.legacy` gitignored | `[x]` |
+| `pg_dump --schema-only --schema=public` | **NOT RUN** |
+| Dump under `backups/legacy-schema-only/` | N/A |
+| Legacy `ohkoojpzmptdfyowdgog` | Intended — not connected |
+| Staging `jzzgoiwfbuwiiyvwgwri` | Excluded |
+| SQL apply / data export | `[x]` — none |
+| Legacy Export (5B) | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
+
+**Next:** Create `.env.legacy` locally → re-run 5B → 5C → P5-STAGING.6.
 
 ---
 
@@ -250,7 +272,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 P5-STAGING.5 inventory complete. Incremental SQL in repo is well-structured for **patches and P5 security**, but **core BoundLore DDL is not versioned**. Provisioning staging requires **Phase 0** (author foundation SQL or approved schema-only export) before any file in §6 Phases 1–5 can run safely.
 
-**Next:** P5-STAGING.5B (explicit approval) → 5C → P5-STAGING.6. No push/deploy/launch.
+**Next:** Operator creates `.env.legacy` → re-run P5-STAGING.5B → 5C → P5-STAGING.6. No push/deploy/launch.
 
 ---
 
@@ -259,10 +281,11 @@ P5-STAGING.5 inventory complete. Incremental SQL in repo is well-structured for 
 | Document | Role |
 |----------|------|
 | `p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
+| `p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (BLOCKED) |
 | `p5-staged-db-application-report.md` | P5-E.5 re-run blocked report |
 | `p5-staging-environment-plan.md` | Staging gate sequence |
 | `PRE_RELEASE_RESET_README.md` | Reset danger documentation |
 
 ---
 
-*Document version: P5-STAGING.5 + P5-STAGING.5A follow-up. No SQL executed.*
+*Document version: P5-STAGING.5 + 5A + 5B BLOCKED follow-up. No SQL executed.*

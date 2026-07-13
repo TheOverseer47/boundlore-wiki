@@ -239,6 +239,7 @@ P5-STAGING.5B (Legacy Schema-Only Export execution) may start only when:
 | Dimension | Verdict |
 |-----------|---------|
 | **Legacy Schema-Only Export Plan (5A)** | **PASS** |
+| **Legacy Schema-Only Export (5B)** | **BLOCKED** — `.env.legacy` missing |
 | **P5-E.5 Re-run** | **BLOCKED** — until curated core schema applied to staging |
 | **P5-STAGING.5 overall** | **PARTIAL** — Phase 0 path defined via 5A→5B→5C |
 | Product-Activation-Ready | **FAIL** |
@@ -248,9 +249,30 @@ P5-STAGING.5B (Legacy Schema-Only Export execution) may start only when:
 
 User chose **Path A**. This gate documents a safe, read-only, schema-only export workflow from legacy `ohkoojpzmptdfyowdgog` to a gitignored local raw dump, then curation into `supabase/core_schema_foundation.sql`. **No export performed in 5A.** Staging `jzzgoiwfbuwiiyvwgwri` not touched.
 
-**Next:** Explicit approval → **P5-STAGING.5B** Legacy Schema-Only Export → **P5-STAGING.5C** Curated Core Schema Extraction.
+**Next:** Operator creates `.env.legacy` locally → re-run **P5-STAGING.5B** → **P5-STAGING.5C** Curated Core Schema Extraction.
 
 **Not in scope:** Push, deploy, launch, data export, P5-E.5.
+
+---
+
+## 11. P5-STAGING.5B Follow-up
+
+**Gate:** P5-STAGING.5B — Legacy Schema-Only Export (HEAD `1f0e53e`). User approval granted. **BLOCKED** — `.env.legacy` not found locally.
+
+| Item | Status |
+|------|--------|
+| User approval for 5B | `[x]` |
+| `.env.legacy` local | `[ ]` — **missing** |
+| `.env.legacy` gitignored | `[x]` — added in 5B |
+| `.env.legacy.example` | `[x]` — template added |
+| `pg_dump` executed | `[x]` — **none** |
+| Legacy DB accessed | `[x]` — **none** |
+| Staging touched | `[x]` — **none** |
+| Legacy Export (5B) | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
+
+**Operator action:** Create `.env.legacy` from `.env.legacy.example` with `SUPABASE_LEGACY_DB_URL` targeting `ohkoojpzmptdfyowdgog` only (not `jzzgoiwfbuwiiyvwgwri`). Re-run P5-STAGING.5B.
 
 ---
 
@@ -258,10 +280,11 @@ User chose **Path A**. This gate documents a safe, read-only, schema-only export
 
 | Document | Role |
 |----------|------|
+| `p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (BLOCKED) |
 | `p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 inventory + Phase 0 |
 | `p5-staged-db-application-report.md` | P5-E.5 re-run blocked |
 | `p5-staging-environment-plan.md` | Staging gate sequence |
 
 ---
 
-*Document version: P5-STAGING.5A. Planning only. No export. No DB access. No secrets.*
+*Document version: P5-STAGING.5A + 5B BLOCKED follow-up. No export. No DB access. No secrets.*

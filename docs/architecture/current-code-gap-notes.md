@@ -3260,6 +3260,29 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 107. P5-STAGING.5B — Legacy Schema-Only Export (BLOCKED)
+
+**Milestone:** P5-STAGING.5B — user approval granted; **BLOCKED** at `.env.legacy` check.
+
+| Check | Result |
+|-------|--------|
+| User approval for 5B | `[x]` |
+| `.env.legacy` local | `[ ]` — **missing** |
+| `.env.legacy` gitignored | `[x]` |
+| Legacy ref intended | `ohkoojpzmptdfyowdgog` — not connected |
+| Staging excluded | `jzzgoiwfbuwiiyvwgwri` |
+| `pg_dump` executed | `[x]` — none |
+| Dump gitignored | `[x]` — N/A (no dump) |
+| SQL apply / data export | `[x]` — none |
+| Legacy Export (5B) | **BLOCKED** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
+
+**Next:** Create `.env.legacy` locally → re-run P5-STAGING.5B → 5C → P5-STAGING.6. No push/deploy/launch.
+
+---
+
 ## 106. P5-STAGING.5A — Legacy Schema-Only Export Plan
 
 **Milestone:** P5-STAGING.5A — Path A planning only; **no export**.
