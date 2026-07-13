@@ -1017,7 +1017,24 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** Re-run P5-STAGING.6 with explicit approval. No push/deploy/launch.
+**Next:** Repair truncated policies (P5-STAGING.6C) → re-run P5-STAGING.6. No push/deploy/launch.
+
+---
+
+## 39. P5-STAGING.6 Re-run 2 — Base Schema Apply (FAIL)
+
+**Milestone:** P5-STAGING.6 Re-run 2 — staging apply; **FAIL**.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Pre-apply backup | `[x]` 185,427 bytes |
+| 6A/6B on apply path | `[x]` PASS |
+| Apply error | truncated `CREATE POLICY` (~line 1641+) |
+| Staging unchanged | `[x]` |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
 
 ---
 

@@ -2271,9 +2271,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Ready for P5-STAGING.6 Re-run | gate | YES (explicit approval) | `[x]` |
 | P5-E.5 re-run | gate | BLOCKED | `[x]` |
 
-**P5-STAGING.6B PASS.** Local extension fix only. P5-STAGING.6 Re-run requires new explicit user approval.
+**P5-STAGING.6B PASS.** Local extension fix only.
 
 **Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
+
+---
+
+## P5-STAGING.6 Re-run 2 — Base Schema Apply to Staging (FAIL)
+
+**Milestone:** P5-STAGING.6 Re-run 2 — staging apply; **FAIL**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| 6A/6B on apply path | staging | PASS | `[x]` |
+| Apply | staging | success | `[ ]` **FAIL** |
+| Core tables | public | 9 present | `[ ]` — none |
+| Test users A/B | auth.users | confirmed | `[x]` |
+| Re-run 2 | gate | PASS | **FAIL** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
 
 ---
 

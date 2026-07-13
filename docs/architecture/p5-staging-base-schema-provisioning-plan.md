@@ -277,7 +277,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `public` still empty. Pre-apply backup: `p5-staging6-preapply-20260713-193900.sql` (185,427 bytes).
 
-**Next:** ~~Add `pg_trgm` to foundation~~ → **P5-STAGING.6B PASS** → re-run P5-STAGING.6 with explicit approval. No push/deploy/launch.
+**Next:** Repair truncated policies (P5-STAGING.6C) → re-run P5-STAGING.6. No push/deploy/launch.
 
 ---
 
@@ -344,10 +344,27 @@ P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `publi
 
 ---
 
+## 19. P5-STAGING.6 Re-run 2 Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 Re-run 2 — user approval granted. **FAIL** — truncated multi-line policies.
+
+| Item | Status |
+|------|--------|
+| Pre-apply backup | `[x]` 185,427 bytes |
+| 6A/6B validated on apply | `[x]` |
+| Apply blocked on policies | `[x]` |
+| Staging `public` | `[x]` still empty |
+| P5-E.5 | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
+
+---
+
 ## Related Documents
 
 | Document | Role |
 |----------|------|
+| `p5-staging-base-schema-apply-rerun2-report.md` | P5-STAGING.6 Re-run 2 report (FAIL) |
 | `p5-core-schema-extension-fix-report.md` | P5-STAGING.6B extension fix (PASS) |
 | `p5-staging-base-schema-apply-rerun-report.md` | P5-STAGING.6 Re-run report (FAIL) |
 | `p5-core-schema-reorder-fix-report.md` | P5-STAGING.6A reorder report (PASS) |

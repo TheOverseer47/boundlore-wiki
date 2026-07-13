@@ -546,16 +546,26 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 **Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
 
-**Next:** ~~Add `pg_trgm` extension to foundation~~ → **P5-STAGING.6B PASS** → re-run P5-STAGING.6 with explicit approval.
+**Next:** Repair truncated policies (P5-STAGING.6C) → re-run P5-STAGING.6.
 
 ---
 
-### P5-STAGING.6B follow-up (PASS — local extension fix)
+### P5-STAGING.6 Re-run 2 follow-up (FAIL)
 
-**P5-STAGING.6B** — `pg_trgm` extension before GIN trigram indexes. **PASS** (repo only).
+**P5-STAGING.6 Re-run 2** (HEAD `afae8c0`). User approval granted. **FAIL** — truncated `CREATE POLICY` statements; 6A/6B blockers passed on apply path.
 
-**Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
+| Item | Status |
+|------|--------|
+| Pre-apply backup | `[x]` 185,427 bytes |
+| `core_schema_foundation.sql` only | `[x]` attempted |
+| 6A/6B blockers | `[x]` resolved on apply |
+| New blocker | truncated multi-line policies |
+| Core tables on staging | `[ ]` — none |
+| Test users A/B | `[x]` intact |
+| Base Schema Apply Re-run 2 | **FAIL** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
 
 ---
 
-*Document version: P5-E.5 blocked + 5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS. Staging unchanged.*
+*Document version: P5-E.5 blocked + 6 Re-run 2 FAIL. Staging unchanged.*

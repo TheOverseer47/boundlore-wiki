@@ -148,4 +148,12 @@ Note: `auth.users` appears only as FK references and inside function bodies (sch
 
 ---
 
-*Document version: P5-STAGING.6A PASS + 6 Re-run FAIL + 6B PASS. No secrets.*
+## 10. P5-STAGING.6 Re-run 2 Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 Re-run 2 — **FAIL** (truncated policies; 6A/6B passed on apply path).
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
+
+---
+
+*Document version: P5-STAGING.6A PASS + 6 Re-run FAIL + 6B PASS + Re-run 2 FAIL. No secrets.*

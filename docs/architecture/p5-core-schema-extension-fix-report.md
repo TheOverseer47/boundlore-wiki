@@ -118,16 +118,24 @@ Static scan of `supabase/core_schema_foundation.sql`:
 | Dimension | Verdict |
 |-----------|---------|
 | **Core Schema Extension Fix (6B)** | **PASS** |
-| **Ready for P5-STAGING.6 Re-run** | **YES** (requires new explicit user approval) |
+| **Ready for P5-STAGING.6 Re-run** | **YES** → **Re-run 2 attempted (FAIL)** |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Recommendation
 
-- **P5-STAGING.6 Re-run** may proceed only with **new explicit user approval**.
+- **P5-STAGING.6 Re-run 2** attempted; **FAIL** (truncated policies). Fix via P5-STAGING.6C suggested.
 - Staging `public` is still empty until apply succeeds.
 - **No push, deploy, or launch** until full gate sequence passes.
 
 ---
 
-*Document version: P5-STAGING.6B PASS. Local extension fix only. No secrets.*
+## 8. P5-STAGING.6 Re-run 2 Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 Re-run 2 — apply attempted after 6B. **FAIL** — incomplete `CREATE POLICY` bodies from 6A reorder.
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
+
+---
+
+*Document version: P5-STAGING.6B PASS + Re-run 2 FAIL. No secrets.*

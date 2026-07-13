@@ -239,4 +239,12 @@
 
 ---
 
-*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS. No secrets.*
+## 15. P5-STAGING.6 Re-run 2 Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 Re-run 2 — **FAIL** (truncated `CREATE POLICY` bodies).
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
+
+---
+
+*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS + Re-run 2 FAIL. No secrets.*
