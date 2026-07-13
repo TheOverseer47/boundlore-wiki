@@ -645,3 +645,19 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 | Storage closure | **DEFERRED** |
 
 **Report:** `docs/architecture/p5-storage-policy-defer-fix-report.md`
+
+---
+
+## 26. P5-E.5 Re-run 3 Follow-up (PARTIAL)
+
+**Gate:** P5-E.5 Re-run 3 — SQL apply PASS; live staging evidence PARTIAL. **PARTIAL**.
+
+| Item | Result |
+|------|--------|
+| release_gate apply | `[x]` PASS |
+| observations apply | `[x]` PASS |
+| Negative tests | `[x]` PARTIAL |
+| Storage closure | **DEFERRED** |
+| P5-E.5 Re-run 3 | **PARTIAL** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`

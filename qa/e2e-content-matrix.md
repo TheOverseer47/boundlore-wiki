@@ -2298,6 +2298,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.5 Re-run 3 — Staged DB Security Retest (PARTIAL)
+
+**Milestone:** P5-E.5 Re-run 3 — SQL apply PASS; live tests PARTIAL. **PARTIAL**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Pre-apply backup | staging | >0 bytes | `[x]` 271,992 |
+| release_gate_lock.sql | staging | PASS | `[x]` |
+| phase_a_observations.sql | staging | PASS | `[x]` |
+| S+-02 notification | staging | PASS | `[x]` |
+| S+-04 RPC gate | staging | PASS | `[x]` |
+| S+-01 posts direct | staging | PASS | `[ ]` PARTIAL |
+| Storage closure | staging | DEFERRED | `[x]` |
+| P5-E.5 Re-run 3 | gate | PASS | **PARTIAL** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
+
+---
+
 ## P5-E.5C — Storage Policy Defer Fix (PASS)
 
 **Milestone:** P5-E.5C — storage policy deferred from `release_gate_lock.sql`; **PASS** (repo only).

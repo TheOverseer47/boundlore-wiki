@@ -142,4 +142,12 @@ From P5-E.5 Re-run report (no DB access in this gate):
 
 ---
 
-*Document version: P5-E.5A PASS + P5-E.5B PASS + Re-run 2 BLOCKED + 5C PASS. No secrets.*
+## 12. P5-E.5 Re-run 3 Follow-up (PARTIAL)
+
+**Gate:** P5-E.5 Re-run 3 — release gate applied on staging. **PARTIAL**.
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
+
+---
+
+*Document version: P5-E.5A PASS + P5-E.5B PASS + Re-run 2 BLOCKED + 5C PASS + Re-run 3 PARTIAL. No secrets.*

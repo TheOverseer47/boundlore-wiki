@@ -1017,7 +1017,26 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5 Re-run 3 with explicit approval. No push/deploy/launch.
+**Next:** P5-E.6 staging evidence acceptance. No push/deploy/launch.
+
+---
+
+## 47. P5-E.5 Re-run 3 — Staged DB Security Retest (PARTIAL)
+
+**Milestone:** P5-E.5 Re-run 3 — SQL apply PASS; live tests PARTIAL. **PARTIAL**.
+
+| Check | Result |
+|-------|--------|
+| Pre-apply backup | `[x]` 271,992 bytes |
+| release_gate apply | `[x]` PASS |
+| observations apply | `[x]` PASS |
+| S+-02 notification | `[x]` PASS |
+| S+-04 RPC gate | `[x]` PASS |
+| S+-01 posts direct | `[x]` PARTIAL |
+| Storage closure | **DEFERRED** |
+| P5-E.5 Re-run 3 | **PARTIAL** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
 
 ---
 

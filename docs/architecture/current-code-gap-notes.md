@@ -3292,7 +3292,22 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5 Re-run 3 with explicit approval. No push/deploy/launch.
+**Next:** P5-E.6 staging evidence acceptance. No push/deploy/launch.
+
+---
+
+## 122. P5-E.5 Re-run 3 — Staged DB Security Retest (PARTIAL)
+
+**Milestone:** P5-E.5 Re-run 3 — SQL apply PASS on staging. **PARTIAL**.
+
+| Check | Result |
+|-------|--------|
+| release_gate apply | `[x]` PASS |
+| observations apply | `[x]` PASS |
+| Negative RLS/RPC | `[x]` PARTIAL |
+| P5-E.5 Re-run 3 | **PARTIAL** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
 
 ---
 

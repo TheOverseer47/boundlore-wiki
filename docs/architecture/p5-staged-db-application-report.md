@@ -618,4 +618,12 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED + 5A/5B PASS + Re-run 2 BLOCKED + 5C PASS. No secrets.*
+### P5-E.5 Re-run 3 follow-up (PARTIAL — SQL apply PASS)
+
+**P5-E.5 Re-run 3** — release gate + observations applied on staging; negative tests PARTIAL.
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run BLOCKED + 5A/5B PASS + Re-run 2 BLOCKED + 5C PASS + Re-run 3 PARTIAL. No secrets.*

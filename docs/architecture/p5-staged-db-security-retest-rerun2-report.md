@@ -229,4 +229,19 @@ All 11 routes returned **200**.
 
 ---
 
-*Document version: P5-E.5 Re-run 2 BLOCKED + P5-E.5C PASS. No secrets.*
+## 15. P5-E.5 Re-run 3 Follow-up (PARTIAL — SQL apply PASS)
+
+**Gate:** P5-E.5 Re-run 3 — release gate + observations applied; live negative tests PARTIAL. **PARTIAL**.
+
+| Item | Result |
+|------|--------|
+| release_gate_lock.sql apply | `[x]` PASS |
+| phase_a_observations.sql apply | `[x]` PASS |
+| Negative RLS/RPC | `[x]` PARTIAL |
+| Storage closure | **DEFERRED** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run 2 BLOCKED + P5-E.5C PASS + Re-run 3 PARTIAL. No secrets.*

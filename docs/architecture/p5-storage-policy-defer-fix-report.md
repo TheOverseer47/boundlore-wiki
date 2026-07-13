@@ -139,10 +139,25 @@ Requires **new explicit user approval** before any DB-touching step.
 
 ### Recommendation
 
-1. **P5-E.5 Re-run 3** — explicit user approval; apply `release_gate_lock.sql` then `phase_a_observations_foundation.sql`; run negative RLS/RPC tests for public paths.
-2. **Storage policy** — separate gate later with owner-capable path (dashboard/MCP/service role in controlled ops context).
+1. **P5-E.5 Re-run 3** — completed PARTIAL; see rerun3 report.
+2. **Storage policy** — separate gate later with owner-capable path.
 3. **No push, deploy, or launch.**
 
 ---
 
-*Document version: P5-E.5C PASS. Local repo fix only. No secrets.*
+## 10. P5-E.5 Re-run 3 Follow-up (PARTIAL)
+
+**Gate:** P5-E.5 Re-run 3 — SQL apply PASS; staging evidence PARTIAL. **PARTIAL**.
+
+| Item | Result |
+|------|--------|
+| release_gate apply | `[x]` PASS |
+| observations apply | `[x]` PASS |
+| Live negative tests | `[x]` PARTIAL |
+| Ready for P5-E.6 | **YES** (review grant gap) |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
+
+---
+
+*Document version: P5-E.5C PASS + Re-run 3 PARTIAL. No secrets.*

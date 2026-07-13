@@ -156,4 +156,12 @@ Transactional upsert for exactly two test users:
 
 ---
 
-*Document version: P5-E.5B PASS + Re-run 2 BLOCKED + 5C PASS. No secrets.*
+## 11. P5-E.5 Re-run 3 Follow-up (PARTIAL)
+
+**Gate:** P5-E.5 Re-run 3 — SQL apply PASS on staging. **PARTIAL**.
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
+
+---
+
+*Document version: P5-E.5B PASS + Re-run 2 BLOCKED + 5C PASS + Re-run 3 PARTIAL. No secrets.*
