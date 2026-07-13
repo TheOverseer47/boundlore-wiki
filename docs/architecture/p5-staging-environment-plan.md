@@ -190,10 +190,11 @@ Stop immediately (do not proceed to SQL apply) if:
 | 5 | **P5-STAGING.3** Tooling & Backup Dry Run | **PASS** — see tooling/backup report |
 | 6 | **P5-STAGING.4** Test user provisioning | **PASS** — see test user report |
 | 7 | **P5-E.5 re-run** | **BLOCKED** — base schema missing (2026-07-13) |
-| 8 | **P5-STAGING.5** | Base schema provisioning plan | **PARTIAL** — see plan doc |
-| 9 | **P5-STAGING.6** | Base schema apply to staging | After Phase 0 DDL |
-| 10 | **P5-E.5 re-run** | **BLOCKED** |
-| 11 | **P5-E.6** (future) | Staging evidence acceptance |
+| 8 | **P5-STAGING.5** | Base schema provisioning plan | **PARTIAL** |
+| 9 | **P5-STAGING.5A** | Legacy schema-only export plan | **PASS** — Path A chosen |
+| 10 | **P5-STAGING.5B** | Legacy export execution | Awaiting explicit approval |
+| 11 | **P5-STAGING.6** | Base schema apply to staging | After 5B + 5C |
+| 12 | **P5-E.5 re-run** | **BLOCKED** |
 
 **Not in scope:** Push, deploy, launch, production clone, automatic project creation without explicit safe approval.
 
@@ -203,6 +204,7 @@ Stop immediately (do not proceed to SQL apply) if:
 
 | Document | Role |
 |----------|------|
+| `p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
 | `p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 base schema plan |
 | `p5-staging-test-user-provisioning.md` | P5-STAGING.4 test user provisioning |
 | `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup dry run |
@@ -269,16 +271,16 @@ Stop immediately (do not proceed to SQL apply) if:
 
 **Gate:** P5-E.5 Re-run (HEAD `b3c64e7`) — user approval YES; **BLOCKED** at schema check. No P5 SQL applied.
 
-**Next:** Resolve Phase 0 (`posts`/`profiles` DDL) → P5-STAGING.6. No push/deploy/launch.
+**Next:** P5-STAGING.5B with explicit approval. No push/deploy/launch.
 
 ---
 
-## 14. P5-STAGING.5 Follow-up
+## 15. P5-STAGING.5A Follow-up
 
-**Gate:** P5-STAGING.5 — Base Schema Provisioning Plan (HEAD `2aa9317`). Inventory complete; **PARTIAL** — core DDL not in repo. No SQL.
+**Gate:** P5-STAGING.5A — Legacy Schema-Only Export Plan (HEAD `e6ca97b`). User chose Path A. No export, no DB access.
 
-**Report:** `docs/architecture/p5-staging-base-schema-provisioning-plan.md`
+**Report:** `docs/architecture/p5-legacy-schema-only-export-plan.md`
 
 ---
 
-*Document version: P5-STAGING.1–5 follow-up. No SQL apply.*
+*Document version: P5-STAGING.1–5A follow-up. No export. No DB access.*

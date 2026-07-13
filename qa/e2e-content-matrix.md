@@ -2212,6 +2212,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.5A — Legacy Schema-Only Export Plan
+
+**Milestone:** P5-STAGING.5A — Path A export plan; no export, no DB access.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User chose Path A | decision | schema-only legacy export | `[x]` |
+| Legacy ref documented | `ohkoojpzmptdfyowdgog` | source only | `[x]` |
+| Staging untouched | `jzzgoiwfbuwiiyvwgwri` | not export target | `[x]` |
+| `--schema-only` required | plan | documented | `[x]` |
+| Hard stops | plan | documented | `[x]` |
+| Raw dump gitignored | `backups/legacy-schema-only/` | yes | `[x]` |
+| Export executed | ops | none | `[x]` |
+| Legacy Export Plan | gate | PASS | `[x]` |
+| P5-E.5 re-run | gate | BLOCKED | `[x]` |
+
+**P5-STAGING.5A PASS.** No export. Next: P5-STAGING.5B with explicit approval. Product-Activation-Ready = FAIL; Public-Launch-Ready = NO-GO.
+
+---
+
 ## P5-STAGING.5 — Base Schema Provisioning Plan
 
 **Milestone:** P5-STAGING.5 — SQL inventory + plan; no SQL, no DB mutation.

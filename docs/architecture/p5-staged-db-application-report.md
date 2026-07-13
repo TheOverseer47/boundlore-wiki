@@ -469,19 +469,21 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ### Required before next P5-E.5 attempt
 
-1. **P5-STAGING.5:** Base schema provisioning plan — **PARTIAL** (see plan doc; `posts`/`profiles` DDL missing in repo).
-2. **P5-STAGING.6:** Apply Phase 0 + foundation SQL to staging (explicit approval).
-3. Re-create pre-apply backup; verify required tables.
-4. Obtain explicit user approval for P5-E.5 re-attempt.
-5. Apply P5 SQL files in order on staging only.
+1. **P5-STAGING.5A:** Legacy schema-only export plan — **PASS** (Path A chosen; no export yet).
+2. **P5-STAGING.5B:** Execute schema-only `pg_dump` from legacy (explicit approval).
+3. **P5-STAGING.5C:** Curate `supabase/core_schema_foundation.sql`.
+4. **P5-STAGING.6:** Apply foundation + incremental SQL to staging.
+5. Re-verify tables; P5-E.5 re-attempt with explicit approval.
 
-**Authoritative plan:** `docs/architecture/p5-staging-base-schema-provisioning-plan.md`
+**Plans:** `p5-staging-base-schema-provisioning-plan.md`, `p5-legacy-schema-only-export-plan.md`
 
 ---
 
-### P5-STAGING.5 follow-up
+### P5-STAGING.5A follow-up
 
-**P5-STAGING.5** base schema inventory complete (HEAD `2aa9317`). **No SQL.** Critical blocker: `CREATE TABLE public.posts` and `CREATE TABLE public.profiles` **not found in repo**. Plan is **PARTIAL**; schema export or new foundation migration required before P5-STAGING.6.
+**P5-STAGING.5A** legacy schema-only export plan (HEAD `e6ca97b`). User chose Path A. **No export, no pg_dump, no DB access.** Staging not touched.
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-plan.md`
 
 ---
 

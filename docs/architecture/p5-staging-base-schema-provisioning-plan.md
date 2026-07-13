@@ -197,7 +197,25 @@
 | Storage | `buckets`, `objects` | `discovery-uploads` bucket (until `discovery_storage.sql`) |
 | Public | **empty** | All BoundLore tables |
 
-**Schema export from legacy DB:** May be required for Phase 0 if no new foundation SQL is authored. Export must target **staging only** (`jzzgoiwfbuwiiyvwgwri`), never committed with secrets, operator-approved, schema-only preferred (no production data copy unless explicitly approved for QA).
+**Schema export from legacy DB:** User chose **Path A** (P5-STAGING.5A). Schema-only export from legacy `ohkoojpzmptdfyowdgog` → gitignored `backups/legacy-schema-only/` → curated `supabase/core_schema_foundation.sql`. **No export in 5A.** Apply curated file to staging only in P5-STAGING.6+.
+
+---
+
+## 11. P5-STAGING.5A Follow-up
+
+**Gate:** P5-STAGING.5A — Legacy Schema-Only Export Plan (HEAD `e6ca97b`). User chose Path A. **No export, no DB access.**
+
+| Item | Status |
+|------|--------|
+| Export plan documented | `[x]` |
+| `--schema-only` required | `[x]` |
+| Raw path `backups/legacy-schema-only/` | `[x]` gitignored via `backups/` |
+| Curated target `core_schema_foundation.sql` | Planned (5C) |
+| P5-STAGING.5B approval | `[ ]` required |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-plan.md`
+
+**Next:** Explicit approval → P5-STAGING.5B export → P5-STAGING.5C curation → P5-STAGING.6.
 
 ---
 
@@ -207,7 +225,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 | # | Criterion |
 |---|-----------|
-| 1 | Phase 0 resolved — `posts`, `profiles`, `post_reactions` DDL available (repo file or approved export plan) |
+| 1 | Phase 0 resolved — `supabase/core_schema_foundation.sql` from 5A→5B→5C path |
 | 2 | Safe apply order documented (this plan §6) with no destructive scripts |
 | 3 | Pre-apply backup exists or new backup planned (`backups/staging/`) |
 | 4 | Connection path documented (session pooler per P5-STAGING.3) |
@@ -232,9 +250,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 P5-STAGING.5 inventory complete. Incremental SQL in repo is well-structured for **patches and P5 security**, but **core BoundLore DDL is not versioned**. Provisioning staging requires **Phase 0** (author foundation SQL or approved schema-only export) before any file in §6 Phases 1–5 can run safely.
 
-**Next:** Resolve Phase 0 blocker → **P5-STAGING.6** Base Schema Apply (explicit approval) → re-verify tables → P5-E.5 re-attempt.
-
-**Not in scope:** Push, deploy, launch, production apply.
+**Next:** P5-STAGING.5B (explicit approval) → 5C → P5-STAGING.6. No push/deploy/launch.
 
 ---
 
@@ -242,10 +258,11 @@ P5-STAGING.5 inventory complete. Incremental SQL in repo is well-structured for 
 
 | Document | Role |
 |----------|------|
+| `p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
 | `p5-staged-db-application-report.md` | P5-E.5 re-run blocked report |
 | `p5-staging-environment-plan.md` | Staging gate sequence |
 | `PRE_RELEASE_RESET_README.md` | Reset danger documentation |
 
 ---
 
-*Document version: P5-STAGING.5. Planning only. No SQL executed. No DB changes.*
+*Document version: P5-STAGING.5 + P5-STAGING.5A follow-up. No SQL executed.*

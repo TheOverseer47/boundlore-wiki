@@ -3260,6 +3260,23 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 106. P5-STAGING.5A — Legacy Schema-Only Export Plan
+
+**Milestone:** P5-STAGING.5A — Path A planning only; **no export**.
+
+| Check | Result |
+|-------|--------|
+| Legacy export plan | `[x]` |
+| No pg_dump / no DB access | `[x]` |
+| Schema-only rules | `[x]` |
+| Hard stops | `[x]` |
+| Legacy Export Plan | **PASS** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-plan.md`
+
+---
+
 ## 105. P5-STAGING.5 — Base Schema Provisioning Plan
 
 **Milestone:** P5-STAGING.5 — planning/inventory only; **no SQL**.

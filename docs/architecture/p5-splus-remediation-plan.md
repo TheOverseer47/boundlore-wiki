@@ -410,8 +410,9 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-STAGING.1 | Staging environment plan | Docs + `.env.staging.example`; see staging plan |
 | **Complete** | P5-STAGING.4 | Test user provisioning | **PASS** |
 | **Blocked** | P5-E.5 re-run | SQL apply + negative tests | **BLOCKED** — base schema missing |
-| **Partial** | P5-STAGING.5 | Base schema provisioning plan | **PARTIAL** — posts/profiles DDL not in repo |
-| **Next** | P5-STAGING.6 | Base schema apply | After Phase 0 resolution |
+| **Partial** | P5-STAGING.5 | Base schema provisioning plan | **PARTIAL** |
+| **Complete** | P5-STAGING.5A | Legacy schema-only export plan | **PASS** — Path A |
+| **Next** | P5-STAGING.5B | Legacy export execution | Explicit approval required |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -974,7 +975,29 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-staged-db-application-report.md` (Re-run section)
 
-**Next:** Phase 0 DDL → P5-STAGING.6. No push/deploy/launch.
+**Next:** P5-STAGING.5B → 5C → P5-STAGING.6. No push/deploy/launch.
+
+---
+
+## 31. P5-STAGING.5A — Legacy Schema-Only Export Plan
+
+**Milestone:** P5-STAGING.5A — Path A export plan; **no export**, **no DB access**.
+
+| Check | Result |
+|-------|--------|
+| User chose schema-only export path | `[x]` |
+| Legacy source `ohkoojpzmptdfyowdgog` documented | `[x]` |
+| Staging `jzzgoiwfbuwiiyvwgwri` not touched | `[x]` |
+| `--schema-only` required | `[x]` |
+| Hard stops documented | `[x]` |
+| Curated target `core_schema_foundation.sql` planned | `[x]` |
+| Export/pg_dump executed | `[x]` — none |
+| Legacy Export Plan | **PASS** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-legacy-schema-only-export-plan.md`
+
+**Next:** Explicit approval → P5-STAGING.5B. No push/deploy/launch.
 
 ---
 
@@ -1002,6 +1025,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
 | `docs/architecture/p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 base schema plan |
 | `docs/architecture/p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |
 | `docs/architecture/p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
