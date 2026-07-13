@@ -27,7 +27,7 @@
     }
 
     add(1, "ReleaseGateClient exists", !!RG, RG ? "loaded" : "missing", "core");
-    add(2, "version p5-e3", RG && RG.RELEASE_GATE_CLIENT_VERSION === "p5-e3", RG ? RG.RELEASE_GATE_CLIENT_VERSION : "", "core");
+    add(2, "version p5-e8c", RG && RG.RELEASE_GATE_CLIENT_VERSION === "p5-e8c", RG ? RG.RELEASE_GATE_CLIENT_VERSION : "", "core");
     add(3, "shouldAllowClientBypass false", RG && RG.shouldAllowClientBypass() === false, String(RG && RG.shouldAllowClientBypass()), "policy");
 
     var defaultLocked = RG ? RG.getDefaultLockedState() : null;
@@ -97,7 +97,7 @@
     add(18, "assertCanSubmitUserContent rejects when locked", blocked && blocked.ok === false, blocked ? String(blocked.ok) : "", "assert");
     add(19, "assertCanSubmitUserContent allows only when unlocked", unlockedRow && RG && RG.isLockedState(unlockedRow) === false, "unlocked normalized", "assert");
 
-    var moduleFetch = await fetch("/js/release-gate-client.js?v=p5-e3", { cache: "no-store" }).then(function(r) { return r.text(); }).catch(function() { return ""; });
+    var moduleFetch = await fetch("/js/release-gate-client.js?v=p5-e8c", { cache: "no-store" }).then(function(r) { return r.text(); }).catch(function() { return ""; });
     add(20, "no query-param bypass", !/location\.search.*release|searchparams.*release/i.test(moduleFetch), "grep", "safety");
     add(21, "no localhost bypass", !/localhost.*bypass|hostname.*localhost.*unlock/i.test(moduleFetch), "grep", "safety");
     add(22, "no localStorage bypass", !/localstorage.*release/i.test(moduleFetch), "grep", "safety");

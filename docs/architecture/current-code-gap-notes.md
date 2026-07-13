@@ -3292,7 +3292,30 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
+**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
+
+---
+
+## 131. P5-E.8C — Upload Path Disablement Review (PASS)
+
+**Milestone:** P5-E.8C — frontend upload hardening. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| `release-gate-client.js` | **p5-e8c** storage defer helpers |
+| `create-post.js` / `support.js` | **Hardened** |
+| `initCreatePermissions` | **Restored** |
+| Upload fixture | **24/24 PASS** |
+| Local server | **8081** |
+| SQL apply / DB access | **None** |
+| Storage Closure (DB) | **DEFERRED** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
 
 ---
 

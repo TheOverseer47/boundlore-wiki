@@ -1054,7 +1054,29 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-storage-closure-plan.md`
 
-**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
+**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
+
+---
+
+## 56. P5-E.8C — Upload Path Disablement Review (PASS)
+
+**Milestone:** P5-E.8C — frontend/QA hardening while storage deferred. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Upload disablement fixture | **24/24 PASS** |
+| Release Lock UI | **30/30 PASS** |
+| Release Lock DB | **CORE_PASS_STORAGE_DEFERRED** |
+| Storage calls while deferred | **Blocked** |
+| SQL apply / DB access | **None** |
+| Storage Closure (DB) | **DEFERRED** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
 
 ---
 

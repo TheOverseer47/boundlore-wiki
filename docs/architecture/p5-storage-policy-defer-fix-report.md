@@ -234,4 +234,18 @@ Requires **new explicit user approval** before any DB-touching step.
 
 ---
 
-*Document version: P5-E.5C PASS + ... + P5-E.8A FAIL + P5-E.8A.2 PASS. No secrets.*
+## 19. P5-E.8C Follow-up (PASS — upload disablement)
+
+**Gate:** P5-E.8C — Upload paths disabled while storage deferred. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Frontend hardening | `[x]` |
+| Storage policy | **Not applied** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+---
+
+*Document version: P5-E.5C PASS + ... + P5-E.8A FAIL + P5-E.8A.2 PASS + P5-E.8C PASS. No secrets.*

@@ -248,7 +248,23 @@ async function applyReleaseGateOnPageCP() {
     if (BoundLoreReleaseGateClient.isLockedState(state)) {
       BoundLoreReleaseGateClient.applyReleaseGateToForm(form, state);
     }
+    applyStorageUploadGuardsCP(form);
   }
+}
+
+function applyStorageUploadGuardsCP(root) {
+  if (typeof BoundLoreReleaseGateClient === "undefined") return;
+  if (!BoundLoreReleaseGateClient.isStorageUploadsDeferred()) return;
+  const host = root || document.getElementById("createPostForm") || document.body;
+  BoundLoreReleaseGateClient.renderStorageUploadUnavailableNotice(host, { prepend: false });
+  BoundLoreReleaseGateClient.applyStorageUploadDisablement(host);
+}
+
+function stripDeferredStorageFilesCP(files) {
+  if (!files || !files.length) return [];
+  if (typeof BoundLoreReleaseGateClient === "undefined") return files;
+  if (!BoundLoreReleaseGateClient.isStorageUploadsDeferred()) return files;
+  return [];
 }
 
 async function assertReleaseGateCanSubmitCP(errorEl) {
@@ -264,6 +280,7 @@ async function assertReleaseGateCanSubmitCP(errorEl) {
   return true;
 }
 
+async function initCreatePermissions() {
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData || !sessionData.session) return;
   createCurrentUserId = sessionData.session.user.id;
@@ -490,6 +507,7 @@ async function initContributionModeCP(route) {
     if (resolvedIntent === "add_recipe" && typeof ContributionFlow.initRecipeFormHandlers === "function") {
       ContributionFlow.initRecipeFormHandlers(panel);
     }
+    applyStorageUploadGuardsCP(panel);
   }
   if (heroTitle) heroTitle.textContent = "Contribute to Wiki Entry";
   if (heroCopy) heroCopy.textContent = "Add focused information to an existing entry. Your submission goes to admin review.";
@@ -587,7 +605,7 @@ async function submitContributionCP(errorEl) {
   let content = ContributionFlow.buildContributionContent(context, collected.values);
 
   const mediaInput = document.getElementById("contribMedia");
-  const files = mediaInput && mediaInput.files ? Array.from(mediaInput.files) : [];
+  const files = stripDeferredStorageFilesCP(mediaInput && mediaInput.files ? Array.from(mediaInput.files) : []);
   const imageUrl = collected.values.image_url || "";
   if (imageUrl && typeof isValidHttpUrl === "function" && !isValidHttpUrl(imageUrl)) {
     errorEl.textContent = "Please provide a valid image URL (http/https).";
@@ -1194,7 +1212,7 @@ async function handleSubmit(e) {
   const content = sanitizedContent;
   let postMeta = collectPostMetaCP();
   const mediaInput = document.getElementById("postMedia");
-  const files = mediaInput && mediaInput.files ? Array.from(mediaInput.files) : [];
+  const files = stripDeferredStorageFilesCP(mediaInput && mediaInput.files ? Array.from(mediaInput.files) : []);
 
   if (!title && currentPostType !== "discovery") {
     errorEl.textContent = "Please enter a title.";
@@ -1732,6 +1750,13 @@ function refreshWikiSubcategoryOptions(presetValue) {
 }
 
 async function uploadDiscoveryFiles(userId, files, context) {
+  if (!files || !files.length) return { files: [] };
+  if (typeof BoundLoreReleaseGateClient !== "undefined" && BoundLoreReleaseGateClient.isStorageUploadsDeferred()) {
+    const guard = BoundLoreReleaseGateClient.assertCanUploadStorage("discovery-uploads");
+    if (!guard.ok) {
+      return { error: guard.message };
+    }
+  }
   const uploaded = [];
   const uploadContext = context || {};
   const discoveryPayload = uploadContext.meta && uploadContext.meta.discovery_payload

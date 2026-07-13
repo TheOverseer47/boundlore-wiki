@@ -303,6 +303,26 @@ Storage defer alone does not unblock Product Activation; it allows **locked MVP*
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
+**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
+
 ---
 
-*Document version: P5-E.8A.2 PASS. No secrets. No DB access.*
+## 11. P5-E.8C Follow-up (PASS — upload disablement)
+
+**Gate:** P5-E.8C — Upload Path Disablement Review + Frontend Hardening. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Upload paths hardened | `[x]` create-post + support |
+| Storage calls while deferred | **Blocked** (UI + JS) |
+| `initCreatePermissions` restored | `[x]` create-post init fix |
+| Upload fixture | **24/24 PASS** |
+| SQL apply / DB access | **None** |
+| Storage Closure (DB) | **DEFERRED** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+---
+
+*Document version: P5-E.8A.2 PASS + P5-E.8C PASS. No secrets. No DB access.*

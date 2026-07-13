@@ -26,6 +26,10 @@ async function initSupportPage() {
       if (submitBtn) submitBtn.setAttribute('data-bl-release-gate-control', '1');
       BoundLoreReleaseGateClient.applyReleaseGateToButtons(formBox, state);
     }
+    if (BoundLoreReleaseGateClient.isStorageUploadsDeferred()) {
+      BoundLoreReleaseGateClient.renderStorageUploadUnavailableNotice(formBox, { prepend: false });
+      BoundLoreReleaseGateClient.applyStorageUploadDisablement(formBox);
+    }
   }
 
   if (category) {
@@ -70,6 +74,12 @@ async function submitReport() {
 
   let screenshotUrl = null;
   if (file) {
+    const uploadGuard = typeof BoundLoreReleaseGateClient !== 'undefined'
+      ? BoundLoreReleaseGateClient.assertCanUploadStorage('report-screenshots')
+      : { ok: true };
+    if (!uploadGuard.ok) {
+      screenshotUrl = null;
+    } else {
     const ext = file.name.split('.').pop();
     const path = `${reportCurrentUser.id}/${Date.now()}.${ext}`;
     const { error: uploadError } = await supabase.storage
@@ -83,6 +93,7 @@ async function submitReport() {
     }
     const { data: urlData } = supabase.storage.from('report-screenshots').getPublicUrl(path);
     screenshotUrl = urlData.publicUrl;
+    }
   }
 
   const targetType = (category === 'user' || category === 'post') ? category : null;

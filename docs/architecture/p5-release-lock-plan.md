@@ -744,7 +744,26 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 
 **Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
-**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
+**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
+
+---
+
+## 35. P5-E.8C Follow-up (PASS — upload disablement)
+
+**Gate:** P5-E.8C — Upload paths hardened while storage deferred. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Frontend upload guards | `[x]` `release-gate-client.js` p5-e8c |
+| create-post/support hardened | `[x]` |
+| Storage DB policy | **Not applied** |
+| Upload paths reachable via JS | **No** (fail-closed) |
+| SQL apply / DB access | **None** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
 
 ---
 
@@ -765,4 +784,4 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 
 **Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
 
-**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
+---

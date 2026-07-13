@@ -404,4 +404,20 @@ P5-E.8 documents a safe, staged path to close the deferred storage release-gate 
 
 ---
 
-*Document version: P5-E.8 PASS + P5-E.8A FAIL + P5-E.8A.2 PASS. No secrets.*
+## 15. P5-E.8C Follow-up (PASS — upload disablement)
+
+**Gate:** P5-E.8C — Frontend upload disablement while storage deferred. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Upload UI/JS hardened | `[x]` |
+| Storage DB closure | **DEFERRED** |
+| Owner path | **OPEN** |
+| SQL apply / DB access | **None** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+---
+
+*Document version: P5-E.8 PASS + P5-E.8A FAIL + P5-E.8A.2 PASS + P5-E.8C PASS. No secrets.*

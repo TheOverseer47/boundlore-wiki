@@ -165,4 +165,19 @@ P5-E.7B aligned the Release Lock DB fixture with the P5-E.5C storage defer desig
 
 ---
 
-*Document version: P5-E.7B PASS + P5-E.8 PASS + P5-E.8A FAIL. No secrets.*
+## 10. P5-E.8C Follow-up (PASS — upload disablement)
+
+**Gate:** P5-E.8C — Upload paths hardened; storage DB still deferred. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Upload paths disabled (frontend) | `[x]` |
+| Storage DB closure | **DEFERRED** |
+| Fixture alignment unchanged | **CORE_PASS_STORAGE_DEFERRED** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+---
+
+*Document version: P5-E.7B PASS + P5-E.8 PASS + P5-E.8A FAIL + P5-E.8C PASS. No secrets.*

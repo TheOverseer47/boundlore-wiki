@@ -213,4 +213,20 @@ Continue **no push / deploy / launch**.
 
 ---
 
-*Document version: P5-E.8A initial BLOCKED + resume FAIL + P5-E.8A.2 PASS. No secrets.*
+## 12. P5-E.8C Follow-up (PASS — upload disablement)
+
+**Gate:** P5-E.8C — Upload paths disabled/hardened while storage deferred. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Frontend guards | `[x]` release-gate-client `p5-e8c` |
+| Storage policy apply | **Still NO** |
+| Upload paths reachable? | **No** (UI + JS fail-closed) |
+| SQL apply / DB access | **None** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+---
+
+*Document version: P5-E.8A initial BLOCKED + resume FAIL + P5-E.8A.2 PASS + P5-E.8C PASS. No secrets.*

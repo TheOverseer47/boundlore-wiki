@@ -2298,6 +2298,32 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.8C — Upload Path Disablement Review (PASS)
+
+**Milestone:** P5-E.8C — frontend upload hardening while storage deferred. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Upload disablement fixture | qa | 24/24 PASS | `[x]` **PASS** |
+| create-post file inputs disabled | frontend | disabled while deferred | `[x]` |
+| support screenshot upload blocked | frontend | no storage call | `[x]` |
+| Release Lock DB fixture | qa | CORE_PASS_STORAGE_DEFERRED | `[x]` |
+| Release Lock UI fixture | qa | 30/30 PASS | `[x]` |
+| Notification fixture | qa | 24/24 PASS | `[x]` |
+| Observation RPC fixture | qa | 17/17 PASS | `[x]` |
+| Sanitization fixture | qa | 45/45 PASS | `[x]` |
+| SQL apply / DB access | gate | none | `[x]` |
+| Storage Closure (DB) | status | DEFERRED | `[x]` |
+| Product-Activation-Ready | status | FAIL | `[x]` FAIL |
+| Public-Launch-Ready | status | NO-GO | `[x]` NO-GO |
+| P5-E.8C | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+**Next:** P5-E.8A.4 Owner-Capable Investigation. No push/deploy/launch.
+
+---
+
 ## P5-E.8A.2 — Storage Owner Path + Bucket Scope Review (PASS)
 
 **Milestone:** P5-E.8A.2 — analysis/documentation only. **PASS**.

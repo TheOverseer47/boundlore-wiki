@@ -4,7 +4,7 @@
 // ============================================
 
 window.BoundLoreReleaseGateClient = (function() {
-  var RELEASE_GATE_CLIENT_VERSION = "p5-e3";
+  var RELEASE_GATE_CLIENT_VERSION = "p5-e8c";
   var CACHE_MS = 15000;
   var USER_LOCKED_COPY =
     "BoundLore is currently in pre-release read-only mode. Community submissions will open when the game release workflow is manually unlocked by an admin.";
@@ -12,6 +12,9 @@ window.BoundLoreReleaseGateClient = (function() {
     "Release Gate: LOCKED. User-generated content submissions are blocked server-side. Unlock only when launch conditions are explicitly met.";
   var UNKNOWN_LOCKED_COPY =
     "Release Gate status unavailable. For safety, submissions are locked.";
+  var STORAGE_UPLOADS_DEFERRED = true;
+  var STORAGE_UPLOAD_UNAVAILABLE_COPY =
+    "Uploads are temporarily unavailable before release. You can continue without attachments.";
 
   var cachedState = null;
   var cacheTs = 0;
@@ -351,10 +354,75 @@ window.BoundLoreReleaseGateClient = (function() {
     return {
       version: RELEASE_GATE_CLIENT_VERSION,
       shouldAllowClientBypass: shouldAllowClientBypass(),
+      storageUploadsDeferred: isStorageUploadsDeferred(),
       cacheAgeMs: cachedState ? Math.max(0, Date.now() - cacheTs) : null,
       cachedState: cachedState ? Object.assign({}, cachedState) : null,
       lastReadError: lastReadError && lastReadError.message ? String(lastReadError.message) : null,
     };
+  }
+
+  function isStorageUploadsDeferred() {
+    return STORAGE_UPLOADS_DEFERRED === true;
+  }
+
+  function assertCanUploadStorage(context) {
+    var ctx = String(context || "storage_upload");
+    if (!isStorageUploadsDeferred()) {
+      return { ok: true, context: ctx, deferred: false };
+    }
+    return {
+      ok: false,
+      blocked: true,
+      context: ctx,
+      deferred: true,
+      message: STORAGE_UPLOAD_UNAVAILABLE_COPY,
+    };
+  }
+
+  function renderStorageUploadUnavailableNotice(container, options) {
+    if (!isStorageUploadsDeferred()) return null;
+    var host = typeof container === "string" ? document.querySelector(container) : container;
+    if (!host) return null;
+
+    var opts = options || {};
+    var existing = host.querySelector("[data-bl-storage-upload-notice='1']");
+    if (existing) existing.remove();
+
+    var notice = document.createElement("div");
+    notice.className = "bl-storage-upload-notice";
+    notice.setAttribute("data-bl-storage-upload-notice", "1");
+    notice.setAttribute("role", "status");
+    notice.style.cssText =
+      "margin:0 0 16px;padding:12px 14px;border:1px solid rgba(90,120,150,0.45);" +
+      "border-radius:8px;background:rgba(90,120,150,0.12);color:var(--text-main,#e8edf2);font-size:0.95rem;";
+    notice.innerHTML =
+      "<strong style=\"display:block;margin-bottom:6px;\">Attachments unavailable</strong>" +
+      "<span>" + escapeHtml(STORAGE_UPLOAD_UNAVAILABLE_COPY) + "</span>";
+
+    if (opts.prepend && host.firstChild) {
+      host.insertBefore(notice, host.firstChild);
+    } else {
+      host.appendChild(notice);
+    }
+    return notice;
+  }
+
+  function applyStorageUploadDisablement(rootElement, options) {
+    if (!isStorageUploadsDeferred()) return;
+    var root = typeof rootElement === "string" ? document.querySelector(rootElement) : rootElement;
+    if (!root) return;
+
+    var fileInputs = root.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(function(el) {
+      el.disabled = true;
+      el.setAttribute("aria-disabled", "true");
+      el.setAttribute("data-bl-storage-upload-deferred", "1");
+      el.title = STORAGE_UPLOAD_UNAVAILABLE_COPY;
+    });
+
+    root.querySelectorAll(".bl-contrib-evidence-upload, [data-bl-storage-upload-zone='1']").forEach(function(zone) {
+      zone.setAttribute("data-bl-storage-upload-unavailable", "1");
+    });
   }
 
   return {
@@ -362,6 +430,7 @@ window.BoundLoreReleaseGateClient = (function() {
     USER_LOCKED_COPY: USER_LOCKED_COPY,
     ADMIN_LOCKED_COPY: ADMIN_LOCKED_COPY,
     UNKNOWN_LOCKED_COPY: UNKNOWN_LOCKED_COPY,
+    STORAGE_UPLOAD_UNAVAILABLE_COPY: STORAGE_UPLOAD_UNAVAILABLE_COPY,
     shouldAllowClientBypass: shouldAllowClientBypass,
     getDefaultLockedState: getDefaultLockedState,
     normalizeReleaseGateRow: normalizeReleaseGateRow,
@@ -376,5 +445,9 @@ window.BoundLoreReleaseGateClient = (function() {
     validateAdminUnlockReason: validateAdminUnlockReason,
     buildAdminUnlockControlsMarkup: buildAdminUnlockControlsMarkup,
     getReleaseGateDiagnostics: getReleaseGateDiagnostics,
+    isStorageUploadsDeferred: isStorageUploadsDeferred,
+    assertCanUploadStorage: assertCanUploadStorage,
+    renderStorageUploadUnavailableNotice: renderStorageUploadUnavailableNotice,
+    applyStorageUploadDisablement: applyStorageUploadDisablement,
   };
 })();

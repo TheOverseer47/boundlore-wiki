@@ -325,4 +325,19 @@ P5-E.5 Re-run 3 delivered **credible staging evidence** for notification injecti
 
 ---
 
-*Document version: P5-E.6 PASS + ... + P5-E.8A FAIL + P5-E.8A.2 PASS. No secrets. No DB access.*
+## 20. P5-E.8C Follow-up (PASS — upload disablement)
+
+**Gate:** P5-E.8C — Upload paths disabled; S+ storage DB still deferred. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Upload paths (frontend) | **Disabled/hardened** |
+| S+-01 Storage (DB) | **DEFERRED** |
+| S+ Staging Evidence | **PARTIAL** |
+| P5-E.8C | **PASS** |
+
+**Report:** `docs/architecture/p5-upload-path-disablement-review.md`
+
+---
+
+*Document version: P5-E.6 PASS + ... + P5-E.8A FAIL + P5-E.8A.2 PASS + P5-E.8C PASS. No secrets. No DB access.*
