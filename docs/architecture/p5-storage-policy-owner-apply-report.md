@@ -183,12 +183,34 @@ P5-E.8A resume confirmed **boundlore-staging** / `jzzgoiwfbuwiiyvwgwri` in Dashb
 
 ### Recommended next steps
 
-1. **P5-E.8A.2** — Identify owner-capable Dashboard role (e.g. `supabase_storage_admin` / storage owner session) or Supabase support path for `storage.objects` policy DDL
-2. **P5-E.8A.3** — `discovery-uploads` bucket provisioning plan (`discovery_storage.sql` — separate gate)
-3. **P5-E.8B** — Fixture re-enable after successful apply + negative test
+1. **P5-E.8A.2** — Storage Owner Path + Bucket Scope Review (analysis only) — **PASS**
+2. **P5-E.8C** — Upload Path Disablement Review (if MVP defer accepted)
+3. **P5-E.8A.4** — Owner-Capable Support/Tooling Investigation
+4. **P5-E.8A.3** — `discovery-uploads` bucket provisioning plan (`discovery_storage.sql` — separate gate)
+5. **P5-E.8B** — Fixture re-enable after successful apply + negative test
 
 Continue **no push / deploy / launch**.
 
 ---
 
-*Document version: P5-E.8A initial BLOCKED + resume FAIL. No secrets.*
+## 11. P5-E.8A.2 Follow-up (PASS — review only)
+
+**Gate:** P5-E.8A.2 — Storage Owner Path + Bucket Scope Review. **PASS**.
+
+| Item | Result |
+|------|--------|
+| SQL apply / DB access | **None** |
+| Dashboard owner path | **REJECTED** — same `42501` as pooler |
+| `discovery-uploads` bucket | **Still missing** on staging |
+| Storage policy | **Still not applied** |
+| Storage Launch-MVP critical? | **No** (while locked + bucket absent) |
+| Storage required before unlock? | **Yes** |
+| Recommended next | **P5-E.8C** (upload disablement) + **P5-E.8A.4** (owner investigation) |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+
+**Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
+
+---
+
+*Document version: P5-E.8A initial BLOCKED + resume FAIL + P5-E.8A.2 PASS. No secrets.*

@@ -1054,7 +1054,31 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-storage-closure-plan.md`
 
-**Next:** P5-E.8A.2 owner-capable role path. No push/deploy/launch.
+**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
+
+---
+
+## 55. P5-E.8A.2 — Storage Owner Path + Bucket Scope Review (PASS)
+
+**Milestone:** P5-E.8A.2 — analysis/documentation only. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Static storage usage review | `[x]` |
+| Dashboard owner path | **REJECTED** |
+| `discovery-uploads` bucket | **Missing** |
+| Storage policy | **Not applied** |
+| Storage Launch-MVP critical? | **No** (locked state) |
+| Recommended next | P5-E.8C + P5-E.8A.4 |
+| SQL apply / DB access | **None** |
+| S+ Staging Evidence | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.8A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
+
+**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
 
 ---
 

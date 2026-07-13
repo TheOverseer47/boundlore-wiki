@@ -217,4 +217,21 @@ Requires **new explicit user approval** before any DB-touching step.
 
 ---
 
-*Document version: P5-E.5C PASS + ... + P5-E.8A FAIL. No secrets.*
+## 18. P5-E.8A.2 Follow-up (PASS — review only)
+
+**Gate:** P5-E.8A.2 — Storage Owner Path + Bucket Scope Review. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Dashboard owner path | **REJECTED** |
+| Storage policy | **Not applied** |
+| `discovery-uploads` bucket | **Missing** |
+| Deferred SQL file | **Unchanged** — ready when owner path found |
+| SQL apply / DB access | **None** |
+| P5-E.8A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
+
+---
+
+*Document version: P5-E.5C PASS + ... + P5-E.8A FAIL + P5-E.8A.2 PASS. No secrets.*

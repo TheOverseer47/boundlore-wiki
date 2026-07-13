@@ -2298,6 +2298,29 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.8A.2 — Storage Owner Path + Bucket Scope Review (PASS)
+
+**Milestone:** P5-E.8A.2 — analysis/documentation only. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Static storage usage review | repo | documented | `[x]` |
+| Core wiki without storage | repo | viable | `[x]` |
+| Dashboard owner path | staging | owner-capable | `[x]` **REJECTED** |
+| `discovery-uploads` bucket | staging | present | `[ ]` missing |
+| Storage policy | storage.objects | applied | `[ ]` NO |
+| Storage MVP-critical (locked) | product | defer acceptable | `[x]` with P5-E.8C |
+| SQL apply / DB access | gate | none | `[x]` |
+| Product-Activation-Ready | status | FAIL | `[x]` FAIL |
+| Public-Launch-Ready | status | NO-GO | `[x]` NO-GO |
+| P5-E.8A.2 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
+
+**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
+
+---
+
 ## P5-E.8A Resume — Storage Policy Apply (FAIL)
 
 **Milestone:** P5-E.8A resume — Dashboard apply. **FAIL**.

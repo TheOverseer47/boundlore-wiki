@@ -744,4 +744,25 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 
 **Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
-**Next:** P5-E.8A.2 owner-capable role investigation. No push/deploy/launch.
+**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
+
+---
+
+## 34. P5-E.8A.2 Follow-up (PASS — review only)
+
+**Gate:** P5-E.8A.2 — Storage Owner Path + Bucket Scope Review. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Dashboard owner path | **REJECTED** — `must be owner of relation objects` |
+| Storage policy | **Not applied** |
+| `discovery-uploads` bucket | **Missing** |
+| Storage usage (static) | create-post + support only |
+| Core release lock without storage | **PASS** |
+| Decision | Option 3 Hybrid recommended |
+| SQL apply / DB access | **None** |
+| P5-E.8A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
+
+**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.

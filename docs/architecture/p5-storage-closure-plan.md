@@ -354,8 +354,8 @@ SELECT public.bl_is_release_unlocked();
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.8 (this planning gate)** | **PASS** |
-| Storage Closure | **DEFERRED** — until P5-E.8A |
-| Recommended apply path | **Supabase Dashboard SQL Editor** on staging `jzzgoiwfbuwiiyvwgwri` |
+| Storage Closure | **DEFERRED** — until owner-capable path found |
+| Recommended apply path | **OPEN** — Dashboard SQL Editor **disproven** (P5-E.8A resume) |
 | psql session pooler | **Not suitable** — owner error proven |
 | S+ Staging Evidence | **PARTIAL** (unchanged) |
 | Product-Activation-Ready | **FAIL** |
@@ -363,9 +363,9 @@ SELECT public.bl_is_release_unlocked();
 
 ### Summary
 
-P5-E.8 documents a safe, staged path to close the deferred storage release-gate policy. The deferred SQL file is statically sound and ready for a separate **P5-E.8A** apply gate using an owner-capable execution path (Dashboard preferred). Session-pooler `psql` remains unsuitable. Fixture re-enablement is deferred to **P5-E.8B** after live verification. No database access occurred in this gate.
+P5-E.8 documents a safe, staged path to close the deferred storage release-gate policy. The deferred SQL file is statically sound. **P5-E.8A resume disproved Dashboard SQL Editor** as owner-capable for `storage.objects`. Session-pooler `psql` also unsuitable. Owner path remains **OPEN** (Support/tooling investigation). Fixture re-enablement deferred to **P5-E.8B** after live verification.
 
-**Recommended next:** **P5-E.8A re-attempt** — user Dashboard sign-in required. See `p5-storage-policy-owner-apply-report.md`.
+**Recommended next:** See `p5-storage-owner-path-bucket-scope-review.md` — P5-E.8C + P5-E.8A.4.
 
 ---
 
@@ -386,4 +386,22 @@ P5-E.8 documents a safe, staged path to close the deferred storage release-gate 
 
 ---
 
-*Document version: P5-E.8 PASS + P5-E.8A FAIL. No secrets.*
+## 14. P5-E.8A.2 Follow-up (PASS — review only)
+
+**Gate:** P5-E.8A.2 — Storage Owner Path + Bucket Scope Review. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Static storage usage review | `[x]` — create-post + support only |
+| Core wiki read path needs storage? | **No** |
+| `discovery-uploads` bucket | **Missing** — separate provisioning gate |
+| Owner-capable path | **OPEN** — Dashboard rejected |
+| Decision tree | Option 3 Hybrid recommended |
+| SQL apply / DB access | **None** |
+| P5-E.8A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
+
+---
+
+*Document version: P5-E.8 PASS + P5-E.8A FAIL + P5-E.8A.2 PASS. No secrets.*

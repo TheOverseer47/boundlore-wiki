@@ -306,4 +306,23 @@ P5-E.5 Re-run 3 delivered **credible staging evidence** for notification injecti
 
 ---
 
-*Document version: P5-E.6 PASS + ... + P5-E.8A FAIL. No secrets. No DB access.*
+## 19. P5-E.8A.2 Follow-up (PASS — review only)
+
+**Gate:** P5-E.8A.2 — Storage Owner Path + Bucket Scope Review. **PASS**.
+
+| Item | Result |
+|------|--------|
+| S+-01 Core (posts + RPC) | **PASS** on staging |
+| S+-01 Storage | **DEFERRED** |
+| S+ Staging Evidence | **PARTIAL** — storage defer not yet formally accepted |
+| Storage MVP-critical? | **No** (locked state) |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| SQL apply / DB access | **None** |
+| P5-E.8A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
+
+---
+
+*Document version: P5-E.6 PASS + ... + P5-E.8A FAIL + P5-E.8A.2 PASS. No secrets. No DB access.*

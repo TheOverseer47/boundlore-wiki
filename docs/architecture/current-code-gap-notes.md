@@ -3292,7 +3292,30 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.8A.2 owner-capable role investigation. No push/deploy/launch.
+**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
+
+---
+
+## 130. P5-E.8A.2 — Storage Owner Path + Bucket Scope Review (PASS)
+
+**Milestone:** P5-E.8A.2 — analysis/documentation only. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Storage in app | `create-post.js` (`discovery-uploads`), `support.js` (`report-screenshots`) |
+| Core read/browse/search | **No storage dependency** |
+| Dashboard owner path | **REJECTED** |
+| `discovery-uploads` bucket | **Missing** on staging |
+| Storage policy | **Not applied** |
+| Storage defer viable for locked MVP? | **Yes** — with P5-E.8C upload path review |
+| SQL apply / DB access | **None** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.8A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-storage-owner-path-bucket-scope-review.md`
+
+**Next:** P5-E.8C Upload Path Disablement Review. No push/deploy/launch.
 
 ---
 
