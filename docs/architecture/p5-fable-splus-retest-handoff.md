@@ -2,9 +2,12 @@
 
 **Gate:** P5-F.2 — Fable Retest Handoff Package  
 **Date:** 2026-07-13  
-**HEAD:** `5907174` — Document Fable S+ retest handoff  
+**Current repo HEAD:** `f4e9fa4` — Correct Fable retest HEAD reference  
+**S+ baseline commit:** `5907174` — Document Fable S+ retest handoff  
 **Branch:** `main`  
 **Type:** Docs-only handoff — **no Fable retest executed in this gate**
+
+> **HEAD note for Fable:** `f4e9fa4` is a docs-only correction commit that updates HEAD references in this handoff package only. It contains **no** JS/HTML/CSS/SQL/Supabase/fixture/data changes. Accept `f4e9fa4` as the legitimate working tree; verify the S+ security baseline through `5907174` inclusive; treat `f4e9fa4` as handoff metadata correction only.
 
 ---
 
@@ -31,7 +34,9 @@ This document hands off the P5 S+ baseline state to **Fable** for an **independe
 
 | Item | Value |
 |------|-------|
-| HEAD | `5907174` — Document Fable S+ retest handoff |
+| Current repo HEAD | `f4e9fa4` — Correct Fable retest HEAD reference (docs-only) |
+| S+ baseline commit | `5907174` — Document Fable S+ retest handoff |
+| `f4e9fa4` scope | HEAD-reference correction in handoff docs only — no security-relevant file changes |
 | Branch | `main` |
 | Working Tree expectation | Clean except `qa/e2e-baseline-bmeta.snapshot.json` untracked (do not commit) |
 | Deployment freeze | **active** |
@@ -155,10 +160,11 @@ $code | py -
 ### A) Read-only repo verification
 
 1. `git status` — clean except untracked `qa/e2e-baseline-bmeta.snapshot.json`
-2. `git rev-parse --short HEAD` — expect `5907174` (Fable handoff baseline) on `main`
-3. `git log --oneline -n 20` — confirm P5-B through P5-F.1 gate commits present
-4. Inspect all files in §5 Evidence File Map
-5. Verify no staged changes; no push/deploy commands run
+2. `git rev-parse --short HEAD` — expect `f4e9fa4` on `main` (docs-only HEAD-reference fix)
+3. `git log --oneline -n 5` — confirm `5907174` is the S+ handoff baseline; `f4e9fa4` only corrects HEAD strings
+4. `git log --oneline -n 20` — confirm P5-B through P5-F.1 gate commits present
+5. Inspect all files in §5 Evidence File Map
+6. Verify no staged changes; no push/deploy commands run
 
 ### B) Run local no-cache server
 

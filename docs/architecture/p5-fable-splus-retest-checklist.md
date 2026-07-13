@@ -1,14 +1,16 @@
 # P5-F.2 — Fable S+ Security Retest Checklist
 
 **Companion to:** `p5-fable-splus-retest-handoff.md` + `p5-fable-splus-retest-prompt.md`  
-**HEAD:** `5907174` · **URL base:** `http://localhost:8080`
+**Current repo HEAD:** `f4e9fa4` · **S+ baseline:** `5907174` · **URL base:** `http://localhost:8080`
 
 ---
 
 ## Repo status
 
 - [ ] `git status` clean except `qa/e2e-baseline-bmeta.snapshot.json` untracked
-- [ ] HEAD is `5907174` on `main` (Fable handoff baseline)
+- [ ] Current HEAD is `f4e9fa4` on `main` (docs-only HEAD-reference fix)
+- [ ] S+ baseline commit `5907174` present in `git log`
+- [ ] `f4e9fa4` diff is docs-only (no JS/HTML/CSS/SQL/Supabase/fixture changes)
 - [ ] No staged / unexpected changes
 - [ ] No push / deploy / SQL executed
 

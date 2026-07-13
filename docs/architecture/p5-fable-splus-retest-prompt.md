@@ -2,7 +2,7 @@
 
 **Verwendung:** Gesamten Inhalt des Abschnitts „Prompt“ unten kopieren und an Fable übergeben.  
 **Handoff-Referenz:** `docs/architecture/p5-fable-splus-retest-handoff.md`  
-**HEAD zum Handoff-Zeitpunkt:** `5907174`
+**Current repo HEAD:** `f4e9fa4` · **S+ baseline commit:** `5907174`
 
 ---
 
@@ -20,7 +20,9 @@ Dies ist **kein** vollständiger Launch-Audit, **kein** Product-Activation-Gate 
 
 - Pfad: C:\Users\Julius\Documents\GitHub\boundlore-wiki
 - Branch: main
-- Erwarteter HEAD: 5907174 — Document Fable S+ retest handoff
+- Aktueller Repo-HEAD: f4e9fa4 — Correct Fable retest HEAD reference
+- S+ Baseline-Commit: 5907174 — Document Fable S+ retest handoff
+- Hinweis: f4e9fa4 ist ein reiner docs-only Korrektur-Commit (HEAD-Referenzen im Handoff). Keine JS/HTML/CSS/SQL/Supabase/Fixture/Datenänderungen. Akzeptiere f4e9fa4 als legitimen Arbeitsstand; prüfe die S+ Baseline bis einschließlich 5907174.
 - Working Tree: sauber außer qa/e2e-baseline-bmeta.snapshot.json (untracked, nicht committen)
 
 ## Aktueller Stand (vom Team dokumentiert, von dir zu verifizieren)
