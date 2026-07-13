@@ -2298,6 +2298,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9 — Production Closure Plan (PASS)
+
+**Milestone:** P5-E.9 — Production Closure Plan (planning/acceptance only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Production Closure Plan documented | docs | complete ledger + gate sequence | `[x]` |
+| Closed findings not reopened without evidence | review | false positives avoided | `[x]` |
+| Storage DB remains DEFERRED | status | documented | `[x]` |
+| Upload path closure accepted for locked MVP | P5-E.8C | CLOSED | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| Production Closure | status | NOT CLOSED | `[x]` NOT CLOSED |
+| SQL / DB / Storage / Push / Deploy | gate | none | `[x]` |
+| P5-E.9 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-production-closure-plan.md`
+
+**Next:** P5-E.9A S+-03 Runtime XSS Evidence Plan. No push/deploy/launch.
+
+---
+
 ## P5-E.8D — Runtime / Product-Activation Review (PASS)
 
 **Milestone:** P5-E.8D — Runtime Closure & Product-Activation Gap Review (docs/analysis only). **PASS**.

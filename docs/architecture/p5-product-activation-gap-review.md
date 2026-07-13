@@ -125,12 +125,26 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ### Empfohlener nächster Gate
 
-1. **P5-E.9** — Production Closure Plan (Plan only, kein Apply)
-2. **S+-03 Runtime XSS Gate** — Staging/App smoke mit gespeicherten Payloads
+1. ~~**P5-E.9** — Production Closure Plan~~ **PASS** — siehe `p5-production-closure-plan.md`
+2. **P5-E.9A** — S+-03 Runtime XSS Evidence Plan
 3. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
-
-Weiterhin: **kein Push, kein Deploy, kein Launch.**
 
 ---
 
-*Dokumentversion: P5-E.8D PASS. Keine Secrets. Kein DB-Zugriff.*
+## 12. P5-E.9 Follow-up (PASS — Production Closure Plan)
+
+**Gate:** P5-E.9 — Production Closure Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Closure Ledger | `[x]` 22 Findings |
+| Gate sequence 9A–9F + 8A.4 | `[x]` |
+| Production Closure | **NOT CLOSED** (Plan only) |
+| SQL apply / DB access | **None** |
+| P5-E.9 | **PASS** |
+
+**Report:** `docs/architecture/p5-production-closure-plan.md`
+
+---
+
+*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS. Keine Secrets. Kein DB-Zugriff.*

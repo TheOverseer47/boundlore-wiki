@@ -3292,7 +3292,63 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.9 Production Closure Plan. No push/deploy/launch.
+**Next:** P5-E.9A S+-03 Runtime XSS Evidence Plan. No push/deploy/launch.
+
+---
+
+## 133. P5-E.9 — Production Closure Plan (PASS)
+
+**Milestone:** P5-E.9 — Production Closure Plan (planning/acceptance only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Production Closure Plan | `p5-production-closure-plan.md` |
+| Closure Ledger | `[x]` 22 Findings klassifiziert |
+| Gate sequence P5-E.9A…9F + P5-E.8A.4 | `[x]` dokumentiert |
+| SQL apply / DB / Production touch | **None** |
+| Production Closure | **NOT CLOSED** (Plan only) |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| Storage Closure (DB) | **DEFERRED_ACCEPTED** (locked MVP) |
+| Upload Path Disablement | **CLOSED** (P5-E.8C) |
+| P5-E.9 | **PASS** |
+
+### Was P5-E.9 geklärt hat
+
+- Vollständiger **Production Closure Ledger** mit CLOSED / CLOSED_FOR_LOCKED_MVP / DEFERRED_ACCEPTED / PARTIAL / OPEN_BLOCKING / NOT_TESTED
+- Sichere **Gate-Reihenfolge** ab aktuellem Stand (9A → 9B → 9C → 9F → 9D → 9E → 8A.4 → P5-E.10+)
+- **Stop Conditions** und explizit verbotene Aktionen bis Freigabe
+- Keine Wiedereröffnung geschlossener Staging-Findings (P5-E.7A.2, P5-E.8C)
+
+### Product Activation Blocker
+
+| Blocker | Klasse |
+|---------|--------|
+| Production Closure (S+-01…04 auf Prod) | OPEN_BLOCKING |
+| S+-03 Runtime XSS | PARTIAL |
+| S-07 Backup/Restore | OPEN_BLOCKING |
+| S-08 Monitoring | OPEN_BLOCKING |
+| Incident Response | OPEN_BLOCKING |
+
+### Public Launch Blocker (zusätzlich)
+
+| Blocker | Klasse |
+|---------|--------|
+| Alle Product-Activation-Blocker | — |
+| S-05 SEO/CSR | OPEN_BLOCKING |
+| S-06 Search Recall | OPEN_BLOCKING |
+| S-10 Production RLS verification | NOT_TESTED |
+| Storage DB vor Unlock | DEFERRED_ACCEPTED → OPEN vor Unlock |
+
+### Empfohlene nächste Gates
+
+1. **P5-E.9A** — S+-03 Runtime XSS Evidence Plan
+2. **P5-E.9B** — Backup/Restore Evidence Plan
+3. **P5-E.9C** — Monitoring/Error Tracking Plan
+
+**Report:** `docs/architecture/p5-production-closure-plan.md`
+
+**Next:** P5-E.9A. No push/deploy/launch.
 
 ---
 

@@ -1,0 +1,312 @@
+# P5-E.9 Production Closure Plan
+
+**Gate:** P5-E.9 — Production Closure Plan (Planung/Abnahme only)  
+**Datum:** 2026-07-14  
+**HEAD (Start):** `3534935` — Document runtime closure and product activation gaps after upload hardening  
+**Verdict:** **PASS** (Planungs-Gate) — **Production Closure bleibt NOT CLOSED**
+
+---
+
+## Executive Verdict
+
+BoundLore hat auf **Staging** und im **Repo** einen belastbaren Security-Core für einen **locked-state MVP**:
+
+- S+-01 Core (Posts + RPC), S+-02, S+-04 auf Staging nachgewiesen
+- Upload-Pfade frontend **CLOSED** (P5-E.8C)
+- Storage DB **DEFERRED_ACCEPTED** für locked MVP
+
+**Production Closure** ist **nicht geschlossen**. Weder **Product Activation** noch **Public Launch** dürfen diskutiert werden, bevor:
+
+1. Alle S+-Findings auf **Production** angewendet und negativ getestet sind
+2. S+-03 **Runtime**-Evidence vorliegt (nicht nur Fixture)
+3. Ops-Gates (Backup/Restore, Monitoring, Incident Response) geschlossen sind
+4. Produkt-Gates (SEO/CSR, Search Recall) für Public Launch geschlossen sind
+5. Storage DB vor jedem Release-Gate-**Unlock** geschlossen ist
+
+Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop Conditions** und **verbotene Aktionen** — ohne Apply, Deploy oder Launch.
+
+---
+
+## Working Tree / No-Apply-Bestätigung
+
+| Prüfung | Ergebnis |
+|---------|----------|
+| HEAD | `3534935` (Start dieses Gates) |
+| `git status --short` | Sauber; untracked: `.env.legacy.example`, `qa/e2e-baseline-bmeta.snapshot.json` |
+| SQL Apply | **Nein** |
+| DB-Write / Production-Touch | **Nein** |
+| Legacy-Apply | **Nein** |
+| Storage-Apply | **Nein** |
+| Push / Deploy / Launch | **Nein** |
+| boundlore.com | **Nicht verwendet** |
+| Secrets in diesem Dokument | **Nein** |
+
+---
+
+## Current Launch Status
+
+| Dimension | Status | Begründung (Kurz) |
+|-----------|--------|-------------------|
+| **Product Activation** | **FAIL** | Production Closure offen; S+-03 Runtime offen; Ops offen |
+| **Public Launch** | **NO-GO** | Product Activation FAIL + S-05/S-06 + Ops + Production Security |
+| **Production Closure** | **NOT CLOSED** | Kein S+-Apply/Negativtest auf Production |
+| **Runtime Closure** | **OPEN** | Plan in `p5-runtime-closure-plan.md`; Umsetzung ausstehend |
+| **Storage Closure (DB)** | **DEFERRED** | Owner-Pfad offen; Policy nicht angewendet |
+| **Upload Path Disablement** | **CLOSED** | P5-E.8C PASS |
+| **S+ Staging Evidence** | **PARTIAL** | Core PASS; Storage DEFERRED |
+
+---
+
+## Closure-Klassifikation (Legende)
+
+| Klasse | Bedeutung |
+|--------|-----------|
+| **CLOSED** | Vollständig nachgewiesen (Staging/Production/Runtime je nach Scope) |
+| **CLOSED_FOR_LOCKED_MVP** | Für read-only/locked MVP ausreichend; nicht für Unlock/Launch |
+| **DEFERRED_ACCEPTED** | Bewusst zurückgestellt, dokumentiert akzeptiert (nur locked MVP) |
+| **PARTIAL** | Teilnachweis; konkreter Rest-Gap benannt |
+| **OPEN_BLOCKING** | Blockiert Product Activation und/oder Public Launch |
+| **NOT_TESTED** | Kein Nachweis — kein FAIL, aber nicht als geschlossen zählen |
+| **OUT_OF_SCOPE_FOR_MVP** | Für locked MVP irrelevant; später relevant |
+
+---
+
+## Closure Ledger
+
+| Finding | Original Severity | Current Status | Evidence | Remaining Gap | Required Next Gate | SQL? | DB Write? | Storage? | Deploy? | Safe before Push? |
+|---------|-------------------|----------------|----------|---------------|-------------------|------|-----------|----------|---------|-------------------|
+| **S+-01 Release Lock — Direct Posts** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.7A.2 PASS staging; `p5-policy-dependency-select-grants-retest-report.md` | Production apply + negative INSERT test | P5-E.10 (prod apply, future) | Ja | Ja (prod) | Nein | Nein | Ja (Plan only) |
+| **S+-01 Release Lock — Observation RPC** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production RPC negative tests | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
+| **S+-01 Release Lock — Client UX** | S+ Critical | **CLOSED** | `release-gate-client.js` p5-e8c; UI fixture 30/30 | Deploy to prod host | Mit Deploy-Gate | Nein | Nein | Nein | Ja | Ja |
+| **S+-01 Storage DB Policy** | S+ Critical | **DEFERRED_ACCEPTED** | P5-E.8A FAIL; deferred SQL in repo | Owner path; bucket; policy apply | P5-E.8A.4 → P5-E.8A.3 → Apply | Ja | Ja (staging/prod) | Ja | Nein | Ja (Investigation only) |
+| **S+-01 Storage Upload Frontend** | S+ Critical | **CLOSED** | P5-E.8C; fixture 24/24 | — (DB layer separate) | — | Nein | Nein | Nein | Ja | Ja |
+| **S+-02 Notification Injection** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3 staging RLS; fixture 24/24 | Production apply + foreign insert test | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
+| **S+-03 Sanitization — Repo** | S+ Critical | **CLOSED** | `BoundLoreContentSafety` p5-d1; fixture 45/45 | Server-side sanitizer optional | — | Nein | Nein | Nein | Ja | Ja |
+| **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture only | Stored XSS auf Staging/App NOT RUN | **P5-E.9A** | Nein | Nein* | Nein | Nein | Ja |
+| **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
+| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | Appendix B; kein prerender | Entity-URLs nicht indexierbar | **P5-E.9D** | Nein | Nein | Nein | Optional | Ja |
+| **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
+| **S-07 Backup/Restore** | S | **OPEN_BLOCKING** (Ops) | P5-STAGING.3 staging dry-run | Prod backup schedule + restore drill | **P5-E.9B** | Nein | Nein** | Nein | Nein | Ja |
+| **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | Nicht im Repo | Client + DB alerting | **P5-E.9C** | Nein | Nein | Nein | Ja*** | Ja |
+| **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
+| **S-10 Base RLS Production** | S | **NOT_TESTED** | Repo SQL; staging partial | Live RLS matrix auf Production | **P5-E.9F** | Nein**** | Nein | Nein | Nein | Ja |
+| **Storage Closure (gesamt)** | S+ | **DEFERRED_ACCEPTED** | P5-E.8A.2/8C | DB vor Unlock | P5-E.8A.4+ | Ja | Ja | Ja | Nein | Ja |
+| **Upload Path Disablement** | S+ | **CLOSED** | P5-E.8C | — | — | Nein | Nein | Nein | Ja | Ja |
+| **Production Closure (Meta)** | — | **OPEN_BLOCKING** | Kein prod apply | Alle S+ auf Production | P5-E.10+ (future) | Ja | Ja | Teilweise | Ja | Ja (Plan) |
+| **Admin unlock/relock** | — | **NOT_TESTED** | UI `p5-e3` | Staging admin journey | Post-staging gate | Nein | Ja (staging) | Nein | Nein | Ja |
+| **post_reactions live block** | — | **NOT_TESTED** | SQL in repo | Kein FK-Target staging | Optional | Nein | Nein | Nein | Nein | Ja |
+| **Incident Response** | Ops | **OPEN_BLOCKING** | Fehlt | Runbook | OPS-3 (in 9C Plan) | Nein | Nein | Nein | Nein | Ja |
+| **robots.txt / sitemap.xml** | SEO | **PARTIAL** | Statisch im Repo | Dynamische URLs | P5-E.9D | Nein | Nein | Nein | Ja | Ja |
+| **report-screenshots Storage** | — | **OUT_OF_SCOPE_FOR_MVP** | Support disabled P5-E.8C | Policy wenn Support reaktiviert | Später | Ja | Ja | Ja | Nein | Ja |
+
+\* P5-E.9A: Read-only Staging smoke mit **bestehenden** Testposts erlaubt; keine neuen Payload-Writes ohne Gate.  
+\*\* P5-E.9B: Backup-Export read-only; Restore nur in isoliertem Drill mit Freigabe.  
+\*\*\* P5-E.9C: Monitoring-SDK-Integration = Code + Deploy-Gate, nicht in P5-E.9.  
+\*\*\*\* P5-E.9F: `pg_dump --schema-only` read-only erlaubt mit Freigabe; kein Apply.
+
+---
+
+## False-Positive-Vermeidung
+
+| Nicht erneut als OPEN markieren | Aktuelle Klasse | Verweis |
+|--------------------------------|-----------------|---------|
+| S+-01 direct posts grant denied | CLOSED_FOR_LOCKED_MVP | P5-E.7A.2 |
+| S+-01 nur RPC geschlossen | CLOSED_FOR_LOCKED_MVP | P5-E.7A.2 + P5-E.5 |
+| Upload-Pfade erreichbar | CLOSED | P5-E.8C |
+| Dashboard SQL Editor owner-capable | REJECTED (in 8A) | P5-E.8A resume |
+| S+-03 nur Fixture = CLOSED | PARTIAL (korrekt) | Fixture ≠ Runtime |
+| Release Lock DB 34/34 erwartet | CLOSED (32+2 DEFERRED) | P5-E.7B |
+
+---
+
+## Empfohlene Gate-Reihenfolge
+
+```
+P5-E.9 (dieses Gate) — Production Closure Plan          [PASS — Plan only]
+    ↓
+P5-E.9A — S+-03 Runtime XSS Evidence Plan               [Plan → dann Evidence Gate]
+    ↓
+P5-E.9B — Backup/Restore Evidence Plan                  [Plan → Staging drill → Prod plan]
+    ↓
+P5-E.9C — Monitoring/Error Tracking Plan                [Plan → SDK/Alerting Gate]
+    ↓
+P5-E.9F — Production RLS Export/Verification Plan       [Read-only schema export]
+    ↓
+P5-E.9D — SEO/CSR Closure Plan                          [Produkt/Architektur]
+    ↓
+P5-E.9E — Search Recall Closure Plan                     [Index/Recall]
+    ↓
+P5-E.8A.4 — Owner-Capable Storage Investigation         [Parallel OK — vor Unlock]
+    ↓
+P5-E.10+ — Production Security Apply Gates              [Separate Freigabe je Finding]
+    ↓
+Product-Activation Re-Review (P5-E.11 o.ä.)
+    ↓
+Public Launch Decision                                  [Explizite Freigabe]
+```
+
+**Begründung Reihenfolge:** Runtime/Ops-Evidence und RLS-Verifikation vor Production-Apply; SEO/Search parallel möglich aber vor Public Launch; Storage-Owner vor Unlock, nicht vor locked MVP.
+
+---
+
+## Unter-Gates (Spezifikation)
+
+### P5-E.9A — S+-03 Runtime XSS Evidence Plan
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | Nachweis, dass gespeicherte XSS-Payloads in post-detail/create/edit sicher gerendert werden |
+| **Erlaubt** | Plan-Dokument; Read-only Staging smoke mit vorhandenen Posts; lokale Fixture-Erweiterung |
+| **Verboten** | Neue XSS-Payloads in Production schreiben; SQL Apply; Deploy ohne Gate |
+| **Artefakte** | `p5-splus03-runtime-xss-evidence-report.md`; Test-Matrix; Screenshots/Console-Log (keine Secrets) |
+| **Akzeptanz** | Definierte Payload-Korpus durchlaufen; kein `alert`/script execution; PARTIAL→CLOSED |
+| **Freigabe** | **Ja** — explizit vor Staging-App-Session |
+
+### P5-E.9B — Backup/Restore Evidence Plan
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | Dokumentierter Backup-Zeitplan + ein Restore-Drill-Nachweis |
+| **Erlaubt** | Plan; Staging backup export (read-only); Restore in **isoliertem** Branch/Projekt |
+| **Verboten** | Production restore ohne Freigabe; `pre_release_test_data_reset.sql` ausführen |
+| **Artefakte** | Backup-Schedule-Doc; Restore-Drill-Report; RTO/RPO-Ziele |
+| **Akzeptanz** | Mindestens ein erfolgreicher Restore-Drill dokumentiert |
+| **Freigabe** | **Ja** — vor jedem Restore-Drill |
+
+### P5-E.9C — Monitoring/Error Tracking Plan
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | Toolwahl + Alerting-Pfade für Client, Hosting, Supabase |
+| **Erlaubt** | Architektur-Doc; Tool-Vergleich; Incident-Response-Entwurf (OPS-3) |
+| **Verboten** | Production API-Keys committen; Deploy ohne Gate |
+| **Artefakte** | `p5-monitoring-error-tracking-plan.md`; Alert-Matrix |
+| **Akzeptanz** | Monitoring-Stack gewählt; PII/DSGVO-Hinweise; Launch-Blocking Ops geschlossen |
+| **Freigabe** | **Ja** — vor SDK-Integration |
+
+### P5-E.9D — SEO/CSR Closure Plan
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | Entity-Seiten für Crawler zugänglich (CSR-Shells, prerender, oder SSG) |
+| **Erlaubt** | Architektur-Plan; sitemap-Erweiterungskonzept |
+| **Verboten** | boundlore.com Deploy; Production-SEO-Änderungen ohne Gate |
+| **Artefakte** | SEO/CSR-Plan; URL-Inventory; Meta-Template-Spec |
+| **Akzeptanz** | Launch-kritische Entity-URLs indexierbar (Plan akzeptiert → Implementierungs-Gate) |
+| **Freigabe** | **Ja** — vor Implementierung |
+
+### P5-E.9E — Search Recall Closure Plan
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | Bekannte Entities (z. B. `monster`) liefern sinnvolle Treffer |
+| **Erlaubt** | Index-Analyse; Recall-Test-Matrix; Plan ohne DB-Writes |
+| **Verboten** | Production-Index-Änderungen ohne Gate |
+| **Artefakte** | Search-Recall-Plan; Test-Korpus; Ziel-Metriken |
+| **Akzeptanz** | Definierte Recall-Tests PASS auf Staging/Prod-Preview |
+| **Freigabe** | **Ja** — vor Index-Änderungen |
+
+### P5-E.9F — Production RLS Export/Verification Plan
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | Production-RLS/Policies mit Repo-SQL abgleichen (S-10) |
+| **Erlaubt** | Read-only `pg_dump --schema-only`; Policy-Diff-Doc; kein Apply |
+| **Verboten** | Production GRANT/POLICY-Änderungen; Legacy-Ref `ohkoojpzmptdfyowdgog` |
+| **Artefakte** | RLS-Export-Report; Diff-Matrix Repo vs Production |
+| **Akzeptanz** | Alle kritischen Tabellen dokumentiert; Abweichungen mit Remediation-Gate |
+| **Freigabe** | **Ja** — vor Production-DB-Zugriff |
+
+### P5-E.8A.4 — Owner-Capable Storage Investigation (parallel)
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | Offiziellen Supabase-Weg für `storage.objects` Policy DDL klären |
+| **Erlaubt** | Support-Docs; Tooling-Recherche; **kein** blind Apply |
+| **Verboten** | Dashboard/psql Apply ohne owner proof; Bucket anlegen |
+| **Artefakte** | `p5-storage-owner-capable-investigation-report.md` |
+| **Akzeptanz** | Owner-Rolle + Apply-Pfad dokumentiert und reviewt |
+| **Freigabe** | **Ja** — vor jedem Storage-Apply-Versuch |
+
+### P5-E.10+ — Production Security Apply (Zukunft, nicht P5-E.9)
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | S+-01…04 SQL auf **Production** anwenden + negative Live-Tests |
+| **Erlaubt** | Nur mit separater Gate-Freigabe, Backup, Rollback-Plan |
+| **Verboten** | Ohne P5-E.9 Plan-Akzeptanz; ohne Staging-Parität; Launch/Unlock |
+| **Artefakte** | Apply-Report je Finding; Negativtest-Protokoll |
+| **Akzeptanz** | Alle S+ Production CLOSED |
+| **Freigabe** | **Ja** — je Finding, Production-only |
+
+---
+
+## Stop Conditions
+
+Sofort stoppen und Bericht schreiben, wenn:
+
+| # | Bedingung |
+|---|-----------|
+| 1 | HEAD weicht von dokumentiertem Nachfolger ohne Gate-Dokument ab |
+| 2 | Jemand versucht SQL/Storage auf Production ohne Freigabe |
+| 3 | Legacy-Ref `ohkoojpzmptdfyowdgog` in Apply-Kontext auftaucht |
+| 4 | Release Gate Unlock ohne Storage-Closure + Audit |
+| 5 | Secrets/Keys in Docs oder Commits |
+| 6 | Findings als CLOSED markiert werden ohne Runtime/Staging/Production-Evidence |
+| 7 | Push/Deploy/Launch ohne explizite Launch-Freigabe |
+| 8 | `pre_release_test_data_reset.sql` ausgeführt wird |
+
+---
+
+## Was ausdrücklich NICHT getan werden darf (in P5-E.9 und Folge bis Freigabe)
+
+| Aktion | Verboten bis |
+|--------|--------------|
+| SQL Apply auf Production | P5-E.10+ Freigabe |
+| SQL Apply Storage Policy | P5-E.8A.4 + Owner proof |
+| Release Gate Unlock | Storage DB Closure + Admin Gate |
+| Push / Deploy / Launch | Public Launch Decision |
+| boundlore.com Änderungen | Deploy-Gate |
+| Neue Staging Payload-Writes (XSS-Tests) | P5-E.9A Freigabe |
+| Production Restore | P5-E.9B Freigabe |
+| Monitoring SDK Keys im Repo | P5-E.9C Implementierungs-Gate |
+| `.env*` committen | Immer |
+| `qa/e2e-baseline-bmeta.snapshot.json` stagen | Immer |
+
+---
+
+## Storage Deferred — Production-Plan-Hinweis
+
+Für **locked MVP auf Production** (falls Deploy ohne Unlock):
+
+| Kriterium | Vor Deploy prüfen |
+|-----------|-------------------|
+| `STORAGE_UPLOADS_DEFERRED = true` im deployed JS | Ja |
+| `release_gate` locked auf Prod-DB | Ja (nach P5-E.10 apply) |
+| Upload-UI disabled | Ja (P5-E.8C) |
+| Storage Policy | **Nicht erforderlich** solange locked + disabled |
+
+Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** (P5-E.8A.4 → 8A.3 → Apply → 8B Fixture).
+
+---
+
+## Verdict
+
+| Dimension | Verdict |
+|-----------|---------|
+| **P5-E.9 (dieses Gate)** | **PASS** |
+| **Production Closure** | **NOT CLOSED** (Plan erstellt) |
+| **Runtime Closure** | **OPEN** |
+| **Product-Activation-Ready** | **FAIL** |
+| **Public-Launch-Ready** | **NO-GO** |
+| **Storage Closure (DB)** | **DEFERRED_ACCEPTED** (locked MVP) |
+
+### Empfohlener nächster Gate
+
+**P5-E.9A** — S+-03 Runtime XSS Evidence Plan
+
+Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
+
+---
+
+*Dokumentversion: P5-E.9 PASS. Keine Secrets. Kein DB-Zugriff.*
