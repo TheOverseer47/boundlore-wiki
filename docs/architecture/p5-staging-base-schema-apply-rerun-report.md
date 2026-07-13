@@ -170,10 +170,25 @@ No local writes. Not staging-connected.
 
 ### Remediation
 
-Add `CREATE EXTENSION IF NOT EXISTS pg_trgm` (before GIN trigram indexes) to `core_schema_foundation.sql`, then re-run P5-STAGING.6 with explicit approval. Legacy schema-only dump also omitted `pg_trgm` (extension lives outside `public` schema-only export).
+~~Add `CREATE EXTENSION IF NOT EXISTS pg_trgm`~~ → **done in P5-STAGING.6B** → re-run P5-STAGING.6 with explicit approval.
 
 **Not in scope:** Push, deploy, launch, legacy/production touch, P5-E.5 apply.
 
 ---
 
-*Document version: P5-STAGING.6 Re-run FAIL. Staging `public` unchanged. Pre-apply backup preserved. No secrets.*
+## 12. P5-STAGING.6B Follow-up (PASS — local extension fix)
+
+**Gate:** P5-STAGING.6B — `pg_trgm` extension added before GIN trigram indexes. **PASS** (repo only).
+
+| Item | Status |
+|------|--------|
+| SQL apply / DB access | `[x]` — none |
+| `pg_trgm` before `gin_trgm_ops` | `[x]` |
+| Staging `public` | `[x]` still empty |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval required |
+
+**Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.6 Re-run FAIL + 6B PASS (local). Staging unchanged. No secrets.*

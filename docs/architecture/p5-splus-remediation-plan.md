@@ -1017,7 +1017,24 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** Add `pg_trgm` to foundation → re-run P5-STAGING.6. No push/deploy/launch.
+**Next:** Re-run P5-STAGING.6 with explicit approval. No push/deploy/launch.
+
+---
+
+## 38. P5-STAGING.6B — Core Schema Extension Fix (PASS)
+
+**Milestone:** P5-STAGING.6B — local `pg_trgm` extension fix; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SQL apply / DB access | `[x]` — none |
+| `pg_trgm` before `gin_trgm_ops` indexes | `[x]` |
+| No data / secrets / destructive SQL | `[x]` |
+| Core Schema Extension Fix (6B) | **PASS** |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval |
+| P5-E.5 re-run | **BLOCKED** until apply succeeds |
+
+**Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
 
 ---
 

@@ -140,4 +140,12 @@ Note: `auth.users` appears only as FK references and inside function bodies (sch
 
 ---
 
-*Document version: P5-STAGING.6A PASS + 6 Re-run FAIL. Local reorder only. No secrets.*
+## 9. P5-STAGING.6B Follow-up (PASS — local extension fix)
+
+**Gate:** P5-STAGING.6B — `pg_trgm` added before GIN trigram indexes. **PASS** (repo only).
+
+**Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.6A PASS + 6 Re-run FAIL + 6B PASS. No secrets.*

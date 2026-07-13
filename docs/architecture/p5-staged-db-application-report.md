@@ -546,26 +546,16 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 **Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
 
-**Next:** Add `pg_trgm` extension to foundation → re-run P5-STAGING.6 → P5-E.5 with explicit approval.
+**Next:** ~~Add `pg_trgm` extension to foundation~~ → **P5-STAGING.6B PASS** → re-run P5-STAGING.6 with explicit approval.
 
 ---
 
-### P5-STAGING.6 Re-run follow-up (FAIL)
+### P5-STAGING.6B follow-up (PASS — local extension fix)
 
-**P5-STAGING.6 Re-run** (HEAD `91aae1c`). User approval granted. **FAIL** — `pg_trgm` / `gin_trgm_ops` at line 660. 6A dependency order validated; transaction rolled back.
+**P5-STAGING.6B** — `pg_trgm` extension before GIN trigram indexes. **PASS** (repo only).
 
-| Item | Status |
-|------|--------|
-| Pre-apply backup | `[x]` 185,427 bytes |
-| `core_schema_foundation.sql` only | `[x]` attempted |
-| 6A blocker resolved | `[x]` |
-| New blocker | `pg_trgm` extension missing |
-| Core tables on staging | `[ ]` — none |
-| Test users A/B | `[x]` intact |
-| Base Schema Apply Re-run | **FAIL** |
-
-**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun-report.md`
+**Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
 
 ---
 
-*Document version: P5-E.5 blocked + 5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL. Staging unchanged.*
+*Document version: P5-E.5 blocked + 5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS. Staging unchanged.*

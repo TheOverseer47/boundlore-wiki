@@ -1,6 +1,7 @@
 -- core_schema_foundation.sql
 --
--- P5-STAGING.5C curated core schema + P5-STAGING.6A dependency reorder.
+-- P5-STAGING.5C curated core schema + P5-STAGING.6A dependency reorder
+--   + P5-STAGING.6B pg_trgm extension dependency fix.
 -- Source: backups/legacy-schema-only/legacy-public-schema-only-20260713-192641.sql
 -- Legacy ref: ohkoojpzmptdfyowdgog (read-only export; not applied in 5C)
 --
@@ -14,6 +15,8 @@
 begin;
 
 create extension if not exists pgcrypto with schema extensions;
+
+create extension if not exists pg_trgm with schema public;
 
 -- === Tables ===
 

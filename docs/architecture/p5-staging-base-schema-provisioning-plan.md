@@ -277,7 +277,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `public` still empty. Pre-apply backup: `p5-staging6-preapply-20260713-193900.sql` (185,427 bytes).
 
-**Next:** Add `pg_trgm` to foundation → re-run P5-STAGING.6. No push/deploy/launch.
+**Next:** ~~Add `pg_trgm` to foundation~~ → **P5-STAGING.6B PASS** → re-run P5-STAGING.6 with explicit approval. No push/deploy/launch.
 
 ---
 
@@ -330,10 +330,25 @@ P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `publi
 
 ---
 
+## 18. P5-STAGING.6B Follow-up (PASS — local extension fix)
+
+**Gate:** P5-STAGING.6B — `pg_trgm` before GIN trigram indexes. **PASS** (repo only).
+
+| Item | Status |
+|------|--------|
+| Extension dependency fixed | `[x]` |
+| No DB access / no SQL apply | `[x]` |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval |
+
+**Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
+
+---
+
 ## Related Documents
 
 | Document | Role |
 |----------|------|
+| `p5-core-schema-extension-fix-report.md` | P5-STAGING.6B extension fix (PASS) |
 | `p5-staging-base-schema-apply-rerun-report.md` | P5-STAGING.6 Re-run report (FAIL) |
 | `p5-core-schema-reorder-fix-report.md` | P5-STAGING.6A reorder report (PASS) |
 | `p5-staging-base-schema-apply-report.md` | P5-STAGING.6 apply report (FAIL) |

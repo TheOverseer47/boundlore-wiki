@@ -204,4 +204,19 @@ Re-order `core_schema_foundation.sql`: **tables → constraints → indexes → 
 
 ---
 
-*Document version: P5-STAGING.6 FAIL + 6A PASS + 6 Re-run FAIL. Staging unchanged. No secrets.*
+## 14. P5-STAGING.6B Follow-up (PASS — local extension fix)
+
+**Gate:** P5-STAGING.6B — `pg_trgm` extension dependency fix. **PASS** (repo only).
+
+| Item | Status |
+|------|--------|
+| `pg_trgm` before `gin_trgm_ops` indexes | `[x]` |
+| No SQL apply / no DB access | `[x]` |
+| Staging `public` still empty | `[x]` |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval required |
+
+**Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS. Staging unchanged. No secrets.*

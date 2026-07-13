@@ -2255,6 +2255,28 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.6B — Core Schema Extension Dependency Fix (PASS)
+
+**Milestone:** P5-STAGING.6B — local `pg_trgm` extension fix; **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| SQL apply / DB access | ops | none | `[x]` |
+| `pg_trgm` before `gin_trgm_ops` | file | PASS | `[x]` |
+| `wiki_relation_types` before `bl_match_entities` | file | PASS | `[x]` |
+| Tables before functions/triggers/policies | file | PASS | `[x]` |
+| No INSERT/COPY/data/secrets | file | PASS | `[x]` |
+| Staging `public` | staging | still empty | `[x]` |
+| Core Schema Extension Fix (6B) | gate | PASS | `[x]` |
+| Ready for P5-STAGING.6 Re-run | gate | YES (explicit approval) | `[x]` |
+| P5-E.5 re-run | gate | BLOCKED | `[x]` |
+
+**P5-STAGING.6B PASS.** Local extension fix only. P5-STAGING.6 Re-run requires new explicit user approval.
+
+**Report:** `docs/architecture/p5-core-schema-extension-fix-report.md`
+
+---
+
 ## P5-STAGING.6A — Core Schema Reorder Fix (PASS)
 
 **Milestone:** P5-STAGING.6A — local repo reorder; **PASS**.
