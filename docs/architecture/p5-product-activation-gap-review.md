@@ -486,4 +486,22 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.2 PASS. Keine Secrets. Keine Sitemap-Entity-URLs.*
+## 31. P5-E.9E.3 Follow-up (PASS — Search DB Strategy)
+
+**Gate:** P5-E.9E.3 — Search DB Strategy. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Strategy Document | `p5-search-db-strategy.md` |
+| MVP Architecture | `search_documents` + `bl_search_public_content` |
+| Client Recall | **CLIENT_RECALL_HARDENED** (unchanged) |
+| DB Search Strategy | **DOCUMENTED** |
+| Search Runtime Evidence | **OPEN** |
+| S-06 | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.3 | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.3 PASS. Keine Secrets. Keine Sitemap-Entity-URLs.*

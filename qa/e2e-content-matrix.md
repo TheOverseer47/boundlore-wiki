@@ -2471,6 +2471,37 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9E.3 — Search DB Strategy (PASS)
+
+**Milestone:** P5-E.9E.3 — Search DB Strategy (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Search DB strategy document exists | `p5-search-db-strategy.md` | complete | `[x]` |
+| Candidate architectures compared | strategy doc | A–F matrix | `[x]` |
+| MVP DB search architecture recommended | strategy doc | search_documents + RPC | `[x]` |
+| Full launch search architecture documented | strategy doc | synonyms, trgm, abuse | `[x]` |
+| Search document contract defined | strategy doc | fields + excludes | `[x]` |
+| Ranking/weighting strategy documented | strategy doc | A–D tiers | `[x]` |
+| Synonym/alias strategy documented | strategy doc | client + DB path | `[x]` |
+| RLS/release-gate constraints documented | strategy doc | fail-closed | `[x]` |
+| Migration risks documented | strategy doc | 12 risks | `[x]` |
+| Verification plan documented | strategy doc | 9E.3A–9E.5 gates | `[x]` |
+| No SQL executed | gate | none | `[x]` |
+| No DB/Supabase access | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| Search Client Recall | status | CLIENT_RECALL_HARDENED | `[x]` |
+| Search Runtime Evidence | status | OPEN | `[x]` OPEN |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.3 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-search-db-strategy.md`
+
+**Next:** P5-E.9E.3A SQL draft or P5-E.9E.3B static review. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.2 — Search Client Recall Hardening (PASS)
 
 **Milestone:** P5-E.9E.2 — Search Client Recall Hardening. **PASS**.

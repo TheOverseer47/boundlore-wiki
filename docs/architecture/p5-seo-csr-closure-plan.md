@@ -26,7 +26,7 @@ BoundLore ist eine **statische CSR-Wiki-App** ohne Prerender/SSR/SSG. Für Crawl
 
 **Kernentscheidung:** Entity-Detail-URLs sind **NO-GO für Public SEO**, solange sie CSR-Shells bleiben. Public Launch erfordert Prerender/SSG/SSR **oder** bewusstes Ausschließen aus Index/Sitemap bis P5-E.9D.3+.
 
-**S-06 Search Recall** bleibt **separater OPEN_BLOCKING Gate** — P5-E.9E.1 Fixture **PASS**; Live-Search-Härtung über 9E.2–9E.5.
+**S-06 Search Recall** bleibt **separater OPEN_BLOCKING Gate** — P5-E.9E.3 DB-Strategie **DOCUMENTED**; Runtime über 9E.3A–9E.5.
 
 ---
 
@@ -51,7 +51,7 @@ BoundLore ist eine **statische CSR-Wiki-App** ohne Prerender/SSR/SSG. Für Crawl
 |-----------|--------|
 | **P5-E.9D** | **PASS** (Plan only) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
-| **S-06 Search Recall** | **OPEN_BLOCKING** (P5-E.9E.1 Fixture PASS; Live PARTIAL) |
+| **S-06 Search Recall** | **OPEN_BLOCKING** (P5-E.9E.3 DOCUMENTED; Runtime OPEN) |
 | **Sitemap** | **STATIC_SITEMAP_HUBS_UPDATED** (9D.2) — 14 statische URLs; keine Entity-URLs |
 | **Static Hub Metadata** | **STATIC_HUB_METADATA_HARDENED** (9D.2) — 100/100 Fixture |
 | **robots / noindex** | **STATIC_HARDENED** (9D.1) — CSR Entity-Details weiter OPEN |
@@ -378,10 +378,12 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.2** — Search Client Recall Hardening~~ **PASS** — 92/92 + `js/search-recall-utils.js`
 
-**P5-E.9E.3** — Search DB Strategy (Plan only) **oder** **P5-E.9E.4** — Staging Search Verification
+~~**P5-E.9E.3** — Search DB Strategy~~ **PASS** — `p5-search-db-strategy.md`
+
+**P5-E.9E.3A** — Search SQL Draft **oder** **P5-E.9E.3B** — Search SQL Static Review
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9E.2 PASS. Keine Secrets. Keine Search-Console-Aktion.*
+*Dokumentversion: P5-E.9D … + P5-E.9E.3 PASS. Keine Secrets. Keine Search-Console-Aktion.*

@@ -3397,6 +3397,29 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 151. P5-E.9E.3 — Search DB Strategy (PASS)
+
+**Milestone:** P5-E.9E.3 — Search DB Strategy (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Strategy Document | `p5-search-db-strategy.md` |
+| Architecture Comparison | A–F documented |
+| MVP Recommendation | `search_documents` + `bl_search_public_content` + FTS |
+| Data Contract + Ranking | documented |
+| RLS/Release-Gate Constraints | documented |
+| Migration Risks | 12 risks assessed |
+| DB Search Strategy | **DOCUMENTED** |
+| SQL executed | **Nein** |
+| S-06 | **OPEN_BLOCKING** |
+| P5-E.9E.3 | **PASS** |
+
+**Report:** `docs/architecture/p5-search-db-strategy.md`
+
+**Next:** P5-E.9E.3A SQL draft or P5-E.9E.3B static review. No push/deploy/launch.
+
+---
+
 ## 150. P5-E.9E.2 — Search Client Recall Hardening (PASS)
 
 **Milestone:** P5-E.9E.2 — Search Client Recall Hardening. **PASS**.

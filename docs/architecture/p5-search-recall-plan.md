@@ -13,6 +13,8 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E** | **PASS** (Plan erstellt) |
+| **P5-E.9E.3** | **PASS** |
+| **DB Search Strategy** | **DOCUMENTED** |
 | **P5-E.9E.2** | **PASS** |
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (92/92 Hardening-Fixture) |
 | **P5-E.9E.1** | **PASS** |
@@ -394,7 +396,7 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | `monster` → Creature | PASS in Referenzlogik |
 | S-06 | **OPEN_BLOCKING** bis 9E.2 + Runtime |
 
-**Empfohlener nächster Gate:** **P5-E.9E.3** — Search DB Strategy (Plan only) oder **P5-E.9E.4** — Staging Search Verification
+**Empfohlener nächster Gate:** **P5-E.9E.3** — Search DB Strategy (Plan only)
 
 ---
 
@@ -418,4 +420,25 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS. Keine Secrets. Keine DB-Verbindung ausgeführt.*
+## P5-E.9E.3 — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Strategiedokument | `docs/architecture/p5-search-db-strategy.md` |
+| Architektur-Vergleich | A–F (Client, FTS posts, search_documents, MV, RPC, extern) |
+| MVP-Empfehlung | `search_documents` + `bl_search_public_content` + FTS |
+| Full Launch | `search_synonyms`, trgm, evidence boost, rate-limit |
+| Data Contract | Normalisierte Felder + Exclude-Regeln dokumentiert |
+| Ranking/Synonym/RLS | Parität mit `BoundLoreSearchRecall` (9E.2) |
+| Migration Risks | 12 Risiken mit Gegenmaßnahmen |
+| Verification Plan | Fixture-Baseline + Staging/Production Gates |
+| SQL ausgeführt | **Nein** |
+| DB Search Strategy | **DOCUMENTED** |
+| Search Runtime Evidence | **OPEN** |
+| S-06 | **OPEN_BLOCKING** bis 9E.4 |
+
+**Empfohlener nächster Gate:** **P5-E.9E.3A** — Search SQL Draft (nicht angewendet) **oder** **P5-E.9E.3B** — Search SQL Static Review
+
+---
+
+*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS + P5-E.9E.3 PASS. Keine Secrets. Keine DB-Verbindung ausgeführt.*
