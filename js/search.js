@@ -20,7 +20,14 @@ function hasStructuredSearch() {
   return typeof window.BoundLoreSearchSignals !== "undefined";
 }
 
+function hasRecallUtils() {
+  return typeof window.BoundLoreSearchRecall !== "undefined";
+}
+
 function escapeHtml(str) {
+  if (hasRecallUtils() && BoundLoreSearchRecall.escapeHtml) {
+    return BoundLoreSearchRecall.escapeHtml(str);
+  }
   if (typeof BoundLoreSearchSignals !== "undefined" && BoundLoreSearchSignals.escapeHtml) {
     return BoundLoreSearchSignals.escapeHtml(str);
   }
@@ -29,10 +36,55 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-function buildPostPath(postOrDoc) {
+function buildPostPath(postOrDoc, row) {
+  if (hasRecallUtils()) {
+    try {
+      let rec = row && row.recallRecord;
+      const doc = postOrDoc && (postOrDoc.document || postOrDoc);
+      if (!rec && doc && (doc.slug || doc.title || doc.content)) {
+        rec = BoundLoreSearchRecall.postToRecallRecord(doc);
+      }
+      if (rec && BoundLoreSearchRecall.isPublicSearchable(rec)) {
+        return BoundLoreSearchRecall.getCanonicalResultUrl(rec);
+      }
+    } catch (e) {
+      // fail-open: fall back to CSR path
+    }
+  }
   const slug = postOrDoc && (postOrDoc.slug || (postOrDoc.document && postOrDoc.document.slug));
   if (slug) return "/wiki/post/?slug=" + encodeURIComponent(slug);
   return "/wiki/post/";
+}
+
+function renderEmptySearchHtml(query) {
+  if (hasRecallUtils()) {
+    try {
+      return BoundLoreSearchRecall.renderEmptyStateHtml(query);
+    } catch (e) {
+      // fail-open
+    }
+  }
+  return '<div class="search-empty">No results found for "' + escapeHtml(query) + '"</div>';
+}
+
+function rankPostsWithRecall(query, posts, documents, limit) {
+  const records = posts
+    .map(function(post) { return BoundLoreSearchRecall.postToRecallRecord(post); })
+    .filter(function(rec) { return BoundLoreSearchRecall.isPublicSearchable(rec); });
+  const recallHits = BoundLoreSearchRecall.searchRecords(records, query, { limit: limit });
+  const docBySlug = {};
+  (documents || []).forEach(function(doc) {
+    if (doc && doc.slug) docBySlug[doc.slug] = doc;
+  });
+  return recallHits.map(function(hit) {
+    const slug = hit.record.canonical_slug || hit.record.slug;
+    return {
+      document: docBySlug[slug] || BoundLoreSearchRecall.recallRecordToSearchDocument(hit.record),
+      score: hit.score,
+      explanation: hit.snippet || BoundLoreSearchRecall.renderSafeSnippet(hit.record, query),
+      recallRecord: hit.record,
+    };
+  });
 }
 
 function getPostCategoryLabelSafe(post) {
@@ -87,7 +139,7 @@ async function fetchStructuredSearchCorpus() {
 function renderStructuredPostResult(row, options) {
   const opts = options || {};
   const doc = row.document || {};
-  const path = buildPostPath(doc);
+  const path = buildPostPath(doc, row);
   const categoryLabel = getPostCategoryLabelSafe(doc);
   const hint = opts.showHints && row.explanation
     ? '<span class="search-result-hint">' + escapeHtml(row.explanation) + "</span>"
@@ -129,9 +181,27 @@ async function runStructuredSearch(query, options) {
   }, options || {});
 
   const corpus = await fetchStructuredSearchCorpus();
-  const postResults = BoundLoreSearchSignals.searchDocuments(query, corpus.documents, {
-    limit: opts.postLimit,
-  });
+  let postResults;
+
+  if (hasRecallUtils()) {
+    try {
+      if (BoundLoreSearchRecall.isUnsafeQuery(query)) {
+        postResults = [];
+      } else {
+        postResults = rankPostsWithRecall(query, corpus.posts, corpus.documents, opts.postLimit);
+      }
+    } catch (err) {
+      console.warn("Recall ranking failed, falling back to search signals:", err);
+      postResults = BoundLoreSearchSignals.searchDocuments(query, corpus.documents, {
+        limit: opts.postLimit,
+      });
+    }
+  } else {
+    postResults = BoundLoreSearchSignals.searchDocuments(query, corpus.documents, {
+      limit: opts.postLimit,
+    });
+  }
+
   const missingResults = BoundLoreSearchSignals.findMissingEntrySuggestions(query, corpus.posts, {
     limit: opts.missingLimit,
   });
@@ -185,7 +255,7 @@ async function runSearch(query, resultsBox, options) {
       const faqResults = filterFaqResults(query);
 
       if (!hasPosts && !hasMissing && faqResults.length === 0) {
-        resultsBox.innerHTML = '<div class="search-empty">No results found for "' + escapeHtml(query) + '"</div>';
+        resultsBox.innerHTML = renderEmptySearchHtml(query);
         resultsBox.style.display = "block";
         return;
       }
@@ -203,7 +273,7 @@ async function runSearch(query, resultsBox, options) {
         resultsBox.style.display = "block";
         return;
       }
-      resultsBox.innerHTML = '<div class="search-empty">No results found for "' + escapeHtml(query) + '"</div>';
+      resultsBox.innerHTML = renderEmptySearchHtml(query);
       resultsBox.style.display = "block";
       return;
     }
@@ -311,7 +381,7 @@ async function initSearchPage() {
       const hasPosts = structured.postResults.length > 0;
       const hasMissing = structured.missingResults.length > 0;
       if (!hasPosts && !hasMissing) {
-        pageResults.innerHTML = '<p class="search-page-empty">No results found for "' + escapeHtml(query) + '"</p>';
+        pageResults.innerHTML = renderEmptySearchHtml(query);
         return;
       }
 

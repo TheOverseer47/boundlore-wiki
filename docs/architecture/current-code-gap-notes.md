@@ -3397,6 +3397,28 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 150. P5-E.9E.2 — Search Client Recall Hardening (PASS)
+
+**Milestone:** P5-E.9E.2 — Search Client Recall Hardening. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| `js/search-recall-utils.js` | `BoundLoreSearchRecall` — Synonyme, Scoring, Snippets, Public-Filter |
+| `js/search.js` Integration | Recall-Ranking nach Corpus-Load; Canonical-URLs; Empty-State |
+| Hardening Fixture | **92/92 PASS** |
+| Recall Fixture Regression | **98/98 PASS** |
+| Node Check | `p5-search-client-hardening-check.mjs` PASS |
+| CLIENT_RECALL_HARDENED | **PASS** |
+| Search Runtime Evidence | **OPEN** |
+| S-06 | **OPEN_BLOCKING** |
+| P5-E.9E.2 | **PASS** |
+
+**Report:** `qa/p5-search-client-hardening-fixtures.html`, `js/search-recall-utils.js`
+
+**Next:** P5-E.9E.3 DB strategy or P5-E.9E.4 staging verification. No push/deploy/launch.
+
+---
+
 ## 149. P5-E.9E.1 — Local Search Recall Fixture (PASS)
 
 **Milestone:** P5-E.9E.1 — Local Search Recall Fixture. **PASS**.

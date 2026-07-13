@@ -359,7 +359,7 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 | Static Hub Metadata | **STATIC_HUB_METADATA_HARDENED** (100/100) |
 | robots / noindex | **STATIC_HARDENED** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** (CSR Entity-Details; keine Runtime-Verifikation) |
-| S-06 Search Recall | **OPEN_BLOCKING** (P5-E.9E.1 Fixture PASS; Live-Search PARTIAL) |
+| S-06 Search Recall | **OPEN_BLOCKING** (P5-E.9E.2 CLIENT_RECALL_HARDENED; Runtime OPEN) |
 | Sitemap | **STATIC_SITEMAP_HUBS_UPDATED** — Entity-URLs weiter ausgeschlossen |
 | Structured Data | **PARTIAL** |
 | Production Closure | **NOT CLOSED** |
@@ -376,10 +376,12 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.1** — Local Search Recall Fixture~~ **PASS** — 98/98
 
-**P5-E.9E.2** — Search Client Recall Hardening
+~~**P5-E.9E.2** — Search Client Recall Hardening~~ **PASS** — 92/92 + `js/search-recall-utils.js`
+
+**P5-E.9E.3** — Search DB Strategy (Plan only) **oder** **P5-E.9E.4** — Staging Search Verification
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9E.1 PASS. Keine Secrets. Keine Search-Console-Aktion.*
+*Dokumentversion: P5-E.9D … + P5-E.9E.2 PASS. Keine Secrets. Keine Search-Console-Aktion.*

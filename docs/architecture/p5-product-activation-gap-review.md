@@ -467,4 +467,23 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.1 PASS. Keine Secrets. Keine Sitemap-Entity-URLs.*
+## 30. P5-E.9E.2 Follow-up (PASS — Search Client Recall Hardening)
+
+**Gate:** P5-E.9E.2 — Search Client Recall Hardening. **PASS**.
+
+| Item | Result |
+|------|--------|
+| `js/search-recall-utils.js` | Produktive Client-Recall-Utility |
+| `js/search.js` | Integriert Ranking/Filter/Snippets/URLs |
+| Hardening Fixture | **92/92 PASS** |
+| Recall Regression | **98/98 PASS** |
+| CLIENT_RECALL_HARDENED | **PASS** |
+| Search Runtime Evidence | **OPEN** |
+| S-06 | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.2 | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.2 PASS. Keine Secrets. Keine Sitemap-Entity-URLs.*

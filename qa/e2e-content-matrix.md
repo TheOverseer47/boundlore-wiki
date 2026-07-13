@@ -2471,6 +2471,42 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9E.2 — Search Client Recall Hardening (PASS)
+
+**Milestone:** P5-E.9E.2 — Search Client Recall Hardening. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Search recall utility exists | `js/search-recall-utils.js` | `BoundLoreSearchRecall` | `[x]` |
+| Productive search uses recall utility | `js/search.js` | rank/filter/snippets | `[x]` |
+| Hardening browser fixture exists | `p5-search-client-hardening-fixtures.*` | present | `[x]` |
+| Monster query returns creature in local fixture | hardening fixture | ember-salamander | `[x]` |
+| Alias query returns expected result | night-beast | ember-salamander | `[x]` |
+| Body-only query returns expected result | xylophone-veil-moss | basalt-warden-notes | `[x]` |
+| Facet-only query returns expected result | mining | molten-ember-shard | `[x]` |
+| Slug-only query returns expected result | molten-ember-shard | match | `[x]` |
+| Draft/Pending/QA excluded | hardening fixture | absent | `[x]` |
+| Unsafe query escaped | empty state | no raw HTML | `[x]` |
+| BLMETA not visibly rendered | snippet | absent | `[x]` |
+| Ranking expectations tested | hardening fixture | title>body | `[x]` |
+| Result URLs prefer SSG canonical path | `/wiki/post/<slug>/` | preferred | `[x]` |
+| Node check | `p5-search-client-hardening-check.mjs` | PASS | `[x]` |
+| Hardening fixture checks | browser | 92/92 PASS | `[x]` |
+| Recall fixture regression | `p5-search-recall-fixtures.*` | 98/98 PASS | `[x]` |
+| No DB/Supabase access | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| Search Client Status | status | CLIENT_RECALL_HARDENED | `[x]` |
+| Search Runtime Evidence | status | OPEN | `[x]` OPEN |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.2 | gate | PASS | **PASS** |
+
+**Report:** `qa/p5-search-client-hardening-fixtures.html`, `js/search-recall-utils.js`
+
+**Next:** P5-E.9E.3 search DB strategy or P5-E.9E.4 staging verification. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.1 — Local Search Recall Fixture (PASS)
 
 **Milestone:** P5-E.9E.1 — Local Search Recall Fixture. **PASS**.

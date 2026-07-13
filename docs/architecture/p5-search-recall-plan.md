@@ -13,6 +13,8 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E** | **PASS** (Plan erstellt) |
+| **P5-E.9E.2** | **PASS** |
+| **Search Client Recall** | **CLIENT_RECALL_HARDENED** (92/92 Hardening-Fixture) |
 | **P5-E.9E.1** | **PASS** |
 | **Local Search Recall Fixture** | **LOCAL_RECALL_FIXTURE_PASS** (98/98) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
@@ -392,8 +394,28 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | `monster` → Creature | PASS in Referenzlogik |
 | S-06 | **OPEN_BLOCKING** bis 9E.2 + Runtime |
 
-**Empfohlener nächster Gate:** **P5-E.9E.2** — Search Client Recall Hardening
+**Empfohlener nächster Gate:** **P5-E.9E.3** — Search DB Strategy (Plan only) oder **P5-E.9E.4** — Staging Search Verification
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS. Keine Secrets. Keine DB-Verbindung. Produktive Search unverändert.*
+## P5-E.9E.2 — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Utility | `js/search-recall-utils.js` — `window.BoundLoreSearchRecall` |
+| Produktive Integration | `js/search.js` — Recall-Ranking, Canonical-URLs, Empty-State |
+| HTML-Einbindung | `wiki/search/`, `index.html`, Browse + Hub-Seiten (`?v=p5-e9e2`) |
+| Hardening Fixture | **92/92 PASS** — `qa/p5-search-client-hardening-fixtures.*` |
+| Node Check | `qa/p5-search-client-hardening-check.mjs` PASS |
+| Recall-Fixture Regression | **98/98 PASS** (9E.1 unverändert) |
+| `monster` → Creature | PASS in produktiver Utility + Fixture |
+| Search Client Status | **CLIENT_RECALL_HARDENED** |
+| Search Runtime Evidence | **OPEN** (kein Staging/Production-Lauf) |
+| S-06 | **OPEN_BLOCKING** bis 9E.4 Runtime |
+| DB/FTS Strategy | Offen für **P5-E.9E.3** |
+
+**Follow-up (nicht in 9E.2):** Hub-Filter in `render-posts.js` / `facet-browse.js` — Recall-Utility optional später; Navbar auf Seiten ohne `search-signals.js` nutzt weiterhin Legacy-`ilike` (Synonym-Recall nur mit vollem Corpus).
+
+---
+
+*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS. Keine Secrets. Keine DB-Verbindung ausgeführt.*
