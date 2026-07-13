@@ -226,6 +226,16 @@ All routes returned **200** (home, browse, search including XSS probe, QA slugs,
 
 **Report:** `docs/architecture/p5-staging-testuser-profiles-report.md`
 
+**Next:** P5-E.5C storage policy split → P5-E.5 Re-run (explicit approval).
+
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS + P5-E.5B PASS. No secrets.*
+## 15. P5-E.5 Re-run 2 Follow-up (BLOCKED — storage policy owner)
+
+**Gate:** P5-E.5 Re-run 2 — `release_gate_lock.sql` failed on `storage.objects` policy. **BLOCKED**.
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS + P5-E.5B PASS + Re-run 2 BLOCKED. No secrets.*

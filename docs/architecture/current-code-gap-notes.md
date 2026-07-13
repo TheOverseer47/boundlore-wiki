@@ -3292,7 +3292,21 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5 Re-run with explicit approval. No push/deploy/launch.
+**Next:** P5-E.5C → Re-run. No push/deploy/launch.
+
+---
+
+## 120. P5-E.5 Re-run 2 — Staged DB Security Retest (BLOCKED)
+
+**Milestone:** P5-E.5 Re-run 2 — storage policy owner error; **BLOCKED**.
+
+| Check | Result |
+|-------|--------|
+| release_gate apply | `[ ]` FAIL |
+| Negative RLS/RPC | `[x]` NOT RUN |
+| P5-E.5 Re-run 2 | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`
 
 ---
 

@@ -1017,7 +1017,23 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5 Re-run with explicit approval. No push/deploy/launch.
+**Next:** P5-E.5C storage policy fix → Re-run. No push/deploy/launch.
+
+---
+
+## 45. P5-E.5 Re-run 2 — Staged DB Security Retest (BLOCKED)
+
+**Milestone:** P5-E.5 Re-run 2 — storage policy owner error; **BLOCKED**.
+
+| Check | Result |
+|-------|--------|
+| Pre-apply backup | `[x]` 271,992 bytes |
+| Profiles A/B | `[x]` |
+| release_gate apply | `[ ]` FAIL |
+| Negative tests | `[x]` NOT RUN |
+| P5-E.5 Re-run 2 | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`
 
 ---
 

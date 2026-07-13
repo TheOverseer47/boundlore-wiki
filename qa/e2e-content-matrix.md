@@ -2298,6 +2298,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.5 Re-run 2 — Staged DB Security Retest (BLOCKED)
+
+**Milestone:** P5-E.5 Re-run 2 — release gate apply blocked on `storage.objects` policy; **BLOCKED**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Pre-apply backup | staging | >0 bytes | `[x]` 271,992 |
+| Profiles A/B | staging | present | `[x]` |
+| release_gate_lock.sql | staging | PASS | `[ ]` **FAIL** |
+| phase_a_observations.sql | staging | PASS | `[ ]` NOT RUN |
+| Negative RLS/RPC | staging | PASS | `[ ]` NOT RUN |
+| P5-E.5 Re-run 2 | gate | PASS | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`
+
+---
+
 ## P5-E.5B — Staging Testuser Profiles Provisioning (PASS)
 
 **Milestone:** P5-E.5B — profiles for test users A/B; **PASS**.

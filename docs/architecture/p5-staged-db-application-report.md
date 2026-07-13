@@ -602,4 +602,12 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS + P5-E.5B PASS. No secrets.*
+### P5-E.5 Re-run 2 follow-up (BLOCKED — storage policy owner)
+
+**P5-E.5 Re-run 2** — `release_gate_lock.sql` failed: `must be owner of relation objects`. Transaction rolled back.
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run BLOCKED + 5A/5B PASS + Re-run 2 BLOCKED. No secrets.*

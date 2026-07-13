@@ -135,8 +135,17 @@ Transactional upsert for exactly two test users:
 
 - **P5-E.5 Re-run** may proceed with new explicit approval (profiles blocker resolved).
 - Apply order remains: `release_gate_lock.sql` → `phase_a_observations_foundation.sql` (`admin_dashboard_notifications.sql` already on staging).
+- **P5-E.5 Re-run 2** blocked on `storage.objects` policy — see rerun2 report.
 - **No push, deploy, or launch.**
 
 ---
 
-*Document version: P5-E.5B PASS. Two testuser profiles provisioned. No secrets.*
+## 9. P5-E.5 Re-run 2 Follow-up (BLOCKED)
+
+**Gate:** P5-E.5 Re-run 2 — storage policy owner error. **BLOCKED**.
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`
+
+---
+
+*Document version: P5-E.5B PASS + Re-run 2 BLOCKED. No secrets.*

@@ -614,3 +614,19 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 **Gate:** P5-E.5A — `bl_is_admin_actor` before policies in `release_gate_lock.sql`. **PASS** (repo only).
 
 **Report:** `docs/architecture/p5-release-gate-sql-order-fix-report.md`
+
+---
+
+## 24. P5-E.5 Re-run 2 Follow-up (BLOCKED — storage policy owner)
+
+**Gate:** P5-E.5 Re-run 2 — `storage.objects` policy owner error. **BLOCKED**.
+
+| Item | Result |
+|------|--------|
+| Pre-apply backup | `[x]` 271,992 bytes |
+| Profiles A/B | `[x]` |
+| release_gate apply | `[ ]` FAIL |
+| Negative tests | `[ ]` NOT RUN |
+| P5-E.5 Re-run 2 | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`

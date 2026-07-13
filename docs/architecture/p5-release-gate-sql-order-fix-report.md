@@ -126,4 +126,12 @@ From P5-E.5 Re-run report (no DB access in this gate):
 
 ---
 
-*Document version: P5-E.5A PASS + P5-E.5B PASS. No secrets.*
+## 10. P5-E.5 Re-run 2 Follow-up (BLOCKED)
+
+**Gate:** P5-E.5 Re-run 2 — storage.objects policy owner error. **BLOCKED**.
+
+**Report:** `docs/architecture/p5-staged-db-security-retest-rerun2-report.md`
+
+---
+
+*Document version: P5-E.5A PASS + P5-E.5B PASS + Re-run 2 BLOCKED. No secrets.*
