@@ -975,7 +975,27 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-staged-db-application-report.md` (Re-run section)
 
-**Next:** P5-STAGING.6 with explicit approval. No push/deploy/launch.
+**Next:** Fix foundation ordering → re-run P5-STAGING.6. No push/deploy/launch.
+
+---
+
+## 35. P5-STAGING.6 — Base Schema Apply to Staging (FAIL)
+
+**Milestone:** P5-STAGING.6 — staging apply; **FAIL**.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Staging ref only | `[x]` |
+| Pre-apply backup | `[x]` 185,427 bytes |
+| `core_schema_foundation.sql` apply | `[ ]` **FAIL** |
+| Staging `public` unchanged | `[x]` rollback |
+| P5 security SQL not applied | `[x]` |
+| Test users intact | `[x]` |
+| Base Schema Apply (6) | **FAIL** |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
 
 ---
 
@@ -1090,7 +1110,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report (PASS) |
+| `docs/architecture/p5-staging-base-schema-apply-report.md` | P5-STAGING.6 apply report (FAIL) |
 | `docs/architecture/p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
 | `docs/architecture/p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 base schema plan |
 | `docs/architecture/p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |

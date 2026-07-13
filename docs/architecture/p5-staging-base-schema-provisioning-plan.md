@@ -269,15 +269,46 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 | **Base Schema Provisioning Plan** | **PASS** (repo foundation file; staging not applied) |
 | **Repo contains full base schema** | **YES** — `supabase/core_schema_foundation.sql` |
 | **Safe incremental order definable** | **YES** — after Phase 0 |
-| **P5-E.5 Re-run** | **BLOCKED** — until base schema on staging |
+| **P5-E.5 Re-run** | **BLOCKED** — 5C apply failed on staging |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Summary
 
-P5-STAGING.5C created `supabase/core_schema_foundation.sql` from gitignored legacy dump. Core DDL now versioned in repo. **Staging apply not performed.**
+P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `public` still empty. Pre-apply backup: `p5-staging6-preapply-20260713-193900.sql` (185,427 bytes).
 
-**Next:** P5-STAGING.6 with explicit approval. No push/deploy/launch.
+**Next:** Re-order foundation SQL → re-run P5-STAGING.6. No push/deploy/launch.
+
+---
+
+## 15. P5-STAGING.6 Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 — Base Schema Apply. User approval granted. **FAIL.**
+
+| Item | Status |
+|------|--------|
+| Pre-apply backup | `[x]` 185,427 bytes |
+| `core_schema_foundation.sql` apply | `[ ]` **FAIL** line ~315 |
+| Staging `public` post-fail | `[x]` empty (rollback) |
+| P5 security SQL | `[x]` not applied |
+| Test users A/B | `[x]` intact, confirmed |
+| Base Schema Apply (6) | **FAIL** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
+
+---
+
+## Related Documents
+
+| Document | Role |
+|----------|------|
+| `p5-staging-base-schema-apply-report.md` | P5-STAGING.6 apply report (FAIL) |
+| `p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report |
+| `p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
+| `p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (PASS) |
+| `p5-staged-db-application-report.md` | P5-E.5 re-run blocked report |
+| `p5-staging-environment-plan.md` | Staging gate sequence |
+| `PRE_RELEASE_RESET_README.md` | Reset danger documentation |
 
 ---
 
@@ -290,24 +321,10 @@ P5-STAGING.5C created `supabase/core_schema_foundation.sql` from gitignored lega
 | `core_schema_foundation.sql` | `[x]` ~115 KB |
 | Required core tables | `[x]` all six |
 | No data / no DB access | `[x]` |
-| Apply order documented | `[x]` |
 | Curated Extraction (5C) | **PASS** |
 
 **Report:** `docs/architecture/p5-curated-core-schema-extraction-report.md`
 
 ---
 
-## Related Documents
-
-| Document | Role |
-|----------|------|
-| `p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report |
-| `p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
-| `p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (PASS) |
-| `p5-staged-db-application-report.md` | P5-E.5 re-run blocked report |
-| `p5-staging-environment-plan.md` | Staging gate sequence |
-| `PRE_RELEASE_RESET_README.md` | Reset danger documentation |
-
----
-
-*Document version: P5-STAGING.5 + 5A + 5B + 5C PASS. Foundation SQL in repo. No staging apply.*
+*Document version: P5-STAGING.5 + 5C PASS + 6 FAIL. Foundation in repo; staging empty.*

@@ -472,7 +472,7 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 1. **P5-STAGING.5A:** Legacy schema-only export plan — **PASS** (Path A chosen; no export yet).
 2. **P5-STAGING.5B:** Execute schema-only `pg_dump` from legacy — **PASS** (re-run; 138,895-byte gitignored dump).
 3. **P5-STAGING.5C:** Curate `supabase/core_schema_foundation.sql` — **PASS** (~115 KB; no apply).
-4. **P5-STAGING.6:** Apply foundation + incremental SQL to staging.
+4. **P5-STAGING.6:** Apply foundation to staging — **FAIL** (dependency order; staging unchanged).
 5. Re-verify tables; P5-E.5 re-attempt with explicit approval.
 
 **Plans:** `p5-staging-base-schema-provisioning-plan.md`, `p5-legacy-schema-only-export-plan.md`
@@ -531,4 +531,23 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ---
 
-*Document version: P5-E.5 blocked + 5B PASS + 5C PASS. No SQL applied.*
+### P5-STAGING.6 follow-up (FAIL)
+
+**P5-STAGING.6** base schema apply (HEAD `c986af2`). User approval granted. **FAIL** — function `bl_match_entities` references `wiki_relation_types` before tables exist (~line 315). Transaction rolled back; staging `public` empty.
+
+| Item | Status |
+|------|--------|
+| Pre-apply backup | `[x]` 185,427 bytes |
+| `core_schema_foundation.sql` only | `[x]` attempted |
+| P5 security SQL | `[x]` not applied |
+| Core tables on staging | `[ ]` — none |
+| Test users A/B | `[x]` intact, confirmed |
+| Base Schema Apply (6) | **FAIL** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
+
+**Next:** Re-order foundation SQL → re-run P5-STAGING.6 → P5-E.5 with explicit approval.
+
+---
+
+*Document version: P5-E.5 blocked + 5C PASS + 6 FAIL. Staging unchanged.*

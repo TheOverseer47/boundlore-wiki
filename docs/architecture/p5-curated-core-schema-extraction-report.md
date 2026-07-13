@@ -190,13 +190,21 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **Curated Core Schema Extraction (5C)** | **PASS** |
-| **Ready for P5-STAGING.6** | **YES** (with explicit approval) |
-| **P5-E.5 Re-run** | **BLOCKED** until staging apply succeeds |
+| **Ready for P5-STAGING.6** | **YES** → **attempted (6 FAIL)** |
+| **P5-E.5 Re-run** | **BLOCKED** — staging apply failed (dependency order) |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
-**Next:** P5-STAGING.6 Base Schema Apply to staging — **explicit approval only**. No push/deploy/launch.
+**Next:** Fix `core_schema_foundation.sql` ordering → re-run P5-STAGING.6. See `p5-staging-base-schema-apply-report.md`.
 
 ---
 
-*Document version: P5-STAGING.5C PASS. Extraction only. No DB access. No secrets.*
+## 11. P5-STAGING.6 Follow-up (FAIL)
+
+**Gate:** P5-STAGING.6 — apply attempted. **FAIL** — function-before-table dependency (`bl_match_entities` → `wiki_relation_types`). Staging `public` unchanged (transaction rollback).
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
+
+---
+
+*Document version: P5-STAGING.5C PASS + 5C apply dependency note. No secrets.*

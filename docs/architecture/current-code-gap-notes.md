@@ -3260,6 +3260,22 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 110. P5-STAGING.6 — Base Schema Apply to Staging (FAIL)
+
+**Milestone:** P5-STAGING.6 — staging apply attempted; **FAIL**.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Pre-apply backup | `[x]` |
+| SQL apply | `[ ]` FAIL — dependency order |
+| Staging unchanged | `[x]` |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
+
+---
+
 ## 109. P5-STAGING.5C — Curated Core Schema Extraction (PASS)
 
 **Milestone:** P5-STAGING.5C — extraction only; **PASS**.

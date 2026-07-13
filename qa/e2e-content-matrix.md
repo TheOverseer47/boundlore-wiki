@@ -2212,6 +2212,27 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.6 — Base Schema Apply to Staging (FAIL)
+
+**Milestone:** P5-STAGING.6 — staging apply; **FAIL**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Staging ref only | `jzzgoiwfbuwiiyvwgwri` | no legacy | `[x]` |
+| Pre-apply backup | `backups/staging/` | > 0 bytes | `[x]` 185,427 |
+| Static SQL safety | foundation file | PASS | `[x]` |
+| `core_schema_foundation.sql` apply | staging | success | `[ ]` **FAIL** |
+| Core tables on staging | public | 6+ present | `[ ]` — none |
+| P5 security SQL | ops | not applied | `[x]` |
+| Test users A/B | auth.users | exist, confirmed | `[x]` |
+| Base Schema Apply (6) | gate | PASS | **FAIL** |
+| P5-E.5 re-run | gate | BLOCKED | `[x]` |
+
+**P5-STAGING.6 FAIL.** Function-before-table order blocked apply; staging unchanged. Next: fix ordering → re-run 6.
+
+---
+
 ## P5-STAGING.5C — Curated Core Schema Extraction (PASS)
 
 **Milestone:** P5-STAGING.5C — extraction only; **PASS**.
