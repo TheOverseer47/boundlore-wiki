@@ -2128,6 +2128,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-F.1 — Combined S+ Security Retest Gate
+
+**Milestone:** P5-F.1 local combined retest — all four S+ baselines **combined baseline retested**; **not production-closed**; Live-RLS/Live-RPC **NOT TESTED**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| S+-02 retest | notification baseline | combined baseline retested | `[x]` |
+| S+-04 retest | observation RPC baseline | combined baseline retested | `[x]` |
+| S+-03 retest | sanitization baseline | combined baseline retested | `[x]` |
+| S+-01 retest | release lock baseline | combined baseline retested | `[x]` |
+| Notification fixture | `p5-notification-security-fixtures` | 24/24 PASS | `[x]` |
+| Observation fixture | `p5-observation-rpc-security-fixtures` | 17/17 PASS | `[x]` |
+| Sanitization fixture | `p5-sanitization-security-fixtures` | 45/45 PASS | `[x]` |
+| Release Lock DB fixture | `p5-release-lock-db-security-fixtures` | 34/34 PASS | `[x]` |
+| Release Lock UI fixture | `p5-release-lock-ui-fixtures` | 30/30 PASS | `[x]` |
+| Standard regression | browse/search/posts/create/admin | no crash | `[x]` |
+| Static S+ grep checks | repo patterns | PASS or NOT TESTED | `[x]` |
+| SQL executed / DB migration | ops | none | `[x]` |
+| Supabase writes / RPC / unlock | ops | none | `[x]` |
+| Live-RLS / Live-RPC | ops | NOT TESTED | `[x]` documented |
+| S+-01..04 production-closed | acceptance | staging + Fable | `[ ]` |
+| Combined retest report | `p5-splus-combined-retest.md` | created | `[x]` |
+
+**P5-F.1 combined S+ security retest completed locally.** All four S+ baselines re-verified together at repository level. All five P5 fixtures green. Standard regression green. No SQL execution, no Supabase writes, no data changes, no push, no deploy. S+ local/repo baseline retest **PASS**; S+ production closure remains **NOT TESTED / FAIL**. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate:** **P5-F.2 Fable Retest Handoff Package**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

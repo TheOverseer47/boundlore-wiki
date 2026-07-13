@@ -349,7 +349,7 @@ Raises SQLSTATE `42501` with clear message when locked, unauthenticated, or miss
 
 - [ ] Staging negative tests documented and passed  
 - [ ] Live policy application consciously approved (LAUNCH-0)  
-- [ ] P5-F.1 combined retest complete  
+- [x] P5-F.1 combined retest complete  
 - [ ] Fable Retest 1 confirms  
 
 **P5-E.1:** None of the above checkboxes are satisfied — planning only.
@@ -544,3 +544,26 @@ Stop and escalate if:
 | Staged DB apply | `[ ]` — P5-E.5+ with explicit approval |
 
 **P5-E.4 verdict:** S+-01 **baseline accepted** at repository level. **Not production-closed.** Next: **P5-F.1 Combined S+ Security Retest Gate**. No push/deploy/launch.
+
+---
+
+## 19. P5-F.1 — Combined S+ Security Retest (S+-01 re-verified)
+
+**Milestone:** P5-F.1 combined local retest — S+-01 **combined baseline retested** with S+-02/03/04; **not production-closed**.
+
+**P5-F.1 combined retest completed locally.** Release Lock DB fixture 34/34 PASS; Release Lock UI fixture 30/30 PASS. Static grep confirms `release_gate`, fail-closed helpers, restrictive policies, and `shouldAllowClientBypass() === false`. Standard regression smoke PASS. No SQL apply, no unlock/relock executed, no Supabase writes, no push, no deploy.
+
+| Item | Result |
+|------|--------|
+| S+-01 combined baseline retested | `[x]` |
+| Release Lock DB fixture 34/34 | `[x]` |
+| Release Lock UI fixture 30/30 | `[x]` |
+| All other P5 fixtures green | `[x]` |
+| Live-RLS / Live-RPC | `[x]` — NOT TESTED |
+| S+-01 production-closed | `[ ]` |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Authoritative combined report:** `docs/architecture/p5-splus-combined-retest.md`
+
+**Next:** **P5-F.2 Fable Retest Handoff Package**. No push/deploy/launch.

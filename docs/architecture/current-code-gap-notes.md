@@ -3260,6 +3260,47 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 97. P5-F.1 — Combined S+ Security Retest Gate
+
+**Milestone:** P5-F.1 local combined retest — all four S+ baselines **combined baseline retested**; **not production-closed**.
+
+### P5-F.1 combined retest
+
+| Check | Result |
+|-------|--------|
+| S+-02 combined baseline retested | `[x]` |
+| S+-04 combined baseline retested | `[x]` |
+| S+-03 combined baseline retested | `[x]` |
+| S+-01 combined baseline retested | `[x]` |
+| Notification fixture 24/24 PASS | `[x]` |
+| Observation fixture 17/17 PASS | `[x]` |
+| Sanitization fixture 45/45 PASS | `[x]` |
+| Release Lock DB fixture 34/34 PASS | `[x]` |
+| Release Lock UI fixture 30/30 PASS | `[x]` |
+| Standard regression smoke | `[x]` |
+| Static S+ grep checks | `[x]` PASS or NOT TESTED documented |
+| SQL executed / Supabase writes | `[x]` — none |
+| Live-RLS / Live-RPC | `[x]` — NOT TESTED |
+| S+-01..04 production-closed | `[ ]` |
+| Optional combined QA fixture | `[x]` — not created; retest doc sufficient |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-01..04 | **Combined baseline retested** — not production-closed |
+
+**P5-F.1 combined S+ security retest completed locally.** All four S+ baselines re-verified together. No SQL, no data changes, no deploy, no push. Authoritative report: `docs/architecture/p5-splus-combined-retest.md`.
+
+### Next candidate
+
+**P5-F.2 Fable Retest Handoff Package**. No push/deploy/launch.
+
+---
+
 ## 96. P5-E.4 — Release Gate Acceptance Sweep
 
 **Milestone:** P5-E.4 local acceptance for S+-01 — **baseline accepted**, **not production-closed**.

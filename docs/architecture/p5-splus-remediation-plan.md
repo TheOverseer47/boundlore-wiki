@@ -402,7 +402,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-E.2 | SQL baseline | `release_gate` DB/RLS/RPC baseline; see §19 — not executed |
 | **Complete** | P5-E.3 | Frontend/Admin UX | Release lock client + admin panel; see §20 — no DB apply |
 | **Complete** | P5-E.4 | Acceptance sweep | Release gate baseline accepted; see §21 — Live-RLS NOT TESTED |
-| **Next** | P5-F.1 | Combined S+ retest | All four S+ fixtures + regression |
+| **Complete** | P5-F.1 | Combined S+ retest | All four S+ fixtures + regression; see §22 — not production-closed |
+| **Next** | P5-F.2 | Fable retest handoff | Evidence bundle for independent Fable security retest |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -755,7 +756,36 @@ For **future implementation gates** (P5-B through P5-E):
 
 **S+-01 status:** **Baseline accepted** at repository level. **Not production-closed.** Staged DB apply remains P5-E.5+ with explicit approval.
 
-**Next candidate:** **P5-F.1 Combined S+ Security Retest Gate**. No push/deploy/launch.
+**Next candidate (historical):** **P5-F.1 Combined S+ Security Retest Gate** — **complete**. See §22.
+
+---
+
+## 22. P5-F.1 — Combined S+ Security Retest Gate
+
+**Milestone:** P5-F.1 local combined retest — all four S+ baselines re-verified together; **combined baseline retested** at repo level; **not production-closed**.
+
+**P5-F.1 combined S+ security retest completed locally.** All P5-B through P5-E acceptance baselines re-run together. Five P5 fixtures green (Notification 24/24, Observation 17/17, Sanitization 45/45, Release Lock DB 34/34, Release Lock UI 30/30). Standard regression smoke PASS. Static S+ grep checks PASS or explicitly NOT TESTED where out of scope. No SQL execution, no Supabase writes, no data changes, no unlock/relock, no push, no deploy, no launch.
+
+| Check | Result |
+|-------|--------|
+| S+-02 combined baseline retested | `[x]` |
+| S+-04 combined baseline retested | `[x]` |
+| S+-03 combined baseline retested | `[x]` |
+| S+-01 combined baseline retested | `[x]` |
+| All five P5 fixtures PASS | `[x]` |
+| Standard regression PASS | `[x]` |
+| Static S+ checks PASS / NOT TESTED documented | `[x]` |
+| SQL executed / DB migration | `[x]` — none |
+| Live-RLS / Live-RPC tested | `[x]` — NOT TESTED |
+| S+-01..04 production-closed | `[ ]` |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**S+-01..04 status:** **Combined baseline retested** at repository level. **Not production-closed.** Live-RLS/Live-RPC/storage real enforcement remain NOT TESTED. Staged DB apply remains P5-E.5+ with explicit approval.
+
+**Authoritative report:** `docs/architecture/p5-splus-combined-retest.md`
+
+**Next candidate:** **P5-F.2 Fable Retest Handoff Package**. No push/deploy/launch.
 
 ---
 
@@ -763,6 +793,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-splus-combined-retest.md` | P5-F.1 combined S+ retest report (authoritative for F.1) |
 | `docs/architecture/p5-release-lock-plan.md` | P5-E.1 release lock architecture (authoritative for E.2+) |
 | `docs/architecture/current-code-gap-notes.md` §85–§93 | P5-A through P5-E.1 gate records |
 | `docs/architecture/moderation-conflict-matrix.md` | Conflict handling must remain untouched during P5 |
