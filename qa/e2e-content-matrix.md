@@ -2212,6 +2212,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.1 — Dedicated Supabase Staging Provisioning Gate
+
+**Milestone:** P5-STAGING.1 docs-only — staging requirements plan; no SQL, no project creation, no secrets.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| P5-E.5 blocked documented | prior gate | isolated staging not proven | `[x]` |
+| Staging plan | `p5-staging-environment-plan.md` | full checklist + re-entry criteria | `[x]` |
+| Config example | `.env.staging.example` | empty placeholders only | `[x]` |
+| `.env.staging` gitignored | `.gitignore` | not committed | `[x]` |
+| Forbidden ref documented | `ohkoojpzmptdfyowdgog` | no P5-E.5 apply | `[x]` |
+| SQL / DB / project creation | ops | none | `[x]` |
+| Secrets committed | ops | none | `[x]` |
+
+**P5-STAGING.1 staging environment plan created.** P5-E.5 remains BLOCKED until user provisions dedicated staging and P5-STAGING.2 passes. No SQL, no data changes, no push/deploy. Product-Activation-Ready = FAIL; Public-Launch-Ready = NO-GO.
+
+**Next:** User creates Supabase staging project → **P5-STAGING.2 Environment Proof & Dry Run**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

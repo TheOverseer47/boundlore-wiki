@@ -1,2 +1,5 @@
 # Local VS Code workspace settings
 .vscode/
+
+# Staging secrets (P5-STAGING.1) — template is .env.staging.example
+.env.staging

@@ -3260,6 +3260,24 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 100. P5-STAGING.1 — Dedicated Supabase Staging Provisioning Gate
+
+**Milestone:** P5-STAGING.1 docs-only — staging plan + config example; **no SQL**, **no DB changes**.
+
+| Check | Result |
+|-------|--------|
+| P5-E.5 blocked reason documented | `[x]` — isolated staging not proven |
+| `p5-staging-environment-plan.md` | `[x]` |
+| `.env.staging.example` (no secrets) | `[x]` |
+| `.env.staging` gitignored | `[x]` |
+| `ohkoojpzmptdfyowdgog` forbidden for P5-E.5 | `[x]` |
+| P5-E.5 re-entry criteria | `[x]` |
+| SQL / Supabase project created | `[x]` — none |
+
+**P5-STAGING.1 complete.** User must create dedicated Supabase staging project manually. Next: P5-STAGING.2. No push/deploy/launch.
+
+---
+
 ## 99. P5-E.5 — Staged DB Application & Negative RLS/RPC Tests (BLOCKED)
 
 **Milestone:** P5-E.5 — **BLOCKED** at environment proof; no SQL applied.

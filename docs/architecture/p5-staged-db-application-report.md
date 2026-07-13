@@ -213,6 +213,10 @@ All served from `http://localhost:8080`. No Supabase writes.
 4. Create pre-apply backup on **proven staging only**.
 5. Re-run P5-E.5 with environment proof section completed before any `execute_sql` / `psql` / migration apply.
 
+### P5-STAGING.1 follow-up (this gate)
+
+**P5-STAGING.1** created `docs/architecture/p5-staging-environment-plan.md` and `.env.staging.example`. No SQL, no project creation, no secrets committed. `ohkoojpzmptdfyowdgog` remains forbidden for P5-E.5 apply.
+
 ### Next steps
 
 - **Do not** apply P5 SQL to `ohkoojpzmptdfyowdgog` until isolation is proven.

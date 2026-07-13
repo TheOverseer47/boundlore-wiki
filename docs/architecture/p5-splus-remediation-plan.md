@@ -407,7 +407,9 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-F.1 | Combined S+ retest | All four S+ fixtures + regression; see §22 — not production-closed |
 | **Complete** | P5-F.2 | Fable retest handoff | Evidence bundle + prompt; see §23 |
 | **Blocked** | P5-E.5 | Staged DB apply + negative tests | **BLOCKED** — isolated staging not proven; see §24 |
-| **Next** | P5-E.5 retry | Staging provisioning | Dedicated staging project required before SQL apply |
+| **Complete** | P5-STAGING.1 | Staging environment plan | Docs + `.env.staging.example`; see staging plan |
+| **Next** | P5-STAGING.2 | Environment proof & dry run | After user creates staging project |
+| **Not now** | P5-E.5 re-run | SQL apply | Blocked until P5-STAGING.2 PASS |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -848,10 +850,35 @@ For **future implementation gates** (P5-B through P5-E):
 
 ---
 
+## 25. P5-STAGING.1 — Dedicated Supabase Staging Provisioning Gate
+
+**Milestone:** P5-STAGING.1 docs-only — staging requirements documented; **no SQL**, **no project creation**, **no secrets committed**.
+
+**P5-STAGING.1 staging environment plan created.** Documents why P5-E.5 was blocked, forbidden project `ohkoojpzmptdfyowdgog`, manual setup checklist, config rules, P5-E.5 re-entry criteria, and stop conditions. Added `.env.staging.example` and gitignored `.env.staging`. No changes to `js/supabase-config.js`, no Supabase writes, no push/deploy/launch.
+
+| Check | Result |
+|-------|--------|
+| `p5-staging-environment-plan.md` created | `[x]` |
+| `.env.staging.example` created (no secrets) | `[x]` |
+| `.env.staging` gitignored | `[x]` |
+| `ohkoojpzmptdfyowdgog` marked forbidden for P5-E.5 | `[x]` |
+| P5-E.5 re-entry criteria documented | `[x]` |
+| SQL / DB changes | `[x]` — none |
+| Supabase project auto-created | `[x]` — none (manual operator step) |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Authoritative plan:** `docs/architecture/p5-staging-environment-plan.md`
+
+**Next:** User creates dedicated Supabase staging project manually → **P5-STAGING.2 Environment Proof & Dry Run**. No push/deploy/launch.
+
+---
+
 ## Appendix A — Related architecture docs
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-staging-environment-plan.md` | P5-STAGING.1 dedicated staging plan |
 | `docs/architecture/p5-staged-db-application-report.md` | P5-E.5 staged DB apply report (BLOCKED) |
 | `docs/architecture/p5-fable-splus-retest-handoff.md` | P5-F.2 Fable S+ retest handoff (authoritative for F.2) |
 | `docs/architecture/p5-fable-splus-retest-prompt.md` | Copy-paste prompt for Fable Retest 1 |
