@@ -1054,11 +1054,28 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-storage-closure-plan.md`
 
-**Next:** P5-E.8A — only with new explicit approval. No push/deploy/launch.
+**Next:** P5-E.8A re-attempt after Dashboard sign-in. No push/deploy/launch.
 
 ---
 
-## 51. P5-E.7B — Release Lock Fixture Alignment (PASS)
+## 53. P5-E.8A — Storage Policy Owner-Capable Apply (BLOCKED)
+
+**Milestone:** P5-E.8A — Dashboard SQL Editor apply on staging. **BLOCKED**.
+
+| Check | Result |
+|-------|--------|
+| Pre-apply backup | `[x]` 290,277 bytes |
+| Release gate locked | `[x]` |
+| Dashboard sign-in | **BLOCKED** |
+| Policy applied | **NO** |
+| Storage closure | **DEFERRED** |
+| P5-E.8A | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
+
+---
+
+## 52. P5-E.8 — Storage Closure Plan (PASS)
 
 **Milestone:** P5-E.7B — Release Lock DB fixture aligned for storage defer. **PASS** (fixture/docs only).
 

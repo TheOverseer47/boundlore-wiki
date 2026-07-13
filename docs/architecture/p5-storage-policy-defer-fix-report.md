@@ -209,4 +209,12 @@ Requires **new explicit user approval** before any DB-touching step.
 
 ---
 
-*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS. No secrets.*
+## 16. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+
+**Gate:** P5-E.8A — owner-capable apply. **BLOCKED** (Dashboard sign-in).
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
+
+---
+
+*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS + P5-E.8A BLOCKED. No secrets.*

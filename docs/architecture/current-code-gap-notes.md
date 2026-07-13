@@ -3292,7 +3292,23 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.8A — explicit approval required. No push/deploy/launch.
+**Next:** P5-E.8A re-attempt after Dashboard sign-in. No push/deploy/launch.
+
+---
+
+## 128. P5-E.8A — Storage Policy Owner-Capable Apply (BLOCKED)
+
+**Milestone:** P5-E.8A — Dashboard apply on staging. **BLOCKED**.
+
+| Check | Result |
+|-------|--------|
+| Backup | `[x]` 290,277 bytes |
+| Dashboard apply | **BLOCKED** — sign-in |
+| Policy applied | **NO** |
+| Storage closure | **DEFERRED** |
+| P5-E.8A | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
 ---
 

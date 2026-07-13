@@ -291,4 +291,20 @@ P5-E.5 Re-run 3 delivered **credible staging evidence** for notification injecti
 
 ---
 
-*Document version: P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS. No secrets. No DB access.*
+## 17. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+
+**Gate:** P5-E.8A — storage policy apply. **BLOCKED**.
+
+| Item | Result |
+|------|--------|
+| Backup | 290,277 bytes |
+| Apply | **BLOCKED** — Dashboard sign-in |
+| `discovery-uploads` bucket | **Not on staging** |
+| Storage closure | **DEFERRED** |
+| P5-E.8A | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
+
+---
+
+*Document version: P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS + P5-E.8A BLOCKED. No secrets. No DB access.*

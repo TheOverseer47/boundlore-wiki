@@ -2298,6 +2298,25 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.8A — Storage Policy Owner-Capable Apply (BLOCKED)
+
+**Milestone:** P5-E.8A — Dashboard SQL Editor apply on staging. **BLOCKED**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Staging ref proof | env/MCP | jzzgoiwfbuwiiyvwgwri | `[x]` |
+| Pre-apply backup | backups/staging | >0 bytes | `[x]` 290,277 |
+| Release gate locked | staging | true | `[x]` |
+| Dashboard apply | SQL Editor | PASS | `[ ]` **BLOCKED** — sign-in |
+| Policy applied | storage.objects | yes | `[ ]` NO |
+| Negative storage test | staging | PASS/NOT RUN | `[ ]` NOT RUN |
+| P5-E.8A | gate | PASS | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
+
+---
+
 ## P5-E.8 — Storage Closure Plan (PASS)
 
 **Milestone:** P5-E.8 — Storage Closure Plan (planning/review only). **PASS**.

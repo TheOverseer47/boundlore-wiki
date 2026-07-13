@@ -726,3 +726,22 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 | P5-E.8 | **PASS** |
 
 **Report:** `docs/architecture/p5-storage-closure-plan.md`
+
+---
+
+## 32. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+
+**Gate:** P5-E.8A — storage policy owner-capable apply. **BLOCKED**.
+
+| Check | Result |
+|-------|--------|
+| Pre-apply backup | `[x]` 290,277 bytes |
+| Release gate locked pre-check | `[x]` |
+| Dashboard apply | **BLOCKED** — sign-in |
+| Policy applied | **NO** |
+| Storage closure | **DEFERRED** |
+| P5-E.8A | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
+
+**Next:** User Dashboard sign-in → re-attempt P5-E.8A apply. No push/deploy/launch.

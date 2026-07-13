@@ -235,4 +235,12 @@ P5-E.7A.2 closed the **profiles/acks SELECT grant gap** on staging. Direct posts
 
 ---
 
-*Document version: P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS. No secrets.*
+## 15. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+
+**Gate:** P5-E.8A — storage policy apply. **BLOCKED**.
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
+
+---
+
+*Document version: P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS + P5-E.8A BLOCKED. No secrets.*

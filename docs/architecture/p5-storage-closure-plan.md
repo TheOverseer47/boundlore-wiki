@@ -365,8 +365,25 @@ SELECT public.bl_is_release_unlocked();
 
 P5-E.8 documents a safe, staged path to close the deferred storage release-gate policy. The deferred SQL file is statically sound and ready for a separate **P5-E.8A** apply gate using an owner-capable execution path (Dashboard preferred). Session-pooler `psql` remains unsuitable. Fixture re-enablement is deferred to **P5-E.8B** after live verification. No database access occurred in this gate.
 
-**Recommended next:** **P5-E.8A** — only with new explicit user approval. Alternative: S+-03 Runtime Closure Plan. Continue **no push / deploy / launch**.
+**Recommended next:** **P5-E.8A re-attempt** — user Dashboard sign-in required. See `p5-storage-policy-owner-apply-report.md`.
 
 ---
 
-*Document version: P5-E.8 PASS (planning). No secrets.*
+## 12. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+
+**Gate:** P5-E.8A — Storage Policy Owner-Capable Apply. **BLOCKED**.
+
+| Item | Result |
+|------|--------|
+| Pre-apply backup | **PASS** — 290,277 bytes |
+| Release gate pre-check | **PASS** — locked |
+| Dashboard apply | **BLOCKED** — sign-in required |
+| Policy applied | **NO** |
+| Storage closure | **DEFERRED** (unchanged) |
+| P5-E.8A | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
+
+---
+
+*Document version: P5-E.8 PASS + P5-E.8A BLOCKED. No secrets.*
