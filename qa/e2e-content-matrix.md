@@ -2383,11 +2383,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `js/error-reporter.js`, `qa/p5-error-reporter-fixtures.html`
 
-**Next:** P5-E.9C.3 (STOPP). No push/deploy/launch/provider-keys.
+**Next:** P5-E.9D.1 robots/noindex hardening. No push/deploy/launch.
 
 ---
 
-## P5-E.9C.1 — Monitoring Provider Decision (PASS)
+## P5-E.9D — SEO CSR Closure Plan (PASS)
+
+**Milestone:** P5-E.9D — SEO/CSR Closure Plan (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| SEO closure plan exists | `p5-seo-csr-closure-plan.md` | complete | `[x]` |
+| Indexing policy matrix exists | plan | documented | `[x]` |
+| CSR shell risk matrix exists | plan | documented | `[x]` |
+| Sitemap/robots gaps documented | plan | documented | `[x]` |
+| No deploy performed | gate | none | `[x]` |
+| No production touched | gate | none | `[x]` |
+| No Search Console action | gate | none | `[x]` |
+| Future SEO implementation | policy | separate gate required | `[x]` |
+| S-05 SEO/CSR | status | OPEN_BLOCKING | `[x]` |
+| S-06 Search Recall | status | OPEN_BLOCKING (separate) | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9D | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-seo-csr-closure-plan.md`
+
+**Next:** P5-E.9D.1 robots/noindex hardening. No push/deploy/launch.
+
+---
 
 **Milestone:** P5-E.9C.1 — Monitoring Provider Decision (planning only). **PASS**.
 

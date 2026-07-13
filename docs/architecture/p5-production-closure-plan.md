@@ -84,7 +84,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-03 Sanitization — Repo** | S+ Critical | **CLOSED** | `BoundLoreContentSafety` p5-d1; fixture 45/45 | Server-side sanitizer optional | — | Nein | Nein | Nein | Ja | Ja |
 | **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
-| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | Appendix B; kein prerender | Entity-URLs nicht indexierbar | **P5-E.9D** | Nein | Nein | Nein | Optional | Ja |
+| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D Plan** | Entity-URLs CSR-Shell; kein Prerender | **P5-E.9D.1** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Provider integration + alerting | **P5-E.9C.3** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
@@ -96,7 +96,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **Admin unlock/relock** | — | **NOT_TESTED** | UI `p5-e3` | Staging admin journey | Post-staging gate | Nein | Ja (staging) | Nein | Nein | Ja |
 | **post_reactions live block** | — | **NOT_TESTED** | SQL in repo | Kein FK-Target staging | Optional | Nein | Nein | Nein | Nein | Ja |
 | **Incident Response** | Ops | **OPEN_BLOCKING** | In P5-E.9C Plan skizziert | Runbook + Escalation | P5-E.9C.4+ | Nein | Nein | Nein | Nein | Ja |
-| **robots.txt / sitemap.xml** | SEO | **PARTIAL** | Statisch im Repo | Dynamische URLs | P5-E.9D | Nein | Nein | Nein | Ja | Ja |
+| **robots.txt / sitemap.xml** | SEO | **PARTIAL** | Statisch; 9 URLs; Allow:/ | Hubs + dynamische URLs | **P5-E.9D.1** → **9D.4** | Nein | Nein | Nein | Ja | Ja |
 | **report-screenshots Storage** | — | **OUT_OF_SCOPE_FOR_MVP** | Support disabled P5-E.8C | Policy wenn Support reaktiviert | Später | Ja | Ja | Ja | Nein | Ja |
 
 \* P5-E.9A: Read-only Staging smoke mit **bestehenden** Testposts erlaubt; keine neuen Payload-Writes ohne Gate.  
@@ -132,7 +132,7 @@ P5-E.9C — Monitoring/Error Tracking Plan                [Plan → SDK/Alerting
     ↓
 P5-E.9F — Production RLS Export/Verification Plan       [Read-only schema export]
     ↓
-P5-E.9D — SEO/CSR Closure Plan                          [Produkt/Architektur]
+P5-E.9D — SEO/CSR Closure Plan                          [PASS — Plan]
     ↓
 P5-E.9E — Search Recall Closure Plan                     [Index/Recall]
     ↓
@@ -319,6 +319,10 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9C.2** — Local Error Capture Stub~~ **PASS** — `js/error-reporter.js` (21/21)
 
+~~**P5-E.9D** — SEO/CSR Closure Plan~~ **PASS** — `p5-seo-csr-closure-plan.md`
+
+**P5-E.9D.1** — robots/noindex Static Hardening (lokale Dateiänderungen, kein Deploy)
+
 **P5-E.9C.3** — Staging Monitoring Integration (**STOPP** — Provider-Key + Freigabe)
 
 **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Freigabe für Writes)
@@ -504,4 +508,28 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9B.2 PASS + P5-E.9C PASS + P5-E.9C.1 PASS + P5-E.9C.2 PASS. Keine Secrets. Kein DB-Zugriff.*
+## 22. P5-E.9D Follow-up (PASS — SEO/CSR Closure Plan)
+
+**Gate:** P5-E.9D — SEO/CSR Closure Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| SEO/CSR Plan | `p5-seo-csr-closure-plan.md` |
+| Indexing Policy Matrix | `[x]` |
+| CSR Shell Risk Matrix | `[x]` |
+| Sitemap/robots Gap Matrix | `[x]` |
+| Minimal Pre-Launch + Full Launch SEO | `[x]` |
+| Folge-Gates 9D.1–9D.5 | `[x]` |
+| Deploy / Search Console | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| S-06 Search Recall | **OPEN_BLOCKING** (P5-E.9E) |
+| Sitemap / robots / Structured Data | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D | **PASS** |
+
+**Report:** `docs/architecture/p5-seo-csr-closure-plan.md`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + … + P5-E.9C.2 PASS + P5-E.9D PASS. Keine Secrets. Kein DB-Zugriff.*

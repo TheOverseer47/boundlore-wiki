@@ -69,7 +69,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **Upload Path Disablement** | OPEN (pre-8C) | **CLOSED** | P5-E.8C; `p5-upload-path-disablement-review.md` | — | Nein (locked MVP) | — |
 | **Storage Closure (gesamt)** | DEFERRED | **DEFERRED (akzeptabel für locked MVP)** | P5-E.8A.2 Hybrid; P5-E.8C Hardening | DB-Policy + Bucket vor Unlock | **Ja** (vor Unlock) | P5-E.8A.4 → P5-E.8A.3 → P5-E.8A retry |
 | **Production Closure** | NOT CLOSED | **BLOCKING** | Kein Production-Apply | Alle S+ auf Production | **Ja** | **P5-E.9** |
-| **S-05 CSR / SEO Entity Pages** | Open | **BLOCKING** (Launch) | `p5-splus-remediation-plan.md` Appendix B | Keine CSR-Shells für Entities | **Ja** (Public Launch) | Post-S+ Produktgate |
+| **S-05 CSR / SEO Entity Pages** | Open | **BLOCKING** (Launch) | **P5-E.9D Plan** | CSR-Shells; kein Prerender | **Ja** (Public Launch) | **P5-E.9D.1** → 9D.5 |
 | **S-06 Search Recall (`monster`)** | Open | **BLOCKING** (Launch) | Bekannter Recall-Gap; Smoke lädt ohne Crash | 0 Treffer für bekannte Entities | **Ja** (Public Launch) | Search-Index-Gate |
 | **S-07 Backup/Restore Evidence** | PARTIAL | **PARTIAL** (Staging backup PASS) | **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **Ja** (Launch/Ops) | **P5-E.9B.3** |
 | **S-08 Monitoring / Error Tracking** | Missing | **BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Keine Provider/Alerting-Integration | **Ja** (Launch/Ops) | **P5-E.9C.3** → 9C.4 |
@@ -78,7 +78,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **Admin unlock/relock journey** | NOT RUN | **NOT TESTED** | UI vorbereitet (`p5-e3`) | Kein Staging-Admin-Test | **Ja** (vor Unlock) | Staging Admin Gate |
 | **post_reactions live block** | NOT RUN | **NOT TESTED** | SQL in `release_gate_lock.sql` | Kein FK-Target auf Staging | Nein (locked MVP) | Optional Staging |
 | **Incident Response** | Docs only | **BLOCKING** (Ops) | Kein Runbook im Repo | Kein dokumentierter IR-Prozess | **Ja** (Launch/Ops) | Ops-Dokumentation |
-| **robots.txt / sitemap.xml** | Present | **PARTIAL** | Statisch im Repo; `boundlore.com` URLs | Dynamische Entity-URLs fehlen; CSR-Gap | **Ja** (SEO Launch) | S-05/S-06 |
+| **robots.txt / sitemap.xml** | Present | **PARTIAL** | 9 URLs; `Allow: /` | Hubs + dynamische URLs fehlen | **Ja** (SEO Launch) | **P5-E.9D.1** → 9D.4 |
 
 ---
 
@@ -136,8 +136,10 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 9. **P5-E.9B.3** — Isolated Restore Drill (**STOPP**)
 10. ~~**P5-E.9C.1** — Monitoring Provider Decision~~ **PASS** — `p5-monitoring-provider-decision.md`
 11. ~~**P5-E.9C.2** — Local Error Capture Stub~~ **PASS** — `js/error-reporter.js` (21/21)
-12. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
-13. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
+12. ~~**P5-E.9D** — SEO/CSR Closure Plan~~ **PASS** — `p5-seo-csr-closure-plan.md`
+13. **P5-E.9D.1** — robots/noindex Static Hardening (lokale Dateien, kein Deploy)
+14. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
+15. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
 
 ---
 
@@ -310,4 +312,22 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9B.2 PASS + P5-E.9C PASS + P5-E.9C.1 PASS + P5-E.9C.2 PASS. Keine Secrets.*
+## 21. P5-E.9D Follow-up (PASS — SEO/CSR Closure Plan)
+
+**Gate:** P5-E.9D — SEO/CSR Closure Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| SEO/CSR Plan | `p5-seo-csr-closure-plan.md` |
+| Indexing Policy + CSR Risk Matrix | `[x]` |
+| Sitemap/robots Gaps dokumentiert | `[x]` |
+| Deploy / Search Console | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| S-06 Search Recall | **OPEN_BLOCKING** (separat) |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9C.2 PASS + P5-E.9D PASS. Keine Secrets.*

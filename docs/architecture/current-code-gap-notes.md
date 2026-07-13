@@ -3338,7 +3338,33 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
 
-**Next:** P5-E.9C.3 (STOPP) or P5-E.9A.2. No push/deploy/launch/provider-keys.
+**Next:** P5-E.9D.1 robots/noindex hardening. No push/deploy/launch.
+
+---
+
+## 141. P5-E.9D — SEO/CSR Closure Plan (PASS)
+
+**Milestone:** P5-E.9D — SEO/CSR Closure Plan (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SEO/CSR Plan | `p5-seo-csr-closure-plan.md` |
+| Indexing Policy Matrix | `[x]` |
+| CSR Shell Risk Matrix | `[x]` |
+| Sitemap/robots Gap Matrix | `[x]` |
+| Minimal Pre-Launch + Full Launch SEO | `[x]` |
+| Folge-Gates 9D.1–9D.5 | `[x]` |
+| Deploy / Search Console | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| S-06 Search Recall | **OPEN_BLOCKING** (P5-E.9E) |
+| Sitemap / robots / Structured Data | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D | **PASS** |
+
+**Report:** `docs/architecture/p5-seo-csr-closure-plan.md`
+
+**Next:** P5-E.9D.1 robots/noindex hardening. No push/deploy/launch.
 
 ---
 
@@ -3535,7 +3561,7 @@ The future Draft Inspector / Preview must **NOT**:
 | Blocker | Klasse |
 |---------|--------|
 | Alle Product-Activation-Blocker | — |
-| S-05 SEO/CSR | OPEN_BLOCKING |
+| S-05 SEO/CSR | OPEN_BLOCKING (P5-E.9D Plan; CSR-Shells, kein Prerender) |
 | S-06 Search Recall | OPEN_BLOCKING |
 | S-10 Production RLS verification | NOT_TESTED |
 | Storage DB vor Unlock | DEFERRED_ACCEPTED → OPEN vor Unlock |
