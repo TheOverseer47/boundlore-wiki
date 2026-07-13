@@ -213,4 +213,20 @@ All 11 routes returned **200**.
 
 ---
 
-*Document version: P5-E.5 Re-run 3 PARTIAL. SQL apply PASS. Storage deferred. No secrets.*
+## 15. P5-E.6 Follow-up (PASS — evidence acceptance review)
+
+**Gate:** P5-E.6 — staging evidence acceptance + gap review. **PASS** (review only).
+
+| Item | Result |
+|------|--------|
+| S+-02 staging accepted | `[x]` |
+| S+-04 staging accepted | `[x]` |
+| S+-01 staging | `[x]` PARTIAL |
+| Storage closure | **DEFERRED** |
+| Product-Activation-Ready | **FAIL** |
+
+**Report:** `docs/architecture/p5-staging-evidence-acceptance-gap-review.md`
+
+---
+
+*Document version: P5-E.5 Re-run 3 PARTIAL + P5-E.6 PASS. No secrets.*

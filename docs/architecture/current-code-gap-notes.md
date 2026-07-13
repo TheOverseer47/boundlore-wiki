@@ -3292,7 +3292,22 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.6 staging evidence acceptance. No push/deploy/launch.
+**Next:** P5-E.7A grant/RLS decision. No push/deploy/launch.
+
+---
+
+## 123. P5-E.6 — Staging Evidence Acceptance + Gap Review (PASS)
+
+**Milestone:** P5-E.6 — evidence acceptance review. **PASS** (docs only).
+
+| Check | Result |
+|-------|--------|
+| S+-02 accepted | `[x]` |
+| S+-04 accepted | `[x]` |
+| S+-01 PARTIAL | `[x]` |
+| P5-E.6 | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-evidence-acceptance-gap-review.md`
 
 ---
 

@@ -2298,6 +2298,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.6 — Staging Evidence Acceptance + Gap Review (PASS)
+
+**Milestone:** P5-E.6 — S+ evidence acceptance review. **PASS** (docs only).
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Review only / no DB | gate | PASS | `[x]` |
+| S+-02 staging accepted | evidence | PASS | `[x]` |
+| S+-04 staging accepted | evidence | PASS | `[x]` |
+| S+-01 PARTIAL | evidence | PARTIAL | `[x]` |
+| Storage DEFERRED | closure | DEFERRED | `[x]` |
+| Product-Activation-Ready | gate | FAIL | `[x]` |
+| P5-E.6 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-evidence-acceptance-gap-review.md`
+
+---
+
 ## P5-E.5 Re-run 3 — Staged DB Security Retest (PARTIAL)
 
 **Milestone:** P5-E.5 Re-run 3 — SQL apply PASS; live tests PARTIAL. **PARTIAL**.

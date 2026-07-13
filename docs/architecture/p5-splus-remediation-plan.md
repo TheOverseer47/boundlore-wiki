@@ -1017,7 +1017,25 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.6 staging evidence acceptance. No push/deploy/launch.
+**Next:** P5-E.7A grant/RLS decision. No push/deploy/launch.
+
+---
+
+## 48. P5-E.6 — Staging Evidence Acceptance + Gap Review (PASS)
+
+**Milestone:** P5-E.6 — S+ staging evidence acceptance review. **PASS** (docs only).
+
+| Check | Result |
+|-------|--------|
+| S+-02 staging accepted | `[x]` PASS |
+| S+-04 staging accepted | `[x]` PASS |
+| S+-01 staging | `[x]` PARTIAL |
+| S+-03 runtime | `[x]` PARTIAL |
+| Storage closure | **DEFERRED** |
+| Product-Activation-Ready | **FAIL** |
+| P5-E.6 | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-evidence-acceptance-gap-review.md`
 
 ---
 

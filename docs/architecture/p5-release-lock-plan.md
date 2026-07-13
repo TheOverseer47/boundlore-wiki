@@ -661,3 +661,17 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 | P5-E.5 Re-run 3 | **PARTIAL** |
 
 **Report:** `docs/architecture/p5-staged-db-security-retest-rerun3-report.md`
+
+---
+
+## 27. P5-E.6 Follow-up (PASS — evidence acceptance review)
+
+**Gate:** P5-E.6 — staging evidence acceptance. **PASS** (review only).
+
+| Item | Result |
+|------|--------|
+| S+-02 / S+-04 accepted on staging | `[x]` |
+| S+-01 PARTIAL (grant gap + storage deferred) | `[x]` |
+| Next: P5-E.7A grant/RLS | **Recommended** |
+
+**Report:** `docs/architecture/p5-staging-evidence-acceptance-gap-review.md`

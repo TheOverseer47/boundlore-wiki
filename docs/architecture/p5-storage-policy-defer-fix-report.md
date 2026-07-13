@@ -160,4 +160,12 @@ Requires **new explicit user approval** before any DB-touching step.
 
 ---
 
-*Document version: P5-E.5C PASS + Re-run 3 PARTIAL. No secrets.*
+## 11. P5-E.6 Follow-up (PASS — evidence acceptance review)
+
+**Gate:** P5-E.6 — S+ staging evidence acceptance. **PASS** (review only).
+
+**Report:** `docs/architecture/p5-staging-evidence-acceptance-gap-review.md`
+
+---
+
+*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS. No secrets.*
