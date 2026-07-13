@@ -3292,7 +3292,32 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.9B.1 or P5-E.9C. No push/deploy/launch.
+**Next:** P5-E.9B.2 (STOPP) or P5-E.9C. No push/deploy/launch.
+
+---
+
+## 137. P5-E.9B.1 — Staging Backup Inventory (PASS)
+
+**Milestone:** P5-E.9B.1 — Staging Backup Inventory (read-only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Inventory Report | `p5-staging-backup-inventory.md` |
+| Backup-/Restore-Hinweise katalogisiert | P5-STAGING.3, Reset-Skripte, 15+ Doc-Refs |
+| Tooling-Hinweise | `pg_dump` 18.4 (historisch); keine Repo-Automation |
+| Automatisierte Backup-Skripte | **0** gefunden |
+| Frischer Backup-Nachweis | **OFFEN** |
+| Restore Evidence | **OPEN** |
+| P5-E.9A.2 | **BLOCKED** — B.1 ≠ Backup Evidence |
+| Dump / SQL / Restore ausgeführt | **Nein** |
+| Legacy-Ref verboten | `[x]` dokumentiert |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9B.1 | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-backup-inventory.md`
+
+**Next:** P5-E.9B.2 (STOPP). No push/deploy/launch/restore/dumps.
 
 ---
 
@@ -3306,7 +3331,7 @@ The future Draft Inspector / Preview must **NOT**:
 | Backup Scope Matrix | `[x]` posts, wiki_*, notifications, profiles, comments, release_gate, storage buckets, auth boundary |
 | Restore Scope Matrix | `[x]` Staging isoliert / Production STOPP |
 | Cleanup-Strategie 9A.2 | `[x]` `qa-splus03-xss-*` — Plan only |
-| Folge-Gates | 9B.1 Inventory, 9B.2 Drill Plan, 9B.3 Cleanup (**STOPP**), 9B.4 Prod (**STOPP**) |
+| Folge-Gates | 9B.1 Inventory **PASS**, 9B.2 Backup (**STOPP**), 9B.3 Restore (**STOPP**), 9B.4 Cleanup (**STOPP**) |
 | Warum nicht geschlossen | Kein Restore-Drill; kein Prod-Schedule; kein Snapshot-Nachweis nach Plan |
 | P5-E.9A.2 | **BLOCKED** — gespeicherte Payloads weiterhin STOPP |
 | SQL apply / DB / Restore | **None** |
@@ -3316,7 +3341,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-backup-restore-evidence-plan.md`
 
-**Next:** P5-E.9B.1. No push/deploy/launch/restore/dumps.
+**Next:** P5-E.9B.2. No push/deploy/launch/restore/dumps.
 
 ---
 

@@ -2298,6 +2298,34 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9B.1 — Staging Backup Inventory (PASS)
+
+**Milestone:** P5-E.9B.1 — Staging Backup Inventory (read-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Inventory document exists | `p5-staging-backup-inventory.md` | complete | `[x]` |
+| No dump created | gate | none | `[x]` |
+| No restore executed | gate | none | `[x]` |
+| No SQL executed | gate | none | `[x]` |
+| No DB write | gate | none | `[x]` |
+| No Storage action | gate | none | `[x]` |
+| No Push/Deploy/Launch | gate | none | `[x]` |
+| Legacy ref remains forbidden | policy | `ohkoojpzmptdfyowdgog` | `[x]` |
+| Production remains untouched | policy | no touch | `[x]` |
+| P5-E.9A.2 remains STOPP | status | BLOCKED | `[x]` BLOCKED |
+| Backup Evidence remains OPEN | status | no fresh dump | `[x]` OPEN |
+| Restore Evidence remains OPEN | status | no drill | `[x]` OPEN |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9B.1 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-backup-inventory.md`
+
+**Next:** P5-E.9B.2 Staging Backup Evidence (**STOPP**). No push/deploy/launch/restore/dumps.
+
+---
+
 ## P5-E.9B — Backup/Restore Evidence Plan (PASS)
 
 **Milestone:** P5-E.9B — Backup/Restore Evidence Plan (planning only). **PASS**.

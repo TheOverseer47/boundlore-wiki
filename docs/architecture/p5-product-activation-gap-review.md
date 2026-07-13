@@ -71,7 +71,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **Production Closure** | NOT CLOSED | **BLOCKING** | Kein Production-Apply | Alle S+ auf Production | **Ja** | **P5-E.9** |
 | **S-05 CSR / SEO Entity Pages** | Open | **BLOCKING** (Launch) | `p5-splus-remediation-plan.md` Appendix B | Keine CSR-Shells für Entities | **Ja** (Public Launch) | Post-S+ Produktgate |
 | **S-06 Search Recall (`monster`)** | Open | **BLOCKING** (Launch) | Bekannter Recall-Gap; Smoke lädt ohne Crash | 0 Treffer für bekannte Entities | **Ja** (Public Launch) | Search-Index-Gate |
-| **S-07 Backup/Restore Evidence** | NOT TESTED | **BLOCKING** (Ops) | P5-STAGING.3 dry-run + **P5-E.9B Plan** | Kein Restore-Drill; kein Prod-Schedule | **Ja** (Launch/Ops) | **P5-E.9B.1** → 9B.4 |
+| **S-07 Backup/Restore Evidence** | NOT TESTED | **BLOCKING** (Ops) | P5-STAGING.3 + **P5-E.9B/9B.1** Inventory | Frischer Backup + Restore-Drill fehlt | **Ja** (Launch/Ops) | **P5-E.9B.2** → 9B.3 |
 | **S-08 Monitoring / Error Tracking** | Missing | **BLOCKING** (Ops) | Kein Sentry/Datadog o.ä. im Repo | Keine Runtime-Observability | **Ja** (Launch/Ops) | Monitoring Gate |
 | **S-09 Patch Mode fail-open** | Partial | **PARTIAL** | Release Gate ersetzt Patch Mode für Writes | Patch Mode noch im Repo | Nein (wenn Gate locked) | Dokumentation |
 | **S-10 Base RLS live verification** | NOT TESTED | **NOT TESTED** | Repo SQL vorhanden | Vollständige Live-RLS-Matrix | **Ja** (Production) | P5-E.9 |
@@ -129,10 +129,11 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 2. ~~**P5-E.9A** — S+-03 Runtime XSS Evidence Plan~~ **PASS** — `p5-splus03-runtime-xss-evidence-plan.md`
 3. ~~**P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence~~ **PASS** — 25/25 fixture
 4. ~~**P5-E.9B** — Backup/Restore Evidence Plan~~ **PASS** — `p5-backup-restore-evidence-plan.md`
-5. **P5-E.9B.1** — Staging Backup Inventory (read-only)
-6. **P5-E.9C** — Monitoring/Error Tracking Plan (parallel, Plan only)
-7. **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — nur nach 9B.1 + Freigabe)
-8. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
+5. ~~**P5-E.9B.1** — Staging Backup Inventory~~ **PASS** — `p5-staging-backup-inventory.md`
+6. **P5-E.9B.2** — Staging Backup Evidence (**STOPP** — frischer Dump/Snapshot)
+7. **P5-E.9C** — Monitoring/Error Tracking Plan (parallel, Plan only)
+8. **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — nur nach 9B.2 + Freigabe)
+9. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
 
 ---
 
@@ -197,7 +198,7 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 | Backup/Restore Plan | `p5-backup-restore-evidence-plan.md` |
 | Backup Evidence | **OPEN** — Plan liefert keine Closure |
 | Restore Evidence | **OPEN** |
-| P5-E.9A.2 blockiert | Bis 9B.1 + Cleanup-Freigabe |
+| P5-E.9A.2 blockiert | Bis 9B.2 + Cleanup-Freigabe |
 | SQL apply / Restore / Dumps | **None** |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
@@ -207,4 +208,24 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS. Keine Secrets. Kein DB-Zugriff.*
+## 16. P5-E.9B.1 Follow-up (PASS — Staging Backup Inventory)
+
+**Gate:** P5-E.9B.1 — Staging Backup Inventory (read-only). **PASS**.
+
+| Item | Result |
+|------|--------|
+| Inventory Report | `p5-staging-backup-inventory.md` |
+| Backup Inventory | **PASS** (dokumentiert) |
+| Backup Evidence | **OPEN** — kein frischer Dump |
+| Restore Evidence | **OPEN** |
+| P5-E.9A.2 | **BLOCKED** |
+| Dump / SQL / Restore | **None** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9B.1 | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-backup-inventory.md`
+
+---
+
+*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS. Keine Secrets. Kein DB-Zugriff.*

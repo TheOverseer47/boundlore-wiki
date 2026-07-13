@@ -18,7 +18,9 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 
 **Dieser Plan** definiert Scope, Risiken, Restore-Strategien, Cleanup für spätere S+-03-Staging-Payloads und Folge-Gates — **ohne** Backup, Dump, Restore, SQL Apply oder DB-Write.
 
-**P5-E.9A.2** (Staging Stored XSS Payloads) bleibt **BLOCKED / STOPP**, bis P5-E.9B.1 (Backup Inventory) und Cleanup-Freigabe erfüllt sind.
+**P5-E.9A.2** (Staging Stored XSS Payloads) bleibt **BLOCKED / STOPP**, bis **P5-E.9B.2** (frischer Backup-Nachweis) und Cleanup-Freigabe erfüllt sind.
+
+**P5-E.9B.1** (Staging Backup Inventory) — **PASS** — siehe `p5-staging-backup-inventory.md`.
 
 **Product Activation** und **Public Launch** bleiben **FAIL / NO-GO**.
 
@@ -49,7 +51,7 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 |-----------|--------|
 | **Backup Evidence** | **OPEN** — Tooling PASS (P5-STAGING.3); kein operativer Schedule + kein Restore-Nachweis |
 | **Restore Evidence** | **OPEN** — kein Drill dokumentiert |
-| **Staging Payload Tests (P5-E.9A.2)** | **BLOCKED** — bis Backup Inventory + Cleanup freigegeben |
+| **Staging Payload Tests (P5-E.9A.2)** | **BLOCKED** — bis P5-E.9B.2 (frischer Backup) + Freigabe |
 | **S+-03 Staging Runtime** | **OPEN / STOPP** |
 | **S-07 Backup/Restore (Ops)** | **OPEN_BLOCKING** |
 | **Production Closure** | **NOT CLOSED** |
@@ -76,7 +78,7 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 
 | # | Fehlender Nachweis | Schwere | Blockiert |
 |---|-------------------|---------|-----------|
-| 1 | Staging **Backup-Inventar** (welche Methoden: `pg_dump`, Dashboard Snapshot, PITR) | Hoch | P5-E.9A.2, S-07 |
+| 1 | Staging **Backup-Inventar** (welche Methoden: `pg_dump`, Dashboard Snapshot, PITR) | Hoch | P5-E.9A.2, S-07 | **PASS** (P5-E.9B.1) — frischer Dump weiterhin offen |
 | 2 | **Restore-Drill** in isolierter Umgebung | Hoch | S-07, Launch |
 | 3 | **RPO/RTO-Ziele** dokumentiert und mit Drill abgeglichen | Mittel | Launch |
 | 4 | Production **automatische Backups** verifiziert | Hoch | Launch |
@@ -242,23 +244,30 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 
 | Item | Detail |
 |------|--------|
-| **Ziel** | Inventar: `pg_dump`, Dashboard Snapshot, PITR-Verfügbarkeit, `backups/` Runbook |
-| **Erlaubt** | Read-only Metadaten; optional neuer Dump **mit Freigabe** |
-| **Verboten** | Restore; Production-Touch |
-| **Akzeptanz** | Dokumentierter Backup-Pfad + Timestamp + Größe; Methoden-Matrix |
-| **Freigabe** | **Ja** — vor erstem neuen Dump |
+| **Ziel** | Read-only Inventar: `pg_dump`, Dashboard Snapshot, PITR, Reset-Skripte, Tooling |
+| **Erlaubt** | Docs lesen; `rg`; keine DB-Verbindung |
+| **Verboten** | Dump; Restore; SQL; `.env*` öffnen |
+| **Akzeptanz** | `p5-staging-backup-inventory.md` mit Inventory Matrix |
+| **Freigabe** | Nein (read-only) |
+| **Status** | **PASS** |
 
-### P5-E.9B.2 — Isolated Restore Drill Plan
+### P5-E.9B.2 — Staging Backup Evidence
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  STOPP — P5-E.9B.2 DARF NICHT OHNE EXPLIZITE FREIGABE STARTEN    ║
+╚══════════════════════════════════════════════════════════════════╝
+```
 
 | Item | Detail |
 |------|--------|
-| **Ziel** | Plan für Restore in isoliertes Branch/Clone-Projekt |
-| **Erlaubt** | Plan-Dokument; Schritt-für-Schritt ohne Durchführung |
-| **Verboten** | Echter Restore in diesem Gate |
-| **Akzeptanz** | RPO/RTO-Ziele; Rollback; Verifikations-Queries |
-| **Freigabe** | Plan only — kein Apply |
+| **Ziel** | Frischer Backup-/Snapshot-/Dump-Nachweis für Staging |
+| **Erlaubt** | `pg_dump` via Pooler **oder** Dashboard Snapshot (mit Freigabe) |
+| **Verboten** | Production; Legacy; Dump committen |
+| **Akzeptanz** | Timestamp + Größe + Methode dokumentiert |
+| **Freigabe** | **Ja** — vor jedem Dump |
 
-### P5-E.9B.3 — Staging Cleanup Drill
+### P5-E.9B.3 — Isolated Restore Drill
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -268,17 +277,32 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 
 | Item | Detail |
 |------|--------|
-| **Ziel** | Cleanup von `qa-splus03-xss-*` nach 9A.2; Readback PASS |
-| **Erlaubt** | Gezieltes DELETE/soft-delete nur QA-Slugs |
-| **Verboten** | Breiter Reset; Production; Legacy |
-| **Akzeptanz** | Counts = 0; Slugs unreachable; Backup vorher dokumentiert |
-| **Freigabe** | **Ja** — separat von 9A.2 |
+| **Ziel** | Restore in isoliertes Branch/Clone-Projekt |
+| **Verboten** | Live-Production-Restore; Live-Staging-Overwrite |
+| **Akzeptanz** | Restore PASS + Verifikations-Queries; RPO/RTO |
+| **Freigabe** | **Ja** — vor Drill |
 
-### P5-E.9B.4 — Production Backup/Restore Verification
+### P5-E.9B.4 — Staging Cleanup Drill
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║  STOPP — P5-E.9B.4 PRODUCTION NUR MIT SEPARATER FREIGABE         ║
+║  STOPP — P5-E.9B.4 DARF NICHT OHNE EXPLIZITE FREIGABE STARTEN   ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+| Item | Detail |
+|------|--------|
+| **Ziel** | Cleanup von `qa-splus03-xss-*` nach 9A.2; Readback PASS |
+| **Erlaubt** | Gezieltes DELETE/soft-delete nur QA-Slugs |
+| **Verboten** | Breiter Reset; Production; Legacy; echte Userdaten |
+| **Akzeptanz** | Counts = 0; Slugs unreachable; Backup vorher dokumentiert |
+| **Freigabe** | **Ja** — separat von 9A.2 |
+
+### P5-E.9B.5 — Production Backup/Restore Verification
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  STOPP — P5-E.9B.5 PRODUCTION NUR MIT SEPARATER FREIGABE         ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
@@ -293,17 +317,19 @@ BoundLore hat **Staging-Backup-Tooling** nachgewiesen (P5-STAGING.3: `pg_dump` v
 ### Abhängigkeitskette
 
 ```
-P5-E.9B (dieses Gate) — Plan                    [PASS]
+P5-E.9B (Plan)                              [PASS]
     ↓
-P5-E.9B.1 — Staging Backup Inventory            [read-only]
+P5-E.9B.1 Staging Backup Inventory          [PASS]
     ↓
-P5-E.9A.2 — Staging XSS Payload Evidence        [STOPP — braucht 9B.1 + Freigabe]
+P5-E.9B.2 Staging Backup Evidence           [STOPP — frischer Dump/Snapshot]
     ↓
-P5-E.9B.3 — Staging Cleanup Drill               [STOPP — nach 9A.2]
+P5-E.9A.2 Staging XSS Payload Evidence      [STOPP — braucht 9B.2 + Freigabe]
     ↓
-P5-E.9B.2 — Isolated Restore Drill Plan         [Plan only]
+P5-E.9B.4 Staging Cleanup Drill             [STOPP — nach 9A.2]
     ↓
-P5-E.9B.4 — Production Backup/Restore           [STOPP]
+P5-E.9B.3 Isolated Restore Drill            [STOPP — nach 9B.2]
+    ↓
+P5-E.9B.5 Production Backup/Restore           [STOPP]
 ```
 
 ---
@@ -312,7 +338,8 @@ P5-E.9B.4 — Production Backup/Restore           [STOPP]
 
 | Dimension | Verdict |
 |-----------|---------|
-| **P5-E.9B (dieses Gate)** | **PASS** |
+| **P5-E.9B (Planungs-Gate)** | **PASS** |
+| **P5-E.9B.1 (Inventory)** | **PASS** |
 | Backup Evidence | **OPEN** |
 | Restore Evidence | **OPEN** |
 | P5-E.9A.2 Staging Payloads | **BLOCKED** |
@@ -323,14 +350,14 @@ P5-E.9B.4 — Production Backup/Restore           [STOPP]
 
 ### Empfohlener nächster Gate
 
-**P5-E.9B.1** — Staging Backup Inventory (read-only)
+**P5-E.9B.2** — Staging Backup Evidence (**STOPP** — frischer Dump/Snapshot)
 
 Alternativ parallel (Plan only): **P5-E.9C** — Monitoring/Error Tracking Plan
 
-**P5-E.9A.2** erst nach **9B.1 PASS** + expliziter Nutzerfreigabe.
+**P5-E.9A.2** erst nach **9B.2 PASS** + expliziter Nutzerfreigabe.
 
 Weiterhin: **kein Push, kein Deploy, kein Launch, kein Restore, keine Dumps.**
 
 ---
 
-*Dokumentversion: P5-E.9B PASS. Keine Secrets. Kein DB-Zugriff. Kein Restore.*
+*Dokumentversion: P5-E.9B PASS + P5-E.9B.1 PASS. Keine Secrets. Kein DB-Zugriff.*
