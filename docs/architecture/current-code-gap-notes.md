@@ -3292,7 +3292,30 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.9B.2 (STOPP) or P5-E.9C. No push/deploy/launch.
+**Next:** P5-E.9B.2 (STOPP) or P5-E.9C.1. No push/deploy/launch.
+
+---
+
+## 138. P5-E.9C — Monitoring/Error Tracking Plan (PASS)
+
+**Milestone:** P5-E.9C — Monitoring/Error Tracking Plan (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Monitoring Plan | `p5-monitoring-error-tracking-plan.md` |
+| Scope Matrix | `[x]` 18 Signale |
+| Error Classes | `[x]` E-01…E-12 |
+| Minimal Pre-Launch + Full Launch | `[x]` |
+| Folge-Gates | 9C.1 Provider, 9C.2 Stub, 9C.3 Staging (**STOPP**), 9C.4 Prod (**STOPP**) |
+| Provider aktiviert | **Nein** |
+| S-08 | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9C | **PASS** |
+
+**Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
+
+**Next:** P5-E.9C.1 or P5-E.9B.2. No push/deploy/launch/provider-keys.
 
 ---
 
@@ -3427,7 +3450,7 @@ The future Draft Inspector / Preview must **NOT**:
 | Production Closure (S+-01…04 auf Prod) | OPEN_BLOCKING |
 | S+-03 Runtime XSS | PARTIAL (9A.1 local mock PASS; Staging offen) |
 | S-07 Backup/Restore | OPEN_BLOCKING (P5-E.9B Plan; kein Drill) |
-| S-08 Monitoring | OPEN_BLOCKING |
+| S-08 Monitoring | OPEN_BLOCKING (P5-E.9C Plan; keine Integration) |
 | Incident Response | OPEN_BLOCKING |
 
 ### Public Launch Blocker (zusätzlich)

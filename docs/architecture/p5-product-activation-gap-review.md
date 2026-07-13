@@ -72,7 +72,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **S-05 CSR / SEO Entity Pages** | Open | **BLOCKING** (Launch) | `p5-splus-remediation-plan.md` Appendix B | Keine CSR-Shells für Entities | **Ja** (Public Launch) | Post-S+ Produktgate |
 | **S-06 Search Recall (`monster`)** | Open | **BLOCKING** (Launch) | Bekannter Recall-Gap; Smoke lädt ohne Crash | 0 Treffer für bekannte Entities | **Ja** (Public Launch) | Search-Index-Gate |
 | **S-07 Backup/Restore Evidence** | NOT TESTED | **BLOCKING** (Ops) | P5-STAGING.3 + **P5-E.9B/9B.1** Inventory | Frischer Backup + Restore-Drill fehlt | **Ja** (Launch/Ops) | **P5-E.9B.2** → 9B.3 |
-| **S-08 Monitoring / Error Tracking** | Missing | **BLOCKING** (Ops) | Kein Sentry/Datadog o.ä. im Repo | Keine Runtime-Observability | **Ja** (Launch/Ops) | Monitoring Gate |
+| **S-08 Monitoring / Error Tracking** | Missing | **BLOCKING** (Ops) | **P5-E.9C Plan** | Keine Integration/Evidence | **Ja** (Launch/Ops) | **P5-E.9C.1** → 9C.4 |
 | **S-09 Patch Mode fail-open** | Partial | **PARTIAL** | Release Gate ersetzt Patch Mode für Writes | Patch Mode noch im Repo | Nein (wenn Gate locked) | Dokumentation |
 | **S-10 Base RLS live verification** | NOT TESTED | **NOT TESTED** | Repo SQL vorhanden | Vollständige Live-RLS-Matrix | **Ja** (Production) | P5-E.9 |
 | **Admin unlock/relock journey** | NOT RUN | **NOT TESTED** | UI vorbereitet (`p5-e3`) | Kein Staging-Admin-Test | **Ja** (vor Unlock) | Staging Admin Gate |
@@ -130,10 +130,11 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 3. ~~**P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence~~ **PASS** — 25/25 fixture
 4. ~~**P5-E.9B** — Backup/Restore Evidence Plan~~ **PASS** — `p5-backup-restore-evidence-plan.md`
 5. ~~**P5-E.9B.1** — Staging Backup Inventory~~ **PASS** — `p5-staging-backup-inventory.md`
-6. **P5-E.9B.2** — Staging Backup Evidence (**STOPP** — frischer Dump/Snapshot)
-7. **P5-E.9C** — Monitoring/Error Tracking Plan (parallel, Plan only)
-8. **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — nur nach 9B.2 + Freigabe)
-9. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
+6. ~~**P5-E.9C** — Monitoring/Error Tracking Plan~~ **PASS** — `p5-monitoring-error-tracking-plan.md`
+7. **P5-E.9B.2** — Staging Backup Evidence (**STOPP**)
+8. **P5-E.9C.1** — Monitoring Provider Decision (Plan only)
+9. **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — nur nach 9B.2 + Freigabe)
+10. **P5-E.8A.4** — Owner-Capable Investigation (parallel, vor Storage-Unlock)
 
 ---
 
@@ -228,4 +229,22 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS. Keine Secrets. Kein DB-Zugriff.*
+## 17. P5-E.9C Follow-up (PASS — Monitoring/Error Tracking Plan)
+
+**Gate:** P5-E.9C — Monitoring/Error Tracking Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Monitoring Plan | `p5-monitoring-error-tracking-plan.md` |
+| Monitoring Evidence | **OPEN** — Plan ≠ Integration |
+| Error Tracking / Alerting | **OPEN** |
+| Provider / Keys / env | **Keine Änderungen** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9C | **PASS** |
+
+**Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
+
+---
+
+*Dokumentversion: P5-E.8D PASS + P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9C PASS. Keine Secrets. Kein DB-Zugriff.*

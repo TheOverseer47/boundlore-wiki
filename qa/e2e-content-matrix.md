@@ -2298,6 +2298,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9C — Monitoring Error Tracking Plan (PASS)
+
+**Milestone:** P5-E.9C — Monitoring/Error Tracking Plan (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Monitoring plan exists | `p5-monitoring-error-tracking-plan.md` | complete | `[x]` |
+| No provider activated | gate | none | `[x]` |
+| No keys added | gate | none | `[x]` |
+| No env changes | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy | gate | none | `[x]` |
+| Future provider integration | policy | explicit approval required | `[x]` |
+| Monitoring Evidence | status | OPEN | `[x]` OPEN |
+| Error Tracking / Alerting | status | OPEN | `[x]` OPEN |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9C | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
+
+**Next:** P5-E.9C.1 Provider Decision or P5-E.9B.2. No push/deploy/launch/provider-keys.
+
+---
+
 ## P5-E.9B.1 — Staging Backup Inventory (PASS)
 
 **Milestone:** P5-E.9B.1 — Staging Backup Inventory (read-only). **PASS**.

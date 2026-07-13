@@ -87,7 +87,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | Appendix B; kein prerender | Entity-URLs nicht indexierbar | **P5-E.9D** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **OPEN_BLOCKING** (Ops) | P5-STAGING.3 + **P5-E.9B/9B.1** Inventory | Frischer Backup + Restore drill | **P5-E.9B.2** → **9B.3** | Nein | Nein** | Nein | Nein | Ja |
-| **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | Nicht im Repo | Client + DB alerting | **P5-E.9C** | Nein | Nein | Nein | Ja*** | Ja |
+| **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C Plan** | Client + DB alerting + Integration | **P5-E.9C.1** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
 | **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
 | **S-10 Base RLS Production** | S | **NOT_TESTED** | Repo SQL; staging partial | Live RLS matrix auf Production | **P5-E.9F** | Nein**** | Nein | Nein | Nein | Ja |
 | **Storage Closure (gesamt)** | S+ | **DEFERRED_ACCEPTED** | P5-E.8A.2/8C | DB vor Unlock | P5-E.8A.4+ | Ja | Ja | Ja | Nein | Ja |
@@ -95,7 +95,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **Production Closure (Meta)** | — | **OPEN_BLOCKING** | Kein prod apply | Alle S+ auf Production | P5-E.10+ (future) | Ja | Ja | Teilweise | Ja | Ja (Plan) |
 | **Admin unlock/relock** | — | **NOT_TESTED** | UI `p5-e3` | Staging admin journey | Post-staging gate | Nein | Ja (staging) | Nein | Nein | Ja |
 | **post_reactions live block** | — | **NOT_TESTED** | SQL in repo | Kein FK-Target staging | Optional | Nein | Nein | Nein | Nein | Ja |
-| **Incident Response** | Ops | **OPEN_BLOCKING** | Fehlt | Runbook | OPS-3 (in 9C Plan) | Nein | Nein | Nein | Nein | Ja |
+| **Incident Response** | Ops | **OPEN_BLOCKING** | In P5-E.9C Plan skizziert | Runbook + Escalation | P5-E.9C.4+ | Nein | Nein | Nein | Nein | Ja |
 | **robots.txt / sitemap.xml** | SEO | **PARTIAL** | Statisch im Repo | Dynamische URLs | P5-E.9D | Nein | Nein | Nein | Ja | Ja |
 | **report-screenshots Storage** | — | **OUT_OF_SCOPE_FOR_MVP** | Support disabled P5-E.8C | Policy wenn Support reaktiviert | Später | Ja | Ja | Ja | Nein | Ja |
 
@@ -311,6 +311,8 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9B.1** — Staging Backup Inventory~~ **PASS** — `p5-staging-backup-inventory.md`
 
+~~**P5-E.9C** — Monitoring/Error Tracking Plan~~ **PASS** — `p5-monitoring-error-tracking-plan.md`
+
 **P5-E.9B.2** — Staging Backup Evidence (**STOPP** — frischer Dump/Snapshot)
 
 **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — blockiert bis 9B.2 + Freigabe)
@@ -403,4 +405,26 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS. Keine Secrets. Kein DB-Zugriff.*
+## 18. P5-E.9C Follow-up (PASS — Monitoring/Error Tracking Plan)
+
+**Gate:** P5-E.9C — Monitoring/Error Tracking Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Monitoring Plan | `p5-monitoring-error-tracking-plan.md` |
+| Monitoring Scope Matrix | `[x]` 18 Bereiche |
+| Error Classes + Alert Matrix | `[x]` E-01…E-12 |
+| Minimal Pre-Launch + Full Launch | `[x]` definiert |
+| Folge-Gates 9C.1–9C.4 | `[x]` |
+| Provider aktiviert / Keys | **Nein** |
+| Monitoring Evidence | **OPEN** |
+| S-08 | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9C | **PASS** |
+
+**Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS + P5-E.9B.1 PASS + P5-E.9C PASS. Keine Secrets. Kein DB-Zugriff.*
