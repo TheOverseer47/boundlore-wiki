@@ -1,9 +1,10 @@
-// QA-only release lock DB/RLS static harness (P5-E.2).
+// QA-only release lock DB/RLS static harness (P5-E.2 + P5-E.7B storage defer alignment).
 // Fetches SQL files via HTTP; no Supabase, no RPC, no writes.
 
 (function() {
   var FILES = {
     releaseGate: "/supabase/release_gate_lock.sql",
+    deferredStorage: "/supabase/release_gate_storage_policy_deferred.sql",
     observations: "/supabase/phase_a_observations_foundation.sql",
     discoveryStorage: "/supabase/discovery_storage.sql",
     patchMode: "/supabase/wiki_patch_mode.sql",
@@ -26,65 +27,113 @@
     return slice.slice(0, endIdx);
   }
 
+  function makeCheck(id, label, category, detail, status) {
+    return {
+      id: id,
+      label: label,
+      category: category,
+      detail: detail,
+      status: status,
+      pass: status === "pass",
+      deferred: status === "deferred",
+    };
+  }
+
   function runChecks(payload) {
     var rg = payload.releaseGate || "";
+    var deferredStorage = payload.deferredStorage || "";
     var obs = payload.observations || "";
     var storage = payload.discoveryStorage || "";
     var patch = payload.patchMode || "";
     var rgLower = rg.toLowerCase();
+    var deferredLower = deferredStorage.toLowerCase();
     var fnBlock = extractRegisterObservationBlock(obs);
     var fnLower = fnBlock.toLowerCase();
     var postsInsertIdx = fnLower.indexOf("insert into public.posts");
     var releaseAssertIdx = fnLower.indexOf("bl_assert_can_create_user_content");
 
+    var storageRemovedFromDefaultApply = !/storage_discovery_uploads_release_gate_insert_restrictive/i.test(rg) &&
+      !/create\s+policy[\s\S]*on\s+storage\.objects/i.test(rgLower);
+    var deferredFileDocumentsDefer = /status:\s*deferred/i.test(deferredStorage) &&
+      /do not apply in default p5-e\.5 path/i.test(deferredLower);
+    var deferredPolicyPresent = /storage_discovery_uploads_release_gate_insert_restrictive/i.test(deferredStorage) &&
+      /on\s+storage\.objects/i.test(deferredLower);
+    var deferredBucketAware = /bucket_id\s*<>\s*'discovery-uploads'/i.test(deferredStorage) &&
+      /public\.bl_can_create_user_content/i.test(deferredStorage);
+
     var checks = [
-      { id: 1, label: "release_gate_lock.sql loads", pass: rg.length > 200, detail: "bytes=" + rg.length, category: "file" },
-      { id: 2, label: "release_gate table exists", pass: /create\s+table\s+if\s+not\s+exists\s+public\.release_gate/i.test(rg), detail: "release_gate DDL", category: "schema" },
-      { id: 3, label: "contribution_locked default true", pass: /contribution_locked\s+boolean\s+not\s+null\s+default\s+true/i.test(rg), detail: "default true", category: "schema" },
-      { id: 4, label: "singleton check id = 1", pass: /check\s*\(\s*id\s*=\s*1\s*\)/i.test(rg), detail: "CHECK (id = 1)", category: "schema" },
-      { id: 5, label: "initial locked row insert", pass: /insert\s+into\s+public\.release_gate[\s\S]*values\s*\(\s*1\s*,\s*true/i.test(rgLower), detail: "default locked seed", category: "schema" },
-      { id: 6, label: "release_gate_audit table exists", pass: /create\s+table\s+if\s+not\s+exists\s+public\.release_gate_audit/i.test(rg), detail: "audit DDL", category: "schema" },
-      { id: 7, label: "bl_is_release_unlocked exists", pass: /create\s+or\s+replace\s+function\s+public\.bl_is_release_unlocked/i.test(rg), detail: "helper", category: "helper" },
-      { id: 8, label: "missing row returns false", pass: /if\s+not\s+found\s+then[\s\S]*return\s+false/i.test(rgLower), detail: "NOT FOUND => false", category: "helper" },
-      { id: 9, label: "exception fail-closed in bl_is_release_unlocked", pass: /exception[\s\S]*when\s+others\s+then[\s\S]*return\s+false/i.test(rgLower), detail: "exception => false", category: "helper" },
-      { id: 10, label: "no fallback true in release helper", pass: /bl_is_release_unlocked[\s\S]*exception[\s\S]*return\s+false/i.test(rgLower) &&
-        !/bl_is_release_unlocked[\s\S]*exception[\s\S]*return\s+true/i.test(rgLower), detail: "exception => false only", category: "helper" },
-      { id: 11, label: "bl_can_create_user_content exists", pass: /create\s+or\s+replace\s+function\s+public\.bl_can_create_user_content/i.test(rg), detail: "helper", category: "helper" },
-      { id: 12, label: "bl_assert_can_create_user_content exists", pass: /create\s+or\s+replace\s+function\s+public\.bl_assert_can_create_user_content/i.test(rg), detail: "assert helper", category: "helper" },
-      { id: 13, label: "bl_assert raises 42501", pass: /raise\s+exception\s+'user content submissions are locked before release'[\s\S]*errcode\s*=\s*'42501'/i.test(rg), detail: "42501", category: "helper" },
-      { id: 14, label: "no service_role reference", pass: !/grant\s+[\s\S]*service_role|to\s+service_role|auth\.role\(\)\s*=\s*'service_role'/i.test(rg + obs + storage + patch), detail: "no service_role grants/usage", category: "safety" },
-      { id: 15, label: "no auth.role() substitute gate", pass: !/auth\.role\(\)\s*=\s*'authenticated'/.test(rgLower), detail: "no role-only gate", category: "safety" },
-      { id: 16, label: "posts restrictive insert policy", pass: /posts_release_gate_insert_restrictive/i.test(rg) && /as\s+restrictive/i.test(rgLower), detail: "restrictive INSERT", category: "rls" },
-      { id: 17, label: "posts insert uses bl_can_create_user_content", pass: /posts_release_gate_insert_restrictive[\s\S]*bl_can_create_user_content\s*\(\s*auth\.uid\(\)\s*\)/i.test(rg), detail: "WITH CHECK helper", category: "rls" },
-      { id: 18, label: "bl_register_observation calls bl_assert", pass: /bl_assert_can_create_user_content\s*\(\s*'bl_register_observation'\s*\)/i.test(fnBlock), detail: "RPC assert", category: "rpc" },
-      { id: 19, label: "release assert before posts INSERT", pass: releaseAssertIdx >= 0 && postsInsertIdx >= 0 && releaseAssertIdx < postsInsertIdx, detail: "assert@" + releaseAssertIdx + " posts@" + postsInsertIdx, category: "rpc" },
-      { id: 20, label: "P5-C Tutorial-Ack still exists", pass: /user_submission_acks/i.test(fnBlock), detail: "ack gate retained", category: "rpc" },
-      { id: 21, label: "discovery storage restrictive policy", pass: /storage_discovery_uploads_release_gate_insert_restrictive/i.test(rg), detail: "storage restrictive", category: "storage" },
-      { id: 22, label: "storage policy bucket-aware", pass: /bucket_id\s*<>\s*'discovery-uploads'/i.test(rg) && /or\s+public\.bl_can_create_user_content/i.test(rgLower), detail: "bucket guard", category: "storage" },
-      { id: 23, label: "report-screenshots NOT TESTED documented", pass: /report-screenshots[\s\S]*not\s+tested/i.test(rgLower), detail: "NOT TESTED marker", category: "gaps" },
-      { id: 24, label: "patch-mode maintenance-only note", pass: /wiki_patch_mode[\s\S]*maintenance/i.test(rgLower) || /patch mode/i.test(rgLower), detail: "patch mode comment", category: "docs" },
-      { id: 25, label: "no frontend wiring in P5-E.2 SQL", pass: !/patch-mode\.js|create-post\.js/i.test(rg), detail: "no JS refs", category: "scope" },
-      { id: 26, label: "DO NOT APPLY header present", pass: /do not apply to production/i.test(rgLower), detail: "staging warning", category: "scope" },
-      { id: 27, label: "fixture performs no SQL execution", pass: true, detail: "static fetch only", category: "meta" },
-      { id: 28, label: "no Supabase client loaded", pass: typeof window.supabase === "undefined", detail: "window.supabase undefined", category: "meta" },
-      { id: 29, label: "no action controls in page", pass: !document.querySelector("button, form, input[type=submit]"), detail: "static page", category: "meta" },
-      { id: 30, label: "bl_is_admin_actor exists", pass: /create\s+or\s+replace\s+function\s+public\.bl_is_admin_actor/i.test(rg), detail: "admin helper", category: "helper" },
-      { id: 31, label: "bl_set_release_gate_locked RPC exists", pass: /create\s+or\s+replace\s+function\s+public\.bl_set_release_gate_locked/i.test(rg), detail: "admin RPC", category: "admin" },
-      { id: 32, label: "posts UPDATE restrictive policy", pass: /posts_release_gate_update_restrictive/i.test(rg), detail: "UPDATE gate", category: "rls" },
-      { id: 33, label: "post_reactions restrictive policies", pass: /post_reactions_release_gate_insert_restrictive/i.test(rg), detail: "reactions gate", category: "rls" },
-      { id: 34, label: "comments NOT TESTED documented", pass: /comments:[\s\S]*not\s+tested/i.test(rgLower), detail: "comments gap", category: "gaps" },
+      makeCheck(1, "release_gate_lock.sql loads", "file", "bytes=" + rg.length, rg.length > 200 ? "pass" : "fail"),
+      makeCheck(2, "release_gate table exists", "schema", "release_gate DDL", /create\s+table\s+if\s+not\s+exists\s+public\.release_gate/i.test(rg) ? "pass" : "fail"),
+      makeCheck(3, "contribution_locked default true", "schema", "default true", /contribution_locked\s+boolean\s+not\s+null\s+default\s+true/i.test(rg) ? "pass" : "fail"),
+      makeCheck(4, "singleton check id = 1", "schema", "CHECK (id = 1)", /check\s*\(\s*id\s*=\s*1\s*\)/i.test(rg) ? "pass" : "fail"),
+      makeCheck(5, "initial locked row insert", "schema", "default locked seed", /insert\s+into\s+public\.release_gate[\s\S]*values\s*\(\s*1\s*,\s*true/i.test(rgLower) ? "pass" : "fail"),
+      makeCheck(6, "release_gate_audit table exists", "schema", "audit DDL", /create\s+table\s+if\s+not\s+exists\s+public\.release_gate_audit/i.test(rg) ? "pass" : "fail"),
+      makeCheck(7, "bl_is_release_unlocked exists", "helper", "helper", /create\s+or\s+replace\s+function\s+public\.bl_is_release_unlocked/i.test(rg) ? "pass" : "fail"),
+      makeCheck(8, "missing row returns false", "helper", "NOT FOUND => false", /if\s+not\s+found\s+then[\s\S]*return\s+false/i.test(rgLower) ? "pass" : "fail"),
+      makeCheck(9, "exception fail-closed in bl_is_release_unlocked", "helper", "exception => false", /exception[\s\S]*when\s+others\s+then[\s\S]*return\s+false/i.test(rgLower) ? "pass" : "fail"),
+      makeCheck(10, "no fallback true in release helper", "helper", "exception => false only",
+        /bl_is_release_unlocked[\s\S]*exception[\s\S]*return\s+false/i.test(rgLower) &&
+        !/bl_is_release_unlocked[\s\S]*exception[\s\S]*return\s+true/i.test(rgLower) ? "pass" : "fail"),
+      makeCheck(11, "bl_can_create_user_content exists", "helper", "helper", /create\s+or\s+replace\s+function\s+public\.bl_can_create_user_content/i.test(rg) ? "pass" : "fail"),
+      makeCheck(12, "bl_assert_can_create_user_content exists", "helper", "assert helper", /create\s+or\s+replace\s+function\s+public\.bl_assert_can_create_user_content/i.test(rg) ? "pass" : "fail"),
+      makeCheck(13, "bl_assert raises 42501", "helper", "42501", /raise\s+exception\s+'user content submissions are locked before release'[\s\S]*errcode\s*=\s*'42501'/i.test(rg) ? "pass" : "fail"),
+      makeCheck(14, "no service_role reference", "safety", "no service_role grants/usage",
+        !/grant\s+[\s\S]*service_role|to\s+service_role|auth\.role\(\)\s*=\s*'service_role'/i.test(rg + obs + storage + patch) ? "pass" : "fail"),
+      makeCheck(15, "no auth.role() substitute gate", "safety", "no role-only gate", !/auth\.role\(\)\s*=\s*'authenticated'/.test(rgLower) ? "pass" : "fail"),
+      makeCheck(16, "posts restrictive insert policy", "rls", "restrictive INSERT", /posts_release_gate_insert_restrictive/i.test(rg) && /as\s+restrictive/i.test(rgLower) ? "pass" : "fail"),
+      makeCheck(17, "posts insert uses bl_can_create_user_content", "rls", "WITH CHECK helper", /posts_release_gate_insert_restrictive[\s\S]*bl_can_create_user_content\s*\(\s*auth\.uid\(\)\s*\)/i.test(rg) ? "pass" : "fail"),
+      makeCheck(18, "bl_register_observation calls bl_assert", "rpc", "RPC assert", /bl_assert_can_create_user_content\s*\(\s*'bl_register_observation'\s*\)/i.test(fnBlock) ? "pass" : "fail"),
+      makeCheck(19, "release assert before posts INSERT", "rpc", "assert@" + releaseAssertIdx + " posts@" + postsInsertIdx,
+        releaseAssertIdx >= 0 && postsInsertIdx >= 0 && releaseAssertIdx < postsInsertIdx ? "pass" : "fail"),
+      makeCheck(20, "P5-C Tutorial-Ack still exists", "rpc", "ack gate retained", /user_submission_acks/i.test(fnBlock) ? "pass" : "fail"),
+      makeCheck(21, "discovery storage restrictive policy", "storage", "DEFERRED — policy in release_gate_storage_policy_deferred.sql",
+        deferredPolicyPresent && storageRemovedFromDefaultApply ? "deferred" : "fail"),
+      makeCheck(22, "storage policy bucket-aware", "storage", "DEFERRED — bucket guard in deferred file",
+        deferredBucketAware && storageRemovedFromDefaultApply ? "deferred" : "fail"),
+      makeCheck(23, "report-screenshots NOT TESTED documented", "gaps", "NOT TESTED marker", /report-screenshots[\s\S]*not\s+tested/i.test(rgLower) ? "pass" : "fail"),
+      makeCheck(24, "patch-mode maintenance-only note", "docs", "patch mode comment", /wiki_patch_mode[\s\S]*maintenance/i.test(rgLower) || /patch mode/i.test(rgLower) ? "pass" : "fail"),
+      makeCheck(25, "no frontend wiring in P5-E.2 SQL", "scope", "no JS refs", !/patch-mode\.js|create-post\.js/i.test(rg) ? "pass" : "fail"),
+      makeCheck(26, "DO NOT APPLY header present", "scope", "staging warning", /do not apply to production/i.test(rgLower) ? "pass" : "fail"),
+      makeCheck(27, "fixture performs no SQL execution", "meta", "static fetch only", "pass"),
+      makeCheck(28, "no Supabase client loaded", "meta", "window.supabase undefined", typeof window.supabase === "undefined" ? "pass" : "fail"),
+      makeCheck(29, "no action controls in page", "meta", "static page", !document.querySelector("button, form, input[type=submit]") ? "pass" : "fail"),
+      makeCheck(30, "bl_is_admin_actor exists", "helper", "admin helper", /create\s+or\s+replace\s+function\s+public\.bl_is_admin_actor/i.test(rg) ? "pass" : "fail"),
+      makeCheck(31, "bl_set_release_gate_locked RPC exists", "admin", "admin RPC", /create\s+or\s+replace\s+function\s+public\.bl_set_release_gate_locked/i.test(rg) ? "pass" : "fail"),
+      makeCheck(32, "posts UPDATE restrictive policy", "rls", "UPDATE gate", /posts_release_gate_update_restrictive/i.test(rg) ? "pass" : "fail"),
+      makeCheck(33, "post_reactions restrictive policies", "rls", "reactions gate", /post_reactions_release_gate_insert_restrictive/i.test(rg) ? "pass" : "fail"),
+      makeCheck(34, "comments NOT TESTED documented", "gaps", "comments gap", /comments:[\s\S]*not\s+tested/i.test(rgLower) ? "pass" : "fail"),
     ];
 
-    var passCount = checks.filter(function(c) { return c.pass; }).length;
-    var failCount = checks.length - passCount;
+    var requiredChecks = checks.filter(function(c) { return !c.deferred; });
+    var deferredChecks = checks.filter(function(c) { return c.deferred; });
+    var passCount = checks.filter(function(c) { return c.status === "pass"; }).length;
+    var requiredPassCount = requiredChecks.filter(function(c) { return c.status === "pass"; }).length;
+    var deferredCount = deferredChecks.length;
+    var failCount = requiredChecks.filter(function(c) { return c.status === "fail"; }).length;
+    var coreOk = failCount === 0;
 
     return {
-      ok: failCount === 0,
-      allPass: failCount === 0,
+      ok: coreOk,
+      allPass: coreOk,
+      corePass: coreOk,
+      storageDeferred: deferredCount > 0 && deferredChecks.every(function(c) { return c.status === "deferred"; }),
       passCount: passCount,
+      requiredPassCount: requiredPassCount,
+      requiredTotal: requiredChecks.length,
+      deferredCount: deferredCount,
       failCount: failCount,
       results: checks,
     };
+  }
+
+  function statusLabel(row) {
+    if (row.status === "deferred") return "DEFERRED";
+    return row.status === "pass" ? "PASS" : "FAIL";
+  }
+
+  function statusCellClass(row) {
+    if (row.status === "deferred") return "deferred-cell";
+    return row.status === "pass" ? "pass-cell" : "fail-cell";
   }
 
   function renderResults(report) {
@@ -101,15 +150,22 @@
       return;
     }
 
-    var statusClass = report.ok ? "pass" : "fail";
-    var statusSpanClass = report.ok ? "qa-guard-status-pass" : "qa-guard-status-fail";
+    var overallClass = report.corePass ? (report.storageDeferred ? "pass-with-deferred" : "pass") : "fail";
+    var overallLabel = report.corePass
+      ? (report.storageDeferred ? "CORE_PASS_STORAGE_DEFERRED" : "PASS")
+      : "FAIL";
 
     if (summary) {
-      summary.className = "qa-guard-summary " + statusClass;
+      summary.className = "qa-guard-summary " + overallClass;
       summary.innerHTML =
-        "<p><span class=\"" + statusSpanClass + "\">Overall: " + (report.ok ? "PASS" : "FAIL") + "</span></p>" +
-        "<p><strong>Checks:</strong> " + report.results.length + "</p>" +
-        "<p><strong>Pass:</strong> " + report.passCount + " · <strong>Fail:</strong> " + report.failCount + "</p>";
+        "<p><span class=\"qa-guard-status-" + (report.corePass ? "pass" : "fail") + "\">Overall: " + overallLabel + "</span></p>" +
+        "<p><strong>Required core checks:</strong> " + report.requiredPassCount + "/" + report.requiredTotal + " PASS</p>" +
+        "<p><strong>Deferred storage checks:</strong> " + report.deferredCount + " DEFERRED</p>" +
+        "<p><strong>Total pass:</strong> " + report.passCount + " · <strong>Required fail:</strong> " + report.failCount + "</p>" +
+        "<p class=\"qa-guard-defer-note\"><strong>Storage Release Gate Policy:</strong> DEFERRED — " +
+        "<code>storage.objects</code> policy requires owner-capable execution path. " +
+        "Deferred file: <code>supabase/release_gate_storage_policy_deferred.sql</code>. " +
+        "Not part of default P5-E.5 apply. Storage closure remains P5-E.8.</p>";
     }
 
     var html = '<table class="bl-qa-preview-matrix-table bl-qa-guard-table">';
@@ -120,18 +176,23 @@
       html += "<td>" + escapeText(row.label) + "</td>";
       html += "<td>" + escapeText(row.category) + "</td>";
       html += "<td><code>" + escapeText(row.detail) + "</code></td>";
-      html += "<td class=\"" + (row.pass ? "pass-cell" : "fail-cell") + "\">" + (row.pass ? "PASS" : "FAIL") + "</td>";
+      html += "<td class=\"" + statusCellClass(row) + "\">" + statusLabel(row) + "</td>";
       html += "</tr>";
     });
     html += "</tbody></table>";
     root.innerHTML = html;
 
     window.__P5ReleaseLockDbSecurityFixtures = {
-      version: "p5-e2",
+      version: "p5-e7b",
       results: report.results,
       passCount: report.passCount,
+      requiredPassCount: report.requiredPassCount,
+      requiredTotal: report.requiredTotal,
+      deferredCount: report.deferredCount,
       failCount: report.failCount,
       allPass: report.allPass,
+      corePass: report.corePass,
+      storageDeferred: report.storageDeferred,
       ok: report.ok,
     };
   }
@@ -146,6 +207,7 @@
   function init() {
     Promise.all([
       fetchText(FILES.releaseGate),
+      fetchText(FILES.deferredStorage),
       fetchText(FILES.observations),
       fetchText(FILES.discoveryStorage),
       fetchText(FILES.patchMode),
@@ -153,9 +215,10 @@
       .then(function(parts) {
         var report = runChecks({
           releaseGate: parts[0],
-          observations: parts[1],
-          discoveryStorage: parts[2],
-          patchMode: parts[3],
+          deferredStorage: parts[1],
+          observations: parts[2],
+          discoveryStorage: parts[3],
+          patchMode: parts[4],
         });
         renderResults(report);
       })

@@ -159,7 +159,7 @@
 | Notification | **PASS** — 24/24 |
 | Observation RPC | **PASS** — 17/17 |
 | Sanitization | **PASS** — 45/45 |
-| Release Lock DB | **PARTIAL** — 32/34 (2 storage checks fail — expected after P5-E.5C defer) |
+| Release Lock DB | **CORE_PASS_STORAGE_DEFERRED** (P5-E.7B) — 32/32 core + 2 DEFERRED |
 | Release Lock UI | **PASS** — 30/30 |
 
 ### Standard regression smoke (HTTP)
@@ -245,4 +245,19 @@ All 11 routes returned **200**.
 
 ---
 
-*Document version: P5-E.5 Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS. No secrets.*
+## 18. P5-E.7B Follow-up (PASS — fixture alignment)
+
+**Gate:** P5-E.7B — Release Lock DB fixture storage defer alignment. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Core checks | **32/32 PASS** |
+| Storage checks | **2 DEFERRED** |
+| Local evidence | **PASS** (8081 server) |
+| P5-E.7B | **PASS** |
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS. No secrets.*

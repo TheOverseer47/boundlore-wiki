@@ -184,4 +184,12 @@ Requires **new explicit user approval** before any DB-touching step.
 
 ---
 
-*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS. No secrets.*
+## 14. P5-E.7B Follow-up (PASS — fixture alignment)
+
+**Gate:** P5-E.7B — Release Lock DB fixture aligned for storage defer. **PASS**.
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
+
+---
+
+*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS. No secrets.*

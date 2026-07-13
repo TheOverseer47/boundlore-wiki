@@ -132,7 +132,7 @@ Direct client inserts into `public.posts` are **intended** in the current app mo
 | Reason deferred | `storage.objects` requires relation owner; pooler `postgres` lacks ownership |
 | Default P5-E.5 apply | **Excluded** by P5-E.5C design |
 | Live S+-01 storage test | **NOT RUN** |
-| Release Lock DB fixture | **32/34** — 2 storage checks fail **expected** after defer |
+| Release Lock DB fixture | **CORE_PASS_STORAGE_DEFERRED** (P5-E.7B) — 32/32 core + 2 DEFERRED |
 
 ### Closure path options (future gate only)
 
@@ -151,18 +151,13 @@ Direct client inserts into `public.posts` are **intended** in the current app mo
 | Notification | 24/24 | PASS | Repo static helper |
 | Observation RPC | 17/17 | PASS | Repo SQL pattern |
 | Sanitization | 45/45 | PASS | Repo static helper |
-| Release Lock DB | 32/34 | PARTIAL (expected) | Checks 21–22 fail — storage policy moved to deferred file |
+| Release Lock DB | **CORE_PASS_STORAGE_DEFERRED** | 32/32 core PASS; checks 21–22 **DEFERRED** (P5-E.7B) |
 | Release Lock UI | 30/30 | PASS | Client fail-closed model |
 | Regression smoke | 11/11 HTTP 200 | PASS | No crash |
 
-### Fixture recommendation (no code change in P5-E.6)
+### Fixture recommendation
 
-**P5-E.7B** — Release Lock DB fixture alignment:
-
-- Option 1: Update fixture to read storage policy from `release_gate_storage_policy_deferred.sql` (expected defer state)
-- Option 2: Defer fixture fix until **P5-E.8** storage closure completes
-
-Either is acceptable; fixture 32/34 is **not a regression** given P5-E.5C.
+**P5-E.7B** — **COMPLETE (PASS).** Release Lock DB fixture now shows storage checks as **DEFERRED** with core 32/32 PASS separately. Storage closure remains **P5-E.8**.
 
 ---
 
@@ -265,4 +260,19 @@ P5-E.5 Re-run 3 delivered **credible staging evidence** for notification injecti
 
 ---
 
-*Document version: P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS. No secrets. No DB access.*
+## 15. P5-E.7B Follow-up (PASS — fixture alignment)
+
+**Gate:** P5-E.7B — Release Lock DB fixture storage defer alignment. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Fixture overall | **CORE_PASS_STORAGE_DEFERRED** |
+| Core checks | **32/32 PASS** |
+| Storage checks | **2 DEFERRED** |
+| P5-E.7B | **PASS** |
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
+
+---
+
+*Document version: P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS. No secrets. No DB access.*

@@ -691,3 +691,22 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 **Gate:** P5-E.7A.2 — direct posts release-lock RLS proven. **PASS**.
 
 **Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
+
+---
+
+## 30. P5-E.7B Follow-up (PASS — fixture alignment)
+
+**Gate:** P5-E.7B — Release Lock DB fixture storage defer alignment. **PASS**.
+
+| Item | Result |
+|------|--------|
+| QA fixture | `qa/p5-release-lock-db-security-fixtures.*` — **CORE_PASS_STORAGE_DEFERRED** |
+| Required core checks | **32/32 PASS** |
+| Storage checks 21–22 | **DEFERRED** (not FAIL/PASS) |
+| Release Lock UI fixture | **30/30 PASS** (unchanged) |
+| SQL / DB changes | **None** |
+| P5-E.7B | **PASS** |
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
+
+**Next:** P5-E.8 Storage Closure Plan. No push/deploy/launch.

@@ -1017,7 +1017,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.7B fixture alignment or P5-E.8 storage closure. No push/deploy/launch.
+**Next:** P5-E.8 storage closure. No push/deploy/launch.
 
 ---
 
@@ -1033,6 +1033,25 @@ For **future implementation gates** (P5-B through P5-E):
 | P5-E.7A.2 | **PASS** |
 
 **Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
+
+---
+
+## 51. P5-E.7B — Release Lock Fixture Alignment (PASS)
+
+**Milestone:** P5-E.7B — Release Lock DB fixture aligned for storage defer. **PASS** (fixture/docs only).
+
+| Check | Result |
+|-------|--------|
+| Storage checks 21–22 | **DEFERRED** |
+| Required core checks | **32/32 PASS** |
+| Overall fixture | **CORE_PASS_STORAGE_DEFERRED** |
+| Local evidence re-run | **PASS** (8081) |
+| SQL apply / DB access | **None** |
+| P5-E.7B | **PASS** |
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
+
+**Next:** P5-E.8 Storage Closure Plan. No push/deploy/launch.
 
 ---
 

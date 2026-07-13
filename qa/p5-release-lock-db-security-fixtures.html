@@ -37,11 +37,19 @@
     font-size: 0.9rem;
   }
   .qa-guard-summary.pass { border-color: #2d6a4f; }
+  .qa-guard-summary.pass-with-deferred { border-color: #2d6a4f; }
   .qa-guard-summary.fail { border-color: #9b2c2c; }
   .qa-guard-status-pass { color: #6ee7a0; font-weight: 600; }
   .qa-guard-status-fail { color: #f87171; font-weight: 600; }
+  .qa-guard-defer-note {
+    margin-top: 10px;
+    color: #c4b56a;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
   .bl-qa-guard-table td.pass-cell { color: #6ee7a0; }
   .bl-qa-guard-table td.fail-cell { color: #f87171; }
+  .bl-qa-guard-table td.deferred-cell { color: #c4b56a; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -49,13 +57,14 @@
   <header class="qa-guard-banner">
     <h1>QA-only release lock DB/RLS baseline — P5-E.2</h1>
     <p><strong>Not linked from wiki navigation.</strong> Static SQL pattern checks only. No Supabase. No auth. No RPC calls. No SQL execution. No data writes.</p>
-    <p>Validates <code>release_gate_lock.sql</code> and related enforcement hooks in repo SQL files.</p>
+    <p>Validates <code>release_gate_lock.sql</code> core enforcement and documents deferred storage policy in <code>release_gate_storage_policy_deferred.sql</code> (P5-E.5C / P5-E.7B).</p>
+    <p><strong>Storage closure:</strong> DEFERRED — not counted as PASS or FAIL; required core checks must pass separately.</p>
   </header>
 
   <div id="fixtureSummary" class="qa-guard-summary">Running release lock DB security fixtures…</div>
   <div id="fixtureRoot"></div>
 </div>
 
-<script src="/qa/p5-release-lock-db-security-fixtures.js?v=2"></script>
+<script src="/qa/p5-release-lock-db-security-fixtures.js?v=3"></script>
 </body>
 </html>

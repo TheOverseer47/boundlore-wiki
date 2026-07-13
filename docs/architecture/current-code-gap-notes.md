@@ -3292,7 +3292,25 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.7B or P5-E.8. No push/deploy/launch.
+**Next:** P5-E.8 Storage Closure Plan. No push/deploy/launch.
+
+---
+
+## 126. P5-E.7B — Release Lock Fixture Alignment (PASS)
+
+**Milestone:** P5-E.7B — Release Lock DB fixture aligned for storage defer. **PASS** (fixture/docs only).
+
+| Check | Result |
+|-------|--------|
+| Storage checks 21–22 | **DEFERRED** (not FAIL) |
+| Required core checks | **32/32 PASS** |
+| Fixture overall | **CORE_PASS_STORAGE_DEFERRED** |
+| SQL / DB access | **None** |
+| Product-Activation-Ready | **FAIL** (unchanged) |
+| Public-Launch-Ready | **NO-GO** (unchanged) |
+| P5-E.7B | **PASS** |
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
 
 ---
 

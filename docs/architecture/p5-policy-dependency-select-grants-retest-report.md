@@ -155,17 +155,18 @@ Strong positive control that locked-state block was release gate, not grant gap.
 
 ## 10. Fixture Status
 
-Local server returned HTTP errors during this gate (server not reachable). Prior gate evidence unchanged:
+Local server on port 8080 was unreachable during P5-E.7A.2. **P5-E.7B** aligned the Release Lock DB fixture and re-ran local evidence on port 8081.
 
-| Fixture | Expected |
-|---------|----------|
-| Release Lock DB | 32/34 (storage defer) |
-| Release Lock UI | 30/30 |
-| Notification | 24/24 |
-| Observation | 17/17 |
-| Sanitization | 45/45 |
+| Fixture | Result (P5-E.7B) |
+|---------|------------------|
+| Release Lock DB | **CORE_PASS_STORAGE_DEFERRED** — 32/32 core PASS; 2 storage DEFERRED |
+| Release Lock UI | **30/30 PASS** |
+| Notification | **24/24 PASS** |
+| Observation | **17/17 PASS** |
+| Sanitization | **45/45 PASS** |
 
-**Fixture check this gate:** **NOT RUN** (server unavailable)
+**Fixture check P5-E.7A.2:** **NOT RUN** (8080 unreachable)  
+**Fixture check P5-E.7B:** **PASS** — see `p5-release-lock-fixture-alignment-report.md`
 
 ---
 
@@ -199,8 +200,24 @@ Local server returned HTTP errors during this gate (server not reachable). Prior
 
 P5-E.7A.2 closed the **profiles/acks SELECT grant gap** on staging. Direct posts INSERT with tutorial ack and email verification prerequisites is now blocked by **`posts_release_gate_insert_restrictive`** while release gate is locked — not by table privilege denial. Transactional unlock control confirms the enforcement layer is release gate RLS.
 
-**Recommended next:** P5-E.7B Fixture Alignment or P5-E.8 Storage Closure Plan.
+**Recommended next:** P5-E.8 Storage Closure Plan.
 
 ---
 
-*Document version: P5-E.7A.2 PASS. No secrets.*
+## 13. P5-E.7B Follow-up (PASS — fixture alignment)
+
+**Gate:** P5-E.7B — Release Lock DB fixture storage defer alignment. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Storage checks 21–22 | **DEFERRED** (not FAIL/PASS) |
+| Required core checks | **32/32 PASS** |
+| Overall fixture status | **CORE_PASS_STORAGE_DEFERRED** |
+| Local evidence re-run | **PASS** (8081 server) |
+| P5-E.7B | **PASS** |
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
+
+---
+
+*Document version: P5-E.7A.2 PASS + P5-E.7B PASS. No secrets.*

@@ -2298,6 +2298,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.7B — Release Lock Fixture Alignment (PASS)
+
+**Milestone:** P5-E.7B — Release Lock DB fixture storage defer alignment. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Fixture alignment | `p5-release-lock-db-security-fixtures` | CORE_PASS_STORAGE_DEFERRED | `[x]` |
+| Core checks | fixture | 32/32 PASS | `[x]` |
+| Storage checks | fixture | 2 DEFERRED | `[x]` |
+| Local evidence | fixtures + smoke | PASS | `[x]` |
+| No DB / SQL apply | gate | none | `[x]` |
+| P5-E.7B | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
+
+---
+
 ## P5-E.7A.2 — Policy Dependency SELECT Grants (PASS)
 
 **Milestone:** P5-E.7A.2 — SELECT grants + direct posts release-lock RLS. **PASS**.

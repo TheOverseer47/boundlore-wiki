@@ -166,13 +166,13 @@ Unlock control did not reach insert success; cannot confirm positive path via di
 
 | Fixture | Result |
 |---------|--------|
-| Release Lock DB | 32/34 — storage defer expected |
+| Release Lock DB | 32/34 — storage defer expected (prior to P5-E.7B) |
 | Release Lock UI | 30/30 PASS |
 | Notification | 24/24 PASS |
 | Observation RPC | 17/17 PASS |
 | Sanitization | 45/45 PASS |
 
-No fixture code changes in this gate.
+No fixture code changes in P5-E.7A. **P5-E.7B** aligned fixture to **CORE_PASS_STORAGE_DEFERRED** — see `p5-release-lock-fixture-alignment-report.md`.
 
 ---
 
@@ -201,7 +201,21 @@ No fixture code changes in this gate.
 
 ---
 
-*Document version: P5-E.7A PARTIAL + P5-E.7A.2 PASS. No secrets.*
+## 12. P5-E.7B Follow-up (PASS — fixture alignment)
+
+**Gate:** P5-E.7B — Release Lock DB fixture aligned for storage defer. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Storage checks | **DEFERRED** (not FAIL) |
+| Core checks | **32/32 PASS** |
+| P5-E.7B | **PASS** |
+
+**Report:** `docs/architecture/p5-release-lock-fixture-alignment-report.md`
+
+---
+
+*Document version: P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS. No secrets.*
 
 | Dimension | Verdict |
 |-----------|---------|
