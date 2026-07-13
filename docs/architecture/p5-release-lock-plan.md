@@ -606,3 +606,11 @@ Re-run stopped at pre-apply schema check: staging `public` schema empty. Pre-app
 After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: policies reference `bl_is_admin_actor()` before function definition. Apply 1 (notifications) committed; release gate not provisioned. Negative tests NOT RUN.
 
 **Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
+
+---
+
+## 23. P5-E.5A Follow-up (PASS — local dependency reorder)
+
+**Gate:** P5-E.5A — `bl_is_admin_actor` before policies in `release_gate_lock.sql`. **PASS** (repo only).
+
+**Report:** `docs/architecture/p5-release-gate-sql-order-fix-report.md`

@@ -2298,6 +2298,21 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.5A — Release Gate SQL Dependency Order Fix (PASS)
+
+**Milestone:** P5-E.5A — local `release_gate_lock.sql` reorder; **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| SQL apply / DB access | ops | none | `[x]` |
+| `bl_is_admin_actor` before policies | file | PASS | `[x]` |
+| Release Gate SQL Order Fix (5A) | gate | PASS | `[x]` |
+| Ready for P5-E.5B | gate | YES | `[x]` |
+
+**Report:** `docs/architecture/p5-release-gate-sql-order-fix-report.md`
+
+---
+
 ## P5-E.5 Re-run — Staged DB Application & Negative RLS/RPC Tests (BLOCKED)
 
 **Milestone:** P5-E.5 Re-run — staging apply + negative tests; **BLOCKED**.

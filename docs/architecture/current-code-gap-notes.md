@@ -3292,7 +3292,23 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** Fix `release_gate_lock.sql` ordering → re-run P5-E.5. No push/deploy/launch.
+**Next:** P5-E.5B testuser profiles → P5-E.5 Re-run. No push/deploy/launch.
+
+---
+
+## 118. P5-E.5A — Release Gate SQL Dependency Order Fix (PASS)
+
+**Milestone:** P5-E.5A — local dependency reorder; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SQL apply / DB access | `[x]` — none |
+| `bl_is_admin_actor` before policies | `[x]` |
+| Release Gate SQL Order Fix (5A) | **PASS** |
+| Ready for P5-E.5B | **YES** |
+| P5-E.5 Re-run | **BLOCKED** until profiles + approval |
+
+**Report:** `docs/architecture/p5-release-gate-sql-order-fix-report.md`
 
 ---
 

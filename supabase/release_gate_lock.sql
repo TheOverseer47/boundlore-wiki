@@ -1,5 +1,6 @@
 -- =============================================================================
 -- P5-E.2 — Release Gate DB/RLS/RPC Baseline (S+-01)
+--   + P5-E.5A dependency order fix (functions before policies)
 -- =============================================================================
 -- DO NOT APPLY TO PRODUCTION WITHOUT EXPLICIT STAGING TEST (P5-E.5).
 -- SQL baseline only — not executed in P5-E.2 gate.
@@ -63,39 +64,7 @@ comment on table public.release_gate_audit is
   'P5-E.2 audit log for release_gate changes. Written by bl_set_release_gate_locked (admin only).';
 
 -- ---------------------------------------------------------------------------
--- C) RLS — release_gate / release_gate_audit
--- ---------------------------------------------------------------------------
-
-alter table public.release_gate enable row level security;
-alter table public.release_gate_audit enable row level security;
-
-drop policy if exists release_gate_select_all on public.release_gate;
-create policy release_gate_select_all
-  on public.release_gate
-  for select
-  to anon, authenticated
-  using (true);
-
-drop policy if exists release_gate_admin_update on public.release_gate;
-create policy release_gate_admin_update
-  on public.release_gate
-  for update
-  to authenticated
-  using (public.bl_is_admin_actor(auth.uid()))
-  with check (public.bl_is_admin_actor(auth.uid()));
-
-drop policy if exists release_gate_audit_admin_select on public.release_gate_audit;
-create policy release_gate_audit_admin_select
-  on public.release_gate_audit
-  for select
-  to authenticated
-  using (public.bl_is_admin_actor(auth.uid()));
-
-grant select on public.release_gate to anon, authenticated;
-grant select on public.release_gate_audit to authenticated;
-
--- ---------------------------------------------------------------------------
--- D) Admin helper (profiles.role = admin — canonical in repo)
+-- C) Helper functions (must exist before policies that reference them)
 -- ---------------------------------------------------------------------------
 
 create or replace function public.bl_is_admin_actor(p_actor_id uuid default auth.uid())
@@ -118,10 +87,6 @@ $$;
 
 comment on function public.bl_is_admin_actor(uuid) is
   'P5-E.2 fail-closed admin check. Null actor or DB miss = false. Uses profiles.role = admin.';
-
--- ---------------------------------------------------------------------------
--- E) Release-lock helpers (fail-closed)
--- ---------------------------------------------------------------------------
 
 create or replace function public.bl_is_release_unlocked()
 returns boolean
@@ -203,7 +168,7 @@ comment on function public.bl_assert_can_create_user_content(text) is
   'P5-E.2 raises 42501 when contribution lock blocks the current actor.';
 
 -- ---------------------------------------------------------------------------
--- F) Admin RPC — unlock / re-lock (no auto-publish, no pending mutation)
+-- D) Admin RPC — unlock / re-lock (no auto-publish, no pending mutation)
 -- ---------------------------------------------------------------------------
 
 create or replace function public.bl_set_release_gate_locked(
@@ -291,7 +256,43 @@ comment on function public.bl_set_release_gate_locked(boolean, text) is
   'P5-E.2 admin-only unlock/relock. Does not approve/publish/mutate pending posts.';
 
 -- ---------------------------------------------------------------------------
--- G) posts INSERT restrictive policy
+-- E) RLS enablement
+-- ---------------------------------------------------------------------------
+
+alter table public.release_gate enable row level security;
+alter table public.release_gate_audit enable row level security;
+
+-- ---------------------------------------------------------------------------
+-- F) release_gate / release_gate_audit policies
+-- ---------------------------------------------------------------------------
+
+drop policy if exists release_gate_select_all on public.release_gate;
+create policy release_gate_select_all
+  on public.release_gate
+  for select
+  to anon, authenticated
+  using (true);
+
+drop policy if exists release_gate_admin_update on public.release_gate;
+create policy release_gate_admin_update
+  on public.release_gate
+  for update
+  to authenticated
+  using (public.bl_is_admin_actor(auth.uid()))
+  with check (public.bl_is_admin_actor(auth.uid()));
+
+drop policy if exists release_gate_audit_admin_select on public.release_gate_audit;
+create policy release_gate_audit_admin_select
+  on public.release_gate_audit
+  for select
+  to authenticated
+  using (public.bl_is_admin_actor(auth.uid()));
+
+grant select on public.release_gate to anon, authenticated;
+grant select on public.release_gate_audit to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- G) posts restrictive policies
 -- ---------------------------------------------------------------------------
 
 drop policy if exists posts_release_gate_insert_restrictive on public.posts;
@@ -307,10 +308,6 @@ create policy posts_release_gate_insert_restrictive
 
 comment on policy posts_release_gate_insert_restrictive on public.posts is
   'P5-E.2 additive restrictive gate. Works with posts_insert_requires_tutorial_ack.';
-
--- ---------------------------------------------------------------------------
--- H) posts UPDATE restrictive policy (non-admin edits blocked when locked)
--- ---------------------------------------------------------------------------
 
 drop policy if exists posts_release_gate_update_restrictive on public.posts;
 
@@ -330,7 +327,7 @@ comment on policy posts_release_gate_update_restrictive on public.posts is
   'P5-E.2 blocks author edits when locked; admin bypass via bl_can_create_user_content.';
 
 -- ---------------------------------------------------------------------------
--- I) post_reactions restrictive policies (table in repo)
+-- H) post_reactions restrictive policies
 -- ---------------------------------------------------------------------------
 
 drop policy if exists post_reactions_release_gate_insert_restrictive on public.post_reactions;
@@ -359,7 +356,7 @@ create policy post_reactions_release_gate_update_restrictive
   );
 
 -- ---------------------------------------------------------------------------
--- J) Storage discovery-uploads restrictive INSERT (bucket-aware)
+-- I) Storage discovery-uploads restrictive INSERT (bucket-aware)
 -- ---------------------------------------------------------------------------
 
 drop policy if exists storage_discovery_uploads_release_gate_insert_restrictive on storage.objects;
@@ -378,7 +375,7 @@ comment on policy storage_discovery_uploads_release_gate_insert_restrictive on s
   'P5-E.2 blocks discovery-uploads INSERT when contribution locked. Other buckets unaffected.';
 
 -- ---------------------------------------------------------------------------
--- K) NOT TESTED — Live-RLS export required before production closure
+-- J) NOT TESTED — Live-RLS export required before production closure
 -- ---------------------------------------------------------------------------
 -- comments: no INSERT policy in repo — NOT TESTED; add restrictive policy after live export
 -- reports: no INSERT policy in repo — NOT TESTED; add restrictive policy after live export
@@ -386,7 +383,7 @@ comment on policy storage_discovery_uploads_release_gate_insert_restrictive on s
 -- ratings: table not found in repo SQL — NOT TESTED
 
 -- ---------------------------------------------------------------------------
--- L) Grants
+-- K) Grants
 -- ---------------------------------------------------------------------------
 
 grant execute on function public.bl_is_admin_actor(uuid) to authenticated;

@@ -213,11 +213,19 @@ All routes returned **200** (home, browse, search including XSS probe, QA slugs,
 
 ### Recommendation
 
-1. **P5-E.5A (repo fix):** Reorder `release_gate_lock.sql` — define `bl_is_admin_actor()` **before** policies that reference it.
-2. **P5-STAGING.4 follow-up:** Ensure `profiles` rows exist for `p5_e5_user_a@example.com` and `p5_e5_user_b@example.com` on staging.
-3. **Re-run P5-E.5** only with new explicit user approval after fixes.
+1. ~~**P5-E.5A (repo fix):** Reorder `release_gate_lock.sql`~~ → **P5-E.5A PASS** (local reorder).
+2. **P5-E.5B:** Ensure `profiles` rows exist for test users on staging.
+3. **Re-run P5-E.5** only with new explicit user approval after 5B.
 4. **No push, deploy, or launch.**
 
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED. Partial apply 1 only. No secrets.*
+## 13. P5-E.5A Follow-up (PASS — local dependency reorder)
+
+**Gate:** P5-E.5A — `release_gate_lock.sql` functions before policies. **PASS** (repo only).
+
+**Report:** `docs/architecture/p5-release-gate-sql-order-fix-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS. No secrets.*

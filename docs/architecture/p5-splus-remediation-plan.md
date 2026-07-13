@@ -1017,7 +1017,22 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** Fix `release_gate_lock.sql` ordering → re-run P5-E.5 (explicit approval). No push/deploy/launch.
+**Next:** P5-E.5B testuser profiles → P5-E.5 Re-run (explicit approval). No push/deploy/launch.
+
+---
+
+## 43. P5-E.5A — Release Gate SQL Dependency Order Fix (PASS)
+
+**Milestone:** P5-E.5A — local `release_gate_lock.sql` reorder; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SQL apply / DB access | `[x]` — none |
+| `bl_is_admin_actor` before policies | `[x]` |
+| Release Gate SQL Order Fix (5A) | **PASS** |
+| Ready for P5-E.5B | **YES** |
+
+**Report:** `docs/architecture/p5-release-gate-sql-order-fix-report.md`
 
 ---
 

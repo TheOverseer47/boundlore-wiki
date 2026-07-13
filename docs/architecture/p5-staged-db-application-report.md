@@ -586,4 +586,12 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 ---
 
-*Document version: P5-E.5 Re-run BLOCKED. Partial apply 1 only. No secrets.*
+### P5-E.5A follow-up (PASS — local dependency reorder)
+
+**P5-E.5A** — `release_gate_lock.sql` reordered; functions before policies. **PASS** (repo only).
+
+**Report:** `docs/architecture/p5-release-gate-sql-order-fix-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run BLOCKED + P5-E.5A PASS. Partial apply 1 only. No secrets.*
