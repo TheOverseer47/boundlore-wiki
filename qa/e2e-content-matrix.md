@@ -1994,7 +1994,38 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **P5-D.2 acceptance sweep completed locally.** HTML sanitization baseline accepted at repository level. Sanitization fixture 45/45 PASS after minimal serializer fix; observation 17/17 and notification 24/24 remain PASS. Reflected search XSS probe clean. No Supabase writes, no deploy, no push. S+-03 baseline-accepted but not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
 
-**Next candidate:** **P5-E.1 Server-side Release Lock Planning Gate**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P5-E.2 Release Gate DB/RLS/RPC Baseline**. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P5-E.1 — Server-side Release Lock Planning Gate
+
+**Milestone:** P5-E.1 docs-only planning for S+-01; ready for P5-E.2 — not implemented.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Plan document | `docs/architecture/p5-release-lock-plan.md` | all §1–§15 sections | `[x]` |
+| Problem statement | patch-mode / wiki_patch_mode | client-only, fail-open documented | `[x]` |
+| `release_gate` architecture | plan §4 | planned, not implemented | `[x]` planned |
+| Helper architecture | plan §5 | fail-closed helpers planned | `[x]` planned |
+| Enforcement matrix | plan §6 | posts/RPC/storage/comments/reactions | `[x]` |
+| Roles matrix | plan §7 | pre-release default locked | `[x]` |
+| UI/Admin plan | plan §8 | P5-E.3 scope defined | `[x]` |
+| Test strategy | plan §9 | P5-E.2/E.3/E.4/E.5 | `[x]` |
+| Gate split | plan §10 | E.2/E.3/E.4 defined | `[x]` |
+| S+-01 acceptance criteria | plan §11 | repo/staging/prod tiers | `[x]` |
+| Stop conditions | plan §12 | documented | `[x]` |
+| Rollback plan | plan §13 | documented | `[x]` |
+| Open questions | plan §14 | documented | `[x]` |
+| `release_gate` implemented | SQL | not in P5-E.1 | `[ ]` |
+| S+-01 baseline accepted | acceptance | P5-E.4 | `[ ]` |
+| S+-01 production-closed | acceptance | staging + Fable | `[ ]` |
+| Code/SQL/data changes | ops | docs only | `[x]` |
+| Supabase writes / deploy / push | ops | none | `[x]` |
+
+**P5-E.1 planning completed locally.** Release Lock implementation plan accepted for planning purposes. `p5-release-lock-plan.md` documents fail-closed `release_gate` target architecture, enforcement/roles matrices, UI plan, and P5-E.2/E.3/E.4 gate split. No SQL, no code, no data changes, no deploy, no push. S+-01 remains open — not implemented, not baseline-accepted. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate:** **P5-E.2 Release Gate DB/RLS/RPC Baseline**. **LAUNCH-0** required before any push/deploy.
 
 ---
 

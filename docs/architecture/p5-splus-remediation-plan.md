@@ -398,7 +398,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-C.2 | Test acceptance sweep | Repo baseline accepted; see §15 — Live-RPC NOT TESTED |
 | **Complete** | P5-D.1 | Code baseline | S+-03 sanitization baseline; see §16 |
 | **Complete** | P5-D.2 | Test acceptance sweep | S+-03 baseline accepted; see §17 |
-| **Next** | P5-E.1 | Planning gate | Server-side release lock |
+| **Complete** | P5-E.1 | Planning gate | Release lock plan; see §18 + `p5-release-lock-plan.md` |
+| **Next** | P5-E.2 | SQL baseline | `release_gate` DB/RLS/RPC (not executed) |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -626,7 +627,37 @@ For **future implementation gates** (P5-B through P5-E):
 
 **S+-03 status:** **Baseline-accepted** at repo level. **Not production-closed** until server-side sanitization, stored-content handling, and staging verification of create/edit/admin write paths.
 
-**Next candidate:** **P5-E.1 Server-side Release Lock Planning Gate**. No push/deploy/launch.
+**Next candidate:** **P5-E.2 Release Gate DB/RLS/RPC Baseline**. No push/deploy/launch.
+
+---
+
+## 18. P5-E.1 — Server-side Release Lock Planning Gate
+
+**Milestone:** P5-E.1 docs-only planning for S+-01; **ready for P5-E.2 implementation** — not implemented, not accepted, not production-closed.
+
+**P5-E.1 planning completed locally.** `docs/architecture/p5-release-lock-plan.md` documents the target `release_gate` architecture, fail-closed helper design, enforcement matrix (posts/RPC/storage/comments/reactions/reports), roles matrix, UI/admin plan, test strategy, gate split P5-E.2/E.3/E.4, acceptance criteria, stop conditions, rollback, and open questions. Repo analysis confirms: `wiki_patch_mode` + `patch-mode.js` are client-only maintenance UX (default OFF, fail-open); `posts_insert_requires_tutorial_ack` has no release lock; `bl_register_observation` has P5-E hook comment only; `discovery_storage` has no lock; `edit-post.js` lacks patch guard.
+
+| Check | Result |
+|-------|--------|
+| `p5-release-lock-plan.md` created | `[x]` |
+| S+-01 architecture planned | `[x]` |
+| Enforcement matrix documented | `[x]` |
+| Roles matrix documented | `[x]` |
+| UI/Admin plan documented | `[x]` |
+| P5-E.2/E.3/E.4 gates defined | `[x]` |
+| `release_gate` implemented | `[ ]` — P5-E.2 |
+| RLS/RPC/Storage enforcement | `[ ]` — P5-E.2 |
+| UI guardrails | `[ ]` — P5-E.3 |
+| S+-01 baseline accepted | `[ ]` — after P5-E.4 |
+| S+-01 production-closed | `[ ]` |
+| Code/SQL/data changes in P5-E.1 | `[x]` — docs only |
+| Supabase writes / deploy / push | `[x]` — none |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**S+-01 status:** Planning completed. **Not implemented.** **Not baseline-accepted.** **Not production-closed.**
+
+**Next candidate:** **P5-E.2 Release Gate DB/RLS/RPC Baseline**. No push/deploy/launch.
 
 ---
 
@@ -634,7 +665,8 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/current-code-gap-notes.md` §85–§92 | P5-A.1 / P5-A.2 / P5-B.1 / P5-B.2 / P5-C.1 / P5-C.2 / P5-D.1 / P5-D.2 gate records |
+| `docs/architecture/p5-release-lock-plan.md` | P5-E.1 release lock architecture (authoritative for E.2+) |
+| `docs/architecture/current-code-gap-notes.md` §85–§93 | P5-A through P5-E.1 gate records |
 | `docs/architecture/moderation-conflict-matrix.md` | Conflict handling must remain untouched during P5 |
 | `docs/architecture/entity-promotion-policy.md` | No auto-promotion during security fixes |
 | `docs/architecture/graph-relations-spec.md` | Relation registry unchanged in P5 |

@@ -3142,6 +3142,43 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 93. P5-E.1 — Server-side Release Lock Planning Gate
+
+**Milestone:** P5-E.1 docs-only planning for S+-01; ready for P5-E.2 — **not implemented**.
+
+### S+-01 planning (repo only)
+
+| Item | Status |
+|------|--------|
+| `docs/architecture/p5-release-lock-plan.md` | Created |
+| `release_gate` table | **Planned** — not created |
+| Fail-closed helpers | **Planned** — not created |
+| RLS/RPC/Storage enforcement | **Planned** — P5-E.2 |
+| UI/Admin guardrails | **Planned** — P5-E.3 |
+| Patch Mode (`wiki_patch_mode` / `patch-mode.js`) | Client-only; fail-open; insufficient |
+| `bl_register_observation` lock hook | Comment only (P5-C) |
+| S+-01 implemented | **No** |
+| S+-01 baseline accepted | **No** |
+| S+-01 production-closed | **No** |
+| Code/SQL/data changes | **No** — docs only |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-01 | **Planning completed** — not implemented |
+
+**P5-E.1 planning completed locally.** Release lock implementation plan documented. No SQL, no code, no data changes, no deploy, no push. BoundLore remains NOT live-ready.
+
+### Next candidate
+
+**P5-E.2 Release Gate DB/RLS/RPC Baseline**. No push/deploy/launch.
+
+---
+
 ## 92. P5-D.2 — HTML Sanitization & URL Safety Acceptance Sweep
 
 **Milestone:** P5-D.2 acceptance sweep; confirms P5-D.1 repo baseline is **baseline-accepted** — **not production-closed**.

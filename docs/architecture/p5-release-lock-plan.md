@@ -1,0 +1,456 @@
+# P5-E Server-side Release Lock Plan
+
+**Version:** P5-E.1 planning baseline  
+**Status:** Planning only — **not implemented**  
+**Finding:** S+-01 — Kein serverseitiger, fail-closed Pre-Release-Content-Lock  
+**HEAD reference:** `0009206` (post P5-D.2 acceptance)
+
+---
+
+## 1. Status und Scope
+
+| Dimension | Verdict |
+|-----------|---------|
+| P5-E.1 gate type | **Docs-only planning** |
+| S+-01 status | **Open** — not implemented, not baseline-accepted, not production-closed |
+| Code/SQL changes in P5-E.1 | **None** |
+| SQL execution / DB migration | **None** |
+| Supabase data changes | **None** |
+| Push / Deploy / Launch | **Forbidden** |
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+
+**Goal:** Define a verifiable architecture and implementation plan for P5-E.2 (DB/RLS/RPC), P5-E.3 (Frontend/Admin UX), and P5-E.4 (acceptance sweep), plus optional P5-E.5 (staging DB application).
+
+Light No Fire is **not released**. Until an admin performs a deliberate, audited unlock, **all normal user content creation** (posts, edits, uploads, reactions, comments, reports) must be blocked **server-side** with fail-closed semantics.
+
+---
+
+## 2. Problem Statement
+
+### Current state (repo evidence)
+
+| Component | Location | Gap |
+|-----------|----------|-----|
+| Patch / Maintenance Mode | `supabase/wiki_patch_mode.sql`, `js/patch-mode.js` | **Maintenance UX only** — `enabled` defaults `false`; no write-blocking RLS |
+| Client enforcement | `js/patch-mode.js` `enforce()`, `assertCanSubmit()` | **Client-only** — bypassable via direct Supabase API |
+| Fail-open behavior | `patch-mode.js` `fetchState()` fallback | On DB error or missing row → `enabled: false` → **submissions allowed** |
+| Submit guard coverage | `js/create-post.js` | `WikiPatchMode.assertCanSubmit()` called before submit; **`edit-post.js` has no patch guard** |
+| Script loading | `js/supabase-config.js` | Injects `patch-mode.js` on pages loading supabase-config; **not a server gate** |
+| Posts INSERT RLS | `supabase/fix_tutorial_ack_rls.sql` | Tutorial-ack or admin only — **no release lock** |
+| Observation RPC | `supabase/phase_a_observations_foundation.sql` | P5-C ack gate present; **P5-E hook comment only** (lines 402–405) |
+| Discovery storage | `supabase/discovery_storage.sql` | Authenticated upload to `discovery-uploads` — **no lock check** |
+| Sync RPC | `supabase/sprint1_sync_rpc.sql` | `rpc_sync_discovery_submission` — **admin-only** (`v_is_admin` check) |
+| Reactions | `supabase/post_reactions_policies.sql` | `post_reactions_insert_own` — **no lock** |
+| Comments / Reports RLS | Repo | Tables referenced in `account_self_delete.sql`, `pre_release_reset_dry_run.sql` — **no INSERT policies in repo** → NOT TESTED |
+| Report screenshots | `js/support.js` | Uploads to `report-screenshots` bucket — **bucket policy not in repo** → NOT TESTED |
+| Central release state | — | **No `release_gate` table or equivalent** |
+
+### Why Patch Mode is insufficient
+
+- Designed for **maintenance windows**, not pre-release content lock.
+- **Default OFF** (`wiki_patch_mode.enabled default false`).
+- **Fail-open** when config unavailable.
+- Does not block **direct Data API**, **Storage API**, or **RPC** writes.
+- Admin bypass is client-side role check only.
+- Does not produce **audit trail** for unlock/re-lock decisions.
+
+### Required target
+
+Until Light No Fire release and explicit admin unlock:
+
+- **Default LOCKED** for user-generated content writes.
+- **Missing config = LOCKED**.
+- **DB read error = LOCKED**.
+- Read-only browsing (published posts, search, browse) remains allowed.
+- Existing pending/drafts **unchanged** — no auto-approve, no auto-publish on unlock.
+
+---
+
+## 3. Release Lock Grundprinzipien
+
+| # | Principle | Rule |
+|---|-----------|------|
+| 1 | Default LOCKED | Fresh deploy and missing `release_gate` row → contributions blocked |
+| 2 | Missing config = LOCKED | No row, corrupt row, or unreadable state → treat as locked |
+| 3 | DB error = LOCKED | Helper functions must not fail-open |
+| 4 | Unknown role = LOCKED | Unauthenticated or unrecognized role → no content writes |
+| 5 | Stale session = LOCKED | JWT/session alone does not bypass; server re-validates on each write |
+| 6 | Client is advisory | UI may explain lock; **RLS/RPC/Storage is enforcement** |
+| 7 | Admin unlock manual only | Requires authenticated admin, reason, confirm step, audit row |
+| 8 | Re-lock anytime | Admin can re-lock immediately; takes effect on next write attempt |
+| 9 | Pending unchanged | Unlock does **not** approve, publish, or mutate existing `pending` posts |
+| 10 | No auto-publish | No cron, no time-based unlock, no `enforced_until` auto-flip without explicit job (defer auto-expiry to later if needed) |
+| 11 | Read-only browsing | SELECT on published content remains for anon/authenticated |
+| 12 | Admin moderation separate | Admin repair/danger-zone/queue actions are **not** unlocked by user contribution unlock |
+| 13 | No hidden bypass | No URL flags, no `localStorage` bypass, no `?unlock=1` |
+| 14 | No client service_role | `service_role` never in browser bundles |
+| 15 | Patch Mode coexists | `wiki_patch_mode` remains maintenance overlay; release lock is orthogonal and stricter for writes |
+
+---
+
+## 4. Vorgeschlagene Datenstruktur (plan only — do not implement in P5-E.1)
+
+### `public.release_gate` (singleton)
+
+```sql
+-- PLANNED — NOT TO BE CREATED IN P5-E.1
+-- id smallint primary key default 1 check (id = 1)
+-- contribution_locked boolean not null default true
+-- reason text
+-- updated_by uuid references auth.users(id)
+-- updated_at timestamptz not null default now()
+-- created_at timestamptz not null default now()
+-- lock_version integer not null default 1
+-- enforced_until timestamptz nullable  -- optional; manual clear only in v1
+```
+
+**Semantics:**
+
+| State | `contribution_locked` | Row exists | Effective |
+|-------|----------------------|------------|-----------|
+| Pre-release default | `true` | yes | LOCKED |
+| Admin unlock | `false` | yes | UNLOCKED (user writes allowed per role matrix) |
+| Missing row | — | no | **LOCKED** (fail-closed) |
+| Read error | — | error | **LOCKED** (fail-closed) |
+
+### Optional: `public.release_gate_audit`
+
+| Field | Purpose |
+|-------|---------|
+| `id uuid` | PK |
+| `actor_id uuid` | Admin who changed lock |
+| `action text` | `unlock` / `relock` / `update_reason` / `read_failure` |
+| `old_locked boolean` | Previous state |
+| `new_locked boolean` | New state |
+| `reason text` | Required on unlock |
+| `created_at timestamptz` | Audit timestamp |
+| `request_context jsonb` | Optional IP/user-agent hash (no PII dump) |
+
+**P5-E.1:** No migration file, no SQL execution.
+
+---
+
+## 5. Helper- / Policy-Architektur (plan only)
+
+### `public.bl_is_admin()` 
+
+- **Repo status:** Not found as standalone function; admin checks are inline (`profiles.role = 'admin'`) in policies and RPCs.
+- **P5-E.2 plan:** Introduce `bl_is_admin()` as `STABLE SECURITY DEFINER` with `SET search_path = public`, or document reuse pattern from existing RPCs.
+- Must return `false` on null `auth.uid()`, missing profile, or DB error.
+
+### `public.bl_is_release_unlocked_for_actor()`
+
+Returns `boolean`. **Fail-closed:**
+
+```text
+false if:
+  - release_gate row missing
+  - contribution_locked = true
+  - SELECT raises exception
+  - auth.uid() is null (for actor-scoped checks)
+true only if:
+  - row exists AND contribution_locked = false
+```
+
+Admin **contribution** unlock affects normal users. Admin **moderation** paths may use separate `bl_is_admin()` without requiring unlock — document per write path.
+
+### `public.bl_can_create_user_content()`
+
+Returns `true` only when **all** hold:
+
+1. `auth.uid()` not null  
+2. `bl_is_release_unlocked_for_actor()` = true  
+3. Tutorial ack present (`user_submission_acks`) **or** path exempt (e.g. ack insert itself)  
+4. Not banned (future)  
+5. Role permitted per matrix below  
+
+### `public.bl_assert_can_create_user_content()`
+
+Raises SQLSTATE `42501` with clear message when locked, unauthenticated, or missing ack.
+
+**Constraints for P5-E.2:**
+
+- No fail-open `COALESCE(..., true)`
+- `SECURITY DEFINER` only where unavoidable; always `SET search_path = public`
+- No dynamic SQL
+- No client-supplied lock override parameters
+
+---
+
+## 6. Enforcement-Matrix
+
+| Write-Pfad | Aktueller Typ | Risiko | Geplantes Enforcement | Gate | Test |
+|------------|---------------|--------|----------------------|------|------|
+| **A) posts INSERT** — create-post UI | Client + RLS (`posts_insert_requires_tutorial_ack`) | HIGH — direct API bypasses UI | Restrictive RLS `WITH CHECK (bl_can_create_user_content())` | P5-E.2 | RLS negative: locked blocks insert |
+| **A) posts INSERT** — contribution mode | Same | HIGH | Same RLS | P5-E.2 | Contribution submit blocked when locked |
+| **A) posts INSERT** — guild apply (`guilds-apply.js`) | RLS | HIGH | Same RLS | P5-E.2 | Guild post insert blocked |
+| **A) posts INSERT** — placeholder/quick-add stubs | `create-post.js` insert | MEDIUM | Same RLS | P5-E.2 | Stub insert blocked |
+| **B) posts UPDATE** — edit-post | RLS (`posts_update_own_or_admin`) | HIGH | Add restrictive policy: non-admin updates require unlock; admin updates allowed for moderation | P5-E.2 | User edit blocked when locked; admin edit allowed |
+| **C) bl_register_observation** | SECURITY DEFINER RPC | HIGH — bypasses posts RLS | `bl_assert_can_create_user_content()` before any INSERT (after P5-C ack gate) | P5-E.2 | RPC raises 42501 when locked |
+| **D) rpc_sync_discovery_submission** | SECURITY DEFINER, admin-only | LOW for normal users | Keep admin-only; **no user unlock path**; document that admin sync does not auto-publish pending without explicit approve action | P5-E.2 review | Non-admin RPC call rejected (existing) |
+| **E) Storage discovery-uploads** | `discovery_storage.sql` INSERT policy | HIGH | Extend policy: `bl_can_create_user_content()` on INSERT | P5-E.2 | Upload blocked when locked |
+| **F) Storage report-screenshots** | `js/support.js` — bucket not in repo | UNKNOWN | Plan policy draft in P5-E.2; mark NOT TESTED until bucket export | P5-E.2 / P5-E.5 | Upload blocked when locked |
+| **G) comments INSERT** | `post-detail.js` → `comments` | HIGH — no RLS in repo | Restrictive RLS when table exists; block when locked | P5-E.2 | Comment insert blocked — NOT TESTED until policy export |
+| **H) post_reactions INSERT/UPDATE** | `post-detail.js`, `post_reactions_policies.sql` | MEDIUM | Restrictive policy referencing lock helper | P5-E.2 | Reaction blocked when locked |
+| **I) reports INSERT** | `support.js` | MEDIUM | **Default: block** until release (user-generated content); revisit in open questions | P5-E.2 | Report blocked when locked |
+| **J) notifications INSERT** | P5-B `notifications_insert_authenticated` | LOW for release lock | **Out of scope** for contribution lock — P5-B injection guard separate; cross-user admin notifications via future RPC | — | No regression on P5-B fixture |
+| **K) user_submission_acks INSERT** | `tutorial-ack.js` | LOW | **Allow** when locked — ack is prerequisite, not published content | P5-E.2 | Ack insert allowed while locked |
+| **L) admin unlock/re-lock** | New admin UI + RPC or direct update | CRITICAL | Admin-only UPDATE on `release_gate`; audit row required | P5-E.2 + P5-E.3 | Unlock/relock audited |
+| **M) admin_actions log** | `wiki/admin/index.html` | — | Extend for unlock/relock events | P5-E.3 | Audit visible |
+| **N) support/contact uploads** | `support.js` storage + reports | MEDIUM | Block uploads + report insert when locked (aligned with I) | P5-E.2 + P5-E.3 | Support form shows locked state |
+| **O) wiki_observations INSERT** | Via `bl_register_observation` only | HIGH | Covered by RPC gate (C) | P5-E.2 | Same as C |
+
+---
+
+## 7. Rollenmatrix (pre-release default = LOCKED)
+
+| Rolle | Read browsing | Create post | Upload evidence | Comment | React/rate | Report | Admin unlock | Moderation (queue/repair) |
+|-------|---------------|-------------|-----------------|---------|------------|--------|--------------|---------------------------|
+| **anon** | ✓ published | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **authenticated user** | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **trusted user** (reserved) | ✓ | ✗ (unless explicitly granted post-unlock) | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **moderator** (reserved) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | TBD — default ✗ until role defined |
+| **admin** | ✓ | ✗ until unlock* | ✗ until unlock* | ✗ until unlock* | ✗ until unlock* | ✗ until unlock* | ✓ unlock/relock | ✓ queue/repair (separate from user unlock) |
+| **service_role** | server only | server only | server only | — | — | — | — | never in client |
+
+\* **Admin as content author:** Admins follow same contribution lock for **user-submission** paths unless a separate documented moderation exception is required. Admin **moderation** (approve, repair, danger-zone) remains available without opening public submissions.
+
+**After admin unlock (`contribution_locked = false`):**
+
+| Rolle | Create post | Upload | Comment | React | Report |
+|-------|-------------|--------|---------|-------|--------|
+| authenticated + ack | ✓ | ✓ | ✓ | ✓ | ✓ (if policies exist) |
+| anon | ✗ | ✗ | ✗ | ✗ | ✗ |
+
+---
+
+## 8. UI- / UX-Plan für P5-E.3
+
+### Affected files (planned)
+
+| File | Change |
+|------|--------|
+| `js/patch-mode.js` | Align with release lock or split: maintenance vs contribution lock; **remove fail-open** for contribution checks |
+| `js/create-post.js` | Pre-release banner; disable submit; call server-side check before insert; handle 42501 |
+| `js/edit-post.js` | Add lock guard (currently **missing**); disable save when locked |
+| `js/support.js` | Disable report submit + upload when locked |
+| `js/post-detail.js` | Disable comment/reaction forms when locked |
+| `js/discovery-core.js` | Surface RPC lock errors from `bl_register_observation` |
+| `wiki/create-post/index.html` | Pre-release messaging; no misleading CTAs |
+| `wiki/edit-post/index.html` | Locked-state messaging |
+| `wiki/admin/index.html` | Lock status panel; unlock/re-lock with reason + confirm |
+| `js/auth-nav.js` / nav CTAs | Optional: dim "+ New Post" when locked |
+| `js/supabase-config.js` | Load unified guard module after P5-E.3 design |
+
+### UX requirements
+
+- Clear message: *"BoundLore is in pre-release. User submissions are closed until Light No Fire launches and an admin unlocks contributions."*
+- Submit buttons **disabled** with explanation (not merely hidden).
+- Admin sees: current lock state, `reason`, `updated_at`, `updated_by`, lock version.
+- Unlock requires: reason (min length), confirm dialog, audit log entry.
+- Re-lock: one-click with confirm (reason optional for re-lock or use fixed "Re-locked for pre-release").
+- Existing pending posts: show unchanged status; no "auto-approved" messaging.
+- No localhost/QA bypass flags in production bundle.
+- Read-only pages load without maintenance overlay when only contribution lock is active (distinction from `wiki_patch_mode` full maintenance).
+
+---
+
+## 9. Teststrategie
+
+### P5-E.2 — Static SQL / repo tests
+
+| Test | Expected |
+|------|----------|
+| `release_gate` table defined in SQL file | Present, default `contribution_locked = true` |
+| Singleton CHECK `id = 1` | Present |
+| `bl_is_release_unlocked_for_actor()` fail-closed | Missing row → false |
+| `bl_can_create_user_content()` | Combines auth + ack + unlock |
+| `posts` restrictive INSERT policy | References lock helper |
+| `posts` UPDATE policy for non-admin | References lock helper |
+| `bl_register_observation` | Lock check before writes |
+| `discovery_upload_authenticated` | Lock check on INSERT |
+| `post_reactions` INSERT | Lock check |
+| No `service_role` in `js/` | Grep clean |
+| QA static fixture | `qa/p5-release-lock-security-fixtures.html` (new in P5-E.2) |
+
+### P5-E.3 — UI tests
+
+| Test | Expected |
+|------|----------|
+| create-post locked message | Submit disabled |
+| edit-post locked message | Save disabled |
+| support locked | No upload/submit |
+| post-detail | Comment/reaction disabled |
+| admin lock panel | Status visible to admin |
+| admin unlock | Reason required; audit logged |
+| re-lock | Immediate effect |
+| no auto-publish pending | Pending count unchanged after unlock |
+
+### P5-E.4 — Acceptance sweep (local baseline)
+
+- P5-B notification fixture 24/24 PASS  
+- P5-C observation fixture 17/17 PASS  
+- P5-D sanitization fixture 45/45 PASS  
+- Standard regression: homepage, browse, search, post detail, admin anon  
+- Direct API negative tests: **documented**; live execution only P5-E.5 with approval  
+
+### P5-E.5 — Staging (optional, explicit approval)
+
+- Apply SQL to isolated/staging project  
+- Negative: anon insert, auth insert locked, missing row, RPC locked, storage locked  
+- Positive: admin unlock → acked user can insert  
+- Re-lock → inserts blocked again  
+- Rollback script tested  
+
+---
+
+## 10. Gate-Aufteilung
+
+| Gate | Type | Deliverables |
+|------|------|--------------|
+| **P5-E.1** | Docs-only | This plan; docs updates; **current gate** |
+| **P5-E.2** | SQL baseline (not executed) | `supabase/release_gate.sql`; helpers; RLS/storage/RPC patches; static QA fixture |
+| **P5-E.3** | Code baseline | UI guards; admin lock panel; patch-mode alignment |
+| **P5-E.4** | Acceptance sweep | Local baseline acceptance; fixtures green; no production closure |
+| **P5-E.5** | Staging (optional) | SQL apply + negative RLS/RPC/storage tests; operator approval required |
+| **P5-F.1** | Combined S+ retest | After P5-E.4; B/C/D/E fixtures + regression |
+| **P5-F.2** | Fable handoff | External retest package |
+
+---
+
+## 11. Acceptance Criteria für S+-01
+
+### Repo baseline accepted (after P5-E.2 + P5-E.3 + P5-E.4)
+
+- [ ] `release_gate` architecture implemented in repo SQL  
+- [ ] Fail-closed helpers exist (`bl_is_release_unlocked_for_actor`, `bl_can_create_user_content`)  
+- [ ] All matrix write paths have planned enforcement **implemented in files**  
+- [ ] UI guardrails on create/edit/support/post-detail  
+- [ ] Admin unlock/re-lock with audit  
+- [ ] QA fixtures pass locally  
+- [ ] P5-B/C/D fixtures remain green  
+- [ ] No known user write path lacks enforcement in repo SQL or documented NOT TESTED with stop condition  
+
+### Staging accepted (P5-E.5)
+
+- [ ] Locked config blocks normal user writes (API + UI)  
+- [ ] Missing `release_gate` row blocks writes  
+- [ ] Direct Supabase client cannot bypass  
+- [ ] RPC `bl_register_observation` blocked when locked  
+- [ ] Storage upload blocked when locked  
+- [ ] Admin unlock works with audit trail  
+- [ ] Re-lock works  
+- [ ] No auto-publish of existing pending  
+- [ ] Rollback documented and tested  
+
+### Production-closed (explicit gate — not P5-E.4)
+
+- [ ] Staging negative tests documented and passed  
+- [ ] Live policy application consciously approved (LAUNCH-0)  
+- [ ] P5-F.1 combined retest complete  
+- [ ] Fable Retest 1 confirms  
+
+**P5-E.1:** None of the above checkboxes are satisfied — planning only.
+
+---
+
+## 12. Stop Conditions
+
+Stop and escalate if:
+
+1. Base RLS for `comments` / `reports` cannot be confirmed — remain **NOT TESTED** until live export  
+2. A write path cannot be identified in inventory — block P5-E.2 until mapped  
+3. Proposed helper would fail-open on NULL/missing row  
+4. Missing config cannot be treated as LOCKED  
+5. Admin bypass is broad (any admin write skips all checks without audit)  
+6. UI-only lock without server backing is proposed as "done"  
+7. SQL application requested during P5-E.1 — **refuse**  
+8. Production deploy requested during P5-E — **refuse**  
+9. `service_role` key appears in client code  
+10. Unlock would auto-approve pending queue items  
+11. Pending `add_recipe` conflict touched as part of release-lock work  
+
+---
+
+## 13. Rollback / Recovery Plan
+
+| Scenario | Action |
+|----------|--------|
+| P5-E.2 SQL bad | Revert SQL commit; do not apply to live DB |
+| P5-E.3 UI regression | Revert JS/HTML commit independently |
+| Emergency re-lock | `UPDATE release_gate SET contribution_locked = true` (staging/prod) |
+| Failed unlock experiment | Re-lock + audit `relock` row |
+| Data safety | No DELETE of posts/comments; pending unchanged |
+| Migration down notes | Include in `release_gate.sql` header (P5-E.2) |
+| Audit preservation | Never truncate `release_gate_audit` in rollback |
+
+**Primary recovery:** Re-lock immediately. Revert code/SQL commits per gate.
+
+---
+
+## 14. Known Open Questions
+
+| # | Question | Default / notes |
+|---|----------|-----------------|
+| 1 | Are `comments` / `reports` RLS policies only in live DB? | Repo has table references but no INSERT policies — **NOT TESTED** |
+| 2 | `report-screenshots` bucket policies absent from repo? | `support.js` uploads; policy export needed |
+| 3 | Does support/contact upload count as pre-release content? | **Plan: yes — block** until unlock |
+| 4 | Should trusted/moderator roles have pre-release write? | **Default: no** until roles defined in `profiles` |
+| 5 | Admin unlock MFA / re-auth? | **v1: role check only**; MFA deferred |
+| 6 | Which environment gets first DB application? | Staging/isolated project; not production in P5-E.2 |
+| 7 | PITR/backup before DB gate? | Required before P5-E.5; verify per `PRE_RELEASE_RESET_README.md` |
+| 8 | Patch Mode after release lock? | Keep for maintenance; contribution lock is separate column/state |
+| 9 | Should `user_submission_acks` INSERT stay allowed while locked? | **Yes** — users can complete tutorial before launch |
+| 10 | Admin compose-from-discovery in `wiki/admin/index.html`? | Moderation path — allowed without public unlock; must not auto-publish pending discoveries without explicit approve |
+| 11 | `guilds-apply.js` post insert? | Covered by posts INSERT RLS |
+| 12 | Time-based `enforced_until` auto-unlock? | **Defer** — manual unlock only in v1 |
+
+---
+
+## 15. Repo Write-Path Inventory (P5-E.1 analysis)
+
+### Frontend submit surfaces
+
+| Surface | File | Server target | Client guard today |
+|---------|------|---------------|-------------------|
+| Post create | `js/create-post.js` | `posts` INSERT/UPDATE | `WikiPatchMode.assertCanSubmit()` (patch only) |
+| Post edit | `js/edit-post.js` | `posts` UPDATE | **None** |
+| Comments | `js/post-detail.js` | `comments` INSERT | **None** |
+| Reactions | `js/post-detail.js` | `post_reactions` INSERT/UPDATE | **None** |
+| Reports | `js/support.js` | `reports` INSERT + storage | **None** |
+| Observation | `js/discovery-core.js` | `bl_register_observation` RPC | P5-C ack (RPC); no release lock |
+| Tutorial ack | `js/tutorial-ack.js` | `user_submission_acks` INSERT | N/A — should stay allowed |
+| Notifications | `js/notifications.js` | `notifications` INSERT | P5-B own-user only |
+| Admin sync | `wiki/admin/index.html` | `rpc_sync_discovery_submission` | Admin session |
+| Admin compose | `wiki/admin/index.html` | `posts` INSERT (publish) | Admin session |
+
+### SQL / RPC (repo files)
+
+| Asset | Write enforcement today |
+|-------|------------------------|
+| `fix_tutorial_ack_rls.sql` | Tutorial ack or admin for posts INSERT |
+| `phase_a_observations_foundation.sql` | auth.uid + ack; P5-E hook comment |
+| `discovery_storage.sql` | Authenticated path prefix only |
+| `post_reactions_policies.sql` | Own user only |
+| `admin_dashboard_notifications.sql` | P5-B insert scope |
+| `sprint1_sync_rpc.sql` | Admin-only sync |
+| `wiki_patch_mode.sql` | No write blocking |
+
+---
+
+## Appendix — Related docs
+
+| Document | Relevance |
+|----------|-----------|
+| `docs/architecture/p5-splus-remediation-plan.md` | S+-01 summary; gate sequence |
+| `docs/architecture/current-code-gap-notes.md` | Gate records §92+ |
+| `qa/e2e-content-matrix.md` | P5-E test rows |
+| `docs/architecture/moderation-conflict-matrix.md` | Pending conflict untouched |
+| `docs/architecture/entity-promotion-policy.md` | No auto-promotion on unlock |
+| `supabase/PRE_RELEASE_RESET_README.md` | Reset vs security gate separation |
+
+---
+
+**P5-E.1 verdict:** Release Lock implementation plan **accepted for planning purposes**. S+-01 remains **open**. Next: **P5-E.2 Release Gate DB/RLS/RPC Baseline**. No push/deploy/launch.
