@@ -3100,13 +3100,51 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-B.2 Notification Injection Acceptance Sweep**. No push/deploy/launch.
+**P5-C.1 Observation RPC Gate Fix Baseline**. No push/deploy/launch.
+
+---
+
+## 88. P5-B.2 — Notification Injection Acceptance Sweep
+
+**Milestone:** P5-B.2 docs-only acceptance sweep; confirms P5-B.1 repository baseline is accepted at repo level — **not production-closed**.
+
+### P5-B.2 acceptance sweep
+
+| Check | Result |
+|-------|--------|
+| SQL baseline `user_id = auth.uid()` in repo file | `[x]` |
+| SQL not executed | `[x]` |
+| Live-RLS NOT TESTED | `[x]` — by design; deferred to DB/staging gate |
+| `BoundLoreNotificationUrlSafety` p5-b1 accepted | `[x]` |
+| Unsafe schemes blocked at write/render | `[x]` |
+| `auth-nav.js` / `notifications.js` accepted | `[x]` |
+| Script load order (post/admin + dynamic auth-nav) | `[x]` |
+| QA fixture 24/24 PASS | `[x]` |
+| Standard regression smoke | `[x]` |
+| No Supabase writes / no notification inserts | `[x]` |
+| S+-02 production-closed | `[ ]` |
+| Code / SQL / data changes in P5-B.2 | `[x]` — docs only |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-02 | **Baseline accepted** — not production-closed |
+
+**P5-B.2 acceptance sweep completed locally.** The Notification Injection guardrail baseline is accepted at repository level. SQL policy scopes authenticated inserts to `user_id = auth.uid()` in the repo migration file, but SQL has not been executed and Live-RLS remains NOT TESTED. `BoundLoreNotificationUrlSafety` p5-b1 accepted; unsafe `target_url` schemes blocked before rendering or client-side insert. QA fixture passes locally. No Supabase writes, no deploy, no push. BoundLore remains NOT live-ready.
+
+### Next candidate
+
+**P5-C.1 Observation RPC Gate Fix Baseline**. No push/deploy/launch.
 
 ---
 
 ## 87. P5-B.1 — Notification Injection Fix Baseline
 
-**Milestone:** P5-B.1 code + SQL baseline for S+-02 Cross-User-Notification-Injection; ready for P5-B.2 acceptance — **not final accepted**.
+**Milestone:** P5-B.1 code + SQL baseline for S+-02 Cross-User-Notification-Injection; **accepted at repo level via P5-B.2** — not production-closed.
 
 ### S+-02 baseline (file/repo only)
 
@@ -3119,7 +3157,9 @@ The future Draft Inspector / Preview must **NOT**:
 | `js/auth-nav.js` render-time URL sanitize | Implemented |
 | Cross-user admin/comment notifications | **Blocked** until SECURITY DEFINER RPC (future gate) |
 | QA fixture `qa/p5-notification-security-fixtures.*` | 22+ URL corpus cases |
-| SQL executed / live RLS tested | **No** — P5-B.2 |
+| SQL executed / live RLS tested | **No** — Live-RLS NOT TESTED |
+| S+-02 repo baseline accepted | **Yes** — P5-B.2 |
+| S+-02 production-closed | **No** — DB gate required |
 | Supabase writes / deploy / push | **No** |
 
 ### Verdict unchanged
@@ -3129,12 +3169,12 @@ The future Draft Inspector / Preview must **NOT**:
 | Foundation-Ready | PASS |
 | Product-Activation-Ready | FAIL |
 | Public-Launch-Ready | **NO-GO** |
-| S+-02 accepted | **No** — baseline only; P5-B.2 required |
+| S+-02 | **Baseline accepted (P5-B.2)** — not production-closed |
 
-**P5-B.1 baseline implemented locally.** RLS insert policy and `target_url` constraint prepared in repo SQL only. Client-side URL safety helper and notification rendering/insert guards added. No live database mutation, no Supabase deploy, no push. BoundLore remains NOT live-ready.
+**P5-B.1 baseline implemented locally.** RLS insert policy and `target_url` constraint prepared in repo SQL only. Client-side URL safety helper and notification rendering/insert guards added. Accepted at repo level by P5-B.2 sweep. No live database mutation, no Supabase deploy, no push. BoundLore remains NOT live-ready.
 
-### Next candidate
+### Next candidate (historical)
 
-**P5-B.2 Notification Injection Acceptance Sweep**. No push/deploy/launch.
+**P5-B.2 Notification Injection Acceptance Sweep** — **complete**. See §88.
 
 ---

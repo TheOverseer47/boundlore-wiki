@@ -1849,11 +1849,38 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 | Public Launch NO-GO | docs | documented | `[x]` |
 | Pending conflict | — | not touched | `[x]` |
 
-**P5-B.1 baseline implemented locally.** Insert policy and `target_url` safety prepared in repo; client URL helper and notification guards added. SQL not executed; live RLS unchanged. No Supabase writes, no deploy, no push. S+-02 remains open until P5-B.2 acceptance sweep. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+**P5-B.1 baseline implemented locally.** Insert policy and `target_url` safety prepared in repo; client URL helper and notification guards added. SQL not executed; live RLS unchanged. Accepted at repo level by P5-B.2 (see below). BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate (historical):** P5-B.2 — **complete**.
+
+---
+
+## P5-B.2 — Notification Injection Acceptance Sweep
+
+**Milestone:** P5-B.2 docs-only acceptance sweep; confirms P5-B.1 repo baseline — not production-closed.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| SQL baseline | `admin_dashboard_notifications.sql` | `WITH CHECK (user_id = auth.uid())` | `[x]` repo file |
+| SQL not executed | — | no live RLS change | `[x]` |
+| Live-RLS NOT TESTED | docs | explicitly documented | `[x]` |
+| URL safety helper | `notification-url-safety.js` | p5-b1; blocks unsafe schemes | `[x]` accepted |
+| Insert guard | `notifications.js` | cross-user + unsafe URL blocked | `[x]` accepted |
+| Render guard | `auth-nav.js` | sanitize before href | `[x]` accepted |
+| Script load order | post/admin + auth-nav dynamic | safety before notifications | `[x]` |
+| QA fixture | `/qa/p5-notification-security-fixtures.html` | 24/24 PASS; `allPass === true` | `[x]` |
+| Regression smoke | homepage/browse/search/post/admin | no crash; no URL-safety errors | `[x]` |
+| S+-02 production-closed | docs | not until DB apply + RLS test | `[ ]` |
+| Supabase writes / deploy / push | — | none | `[x]` |
+| Product Activation FAIL | docs | documented | `[x]` |
+| Public Launch NO-GO | docs | documented | `[x]` |
+| Pending conflict | — | not touched | `[x]` |
+
+**P5-B.2 acceptance sweep completed locally.** The Notification Injection guardrail baseline is accepted at repository level. SQL policy scopes authenticated inserts to `user_id = auth.uid()` in repo file; SQL not executed; Live-RLS NOT TESTED. `BoundLoreNotificationUrlSafety` p5-b1 accepted; unsafe schemes blocked. QA fixture 24/24 PASS. No Supabase writes, no deploy, no push. S+-02 baseline-accepted but not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
 
 **STOPP — ab hier wäre der nächste Schritt potenziell Live/Push/Deploy. Jetzt erst bewusst entscheiden.**
 
-**Next candidate:** **P5-B.2 Notification Injection Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P5-C.1 Observation RPC Gate Fix Baseline**. **LAUNCH-0** required before any push/deploy.
 
 ---
 
