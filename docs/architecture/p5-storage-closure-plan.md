@@ -369,21 +369,21 @@ P5-E.8 documents a safe, staged path to close the deferred storage release-gate 
 
 ---
 
-## 12. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+## 13. P5-E.8A Follow-up (FAIL — owner error on storage.objects)
 
-**Gate:** P5-E.8A — Storage Policy Owner-Capable Apply. **BLOCKED**.
+**Gate:** P5-E.8A resume — Dashboard apply attempted. **FAIL**.
 
 | Item | Result |
 |------|--------|
-| Pre-apply backup | **PASS** — 290,277 bytes |
-| Release gate pre-check | **PASS** — locked |
-| Dashboard apply | **BLOCKED** — sign-in required |
+| Dashboard project | **boundlore-staging** / `jzzgoiwfbuwiiyvwgwri` confirmed |
+| Apply method | Dashboard SQL Editor |
+| Apply error | `42501: must be owner of relation objects` |
 | Policy applied | **NO** |
-| Storage closure | **DEFERRED** (unchanged) |
-| P5-E.8A | **BLOCKED** |
+| Storage closure | **DEFERRED** |
+| P5-E.8A | **FAIL** |
 
 **Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
 ---
 
-*Document version: P5-E.8 PASS + P5-E.8A BLOCKED. No secrets.*
+*Document version: P5-E.8 PASS + P5-E.8A FAIL. No secrets.*

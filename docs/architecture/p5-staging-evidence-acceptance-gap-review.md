@@ -291,20 +291,19 @@ P5-E.5 Re-run 3 delivered **credible staging evidence** for notification injecti
 
 ---
 
-## 17. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+## 18. P5-E.8A Resume Follow-up (FAIL)
 
-**Gate:** P5-E.8A — storage policy apply. **BLOCKED**.
+**Gate:** P5-E.8A resume — Dashboard apply owner error. **FAIL**.
 
 | Item | Result |
 |------|--------|
-| Backup | 290,277 bytes |
-| Apply | **BLOCKED** — Dashboard sign-in |
-| `discovery-uploads` bucket | **Not on staging** |
+| Apply | **FAIL** — `must be owner of relation objects` |
+| `discovery-uploads` bucket | **Still missing** |
 | Storage closure | **DEFERRED** |
-| P5-E.8A | **BLOCKED** |
+| P5-E.8A | **FAIL** |
 
 **Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
 ---
 
-*Document version: P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS + P5-E.8A BLOCKED. No secrets. No DB access.*
+*Document version: P5-E.6 PASS + ... + P5-E.8A FAIL. No secrets. No DB access.*

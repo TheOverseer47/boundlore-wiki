@@ -2298,6 +2298,24 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.8A Resume — Storage Policy Apply (FAIL)
+
+**Milestone:** P5-E.8A resume — Dashboard apply. **FAIL**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Dashboard ref confirmed | boundlore-staging | jzzgoiwfbuwiiyvwgwri | `[x]` |
+| Apply via SQL Editor | deferred SQL only | PASS | `[ ]` **FAIL** — owner error |
+| Policy exists | storage.objects | yes | `[ ]` NO |
+| release_gate locked after | staging | true | `[x]` |
+| discovery-uploads bucket | staging | present | `[ ]` missing |
+| Negative upload test | staging | PASS/NOT RUN | `[ ]` NOT RUN |
+| P5-E.8A | gate | PASS | **FAIL** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
+
+---
+
 ## P5-E.8A — Storage Policy Owner-Capable Apply (BLOCKED)
 
 **Milestone:** P5-E.8A — Dashboard SQL Editor apply on staging. **BLOCKED**.

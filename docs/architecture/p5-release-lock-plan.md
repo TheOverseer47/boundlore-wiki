@@ -729,19 +729,19 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 
 ---
 
-## 32. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+## 33. P5-E.8A Resume Follow-up (FAIL — owner error)
 
-**Gate:** P5-E.8A — storage policy owner-capable apply. **BLOCKED**.
+**Gate:** P5-E.8A resume — Dashboard apply failed. **FAIL**.
 
 | Check | Result |
 |-------|--------|
-| Pre-apply backup | `[x]` 290,277 bytes |
-| Release gate locked pre-check | `[x]` |
-| Dashboard apply | **BLOCKED** — sign-in |
+| boundlore-staging / jzzgoiwfbuwiiyvwgwri | `[x]` confirmed |
+| Dashboard apply | `[x]` attempted |
+| Apply error | `42501 must be owner of relation objects` |
 | Policy applied | **NO** |
-| Storage closure | **DEFERRED** |
-| P5-E.8A | **BLOCKED** |
+| release_gate locked after | `[x]` |
+| P5-E.8A | **FAIL** |
 
 **Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
-**Next:** User Dashboard sign-in → re-attempt P5-E.8A apply. No push/deploy/launch.
+**Next:** P5-E.8A.2 owner-capable role investigation. No push/deploy/launch.

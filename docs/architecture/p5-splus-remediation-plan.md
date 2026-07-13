@@ -1054,7 +1054,23 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-storage-closure-plan.md`
 
-**Next:** P5-E.8A re-attempt after Dashboard sign-in. No push/deploy/launch.
+**Next:** P5-E.8A.2 owner-capable role path. No push/deploy/launch.
+
+---
+
+## 54. P5-E.8A Resume — Storage Policy Apply (FAIL)
+
+**Milestone:** P5-E.8A resume — Dashboard SQL Editor apply. **FAIL**.
+
+| Check | Result |
+|-------|--------|
+| boundlore-staging / jzzgoiwfbuwiiyvwgwri | `[x]` confirmed |
+| Dashboard apply | `[x]` attempted |
+| Owner error | `[x]` `must be owner of relation objects` |
+| Policy applied | **NO** |
+| P5-E.8A | **FAIL** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
 ---
 

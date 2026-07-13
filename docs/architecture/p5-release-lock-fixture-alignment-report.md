@@ -157,19 +157,12 @@ P5-E.7B aligned the Release Lock DB fixture with the P5-E.5C storage defer desig
 
 ---
 
-## 8. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+## 9. P5-E.8A Resume Follow-up (FAIL)
 
-**Gate:** P5-E.8A — Storage policy apply attempted. **BLOCKED**.
-
-| Item | Result |
-|------|--------|
-| Apply executed | **NO** — Dashboard sign-in required |
-| Fixture status | **CORE_PASS_STORAGE_DEFERRED** (unchanged) |
-| P5-E.8B | Still pending |
-| P5-E.8A | **BLOCKED** |
+**Gate:** P5-E.8A resume — apply failed with owner error. **FAIL**.
 
 **Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
 ---
 
-*Document version: P5-E.7B PASS + P5-E.8 PASS + P5-E.8A BLOCKED. No secrets.*
+*Document version: P5-E.7B PASS + P5-E.8 PASS + P5-E.8A FAIL. No secrets.*

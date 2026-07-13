@@ -3292,7 +3292,24 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.8A re-attempt after Dashboard sign-in. No push/deploy/launch.
+**Next:** P5-E.8A.2 owner-capable role investigation. No push/deploy/launch.
+
+---
+
+## 129. P5-E.8A Resume — Storage Policy Apply (FAIL)
+
+**Milestone:** P5-E.8A resume — Dashboard apply. **FAIL**.
+
+| Check | Result |
+|-------|--------|
+| Dashboard project confirmed | `[x]` boundlore-staging / `jzzgoiwfbuwiiyvwgwri` |
+| Apply via SQL Editor | `[x]` attempted |
+| Apply error | `42501 must be owner of relation objects` |
+| Policy applied | **NO** |
+| release_gate locked after | `[x]` true |
+| P5-E.8A | **FAIL** |
+
+**Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
 ---
 

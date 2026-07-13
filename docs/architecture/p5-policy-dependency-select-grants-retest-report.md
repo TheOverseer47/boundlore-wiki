@@ -235,12 +235,12 @@ P5-E.7A.2 closed the **profiles/acks SELECT grant gap** on staging. Direct posts
 
 ---
 
-## 15. P5-E.8A Follow-up (BLOCKED — Dashboard sign-in)
+## 16. P5-E.8A Resume Follow-up (FAIL — owner error)
 
-**Gate:** P5-E.8A — storage policy apply. **BLOCKED**.
+**Gate:** P5-E.8A resume — Dashboard apply. **FAIL** — `must be owner of relation objects`.
 
 **Report:** `docs/architecture/p5-storage-policy-owner-apply-report.md`
 
 ---
 
-*Document version: P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS + P5-E.8A BLOCKED. No secrets.*
+*Document version: P5-E.7A.2 PASS + P5-E.7B PASS + P5-E.8 PASS + P5-E.8A FAIL. No secrets.*

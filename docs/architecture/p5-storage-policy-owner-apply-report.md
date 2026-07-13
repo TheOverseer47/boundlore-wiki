@@ -2,8 +2,8 @@
 
 **Gate:** P5-E.8A — Storage Policy Owner-Capable Apply on Staging  
 **Date:** 2026-07-13  
-**HEAD (start):** `6bf718b` — Document storage closure plan  
-**Verdict:** **BLOCKED** — Dashboard apply not executed (sign-in required)
+**HEAD (start):** `ff20edd` — Document storage policy owner apply blockers  
+**Verdict:** **FAIL** — Dashboard apply attempted; owner error on `storage.objects`
 
 ---
 
@@ -14,8 +14,9 @@
 | User approval for P5-E.8A | **YES** — staging only |
 | Staging ref | `jzzgoiwfbuwiiyvwgwri` |
 | Apply method required | Supabase Dashboard SQL Editor only |
-| Legacy excluded | **YES** — `ohkoojpzmptdfyowdgog` not used |
-| Production excluded | **YES** |
+| Legacy excluded | **YES** — `ohkoojpzmptdfyowdgog` not opened |
+| Production excluded | **YES** — no legacy/production project |
+| No MCP apply / no psql apply | **YES** |
 | No push / deploy / launch | **YES** |
 | No secrets in report | **YES** |
 
@@ -26,55 +27,41 @@
 | Check | Result |
 |-------|--------|
 | `SUPABASE_STAGING_PROJECT_REF` | `jzzgoiwfbuwiiyvwgwri` |
-| `SUPABASE_STAGING_URL` | `https://jzzgoiwfbuwiiyvwgwri.supabase.co` |
 | `SUPABASE_STAGING_CONFIRM_ISOLATED` | `true` |
-| Staging ref in DB URL | **YES** |
-| Legacy ref in DB URL | **NO** |
-| `service_role` / `sb_secret` client key | **NO** |
-| Supabase MCP `get_project` | **PASS** — project name `boundlore-staging`, status `ACTIVE_HEALTHY`, region `eu-central-1` |
-| Dashboard project ref in URL | `jzzgoiwfbuwiiyvwgwri` (sign-in redirect target) |
-| Dashboard logged-in / ref visually confirmed | **NO** — sign-in page shown |
-| `.env.staging` | Present, gitignored — not committed |
+| Legacy ref excluded | **YES** |
+| Supabase MCP `get_project` | **PASS** — `boundlore-staging`, `ACTIVE_HEALTHY` |
 
-### Backup
+### Dashboard visual confirmation (resume)
+
+| Check | Result |
+|-------|--------|
+| User login confirmed | **YES** (user + automation session) |
+| Project name visible | **boundlore-staging** |
+| Project ref in URL | **jzzgoiwfbuwiiyvwgwri** |
+| SQL Editor reachable | **YES** |
+| Legacy `ohkoojpzmptdfyowdgog` | **Not opened** |
+
+**Note:** Supabase UI shows branch badge `main PRODUCTION` — this is the **default database branch label inside the staging project**, not the forbidden legacy/production BoundLore project. Project URL and name confirm **boundlore-staging** / `jzzgoiwfbuwiiyvwgwri`.
+
+### Backup (from initial P5-E.8A attempt)
 
 | Item | Value |
 |------|-------|
 | Path | `backups/staging/p5-e8a-storage-policy-preapply-20260713-231730.sql` |
 | Size | **290,277 bytes** |
-| Gitignored | **YES** — not staged |
-| Method | `pg_dump` via session pooler (direct host in `.env.staging` not resolvable locally) |
+| Gitignored | **YES** |
 
 ---
 
 ## 3. Pre-Apply State
 
-### Release gate (read-only, staging)
-
 | Check | Result |
 |-------|--------|
-| `release_gate` id=1 exists | **YES** |
+| `release_gate` id=1 | **Present** |
 | `contribution_locked` | **true** |
-| `reason` | `Pre-release default locked` |
-| `lock_version` | `1` |
 | `bl_is_release_unlocked()` | **false** |
-
-### Deferred storage policy pre-existence
-
-| Check | Result |
-|-------|--------|
-| `storage_discovery_uploads_release_gate_insert_restrictive` on `storage.objects` | **Not present** (0 rows) |
-
-### Static SQL safety (`release_gate_storage_policy_deferred.sql`)
-
-| Check | Result |
-|-------|--------|
-| DEFERRED marker | **PASS** |
-| Policy name present | **PASS** |
-| DROP POLICY IF EXISTS | **PASS** |
-| CREATE POLICY on `storage.objects` | **PASS** |
-| `bl_can_create_user_content()` in WITH CHECK | **PASS** |
-| No data / secrets / URLs / service_role / TRUNCATE / unlock | **PASS** |
+| Policy pre-existence | **Not present** |
+| Deferred SQL static safety | **PASS** |
 
 ---
 
@@ -82,63 +69,65 @@
 
 | Item | Value |
 |------|-------|
-| File intended | `supabase/release_gate_storage_policy_deferred.sql` |
-| Method required | Supabase Dashboard SQL Editor |
-| Dashboard navigation | `https://supabase.com/dashboard/project/jzzgoiwfbuwiiyvwgwri/sql/new` |
-| Dashboard state | **Sign-in required** — not authenticated |
-| SQL pasted / executed | **NO** |
+| File applied | `supabase/release_gate_storage_policy_deferred.sql` (DDL portion: `begin` … `commit`) |
+| Method | **Supabase Dashboard SQL Editor** |
+| Dashboard URL | `/dashboard/project/jzzgoiwfbuwiiyvwgwri/sql/...` |
+| Role selected | `postgres` |
 | Other SQL files | **None** |
-| psql apply | **Not used** (forbidden) |
-| MCP `apply_migration` | **Not used** (gate requires Dashboard) |
+| MCP apply | **Not used** |
+| psql apply | **Not used** |
 
-### Apply result: **BLOCKED**
+### Apply attempts
 
-**Blocker:** Supabase Dashboard requires user authentication. Automated browser session reached sign-in page; project ref `jzzgoiwfbuwiiyvwgwri` visible only in redirect URL, not as logged-in project context.
+| Attempt | Result |
+|---------|--------|
+| 1 | **FAIL** — editor sync issue; query ran as literal `undefined` (syntax error) |
+| 2 | SQL loaded via Monaco `setValue`; destructive-op confirm accepted; **FAIL** |
 
-**Error summary:** No SQL execution attempted. No owner/syntax error — apply never started.
+### Apply error (attempt 2)
 
-Per gate rules: **STOP** — no quick-fix alternate apply path attempted.
+```
+ERROR: 42501: must be owner of relation objects
+```
+
+Same root cause as P5-E.5 Re-run 2: Dashboard SQL Editor `postgres` role is **not owner** of `storage.objects`. Transaction rolled back; no policy created.
+
+Per gate rules: **STOP** — no second SQL variant attempted.
+
+### Apply result: **FAIL**
 
 ---
 
 ## 5. Policy Metadata Verification
 
-**Post-apply verification:** **NOT RUN** — policy not applied.
-
 | Check | Result |
 |-------|--------|
-| Policy exists | **NO** (unchanged from pre-apply) |
+| Policy exists | **NO** |
 | Policy name | N/A |
 | Schema/table | N/A |
 | cmd/roles | N/A |
-| Bucket/path guard | N/A |
-| Release-gate signal | N/A |
+| Bucket guard in `with_check` | N/A |
+| `bl_can_create_user_content` signal | N/A |
 
-**Verdict:** **BLOCKED** — no policy to verify.
+**Verdict:** **FAIL** — policy not provisioned.
 
 ---
 
 ## 6. Negative Storage Test
 
-### Prerequisites
-
-| Check | Result |
-|-------|--------|
-| `discovery-uploads` bucket on staging | **NOT PRESENT** (0 rows in `storage.buckets`) |
-| Storage policy applied | **NO** |
-
-### Results
+| Prerequisite | Result |
+|--------------|--------|
+| Policy applied | **NO** |
+| `discovery-uploads` bucket | **NOT PRESENT** on staging |
 
 | Test | Result |
 |------|--------|
-| Metadata/policy verification (post-apply) | **NOT RUN** |
-| Transactional `storage.objects` INSERT test | **NOT RUN** |
+| Metadata verification (post-apply) | **FAIL** (no policy) |
+| Transactional `storage.objects` INSERT | **NOT RUN** |
 | Real upload test | **NOT RUN** |
-| `p5_e8a` objects persisted | **N/A** — no test executed |
+| `p5_e8a` objects persisted | **NO** (0) |
 
-**Note:** Even after successful policy apply, negative upload test would require `discovery-uploads` bucket provisioning (separate from this deferred policy file). Bucket absence is an additional staging gap.
-
-**Verdict:** **NOT RUN** / **BLOCKED**
+**Verdict:** **NOT RUN**
 
 ---
 
@@ -148,21 +137,18 @@ Per gate rules: **STOP** — no quick-fix alternate apply path attempted.
 |-------|--------|
 | `release_gate.contribution_locked` | **true** (unchanged) |
 | `bl_is_release_unlocked()` | **false** (unchanged) |
-| `p5_e8a` storage objects | **0** (no test objects created) |
-| Production touched | **NO** |
-| Legacy touched | **NO** |
+| `p5_e8a` storage objects | **0** |
+| Production / legacy touched | **NO** |
 | Push / deploy / launch | **NO** |
 
 ---
 
 ## 8. Fixture Impact
 
-| Fixture | Result |
+| Fixture | Status |
 |---------|--------|
-| Release Lock DB | **CORE_PASS_STORAGE_DEFERRED** — 32/32 core + 2 DEFERRED (unchanged) |
-| Server | `localhost:8081` (8080 stale in prior gates) |
-
-**P5-E.8B** (Storage Fixture Re-Enablement) remains **pending** — requires successful policy apply + live evidence first.
+| Release Lock DB | **CORE_PASS_STORAGE_DEFERRED** (unchanged) |
+| P5-E.8B re-enable | **Still pending** |
 
 ---
 
@@ -170,9 +156,9 @@ Per gate rules: **STOP** — no quick-fix alternate apply path attempted.
 
 | Gap | Status |
 |-----|--------|
-| Storage policy apply | **BLOCKED** — Dashboard sign-in |
-| `discovery-uploads` bucket on staging | **Not provisioned** |
-| S+-03 runtime/production sanitization | **NOT CLOSED** |
+| Storage policy apply | **FAIL** — owner-capable path not achieved via Dashboard `postgres` role |
+| `discovery-uploads` bucket | **Not provisioned** on staging |
+| S+-03 runtime/production | **NOT CLOSED** |
 | Production Closure | **NOT CLOSED** |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
@@ -183,27 +169,26 @@ Per gate rules: **STOP** — no quick-fix alternate apply path attempted.
 
 | Dimension | Verdict |
 |-----------|---------|
-| **P5-E.8A (overall)** | **BLOCKED** |
-| Storage Policy Apply | **BLOCKED** |
-| Storage Closure Evidence | **BLOCKED** |
-| S+-01 Storage (staging) | **DEFERRED** (unchanged) |
-| S+ Staging Evidence | **PARTIAL** (unchanged) |
+| **P5-E.8A (overall)** | **FAIL** |
+| Storage Policy Apply | **FAIL** |
+| Storage Closure Evidence | **FAIL** |
+| S+-01 Storage (staging) | **DEFERRED** |
+| S+ Staging Evidence | **PARTIAL** |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 
 ### Summary
 
-Pre-apply preparation **succeeded**: environment validated, backup created (290,277 bytes), release gate confirmed locked, deferred SQL statically safe, policy not pre-existing. **Apply blocked** because Supabase Dashboard requires manual sign-in; gate rules forbid psql/MCP alternate apply paths. Storage closure remains **DEFERRED**.
+P5-E.8A resume confirmed **boundlore-staging** / `jzzgoiwfbuwiiyvwgwri` in Dashboard. Apply was executed via SQL Editor with only the deferred storage policy DDL. **Failed** with `must be owner of relation objects` — Dashboard `postgres` role insufficient, matching P5-E.5 Re-run 2. Release gate remains locked. Storage closure **still DEFERRED**.
 
 ### Recommended next steps
 
-1. **User signs in** to Supabase Dashboard → project `boundlore-staging` / ref `jzzgoiwfbuwiiyvwgwri`
-2. **Re-run P5-E.8A apply step** — paste only `release_gate_storage_policy_deferred.sql` in SQL Editor
-3. **Provision `discovery-uploads` bucket** on staging if negative upload test required (may need `discovery_storage.sql` in separate approved gate)
-4. **P5-E.8B** after live apply + verification PASS
+1. **P5-E.8A.2** — Identify owner-capable Dashboard role (e.g. `supabase_storage_admin` / storage owner session) or Supabase support path for `storage.objects` policy DDL
+2. **P5-E.8A.3** — `discovery-uploads` bucket provisioning plan (`discovery_storage.sql` — separate gate)
+3. **P5-E.8B** — Fixture re-enable after successful apply + negative test
 
 Continue **no push / deploy / launch**.
 
 ---
 
-*Document version: P5-E.8A BLOCKED. No secrets.*
+*Document version: P5-E.8A initial BLOCKED + resume FAIL. No secrets.*
