@@ -3223,6 +3223,43 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 95. P5-E.3 — Release Gate Frontend/Admin UX Baseline
+
+**Milestone:** P5-E.3 client UX for S+-01 — **implemented in repo**, **not applied to DB**, **not baseline-accepted** (P5-E.4).
+
+### S+-01 Frontend/Admin UX (repo only)
+
+| Item | Status |
+|------|--------|
+| `js/release-gate-client.js` | **Created** — v `p5-e3` |
+| Fail-closed when table missing | **Yes** — client treats as locked |
+| create-post guard | **Wired** |
+| edit-post guard | **Wired** — fail-closed for all saves on client |
+| support/report guard | **Wired** |
+| Admin status panel | **Wired** in `wiki/admin/index.html` |
+| Unlock/relock UI | **Prepared** — reason + confirm; not executed in gate |
+| SQL / Supabase files changed | **No** |
+| QA UI fixture | 30/30 PASS |
+| S+-01 | **Frontend/Admin UX baseline** — not accepted |
+| S+-01 production-closed | **No** |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-01 | **Frontend/Admin UX baseline implemented** — not accepted, not production-closed |
+
+**P5-E.3 baseline implemented locally.** Client guardrails and admin panel prepared. No unlock executed. No SQL changes. No deploy. No push.
+
+### Next candidate
+
+**P5-E.4 Release Gate Acceptance Sweep**. No push/deploy/launch.
+
+---
+
 ## 92. P5-D.2 — HTML Sanitization & URL Safety Acceptance Sweep
 
 **Milestone:** P5-D.2 acceptance sweep; confirms P5-D.1 repo baseline is **baseline-accepted** — **not production-closed**.

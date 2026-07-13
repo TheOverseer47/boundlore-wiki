@@ -2063,6 +2063,37 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.3 — Release Gate Frontend/Admin UX Baseline
+
+**Milestone:** P5-E.3 client UX for S+-01 — **not applied to DB**, **not baseline-accepted** (P5-E.4).
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ReleaseGateClient | `js/release-gate-client.js` | v p5-e3, fail-closed API | `[x]` |
+| Missing table = locked | client read | locked without DB apply | `[x]` |
+| shouldAllowClientBypass | client | always false | `[x]` |
+| create-post guard | `js/create-post.js` | assert + notice on load | `[x]` |
+| edit-post guard | `js/edit-post.js` | save blocked when locked | `[x]` |
+| support guard | `js/support.js` | report/upload blocked | `[x]` |
+| Admin status panel | `wiki/admin/index.html` | locked/unlocked/unknown view | `[x]` |
+| Unlock/relock UI | admin panel | reason + confirm; no auto-run | `[x]` |
+| No SQL changes | ops | supabase/*.sql untouched | `[x]` |
+| QA UI fixture | `p5-release-lock-ui-fixtures` | 30/30 PASS | `[x]` |
+| DB fixture regression | `p5-release-lock-db-security-fixtures` | PASS | `[x]` |
+| Sanitization regression | `p5-sanitization-security-fixtures` | PASS | `[x]` |
+| Observation regression | `p5-observation-rpc-security-fixtures` | PASS | `[x]` |
+| Notification regression | `p5-notification-security-fixtures` | PASS | `[x]` |
+| Create post page | `/wiki/create-post/` | pre-release notice / blocked submit | `[x]` |
+| Supabase writes / deploy / push | ops | none | `[x]` |
+| S+-01 baseline accepted | acceptance | P5-E.4 | `[ ]` |
+| S+-01 production-closed | acceptance | staging + Fable | `[ ]` |
+
+**P5-E.3 baseline implemented locally.** ReleaseGateClient and submit guards wired; admin panel prepared. No unlock executed. No SQL changes. S+-01 **Frontend/Admin UX baseline implemented** — not baseline-accepted, not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate:** **P5-E.4 Release Gate Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

@@ -116,6 +116,13 @@
         <p style="color:var(--text-muted);margin:0;">Loading unresolved targets from published content...</p>
       </div>
     </div>
+    <div class="form-box" id="releaseGatePanel" style="margin-bottom:16px;">
+      <div id="releaseGateStatusHost">
+        <h3 style="margin-top:0;">Release Gate</h3>
+        <p style="color:var(--text-muted);margin:0 0 8px;">Pre-release contribution lock for user-generated content. Separate from Wiki Patch Mode.</p>
+        <p id="releaseGateStatusLine" style="margin:0;font-size:0.92rem;">Status: checking...</p>
+      </div>
+    </div>
     <div class="form-box" id="patchModePanel" style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
         <div>
@@ -308,6 +315,7 @@
 <script src="/js/unresolved-targets.js?v=4"></script>
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/content-safety.js?v=p5-d1"></script>
+<script src="/js/release-gate-client.js?v=p5-e3"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notification-url-safety.js"></script>
 <script src="/js/notifications.js"></script>
@@ -328,6 +336,7 @@ let canUseCategoryExtensions = false;
 let canUseDiscoveryEvidenceTable = false;
 let canUseDiscoverySyncRpc = false;
 let canUseSubmissionLifecycle = false;
+let canUseReleaseGate = false;
 let composeBodyEditor = null;
 let composePublishInFlight = false;
 const ADMIN_DISCOVERY_PLACEHOLDER_VALUES = ["asdf", "qwerty", "test", "todo", "none", "n/a", "na", "idk", "???", "12345"];
@@ -469,6 +478,7 @@ async function detectDashboardFeatures() {
   canUseSubmissionLifecycle = !submissionProbe.error;
 
   await probeWikiPatchModeA();
+  await probeReleaseGateA();
 }
 
 function initAdminControls() {
@@ -1191,6 +1201,107 @@ function syncAdminSystemNotice() {
 let canUseWikiPatchMode = false;
 let wikiPatchModeState = null;
 
+async function probeReleaseGateA() {
+  try {
+    const { error } = await supabase.from("release_gate").select("id").eq("id", 1).limit(1);
+    canUseReleaseGate = !error;
+  } catch (err) {
+    canUseReleaseGate = false;
+  }
+}
+
+async function loadReleaseGatePanelA() {
+  const panel = document.getElementById("releaseGatePanel");
+  const statusHost = document.getElementById("releaseGateStatusHost");
+  const statusLine = document.getElementById("releaseGateStatusLine");
+  if (!panel || !statusHost) return;
+
+  if (typeof BoundLoreReleaseGateClient === "undefined") {
+    if (statusLine) statusLine.textContent = "Status: release gate client unavailable.";
+    return;
+  }
+
+  const state = await BoundLoreReleaseGateClient.readReleaseGateState({ force: true });
+  const statusMarkup = BoundLoreReleaseGateClient.buildReleaseGateStatusView(state, { forAdmin: true });
+  const controlsMarkup = BoundLoreReleaseGateClient.buildAdminUnlockControlsMarkup();
+
+  statusHost.innerHTML =
+    "<h3 style=\"margin-top:0;\">Release Gate</h3>" +
+    "<p style=\"color:var(--text-muted);margin:0 0 8px;\">Pre-release contribution lock for user-generated content. Separate from Wiki Patch Mode.</p>" +
+    statusMarkup +
+    (canUseReleaseGate ? controlsMarkup : (
+      "<p style=\"margin-top:12px;color:var(--text-muted);font-size:0.88rem;\">" +
+      "Release gate controls require <code>release_gate</code> table and <code>bl_set_release_gate_locked</code> RPC (apply P5-E.2 SQL on staging first).</p>"
+    ));
+
+  if (statusLine) {
+    statusLine.textContent = BoundLoreReleaseGateClient.isLockedState(state)
+      ? "Status: LOCKED"
+      : "Status: UNLOCKED";
+  }
+
+  if (!canUseReleaseGate) {
+    document.getElementById("btnUnlockReleaseGate")?.setAttribute("disabled", "disabled");
+    document.getElementById("btnRelockReleaseGate")?.setAttribute("disabled", "disabled");
+    return;
+  }
+
+  document.getElementById("btnUnlockReleaseGate")?.addEventListener("click", function() {
+    saveReleaseGateLockedA(false);
+  });
+  document.getElementById("btnRelockReleaseGate")?.addEventListener("click", function() {
+    saveReleaseGateLockedA(true);
+  });
+}
+
+async function saveReleaseGateLockedA(locked) {
+  const msg = document.getElementById("releaseGateMsg");
+  if (!canUseReleaseGate) {
+    if (msg) msg.textContent = "Release gate table/RPC is not available.";
+    return;
+  }
+  if (typeof BoundLoreReleaseGateClient === "undefined") {
+    if (msg) msg.textContent = "Release gate client is not loaded.";
+    return;
+  }
+
+  const reasonInput = document.getElementById("releaseGateReason");
+  const reasonCheck = BoundLoreReleaseGateClient.validateAdminUnlockReason(
+    reasonInput ? reasonInput.value : ""
+  );
+  if (!reasonCheck.ok) {
+    if (msg) msg.textContent = reasonCheck.message;
+    return;
+  }
+
+  const actionLabel = locked ? "RE-LOCK user submissions" : "UNLOCK user submissions";
+  const confirmText = locked
+    ? "Re-lock the release gate?\n\nUser-generated content submissions will be blocked again. No pending posts will be auto-published."
+    : "Unlock the release gate?\n\nUser submissions will be allowed when server policies are applied. No pending posts will be auto-published.";
+  if (!confirm(confirmText + "\n\nReason: " + reasonCheck.reason)) return;
+
+  const { error } = await supabase.rpc("bl_set_release_gate_locked", {
+    p_locked: locked,
+    p_reason: reasonCheck.reason,
+  });
+
+  if (error) {
+    if (msg) msg.textContent = "Release gate update failed: " + error.message;
+    return;
+  }
+
+  await logAdminAction(
+    locked ? "relock_release_gate" : "unlock_release_gate",
+    "system",
+    "release_gate",
+    reasonCheck.reason.slice(0, 240)
+  );
+
+  if (msg) msg.textContent = locked ? "Release gate re-locked." : "Release gate unlocked.";
+  BoundLoreReleaseGateClient.readReleaseGateState({ force: true });
+  await loadReleaseGatePanelA();
+}
+
 async function probeWikiPatchModeA() {
   try {
     const { error } = await supabase.from("wiki_patch_mode").select("id").eq("id", 1).limit(1);
@@ -1347,6 +1458,7 @@ async function loadOverview() {
     });
   }
   await loadWikiPatchModePanelA();
+  await loadReleaseGatePanelA();
 }
 
 async function loadMissingEntryQueue() {

@@ -17,6 +17,17 @@ async function initSupportPage() {
   gateBox.style.display = 'none';
   formBox.style.display = 'block';
 
+  if (typeof BoundLoreReleaseGateClient !== 'undefined') {
+    const state = await BoundLoreReleaseGateClient.readReleaseGateState();
+    BoundLoreReleaseGateClient.renderReleaseGateNotice(formBox, state, { prepend: true });
+    if (BoundLoreReleaseGateClient.isLockedState(state)) {
+      BoundLoreReleaseGateClient.applyReleaseGateToForm(formBox, state);
+      const submitBtn = document.getElementById('btnSubmitReport');
+      if (submitBtn) submitBtn.setAttribute('data-bl-release-gate-control', '1');
+      BoundLoreReleaseGateClient.applyReleaseGateToButtons(formBox, state);
+    }
+  }
+
   if (category) {
     category.addEventListener('change', applySupportCategoryUi);
     applySupportCategoryUi();
@@ -28,6 +39,15 @@ async function initSupportPage() {
 async function submitReport() {
   const btn = document.getElementById('btnSubmitReport');
   const status = document.getElementById('reportStatus');
+
+  if (typeof BoundLoreReleaseGateClient !== 'undefined') {
+    const gate = await BoundLoreReleaseGateClient.assertCanSubmitUserContent('support-report');
+    if (!gate.ok) {
+      setReportStatus(gate.message, 'error');
+      return;
+    }
+  }
+
   const category = document.getElementById('reportCategory').value;
   const target = document.getElementById('reportTarget').value.trim();
   const description = document.getElementById('reportDescription').value.trim();

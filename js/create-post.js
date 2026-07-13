@@ -168,6 +168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await initCreatePermissions();
   await initTutorialGateCP();
+  await applyReleaseGateOnPageCP();
   structuredDiscoveryEnabled = typeof isStructuredDiscoveryEnabled === "function"
     ? isStructuredDiscoveryEnabled()
     : false;
@@ -238,7 +239,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   applyMissingEntryPrefillCP(params);
 });
 
-async function initCreatePermissions() {
+async function applyReleaseGateOnPageCP() {
+  if (typeof BoundLoreReleaseGateClient === "undefined") return;
+  const state = await BoundLoreReleaseGateClient.readReleaseGateState();
+  const form = document.getElementById("createPostForm");
+  if (form) {
+    BoundLoreReleaseGateClient.renderReleaseGateNotice(form, state, { prepend: true });
+    if (BoundLoreReleaseGateClient.isLockedState(state)) {
+      BoundLoreReleaseGateClient.applyReleaseGateToForm(form, state);
+    }
+  }
+}
+
+async function assertReleaseGateCanSubmitCP(errorEl) {
+  if (typeof BoundLoreReleaseGateClient === "undefined") return true;
+  const gate = await BoundLoreReleaseGateClient.assertCanSubmitUserContent("create-post");
+  if (!gate.ok) {
+    if (errorEl) {
+      errorEl.textContent = gate.message;
+      errorEl.style.display = "block";
+    }
+    return false;
+  }
+  return true;
+}
+
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData || !sessionData.session) return;
   createCurrentUserId = sessionData.session.user.id;
@@ -484,6 +509,8 @@ async function initContributionModeCP(route) {
 async function submitContributionCP(errorEl) {
   const context = window.__boundloreContributionContext;
   if (!context || !context.active || typeof ContributionFlow === "undefined") return false;
+
+  if (!(await assertReleaseGateCanSubmitCP(errorEl))) return true;
 
   const mask = ContributionFlow.getMask(context.resolvedIntent, context.field, context.entityType);
   const collected = ContributionFlow.collectFormValues(mask);
@@ -1106,6 +1133,8 @@ async function handleSubmit(e) {
   const errorEl = document.getElementById("formError");
   errorEl.style.display = "none";
   const submitBtn = document.querySelector("#createPostForm button[type='submit']");
+
+  if (!(await assertReleaseGateCanSubmitCP(errorEl))) return;
 
   if (typeof WikiPatchMode !== "undefined") {
     const submitGuard = await WikiPatchMode.assertCanSubmit();

@@ -400,7 +400,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-D.2 | Test acceptance sweep | S+-03 baseline accepted; see §17 |
 | **Complete** | P5-E.1 | Planning gate | Release lock plan; see §18 + `p5-release-lock-plan.md` |
 | **Complete** | P5-E.2 | SQL baseline | `release_gate` DB/RLS/RPC baseline; see §19 — not executed |
-| **Next** | P5-E.3 | Frontend/Admin UX | Release lock UI; no DB apply |
+| **Complete** | P5-E.3 | Frontend/Admin UX | Release lock client + admin panel; see §20 — no DB apply |
+| **Next** | P5-E.4 | Acceptance sweep | UI + static fixtures + regression |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -692,6 +693,36 @@ For **future implementation gates** (P5-B through P5-E):
 **S+-01 status:** **DB/RLS/RPC baseline implemented** in repo. **Not baseline-accepted.** **Not production-closed.**
 
 **Next candidate:** **P5-E.3 Release Gate Frontend/Admin UX Baseline**. No push/deploy/launch.
+
+---
+
+## 20. P5-E.3 — Release Gate Frontend/Admin UX Baseline
+
+**Milestone:** P5-E.3 client UX for S+-01 — **fail-closed**, **not baseline-accepted** (P5-E.4), **not production-closed**.
+
+**P5-E.3 baseline implemented locally.** `js/release-gate-client.js` provides fail-closed read/UX (`missing_config`/`read_error`/`no_client` → locked). Create-post, edit-post, and support submit guards wired. Admin Release Gate panel with status view and unlock/re-lock UI (reason + confirm; no auto-run). QA UI fixture 30/30 PASS. No unlock/relock executed in tests. No SQL changes. No deploy. No push.
+
+| Check | Result |
+|-------|--------|
+| `release-gate-client.js` created | `[x]` |
+| Fail-closed client read model | `[x]` |
+| `shouldAllowClientBypass` always false | `[x]` |
+| create-post submit guard | `[x]` |
+| edit-post save guard | `[x]` |
+| support/report upload guard | `[x]` |
+| Admin lock status panel | `[x]` |
+| Unlock/relock UI prepared only | `[x]` — no action in gate tests |
+| No auto-publish / queue linkage | `[x]` |
+| SQL files changed | `[x]` — none |
+| QA UI fixture PASS | `[x]` — 30 checks |
+| S+-01 baseline accepted | `[ ]` — P5-E.4 |
+| S+-01 production-closed | `[ ]` |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**S+-01 status:** **Frontend/Admin UX baseline implemented**. **Not baseline-accepted.** **Not production-closed.**
+
+**Next candidate:** **P5-E.4 Release Gate Acceptance Sweep**. No push/deploy/launch.
 
 ---
 

@@ -202,6 +202,16 @@ async function initEditPost() {
 
   loading.style.display = "none";
   form.style.display = "block";
+  await applyReleaseGateOnPageEP(form);
+}
+
+async function applyReleaseGateOnPageEP(form) {
+  if (typeof BoundLoreReleaseGateClient === "undefined") return;
+  const state = await BoundLoreReleaseGateClient.readReleaseGateState();
+  BoundLoreReleaseGateClient.renderReleaseGateNotice(form, state, { prepend: true });
+  if (BoundLoreReleaseGateClient.isLockedState(state)) {
+    BoundLoreReleaseGateClient.applyReleaseGateToForm(form, state);
+  }
 }
 
 function fillCategorySelectors() {
@@ -465,6 +475,15 @@ async function handleEditSubmit(e) {
   const okEl = document.getElementById("editFormOk");
   errEl.style.display = "none";
   okEl.style.display = "none";
+
+  if (typeof BoundLoreReleaseGateClient !== "undefined") {
+    const gate = await BoundLoreReleaseGateClient.assertCanSubmitUserContent("edit-post");
+    if (!gate.ok) {
+      errEl.textContent = gate.message;
+      errEl.style.display = "block";
+      return;
+    }
+  }
 
   if (!editPost) {
     errEl.textContent = "Post context missing.";

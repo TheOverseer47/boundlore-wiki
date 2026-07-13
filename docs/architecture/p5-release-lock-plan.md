@@ -1,7 +1,7 @@
 # P5-E Server-side Release Lock Plan
 
-**Version:** P5-E.2 DB/RLS/RPC baseline  
-**Status:** SQL baseline implemented — **not applied to DB**, not baseline-accepted, not production-closed  
+**Version:** P5-E.3 Frontend/Admin UX baseline  
+**Status:** Frontend/Admin UX baseline implemented — **not applied to DB**, not baseline-accepted, not production-closed  
 **Finding:** S+-01 — Kein serverseitiger, fail-closed Pre-Release-Content-Lock  
 **HEAD reference:** `49097cc` (pre P5-E.2); post-gate commit pending
 
@@ -487,3 +487,29 @@ Stop and escalate if:
 | Public-Launch-Ready | **NO-GO** |
 
 **P5-E.2 verdict:** Release Gate DB/RLS/RPC baseline **implemented in repo SQL**. Ready for P5-E.3 frontend/admin UX baseline and later staged DB application (P5-E.5). S+-01 **not** production-closed. No push/deploy/launch.
+
+---
+
+## 17. P5-E.3 — Release Gate Frontend/Admin UX Baseline (implemented in repo)
+
+**Milestone:** Client UX baseline — **fail-closed when DB table missing**, **not baseline-accepted** (P5-E.4).
+
+| Item | Status |
+|------|--------|
+| `js/release-gate-client.js` | **Created** — `BoundLoreReleaseGateClient` v `p5-e3` |
+| Fail-closed read model | missing client / table / error / invalid row → locked |
+| `shouldAllowClientBypass()` | Always `false` — no query/localStorage/localhost bypass |
+| `create-post.js` guard | `assertCanSubmitUserContent` + lock notice on load |
+| `edit-post.js` guard | Save blocked when locked (all users — client fail-closed) |
+| `support.js` guard | Report submit + screenshot upload blocked when locked |
+| Admin status panel | `wiki/admin/index.html` — Release Gate panel with status/reason/version |
+| Unlock/Re-lock UI | Prepared with reason + confirm; calls `bl_set_release_gate_locked` on explicit click only |
+| No auto-publish / queue | Confirm copy documents no pending auto-publish |
+| Patch Mode | Remains separate maintenance UX |
+| SQL / DB apply | **None** |
+| QA UI fixture | `qa/p5-release-lock-ui-fixtures.html/js` — 30 checks |
+| S+-01 | **Frontend/Admin UX baseline implemented** — not accepted, not production-closed |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+
+**P5-E.3 verdict:** Release Gate Frontend/Admin UX baseline **implemented**. Client fail-closed even when `release_gate` table not yet applied. Ready for P5-E.4 acceptance sweep. No push/deploy/launch.
