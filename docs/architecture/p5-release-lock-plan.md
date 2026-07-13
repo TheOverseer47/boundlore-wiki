@@ -683,3 +683,11 @@ After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: polic
 **Gate:** P5-E.7A — posts INSERT grant; direct release-lock RLS PARTIAL.
 
 **Report:** `docs/architecture/p5-direct-posts-grant-rls-retest-report.md`
+
+---
+
+## 29. P5-E.7A.2 Follow-up (PASS)
+
+**Gate:** P5-E.7A.2 — direct posts release-lock RLS proven. **PASS**.
+
+**Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`

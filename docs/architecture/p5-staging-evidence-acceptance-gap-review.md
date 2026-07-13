@@ -251,4 +251,18 @@ P5-E.5 Re-run 3 delivered **credible staging evidence** for notification injecti
 
 ---
 
-*Document version: P5-E.6 PASS + P5-E.7A PARTIAL. No secrets. No DB access.*
+## 14. P5-E.7A.2 Follow-up (PASS — SELECT grants + release-lock RLS)
+
+**Gate:** P5-E.7A.2 — profiles/acks SELECT grants; direct posts release-lock RLS proven. **PASS**.
+
+| Item | Result |
+|------|--------|
+| SELECT grants applied | `[x]` |
+| Release-lock RLS on direct insert | `[x]` PASS |
+| P5-E.7A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
+
+---
+
+*Document version: P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS. No secrets. No DB access.*

@@ -237,4 +237,12 @@ All 11 routes returned **200**.
 
 ---
 
-*Document version: P5-E.5 Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL. No secrets.*
+## 17. P5-E.7A.2 Follow-up (PASS)
+
+**Gate:** P5-E.7A.2 — direct posts release-lock RLS proven. **PASS**.
+
+**Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
+
+---
+
+*Document version: P5-E.5 Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS. No secrets.*

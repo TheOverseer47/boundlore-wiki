@@ -176,4 +176,12 @@ Requires **new explicit user approval** before any DB-touching step.
 
 ---
 
-*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL. No secrets.*
+## 13. P5-E.7A.2 Follow-up (PASS)
+
+**Gate:** P5-E.7A.2 — direct release-lock RLS on posts INSERT. **PASS**.
+
+**Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
+
+---
+
+*Document version: P5-E.5C PASS + Re-run 3 PARTIAL + P5-E.6 PASS + P5-E.7A PARTIAL + P5-E.7A.2 PASS. No secrets.*

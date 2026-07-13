@@ -1017,7 +1017,22 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.7A.2 profiles SELECT grant or P5-E.7B fixture alignment. No push/deploy/launch.
+**Next:** P5-E.7B fixture alignment or P5-E.8 storage closure. No push/deploy/launch.
+
+---
+
+## 50. P5-E.7A.2 — Policy Dependency SELECT Grants (PASS)
+
+**Milestone:** P5-E.7A.2 — SELECT grants; direct posts release-lock RLS proven. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| profiles/acks SELECT grants | `[x]` PASS |
+| Release-lock RLS direct insert | `[x]` PASS |
+| Unlock control | `[x]` PASS |
+| P5-E.7A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
 
 ---
 

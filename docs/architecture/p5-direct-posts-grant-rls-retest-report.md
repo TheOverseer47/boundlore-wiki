@@ -189,11 +189,19 @@ No fixture code changes in this gate.
 
 ### Recommended follow-up
 
-**P5-E.7A.2** (or extend 7A with explicit approval): minimal `GRANT SELECT` on `public.profiles` and `public.user_submission_acks` to `authenticated` on staging only, then re-run locked direct posts INSERT test to observe `row-level security policy` / release-lock block.
+**P5-E.7A.2** completed PASS — see `p5-policy-dependency-select-grants-retest-report.md`.
 
 ---
 
-## 10. Verdict
+## 11. P5-E.7A.2 Follow-up (PASS)
+
+**Gate:** P5-E.7A.2 — SELECT grants + release-lock RLS on direct posts. **PASS**.
+
+**Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
+
+---
+
+*Document version: P5-E.7A PARTIAL + P5-E.7A.2 PASS. No secrets.*
 
 | Dimension | Verdict |
 |-----------|---------|

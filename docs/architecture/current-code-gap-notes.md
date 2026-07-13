@@ -3292,7 +3292,21 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.7A.2 profiles SELECT grant. No push/deploy/launch.
+**Next:** P5-E.7B or P5-E.8. No push/deploy/launch.
+
+---
+
+## 125. P5-E.7A.2 — Policy Dependency SELECT Grants (PASS)
+
+**Milestone:** P5-E.7A.2 — direct posts release-lock RLS proven. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SELECT grants | `[x]` PASS |
+| Release-lock RLS | `[x]` PASS |
+| P5-E.7A.2 | **PASS** |
+
+**Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
 
 ---
 

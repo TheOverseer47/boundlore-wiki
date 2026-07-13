@@ -2298,6 +2298,22 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.7A.2 — Policy Dependency SELECT Grants (PASS)
+
+**Milestone:** P5-E.7A.2 — SELECT grants + direct posts release-lock RLS. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Pre-write backup | staging | >0 bytes | `[x]` 290,277 |
+| SELECT grants apply | staging | PASS | `[x]` |
+| Release-lock RLS direct insert | staging | PASS | `[x]` |
+| P5-E.7A.2 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-policy-dependency-select-grants-retest-report.md`
+
+---
+
 ## P5-E.7A — Direct Posts Grant/RLS Re-Test (PARTIAL)
 
 **Milestone:** P5-E.7A — posts INSERT grant on staging. **PARTIAL**.
