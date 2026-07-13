@@ -144,8 +144,10 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 17. ~~**P5-E.9D.3B** — Static Entity HTML Prototype~~ **PASS** — 84/84 fixture
 18. ~~**P5-E.9D.3C** — Entity SSG Generator Implementation~~ **PASS** — FIXTURE_GENERATOR_PASS
 19. **P5-E.9D.3D** — Entity Sitemap Integration
-19. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
-20. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
+20. ~~**P5-E.9E** — Search Recall Plan~~ **PASS** — `p5-search-recall-plan.md`
+21. **P5-E.9E.1** — Local Search Recall Fixture
+22. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
+23. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
 
 ---
 
@@ -329,7 +331,7 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 | Sitemap/robots Gaps dokumentiert | `[x]` |
 | Deploy / Search Console | **Nein** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
-| S-06 Search Recall | **OPEN_BLOCKING** (separat) |
+| S-06 Search Recall | **OPEN_BLOCKING** (P5-E.9E Plan PASS; Recall-Umsetzung offen) |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
 | P5-E.9D | **PASS** |
@@ -448,4 +450,18 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9D.3C PASS. Keine Secrets. Keine Sitemap-Entity-URLs.*
+## 28. P5-E.9E Follow-up (PASS — Search Recall Plan)
+
+**Gate:** P5-E.9E — Search Recall Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Plan | `p5-search-recall-plan.md` |
+| Search Implementation | **PARTIAL** — client signals; Recall-Gaps dokumentiert |
+| Search Runtime Evidence | **OPEN** |
+| S-06 | **OPEN_BLOCKING** bis 9E.1+ |
+| P5-E.9E | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9E PASS. Keine Secrets. Keine Sitemap-Entity-URLs.*

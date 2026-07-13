@@ -3366,7 +3366,34 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9D.3D entity sitemap integration or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9E.1 local search recall fixture or P5-E.9D.3D entity sitemap integration. No push/deploy/launch.
+
+---
+
+## 148. P5-E.9E — Search Recall Plan (PASS)
+
+**Milestone:** P5-E.9E — Search Recall Plan (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Search Recall Plan | `docs/architecture/p5-search-recall-plan.md` |
+| Search Surface Inventory | Navbar, Search Page, Category Hub, Facet Browse |
+| Searchable Fields Matrix | title, BLMETA signals, excerpt; body **nicht** indexiert |
+| Recall Risk Matrix | `monster`→0, Body-Gap, kein FTS dokumentiert |
+| Required Recall Corpus | Definiert für 9E.1 |
+| Minimal Pre-Launch Strategy | Client Synonym/Normalizer ohne DB |
+| Full Launch Strategy | FTS/search_documents für später |
+| Future Gates | 9E.1–9E.5 definiert |
+| DB / Deploy / Search Console | **Nein** |
+| S-06 Search Recall | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** (separat) |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9E | **PASS** |
+
+**Report:** `docs/architecture/p5-search-recall-plan.md`
+
+**Next:** P5-E.9E.1 local search recall fixture. No push/deploy/launch.
 
 ---
 

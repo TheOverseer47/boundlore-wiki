@@ -2439,7 +2439,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9D.3D entity sitemap integration or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9E.1 local search recall fixture or P5-E.9D.3D entity sitemap integration. No push/deploy/launch.
+
+---
+
+## P5-E.9E — Search Recall Plan (PASS)
+
+**Milestone:** P5-E.9E — Search Recall Plan (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Search recall plan exists | `p5-search-recall-plan.md` | complete | `[x]` |
+| Search surface inventory exists | plan doc | documented | `[x]` |
+| Searchable fields matrix exists | plan doc | documented | `[x]` |
+| Recall risk matrix exists | plan doc | documented | `[x]` |
+| Required recall corpus defined | plan doc | test queries | `[x]` |
+| Minimal pre-launch strategy documented | plan doc | client-only | `[x]` |
+| Full launch strategy documented | plan doc | FTS/index | `[x]` |
+| No implementation performed | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| No Search Console action performed | gate | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| S-05 SEO/CSR | status | OPEN_BLOCKING (separat) | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-search-recall-plan.md`
+
+**Next:** P5-E.9E.1 local search recall fixture. No push/deploy/launch.
 
 ---
 
