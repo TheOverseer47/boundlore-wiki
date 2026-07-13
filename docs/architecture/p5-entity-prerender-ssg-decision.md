@@ -398,7 +398,9 @@ S-05 SEO/CSR wird **CLOSED** erst wenn:
 
 ~~**P5-E.9D.3A** — Entity SSG Prototype Plan~~ **PASS** — `p5-entity-ssg-prototype-plan.md`
 
-**P5-E.9D.3B** — Static Entity HTML Prototype (Fixture JSON + 3 Beispielseiten)
+~~**P5-E.9D.3B** — Static Entity HTML Prototype~~ **PASS** — 84/84 fixture
+
+**P5-E.9D.3C** — Entity SSG Generator Implementation
 
 Alternativ parallel: **P5-E.9E** — Search Recall Plan
 

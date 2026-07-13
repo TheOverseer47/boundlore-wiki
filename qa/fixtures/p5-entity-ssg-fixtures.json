@@ -1,0 +1,85 @@
+{
+  "schema": "EntitySsgRecord",
+  "version": "p5-e9d3b",
+  "content_origin_default": "prototype_fixture",
+  "entities": [
+    {
+      "canonical_slug": "qa-ssg-creature-prototype",
+      "title": "Ember Salamander",
+      "category": "creatures",
+      "entity_domain": "fauna",
+      "entity_subtype": "creature",
+      "excerpt": "A heat-adapted amphibian observed near volcanic vents in Light No Fire. QA SSG prototype fixture — not a live database entry.",
+      "body_html_sanitized": "<p>The <strong>Ember Salamander</strong> is a community-documented creature fixture used to validate static SSG HTML output on BoundLore.</p><p>Players report sightings along basalt ridges where ground heat keeps small pools warm year-round. The salamander's orange dorsal pattern may help it blend with glowing ember cracks.</p><ul><li>Habitat: volcanic foothills</li><li>Behavior: nocturnal foraging</li><li>Threat: low to explorers</li></ul>",
+      "updated_at": "2026-07-10T14:30:00Z",
+      "published_at": "2026-07-01T09:00:00Z",
+      "content_origin": "prototype_fixture",
+      "status": "published",
+      "canonical_url": "https://boundlore.com/wiki/post/qa-ssg-creature-prototype/",
+      "image_url": "https://boundlore.com/public/images/social-preview.png",
+      "evidence_tier": "community_verified",
+      "completeness": "partial",
+      "relations_summary": ["biome:qa-ssg-biome-prototype"],
+      "facets": { "habitat": "volcanic", "threat_level": "low" },
+      "breadcrumbs": [
+        { "name": "Home", "url": "https://boundlore.com/" },
+        { "name": "Browse", "url": "https://boundlore.com/wiki/browse/" },
+        { "name": "Creatures", "url": "https://boundlore.com/wiki/creatures/" },
+        { "name": "Ember Salamander", "url": "https://boundlore.com/wiki/post/qa-ssg-creature-prototype/" }
+      ],
+      "aliases": ["ember-salamander-fixture"]
+    },
+    {
+      "canonical_slug": "qa-ssg-item-prototype",
+      "title": "Volcanic Heat Charm",
+      "category": "items",
+      "entity_domain": "gear",
+      "entity_subtype": "trinket",
+      "excerpt": "A crafted charm said to reduce heat exposure during long expeditions. QA SSG prototype fixture for static item pages.",
+      "body_html_sanitized": "<p>The <strong>Volcanic Heat Charm</strong> is a prototype item entry demonstrating sanitized static body HTML for BoundLore SSG pages.</p><p>Expedition logs describe charms woven from heat-resistant fibers and cooled basalt shards. Effects remain unconfirmed in-game; this fixture documents community expectations only.</p><p>Crafters on BoundLore track recipe evidence separately. This page does not claim verified drop locations.</p>",
+      "updated_at": "2026-07-11T11:15:00Z",
+      "published_at": "2026-07-02T10:00:00Z",
+      "content_origin": "prototype_fixture",
+      "status": "published",
+      "canonical_url": "https://boundlore.com/wiki/post/qa-ssg-item-prototype/",
+      "image_url": "https://boundlore.com/public/images/social-preview.png",
+      "evidence_tier": "community_reported",
+      "completeness": "stub",
+      "relations_summary": ["creature:qa-ssg-creature-prototype"],
+      "facets": { "item_type": "trinket", "crafting": "unknown" },
+      "breadcrumbs": [
+        { "name": "Home", "url": "https://boundlore.com/" },
+        { "name": "Browse", "url": "https://boundlore.com/wiki/browse/" },
+        { "name": "Items", "url": "https://boundlore.com/wiki/items/" },
+        { "name": "Volcanic Heat Charm", "url": "https://boundlore.com/wiki/post/qa-ssg-item-prototype/" }
+      ],
+      "aliases": []
+    },
+    {
+      "canonical_slug": "qa-ssg-biome-prototype",
+      "title": "Cinder Basalt Flats",
+      "category": "biomes",
+      "entity_domain": "environment",
+      "entity_subtype": "biome",
+      "excerpt": "A scorched basalt plateau with fissure vents and sparse heat-tolerant flora. QA SSG prototype fixture for static biome pages.",
+      "body_html_sanitized": "<p><strong>Cinder Basalt Flats</strong> is a biome prototype fixture showing how environment entries can ship crawler-visible HTML without a CSR loading shell.</p><p>The flats stretch between cooled lava rivers and active vent clusters. Wind carries fine ash that settles in ripple patterns across dark stone fields.</p><p>Explorers note reduced visibility during thermal updrafts. Camp placement should account for sudden temperature spikes near open fissures.</p>",
+      "updated_at": "2026-07-12T16:45:00Z",
+      "published_at": "2026-07-03T08:30:00Z",
+      "content_origin": "prototype_fixture",
+      "status": "published",
+      "canonical_url": "https://boundlore.com/wiki/post/qa-ssg-biome-prototype/",
+      "image_url": "https://boundlore.com/public/images/social-preview.png",
+      "evidence_tier": "curated",
+      "completeness": "partial",
+      "relations_summary": ["creature:qa-ssg-creature-prototype", "item:qa-ssg-item-prototype"],
+      "facets": { "climate": "arid_volcanic", "danger": "moderate" },
+      "breadcrumbs": [
+        { "name": "Home", "url": "https://boundlore.com/" },
+        { "name": "Browse", "url": "https://boundlore.com/wiki/browse/" },
+        { "name": "Biomes", "url": "https://boundlore.com/wiki/biomes/" },
+        { "name": "Cinder Basalt Flats", "url": "https://boundlore.com/wiki/post/qa-ssg-biome-prototype/" }
+      ],
+      "aliases": ["cinder-basalt-flats-fixture"]
+    }
+  ]
+}

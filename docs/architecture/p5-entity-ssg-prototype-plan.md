@@ -574,6 +574,9 @@ S-05 wird **CLOSED** erst nach: 9D.3B (Template proof) + 9D.3C (Generator) + 9D.
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9D.3A** | **PASS** |
+| **P5-E.9D.3B** | **PASS** |
+| Static Entity HTML Prototype | **PROTOTYPE_PASS** (84/84) |
+| Entity SSG Implementation | **NOT IMPLEMENTED** |
 | Entity SSG Prototype Plan | **CREATED** |
 | Entity SSG Implementation | **NOT IMPLEMENTED** |
 | Entity Detail SEO | **OPEN_BLOCKING** |
@@ -584,10 +587,12 @@ S-05 wird **CLOSED** erst nach: 9D.3B (Template proof) + 9D.3C (Generator) + 9D.
 
 ### Empfohlener nächster Gate
 
-**P5-E.9D.3B** — Static Entity HTML Prototype (Fixture JSON + 3 Beispielseiten)
+~~**P5-E.9D.3B** — Static Entity HTML Prototype~~ **PASS** — 3 pages + `p5-entity-ssg-prototype-fixtures.*` (84/84)
+
+**P5-E.9D.3C** — Entity SSG Generator Implementation
 
 Alternativ parallel: **P5-E.9E** — Search Recall Plan
 
 ---
 
-*Dokumentversion: P5-E.9D.3A PASS. Keine Secrets. Keine Umsetzung. Keine Search-Console-Aktion.*
+*Dokumentversion: P5-E.9D.3A PASS + P5-E.9D.3B PASS. Keine Secrets. Keine Umsetzung des Generators.*

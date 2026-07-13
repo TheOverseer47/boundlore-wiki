@@ -3366,7 +3366,31 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9D.3B static entity HTML prototype or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9D.3C entity SSG generator or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
+## 146. P5-E.9D.3B — Static Entity HTML Prototype (PASS)
+
+**Milestone:** P5-E.9D.3B — Static Entity HTML Prototype. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Fixture JSON | `qa/fixtures/p5-entity-ssg-fixtures.json` — 3 entities |
+| Prototype Pages | `wiki/post/qa-ssg-creature-prototype/`, `qa-ssg-item-prototype/`, `qa-ssg-biome-prototype/` |
+| QA Fixture | `p5-entity-ssg-prototype-fixtures.*` — **84/84 PASS** |
+| Sitemap | Prototype URLs **excluded** |
+| CSR Fallback | `/wiki/post/` unverändert |
+| Generator / DB / Deploy | **Nein** |
+| Entity SSG Implementation | **NOT IMPLEMENTED** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.3B | **PASS** |
+
+**Report:** `qa/p5-entity-ssg-prototype-fixtures.html`, `wiki/post/qa-ssg-creature-prototype/index.html`
+
+**Next:** P5-E.9D.3C entity SSG generator or P5-E.9E search recall. No push/deploy/launch.
 
 ---
 

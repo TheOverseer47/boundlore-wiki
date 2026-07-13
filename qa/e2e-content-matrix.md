@@ -2439,7 +2439,39 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9D.3B static entity HTML prototype or P5-E.9E search recall. No push/deploy/launch.
+**Next:** P5-E.9D.3C entity SSG generator or P5-E.9E search recall. No push/deploy/launch.
+
+---
+
+## P5-E.9D.3B — Static Entity HTML Prototype (PASS)
+
+**Milestone:** P5-E.9D.3B — Static Entity HTML Prototype. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fixture JSON exists | `p5-entity-ssg-fixtures.json` | 3 entities | `[x]` |
+| 3 prototype entity pages exist | `wiki/post/qa-ssg-*-prototype/` | present | `[x]` |
+| Prototype pages have entity-specific title/description | HTML | present | `[x]` |
+| Prototype pages have canonical/OG/Twitter | HTML | present | `[x]` |
+| Prototype pages have JSON-LD CreativeWork and BreadcrumbList | HTML | present | `[x]` |
+| Prototype pages have exactly one H1 | HTML | count=1 | `[x]` |
+| Prototype pages do not render BLMETA | HTML | absent | `[x]` |
+| Prototype pages do not rely on Loading post shell | HTML | absent | `[x]` |
+| Hydration hook exists | HTML | data-bl-ssg-hydrate | `[x]` |
+| Prototype entity URLs are not in sitemap | `sitemap.xml` | absent | `[x]` |
+| CSR fallback remains documented | `/wiki/post/` | CSR shell | `[x]` |
+| Fixture checks | `p5-entity-ssg-prototype-fixtures.*` | 84/84 PASS | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| No Search Console action performed | gate | none | `[x]` |
+| Entity SSG Implementation | status | NOT IMPLEMENTED | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9D.3B | gate | PASS | **PASS** |
+
+**Report:** `qa/p5-entity-ssg-prototype-fixtures.html`, `qa/fixtures/p5-entity-ssg-fixtures.json`
+
+**Next:** P5-E.9D.3C entity SSG generator or P5-E.9E search recall. No push/deploy/launch.
 
 ---
 

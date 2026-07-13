@@ -141,9 +141,10 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 14. ~~**P5-E.9D.2** — Static Hub Metadata Cleanup~~ **PASS** — 100/100 fixture
 15. ~~**P5-E.9D.3** — Entity Prerender/SSG Decision~~ **PASS** — `p5-entity-prerender-ssg-decision.md`
 16. ~~**P5-E.9D.3A** — Entity SSG Prototype Plan~~ **PASS** — `p5-entity-ssg-prototype-plan.md`
-17. **P5-E.9D.3B** — Static Entity HTML Prototype (Fixture JSON, kein DB)
-18. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
-19. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
+17. ~~**P5-E.9D.3B** — Static Entity HTML Prototype~~ **PASS** — 84/84 fixture
+18. **P5-E.9D.3C** — Entity SSG Generator Implementation (Fixture JSON zuerst)
+19. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
+20. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
 
 ---
 
@@ -410,4 +411,21 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9D.3 PASS + P5-E.9D.3A PASS. Keine Secrets.*
+## 26. P5-E.9D.3B Follow-up (PASS — Static Entity HTML Prototype)
+
+**Gate:** P5-E.9D.3B — Static Entity HTML Prototype. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Fixture JSON + 3 Prototype Pages | `[x]` |
+| QA Fixture | 84/84 PASS |
+| Entity SSG Generator | **NOT IMPLEMENTED** |
+| Sitemap Entity URLs | **Excluded** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.3B | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9D.3A PASS + P5-E.9D.3B PASS. Keine Secrets.*
