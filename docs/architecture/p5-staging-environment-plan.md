@@ -283,4 +283,12 @@ Stop immediately (do not proceed to SQL apply) if:
 
 ---
 
-*Document version: P5-STAGING.1–5A follow-up. No export. No DB access.*
+## 16. P5-E.5 Re-run Follow-up (BLOCKED)
+
+**Gate:** P5-E.5 Re-run after 6 Re-run 3 PASS — **BLOCKED** at `release_gate_lock.sql` apply (`bl_is_admin_actor` ordering).
+
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
+
+---
+
+*Document version: P5-STAGING.1–6 Re-run 3 + P5-E.5 Re-run BLOCKED. No secrets.*

@@ -193,4 +193,12 @@ No passwords or user IDs documented.
 
 ---
 
-*Document version: P5-STAGING.6 Re-run 3 PASS. Staging base schema provisioned. No secrets.*
+## 12. P5-E.5 Re-run Follow-up (BLOCKED)
+
+**Gate:** P5-E.5 Re-run — SQL apply failed at `release_gate_lock.sql`. **BLOCKED**.
+
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
+
+---
+
+*Document version: P5-STAGING.6 Re-run 3 PASS + P5-E.5 Re-run BLOCKED. No secrets.*

@@ -202,9 +202,17 @@ Inventory: 21 SQL files classified. **`CREATE TABLE public.posts`** and **`CREAT
 | `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
 | `p5-staging-environment-plan.md` | P5-STAGING.1 plan + re-entry criteria |
 | `p5-staged-db-application-report.md` | P5-E.5 original blocked report |
-| `p5-splus-remediation-plan.md` | Gate sequence |
+| `p5-staged-db-application-rerun-report.md` | P5-E.5 Re-run blocked report |
 | `.env.staging.example` | Committed template (no secrets) |
 
 ---
 
-*Document version: P5-STAGING.2–4 follow-up. No SQL apply. No secrets committed.*
+## P5-E.5 Re-run Follow-up (BLOCKED)
+
+After base schema PASS (6 Re-run 3), P5-E.5 Re-run blocked at `release_gate_lock.sql`. Test users lack `profiles` rows.
+
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
+
+---
+
+*Document version: P5-STAGING.2–6 Re-run 3 + P5-E.5 Re-run BLOCKED. No secrets committed.*

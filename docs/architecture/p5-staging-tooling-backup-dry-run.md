@@ -190,7 +190,16 @@ Base schema plan **PARTIAL** — posts/profiles DDL missing from repo. No SQL in
 | `p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |
 | `p5-staging-environment-proof.md` | P5-STAGING.2 identity proof |
 | `p5-staged-db-application-report.md` | P5-E.5 blocked report |
+| `p5-staged-db-application-rerun-report.md` | P5-E.5 Re-run blocked report |
 
 ---
 
-*Document version: P5-STAGING.3 + P5-STAGING.4 follow-up. No SQL apply. No secrets committed.*
+## 10. P5-E.5 Re-run Follow-up (BLOCKED)
+
+P5-E.5 Re-run after 6 Re-run 3: backup 270,836 bytes; apply 1 PASS; apply 2 FAIL on `release_gate_lock.sql`.
+
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
+
+---
+
+*Document version: P5-STAGING.3 + 6 Re-run 3 + P5-E.5 Re-run BLOCKED. No secrets committed.*

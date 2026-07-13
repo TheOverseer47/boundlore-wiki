@@ -108,11 +108,13 @@ When P5-E.5 re-run is **explicitly approved**, these users support staged negati
 
 ---
 
-## 7. P5-E.5 Re-run Follow-up
+## 7. P5-E.5 Re-run Follow-up (BLOCKED)
 
-**Gate:** P5-E.5 Re-run (HEAD `b3c64e7`) — **BLOCKED**. Staging `public` schema empty; P5 SQL not applied. Test users exist in `auth.users` only.
+**Gate:** P5-E.5 Re-run — **BLOCKED** at `release_gate_lock.sql`. Test users in `auth.users` only; **no `profiles` rows** for A/B.
 
-**Next:** Phase 0 → P5-STAGING.6 → P5-E.5 re-attempt.
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
+
+**Next:** Profiles for test users + fix `release_gate_lock.sql` ordering → re-run P5-E.5.
 
 ---
 
@@ -127,8 +129,8 @@ Base schema provisioning plan created. Core blocker: no `posts`/`profiles` CREAT
 | `p5-staging-environment-plan.md` | Staging setup + re-entry criteria |
 | `p5-staging-environment-proof.md` | P5-STAGING.2 identity proof |
 | `p5-staging-tooling-backup-dry-run.md` | P5-STAGING.3 tooling & backup |
-| `p5-staged-db-application-report.md` | P5-E.5 original blocked report |
+| `p5-staged-db-application-rerun-report.md` | P5-E.5 Re-run blocked report |
 
 ---
 
-*Document version: P5-STAGING.4. Docs only. No SQL. No secrets. No further Supabase actions in this gate.*
+*Document version: P5-STAGING.4 + P5-E.5 Re-run BLOCKED. No SQL. No secrets.*

@@ -596,3 +596,13 @@ Stop and escalate if:
 **Date:** 2026-07-13 · **HEAD:** `b3c64e7` · User approval: **YES** (staging only)
 
 Re-run stopped at pre-apply schema check: staging `public` schema empty. Pre-apply backup `p5-e5-rerun-preapply-20260713-185457.sql` (169,075 bytes). Test users confirmed. No SQL applied.
+
+---
+
+## 22. P5-E.5 Re-run 2 Follow-up (BLOCKED — apply ordering)
+
+**Date:** 2026-07-13 · **HEAD:** `1ac4e21` · User approval: **YES**
+
+After P5-STAGING.6 Re-run 3 PASS, apply failed at `release_gate_lock.sql`: policies reference `bl_is_admin_actor()` before function definition. Apply 1 (notifications) committed; release gate not provisioned. Negative tests NOT RUN.
+
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`

@@ -2294,6 +2294,30 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
+
+---
+
+## P5-E.5 Re-run — Staged DB Application & Negative RLS/RPC Tests (BLOCKED)
+
+**Milestone:** P5-E.5 Re-run — staging apply + negative tests; **BLOCKED**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval | gate | explicit yes | `[x]` |
+| Pre-apply backup | staging | >0 bytes | `[x]` 270,836 |
+| Base schema | staging | 9 core tables | `[x]` |
+| Apply 1 notifications SQL | staging | PASS | `[x]` |
+| Apply 2 release_gate SQL | staging | PASS | `[ ]` **FAIL** |
+| Apply 3 observations SQL | staging | PASS | `[ ]` NOT RUN |
+| Negative RLS/RPC tests | staging | PASS | `[ ]` NOT RUN |
+| Local fixtures | localhost | all PASS | `[x]` |
+| P5-E.5 Re-run | gate | PASS | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
+
+---
+
 ## P5-STAGING.6 Re-run 3 — Base Schema Apply to Staging (PASS)
 
 **Milestone:** P5-STAGING.6 Re-run 3 — staging apply; **PASS**.

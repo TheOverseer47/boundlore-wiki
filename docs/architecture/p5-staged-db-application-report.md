@@ -569,8 +569,21 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 | P5 security deferred | `[x]` |
 | P5-E.5 re-run | **READY** — explicit approval |
 
-**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun3-report.md`
+### P5-E.5 Re-run follow-up (BLOCKED — SQL apply failure)
+
+**P5-E.5 Re-run** — user approval granted. **BLOCKED** at `release_gate_lock.sql`.
+
+| Item | Status |
+|------|--------|
+| Pre-apply backup | `[x]` 270,836 bytes |
+| Apply 1 `admin_dashboard_notifications.sql` | `[x]` PASS |
+| Apply 2 `release_gate_lock.sql` | `[ ]` FAIL — `bl_is_admin_actor` ordering |
+| Apply 3 `phase_a_observations_foundation.sql` | `[x]` NOT RUN |
+| Negative RLS/RPC tests | `[x]` NOT RUN |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
 
 ---
 
-*Document version: P5-E.5 blocked + 6 Re-run 3 PASS. Staging base schema provisioned.*
+*Document version: P5-E.5 Re-run BLOCKED. Partial apply 1 only. No secrets.*

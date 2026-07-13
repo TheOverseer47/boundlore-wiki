@@ -3292,7 +3292,24 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.5 Re-run with explicit approval. No push/deploy/launch.
+**Next:** Fix `release_gate_lock.sql` ordering → re-run P5-E.5. No push/deploy/launch.
+
+---
+
+## 117. P5-E.5 Re-run — Staged DB Application (BLOCKED)
+
+**Milestone:** P5-E.5 Re-run — SQL apply failed; **BLOCKED**.
+
+| Check | Result |
+|-------|--------|
+| User approval | `[x]` |
+| Pre-apply backup | `[x]` 270,836 bytes |
+| Apply 1 notifications | `[x]` PASS |
+| Apply 2 release_gate | `[ ]` FAIL — `bl_is_admin_actor` before policies |
+| Negative RLS/RPC tests | `[x]` NOT RUN |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staged-db-application-rerun-report.md`
 
 ---
 
