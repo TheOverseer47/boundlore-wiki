@@ -3142,6 +3142,46 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 92. P5-D.2 — HTML Sanitization & URL Safety Acceptance Sweep
+
+**Milestone:** P5-D.2 acceptance sweep; confirms P5-D.1 repo baseline is **baseline-accepted** — **not production-closed**.
+
+### P5-D.2 acceptance sweep
+
+| Check | Result |
+|-------|--------|
+| `BoundLoreContentSafety` p5-d1 accepted | `[x]` |
+| Strict allowlist + URL scheme policy accepted | `[x]` |
+| Sink guards (post/create/edit/avatar/admin) accepted | `[x]` |
+| WikiEntryLayout upstream sanitization verified | `[x]` |
+| Structured discovery builders escaped | `[x]` |
+| Reflected search XSS probe clean | `[x]` |
+| Sanitization fixture 45/45 PASS | `[x]` |
+| Observation fixture 17/17 PASS | `[x]` |
+| Notification fixture 24/24 PASS | `[x]` |
+| Serializer bug fixed during sweep | `[x]` — `sanitizeRichTextHtml` returned empty output |
+| Server-side sanitizer | `[ ]` |
+| Stored content migration | `[ ]` |
+| S+-03 production-closed | `[ ]` |
+| Code changes beyond minimal fix + docs | `[x]` — one-line serializer fix only |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-03 | **Baseline accepted (P5-D.2)** — not production-closed |
+
+**P5-D.2 acceptance sweep completed locally.** HTML sanitization baseline accepted at repository level. Minimal `sanitizeRichTextHtml` serializer fix applied during sweep. No server-side sanitizer, no stored-content migration, no Supabase writes, no deploy, no push. BoundLore remains NOT live-ready.
+
+### Next candidate
+
+**P5-E.1 Server-side Release Lock Planning Gate**. No push/deploy/launch.
+
+---
+
 ## 91. P5-D.1 — HTML Sanitization & URL Safety Baseline
 
 **Milestone:** P5-D.1 code baseline for S+-03 stored XSS / missing HTML sanitization; ready for P5-D.2 acceptance — **not production-closed**.
@@ -3175,7 +3215,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 ### Next candidate
 
-**P5-D.2 HTML Sanitization Acceptance Sweep**. No push/deploy/launch.
+**P5-E.1 Server-side Release Lock Planning Gate**. No push/deploy/launch.
 
 ---
 

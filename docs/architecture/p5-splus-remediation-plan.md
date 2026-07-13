@@ -397,7 +397,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-C.1 | SQL baseline | S+-04 RPC gate baseline; see §14 |
 | **Complete** | P5-C.2 | Test acceptance sweep | Repo baseline accepted; see §15 — Live-RPC NOT TESTED |
 | **Complete** | P5-D.1 | Code baseline | S+-03 sanitization baseline; see §16 |
-| **Next** | P5-D.2 | Test acceptance sweep | XSS corpus; reflected-search regression; Quill spot-check |
+| **Complete** | P5-D.2 | Test acceptance sweep | S+-03 baseline accepted; see §17 |
+| **Next** | P5-E.1 | Planning gate | Server-side release lock |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -591,7 +592,41 @@ For **future implementation gates** (P5-B through P5-E):
 
 **S+-03 status:** Baseline implemented at repo level. **Not production-closed** until P5-D.2 acceptance sweep, reflected-search regression, and staging verification of create/edit/admin paths.
 
-**Next candidate:** **P5-D.2 HTML Sanitization Acceptance Sweep**. No push/deploy/launch.
+**Next candidate:** **P5-E.1 Server-side Release Lock Planning Gate**. No push/deploy/launch.
+
+---
+
+## 17. P5-D.2 — HTML Sanitization & URL Safety Acceptance Sweep
+
+**Milestone:** P5-D.2 acceptance sweep; confirms P5-D.1 repository baseline is **baseline-accepted** — **not production-closed**.
+
+**P5-D.2 acceptance sweep completed locally.** The HTML Sanitization & URL Safety baseline is accepted at repository level. `BoundLoreContentSafety` (`p5-d1`) provides DOMParser strict-allowlist rich-text sanitization and URL-scheme validation. `post-detail`, `create-post`, `edit-post`, `avatar-utils`, and relevant admin compose/preview sinks are accepted as guarded for the P5-D baseline. During acceptance, a minimal serializer bug in `sanitizeRichTextHtml` (empty output from detached fragment) was found and fixed — `return outRoot.innerHTML` instead of empty `outDoc.body.innerHTML`.
+
+**Acceptance checks:**
+
+| Check | Result |
+|-------|--------|
+| ContentSafety API + fail-closed policy | `[x]` |
+| Strict allowlist blocks unsafe HTML/URLs | `[x]` |
+| Safe Quill basics preserved | `[x]` |
+| post-detail / create / edit / avatar / admin sinks accepted | `[x]` |
+| WikiEntryLayout upstream sanitization verified | `[x]` — layout output not re-sanitized; `cleanContent` sanitized before `buildModel` |
+| Structured discovery builders use `escapeHtml` | `[x]` — `buildStructuredDiscoveryContent` / `buildSourceDiscoveryHtml` |
+| Reflected search XSS probe escaped | `[x]` — `?q=<img onerror=...>` no script execution |
+| Sanitization fixture 45/45 PASS | `[x]` |
+| Observation fixture 17/17 PASS | `[x]` |
+| Notification fixture 24/24 PASS | `[x]` |
+| Standard regression smoke | `[x]` |
+| Server-side sanitizer | `[ ]` — not implemented |
+| Stored content migration | `[ ]` — not performed |
+| S+-03 production-closed | `[ ]` |
+| Supabase writes / deploy / push | `[x]` — none |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**S+-03 status:** **Baseline-accepted** at repo level. **Not production-closed** until server-side sanitization, stored-content handling, and staging verification of create/edit/admin write paths.
+
+**Next candidate:** **P5-E.1 Server-side Release Lock Planning Gate**. No push/deploy/launch.
 
 ---
 
@@ -599,7 +634,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/current-code-gap-notes.md` §85–§91 | P5-A.1 / P5-A.2 / P5-B.1 / P5-B.2 / P5-C.1 / P5-C.2 / P5-D.1 gate records |
+| `docs/architecture/current-code-gap-notes.md` §85–§92 | P5-A.1 / P5-A.2 / P5-B.1 / P5-B.2 / P5-C.1 / P5-C.2 / P5-D.1 / P5-D.2 gate records |
 | `docs/architecture/moderation-conflict-matrix.md` | Conflict handling must remain untouched during P5 |
 | `docs/architecture/entity-promotion-policy.md` | No auto-promotion during security fixes |
 | `docs/architecture/graph-relations-spec.md` | Relation registry unchanged in P5 |

@@ -304,7 +304,7 @@
       var outDoc = document.implementation.createHTMLDocument("");
       var outRoot = outDoc.createElement("div");
       sanitizeNodeTree(sourceRoot, outRoot, outDoc);
-      return outDoc.body ? outDoc.body.innerHTML : outRoot.innerHTML;
+      return outRoot.innerHTML;
     } catch (err) {
       return "";
     }

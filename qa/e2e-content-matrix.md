@@ -1966,7 +1966,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **P5-D.1 baseline implemented locally.** Central ContentSafety utility with rich HTML allowlist and URL scheme whitelist. Post render, create/edit outgoing paths, avatars, and admin compose/preview sinks guarded. QA sanitization fixture 45/45 PASS; observation 17/17 and notification 24/24 remain PASS. No Supabase writes, no deploy, no push. S+-03 baseline-implemented but not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
 
-**Next candidate:** **P5-D.2 HTML Sanitization Acceptance Sweep**. **LAUNCH-0** required before any push/deploy.
+**Next candidate:** **P5-E.1 Server-side Release Lock Planning Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
+## P5-D.2 — HTML Sanitization & URL Safety Acceptance Sweep
+
+**Milestone:** P5-D.2 acceptance sweep; confirms P5-D.1 repo baseline — **baseline-accepted**, not production-closed.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| ContentSafety accepted | `js/content-safety.js` | p5-d1; fail-closed | `[x]` |
+| Strict allowlist | fixture + code | unsafe blocked; Quill preserved | `[x]` |
+| Sink guards accepted | post/create/edit/avatar/admin | guarded paths | `[x]` |
+| WikiEntryLayout upstream | `post-detail.js` + layout | `cleanContent` sanitized before `buildModel` | `[x]` |
+| Structured builders | `buildStructuredDiscoveryContent` | escaped fields | `[x]` |
+| Reflected search XSS | `?q=<img onerror=...>` | escaped; no execution | `[x]` |
+| Sanitization fixture | `qa/p5-sanitization-security-fixtures.html` | 45/45 PASS | `[x]` |
+| Observation fixture | `qa/p5-observation-rpc-security-fixtures.html` | 17/17 PASS | `[x]` |
+| Notification fixture | `qa/p5-notification-security-fixtures.html` | 24/24 PASS | `[x]` |
+| Standard regression | browse/search/posts/admin | no crash | `[x]` |
+| Serializer fix | `sanitizeRichTextHtml` | non-empty safe HTML output | `[x]` — found in sweep |
+| Server-side sanitizer | DB/RPC | not implemented | `[ ]` |
+| Stored content migration | DB | not performed | `[ ]` |
+| S+-03 production-closed | acceptance | not claimed | `[ ]` |
+| Supabase writes / deploy / push | ops | none | `[x]` |
+
+**P5-D.2 acceptance sweep completed locally.** HTML sanitization baseline accepted at repository level. Sanitization fixture 45/45 PASS after minimal serializer fix; observation 17/17 and notification 24/24 remain PASS. Reflected search XSS probe clean. No Supabase writes, no deploy, no push. S+-03 baseline-accepted but not production-closed. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate:** **P5-E.1 Server-side Release Lock Planning Gate**. **LAUNCH-0** required before any push/deploy.
 
 ---
 
