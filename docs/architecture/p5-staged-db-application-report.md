@@ -471,7 +471,7 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 1. **P5-STAGING.5A:** Legacy schema-only export plan — **PASS** (Path A chosen; no export yet).
 2. **P5-STAGING.5B:** Execute schema-only `pg_dump` from legacy — **PASS** (re-run; 138,895-byte gitignored dump).
-3. **P5-STAGING.5C:** Curate `supabase/core_schema_foundation.sql`.
+3. **P5-STAGING.5C:** Curate `supabase/core_schema_foundation.sql` — **PASS** (~115 KB; no apply).
 4. **P5-STAGING.6:** Apply foundation + incremental SQL to staging.
 5. Re-verify tables; P5-E.5 re-attempt with explicit approval.
 
@@ -512,8 +512,23 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 **Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
 
-**Next:** P5-STAGING.5C → P5-STAGING.6 → P5-E.5 re-attempt.
+**Next:** P5-STAGING.6 with explicit approval → P5-E.5 re-attempt.
 
 ---
 
-*Document version: P5-E.5 original + re-run blocked + P5-STAGING.5 plan + 5B PASS (re-run). No SQL applied.*
+### P5-STAGING.5C follow-up (PASS)
+
+**P5-STAGING.5C** curated core schema extraction (HEAD `348c110`). **PASS** — `supabase/core_schema_foundation.sql` created from gitignored dump. **No SQL apply, no DB access.**
+
+| Item | Status |
+|------|--------|
+| `core_schema_foundation.sql` | `[x]` |
+| Six required core tables | `[x]` |
+| No INSERT/COPY/data | `[x]` |
+| Curated Extraction (5C) | **PASS** |
+
+**Report:** `docs/architecture/p5-curated-core-schema-extraction-report.md`
+
+---
+
+*Document version: P5-E.5 blocked + 5B PASS + 5C PASS. No SQL applied.*

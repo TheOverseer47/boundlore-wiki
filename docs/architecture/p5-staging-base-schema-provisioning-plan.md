@@ -252,7 +252,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 | # | Criterion |
 |---|-----------|
-| 1 | Phase 0 resolved — `supabase/core_schema_foundation.sql` from 5A→5B→5C path |
+| 1 | Phase 0 resolved — `supabase/core_schema_foundation.sql` | `[x]` **5C PASS** |
 | 2 | Safe apply order documented (this plan §6) with no destructive scripts |
 | 3 | Pre-apply backup exists or new backup planned (`backups/staging/`) |
 | 4 | Connection path documented (session pooler per P5-STAGING.3) |
@@ -266,8 +266,8 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 | Dimension | Verdict |
 |-----------|---------|
-| **Base Schema Provisioning Plan** | **PARTIAL** |
-| **Repo contains full base schema** | **NO** — `posts` / `profiles` / `post_reactions` DDL missing |
+| **Base Schema Provisioning Plan** | **PASS** (repo foundation file; staging not applied) |
+| **Repo contains full base schema** | **YES** — `supabase/core_schema_foundation.sql` |
 | **Safe incremental order definable** | **YES** — after Phase 0 |
 | **P5-E.5 Re-run** | **BLOCKED** — until base schema on staging |
 | Product-Activation-Ready | **FAIL** |
@@ -275,9 +275,25 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 ### Summary
 
-P5-STAGING.5 inventory complete. Incremental SQL in repo is well-structured for **patches and P5 security**, but **core BoundLore DDL is not versioned**. Provisioning staging requires **Phase 0** (author foundation SQL or approved schema-only export) before any file in §6 Phases 1–5 can run safely.
+P5-STAGING.5C created `supabase/core_schema_foundation.sql` from gitignored legacy dump. Core DDL now versioned in repo. **Staging apply not performed.**
 
-**Next:** P5-STAGING.5C → P5-STAGING.6. No push/deploy/launch.
+**Next:** P5-STAGING.6 with explicit approval. No push/deploy/launch.
+
+---
+
+## 14. P5-STAGING.5C Follow-up (PASS)
+
+**Gate:** P5-STAGING.5C — Curated Core Schema Extraction. **PASS.**
+
+| Item | Status |
+|------|--------|
+| `core_schema_foundation.sql` | `[x]` ~115 KB |
+| Required core tables | `[x]` all six |
+| No data / no DB access | `[x]` |
+| Apply order documented | `[x]` |
+| Curated Extraction (5C) | **PASS** |
+
+**Report:** `docs/architecture/p5-curated-core-schema-extraction-report.md`
 
 ---
 
@@ -285,6 +301,7 @@ P5-STAGING.5 inventory complete. Incremental SQL in repo is well-structured for 
 
 | Document | Role |
 |----------|------|
+| `p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report |
 | `p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
 | `p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (PASS) |
 | `p5-staged-db-application-report.md` | P5-E.5 re-run blocked report |
@@ -293,4 +310,4 @@ P5-STAGING.5 inventory complete. Incremental SQL in repo is well-structured for 
 
 ---
 
-*Document version: P5-STAGING.5 + 5A + 5B PASS (re-run). No SQL executed.*
+*Document version: P5-STAGING.5 + 5A + 5B + 5C PASS. Foundation SQL in repo. No staging apply.*

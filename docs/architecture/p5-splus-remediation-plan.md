@@ -975,7 +975,25 @@ For **future implementation gates** (P5-B through P5-E):
 
 **Report:** `docs/architecture/p5-staged-db-application-report.md` (Re-run section)
 
-**Next:** P5-STAGING.5C → P5-STAGING.6. No push/deploy/launch.
+**Next:** P5-STAGING.6 with explicit approval. No push/deploy/launch.
+
+---
+
+## 34. P5-STAGING.5C — Curated Core Schema Extraction (PASS)
+
+**Milestone:** P5-STAGING.5C — extraction only; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Raw dump read-only | `[x]` |
+| `core_schema_foundation.sql` | `[x]` ~115 KB |
+| No data / no DB access | `[x]` |
+| Six core tables | `[x]` |
+| SQL apply | `[x]` — none |
+| Curated Extraction (5C) | **PASS** |
+| Ready for P5-STAGING.6 | **YES** |
+
+**Report:** `docs/architecture/p5-curated-core-schema-extraction-report.md`
 
 ---
 
@@ -1072,7 +1090,7 @@ For **future implementation gates** (P5-B through P5-E):
 
 | Document | Relevance |
 |----------|-----------|
-| `docs/architecture/p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (PASS) |
+| `docs/architecture/p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report (PASS) |
 | `docs/architecture/p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A legacy export plan |
 | `docs/architecture/p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 base schema plan |
 | `docs/architecture/p5-staging-test-user-provisioning.md` | P5-STAGING.4 test users |

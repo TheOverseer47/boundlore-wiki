@@ -288,7 +288,26 @@ User chose **Path A**. Schema-only export from legacy `ohkoojpzmptdfyowdgog` com
 
 **Report:** `docs/architecture/p5-legacy-schema-only-export-report.md`
 
-**Next:** P5-STAGING.5C → P5-STAGING.6. No push/deploy/launch.
+**Next:** P5-STAGING.6 (explicit approval). No push/deploy/launch.
+
+---
+
+## 13. P5-STAGING.5C Follow-up (PASS)
+
+**Gate:** P5-STAGING.5C — Curated Core Schema Extraction (HEAD `348c110`). **PASS.**
+
+| Item | Status |
+|------|--------|
+| Raw dump used (read-only) | `[x]` gitignored local |
+| `supabase/core_schema_foundation.sql` | `[x]` created (~115 KB) |
+| No INSERT/COPY/data | `[x]` |
+| Six required core tables | `[x]` all present |
+| SQL apply / DB access | `[x]` — none |
+| Curated Extraction (5C) | **PASS** |
+
+**Report:** `docs/architecture/p5-curated-core-schema-extraction-report.md`
+
+**Next:** P5-STAGING.6 with explicit approval.
 
 ---
 
@@ -297,10 +316,10 @@ User chose **Path A**. Schema-only export from legacy `ohkoojpzmptdfyowdgog` com
 | Document | Role |
 |----------|------|
 | `p5-legacy-schema-only-export-report.md` | P5-STAGING.5B export report (PASS) |
-| `p5-staging-base-schema-provisioning-plan.md` | P5-STAGING.5 inventory + Phase 0 |
+| `p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report (PASS) |
 | `p5-staged-db-application-report.md` | P5-E.5 re-run blocked |
 | `p5-staging-environment-plan.md` | Staging gate sequence |
 
 ---
 
-*Document version: P5-STAGING.5A + 5B PASS (re-run). Export local/gitignored. No secrets.*
+*Document version: P5-STAGING.5A + 5B PASS + 5C PASS. No apply. No secrets.*

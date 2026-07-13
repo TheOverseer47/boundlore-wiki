@@ -2212,6 +2212,26 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.5C — Curated Core Schema Extraction (PASS)
+
+**Milestone:** P5-STAGING.5C — extraction only; **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Raw dump read-only | local gitignored | used, not committed | `[x]` |
+| `core_schema_foundation.sql` | repo | created | `[x]` ~115 KB |
+| No INSERT/COPY/data | file | none | `[x]` |
+| profiles/posts/post_reactions CREATE | file | yes | `[x]` |
+| notifications/user_submission_acks CREATE | file | yes | `[x]` |
+| wiki_entities CREATE | file | yes | `[x]` |
+| SQL apply / DB access | ops | none | `[x]` |
+| Curated Extraction (5C) | gate | PASS | `[x]` |
+| P5-STAGING.6 ready | gate | YES | `[x]` |
+
+**P5-STAGING.5C PASS.** `supabase/core_schema_foundation.sql` in repo. No apply. Next: P5-STAGING.6 with explicit approval.
+
+---
+
 ## P5-STAGING.5B Re-run — Legacy Schema-Only Export (PASS)
 
 **Milestone:** P5-STAGING.5B re-run — read-only schema-only export; **PASS**.

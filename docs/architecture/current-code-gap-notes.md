@@ -3260,6 +3260,25 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 109. P5-STAGING.5C — Curated Core Schema Extraction (PASS)
+
+**Milestone:** P5-STAGING.5C — extraction only; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| `core_schema_foundation.sql` | `[x]` |
+| Six core tables in file | `[x]` |
+| No INSERT/COPY/data | `[x]` |
+| No DB access | `[x]` |
+| Curated Extraction (5C) | **PASS** |
+| P5-STAGING.6 ready | **YES** |
+
+**Report:** `docs/architecture/p5-curated-core-schema-extraction-report.md`
+
+**Next:** P5-STAGING.6 explicit approval. No push/deploy/launch.
+
+---
+
 ## 108. P5-STAGING.5B Re-run — Legacy Schema-Only Export (PASS)
 
 **Milestone:** P5-STAGING.5B re-run — read-only export; **PASS**.

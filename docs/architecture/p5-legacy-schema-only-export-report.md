@@ -101,7 +101,8 @@ Additional public tables in dump (for 5C curation): `comments`, `ratings`, `repo
 | Dimension | Verdict |
 |-----------|---------|
 | **Legacy Schema-Only Export (5B)** | **PASS** |
-| **Ready for P5-STAGING.5C** | **YES** |
+| **Ready for P5-STAGING.5C** | **YES** → **DONE** (5C PASS) |
+| **Ready for P5-STAGING.6** | **YES** (explicit approval required) |
 | **P5-E.5 Re-run** | **BLOCKED** (unchanged — core schema not yet curated/applied to staging) |
 | Product-Activation-Ready | **FAIL** |
 | Public-Launch-Ready | **NO-GO** |
@@ -110,7 +111,7 @@ Additional public tables in dump (for 5C curation): `comments`, `ratings`, `repo
 
 P5-STAGING.5B re-run completed successfully. Read-only `pg_dump --schema-only --schema=public` from legacy `ohkoojpzmptdfyowdgog` produced a gitignored local dump with no row data. All six required core tables present as `CREATE TABLE` statements.
 
-**Next:** **P5-STAGING.5C** — Curated Core Schema Extraction → `supabase/core_schema_foundation.sql` → then **P5-STAGING.6** apply to staging.
+**Next:** **P5-STAGING.6** apply to staging (explicit approval). See `p5-curated-core-schema-extraction-report.md`.
 
 **Not in scope:** Push, deploy, launch, dump commit, staging apply.
 
@@ -121,7 +122,7 @@ P5-STAGING.5B re-run completed successfully. Read-only `pg_dump --schema-only --
 | Document | Role |
 |----------|------|
 | `p5-legacy-schema-only-export-plan.md` | P5-STAGING.5A/5B plan |
-| `p5-staging-base-schema-provisioning-plan.md` | Phase 0 context |
+| `p5-curated-core-schema-extraction-report.md` | P5-STAGING.5C extraction report (PASS) |
 
 ---
 
