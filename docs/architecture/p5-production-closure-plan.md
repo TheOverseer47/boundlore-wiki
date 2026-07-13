@@ -86,7 +86,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | Appendix B; kein prerender | Entity-URLs nicht indexierbar | **P5-E.9D** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
-| **S-07 Backup/Restore** | S | **OPEN_BLOCKING** (Ops) | P5-STAGING.3 staging dry-run | Prod backup schedule + restore drill | **P5-E.9B** | Nein | Nein** | Nein | Nein | Ja |
+| **S-07 Backup/Restore** | S | **OPEN_BLOCKING** (Ops) | P5-STAGING.3 staging dry-run; **P5-E.9B Plan** | Prod backup schedule + restore drill | **P5-E.9B.1** → **9B.4** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | Nicht im Repo | Client + DB alerting | **P5-E.9C** | Nein | Nein | Nein | Ja*** | Ja |
 | **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
 | **S-10 Base RLS Production** | S | **NOT_TESTED** | Repo SQL; staging partial | Live RLS matrix auf Production | **P5-E.9F** | Nein**** | Nein | Nein | Nein | Ja |
@@ -307,7 +307,11 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9A.1** — S+-03 Runtime XSS Local/Mocked Evidence~~ **PASS** — `qa/p5-splus03-runtime-xss-fixtures.*` (25/25)
 
-**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP**)
+~~**P5-E.9B** — Backup/Restore Evidence Plan~~ **PASS** — `p5-backup-restore-evidence-plan.md`
+
+**P5-E.9B.1** — Staging Backup Inventory (read-only)
+
+**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — blockiert bis 9B.1 + Freigabe)
 
 Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
@@ -353,4 +357,27 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS. Keine Secrets. Kein DB-Zugriff.*
+## 16. P5-E.9B Follow-up (PASS — Backup/Restore Evidence Plan)
+
+**Gate:** P5-E.9B — Backup/Restore Evidence Plan. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Backup/Restore Plan | `p5-backup-restore-evidence-plan.md` |
+| Backup Scope Matrix | `[x]` 20+ Bereiche |
+| Restore Scope Matrix | `[x]` Staging / Production |
+| Cleanup-Strategie P5-E.9A.2 | `[x]` Plan only (`qa-splus03-xss-*`) |
+| Folge-Gates 9B.1–9B.4 | `[x]` definiert |
+| Backup Evidence | **OPEN** — kein Restore-Drill |
+| Restore Evidence | **OPEN** |
+| P5-E.9A.2 | **BLOCKED** bis 9B.1 + Freigabe |
+| SQL apply / DB / Restore | **None** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9B | **PASS** |
+
+**Report:** `docs/architecture/p5-backup-restore-evidence-plan.md`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + P5-E.9A PASS + P5-E.9A.1 PASS + P5-E.9B PASS. Keine Secrets. Kein DB-Zugriff.*

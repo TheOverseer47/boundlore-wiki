@@ -2298,6 +2298,31 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9B — Backup/Restore Evidence Plan (PASS)
+
+**Milestone:** P5-E.9B — Backup/Restore Evidence Plan (planning only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Backup/Restore plan documented | docs | complete scope + gates | `[x]` |
+| Backup Evidence | status | OPEN until verified | `[x]` OPEN |
+| Restore Evidence | status | OPEN until verified | `[x]` OPEN |
+| Cleanup strategy for 9A.2 | docs | `qa-splus03-xss-*` plan only | `[x]` |
+| No SQL/DB/Storage/Push/Deploy | gate | none | `[x]` |
+| No dumps created | gate | none | `[x]` |
+| No restore executed | gate | none | `[x]` |
+| No payload tests performed | gate | none | `[x]` |
+| P5-E.9A.2 | status | STOPP until 9B.1 + approval | `[x]` BLOCKED |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9B | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-backup-restore-evidence-plan.md`
+
+**Next:** P5-E.9B.1 Staging Backup Inventory. No push/deploy/launch/restore/dumps.
+
+---
+
 ## P5-E.9A.1 — S+-03 Local/Mocked Runtime XSS Evidence (PASS)
 
 **Milestone:** P5-E.9A.1 — S+-03 Runtime XSS Local/Mocked Evidence. **PASS**.

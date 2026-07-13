@@ -3292,7 +3292,31 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** P5-E.9A.2 (STOPP) or P5-E.9B. No push/deploy/launch.
+**Next:** P5-E.9B.1 or P5-E.9C. No push/deploy/launch.
+
+---
+
+## 136. P5-E.9B — Backup/Restore Evidence Plan (PASS)
+
+**Milestone:** P5-E.9B — Backup/Restore Evidence Plan (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Evidence Plan | `p5-backup-restore-evidence-plan.md` |
+| Backup Scope Matrix | `[x]` posts, wiki_*, notifications, profiles, comments, release_gate, storage buckets, auth boundary |
+| Restore Scope Matrix | `[x]` Staging isoliert / Production STOPP |
+| Cleanup-Strategie 9A.2 | `[x]` `qa-splus03-xss-*` — Plan only |
+| Folge-Gates | 9B.1 Inventory, 9B.2 Drill Plan, 9B.3 Cleanup (**STOPP**), 9B.4 Prod (**STOPP**) |
+| Warum nicht geschlossen | Kein Restore-Drill; kein Prod-Schedule; kein Snapshot-Nachweis nach Plan |
+| P5-E.9A.2 | **BLOCKED** — gespeicherte Payloads weiterhin STOPP |
+| SQL apply / DB / Restore | **None** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9B | **PASS** |
+
+**Report:** `docs/architecture/p5-backup-restore-evidence-plan.md`
+
+**Next:** P5-E.9B.1. No push/deploy/launch/restore/dumps.
 
 ---
 
@@ -3377,7 +3401,7 @@ The future Draft Inspector / Preview must **NOT**:
 |---------|--------|
 | Production Closure (S+-01…04 auf Prod) | OPEN_BLOCKING |
 | S+-03 Runtime XSS | PARTIAL (9A.1 local mock PASS; Staging offen) |
-| S-07 Backup/Restore | OPEN_BLOCKING |
+| S-07 Backup/Restore | OPEN_BLOCKING (P5-E.9B Plan; kein Drill) |
 | S-08 Monitoring | OPEN_BLOCKING |
 | Incident Response | OPEN_BLOCKING |
 
