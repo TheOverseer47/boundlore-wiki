@@ -84,7 +84,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-03 Sanitization — Repo** | S+ Critical | **CLOSED** | `BoundLoreContentSafety` p5-d1; fixture 45/45 | Server-side sanitizer optional | — | Nein | Nein | Nein | Ja | Ja |
 | **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
-| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D Plan** | Entity-URLs CSR-Shell; kein Prerender | **P5-E.9D.1** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
+| **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.1** | Entity-URLs CSR-Shell; robots hardened | **P5-E.9D.2** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
 | **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | `monster` → 0; Smoke OK | Index/Recall-Gap | **P5-E.9E** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Provider integration + alerting | **P5-E.9C.3** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
@@ -96,7 +96,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **Admin unlock/relock** | — | **NOT_TESTED** | UI `p5-e3` | Staging admin journey | Post-staging gate | Nein | Ja (staging) | Nein | Nein | Ja |
 | **post_reactions live block** | — | **NOT_TESTED** | SQL in repo | Kein FK-Target staging | Optional | Nein | Nein | Nein | Nein | Ja |
 | **Incident Response** | Ops | **OPEN_BLOCKING** | In P5-E.9C Plan skizziert | Runbook + Escalation | P5-E.9C.4+ | Nein | Nein | Nein | Nein | Ja |
-| **robots.txt / sitemap.xml** | SEO | **PARTIAL** | Statisch; 9 URLs; Allow:/ | Hubs + dynamische URLs | **P5-E.9D.1** → **9D.4** | Nein | Nein | Nein | Ja | Ja |
+| **robots.txt / sitemap.xml** | SEO | **PARTIAL** | robots STATIC_HARDENED (9D.1); Sitemap 9 URLs | Hubs + dynamische URLs | **P5-E.9D.2** → **9D.4** | Nein | Nein | Nein | Ja | Ja |
 | **report-screenshots Storage** | — | **OUT_OF_SCOPE_FOR_MVP** | Support disabled P5-E.8C | Policy wenn Support reaktiviert | Später | Ja | Ja | Ja | Nein | Ja |
 
 \* P5-E.9A: Read-only Staging smoke mit **bestehenden** Testposts erlaubt; keine neuen Payload-Writes ohne Gate.  
@@ -321,7 +321,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9D** — SEO/CSR Closure Plan~~ **PASS** — `p5-seo-csr-closure-plan.md`
 
-**P5-E.9D.1** — robots/noindex Static Hardening (lokale Dateiänderungen, kein Deploy)
+~~**P5-E.9D.1** — robots/noindex Static Hardening~~ **PASS** — `robots.txt` + HTML noindex (33/33)
+
+**P5-E.9D.2** — Static Hub Metadata Cleanup (lokale HTML-Meta, kein Deploy)
 
 **P5-E.9C.3** — Staging Monitoring Integration (**STOPP** — Provider-Key + Freigabe)
 
@@ -532,4 +534,27 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + … + P5-E.9C.2 PASS + P5-E.9D PASS. Keine Secrets. Kein DB-Zugriff.*
+## 23. P5-E.9D.1 Follow-up (PASS — robots/noindex Static Hardening)
+
+**Gate:** P5-E.9D.1 — robots/noindex Static Hardening. **PASS**.
+
+| Item | Result |
+|------|--------|
+| robots.txt | Disallow Admin/Auth/QA/Create/Edit/Search + Allow:/ |
+| HTML noindex | admin, public/admin, create/edit, search, login, register, account, reset-password, seed-local |
+| QA Fixture | `p5-seo-static-hardening-fixtures.*` — **33/33 PASS** |
+| Indexierbare Hubs | Homepage, browse, privacy, imprint **nicht** noindex |
+| post detail shell | **Kein** erzwungenes noindex (deferred 9D.3) |
+| Deploy / Search Console | **Nein** |
+| robots/noindex | **STATIC_HARDENED** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** (CSR Entity-Details) |
+| Sitemap / Structured Data | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.1 | **PASS** |
+
+**Report:** `robots.txt`, `qa/p5-seo-static-hardening-fixtures.html`
+
+---
+
+*Dokumentversion: P5-E.9 PASS + … + P5-E.9D PASS + P5-E.9D.1 PASS. Keine Secrets. Kein DB-Zugriff.*

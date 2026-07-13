@@ -3338,7 +3338,32 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-monitoring-error-tracking-plan.md`
 
-**Next:** P5-E.9D.1 robots/noindex hardening. No push/deploy/launch.
+**Next:** P5-E.9D.2 hub metadata. No push/deploy/launch.
+
+---
+
+## 142. P5-E.9D.1 — robots/noindex Static Hardening (PASS)
+
+**Milestone:** P5-E.9D.1 — robots/noindex Static Hardening. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| robots.txt | Disallow Admin/Auth/QA/Create/Edit/Search |
+| HTML noindex | admin, auth, create/edit, search, public/admin |
+| QA Fixture | `p5-seo-static-hardening-fixtures.*` — **33/33 PASS** |
+| Indexierbare Hubs geschützt | `/`, browse, privacy, imprint nicht noindex |
+| post detail | Kein erzwungenes noindex (9D.3 deferred) |
+| Deploy / Search Console | **Nein** |
+| robots/noindex | **STATIC_HARDENED** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Sitemap / Structured Data | **PARTIAL** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.1 | **PASS** |
+
+**Report:** `robots.txt`, `qa/p5-seo-static-hardening-fixtures.html`
+
+**Next:** P5-E.9D.2 hub metadata. No push/deploy/launch.
 
 ---
 

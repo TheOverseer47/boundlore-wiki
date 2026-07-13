@@ -78,7 +78,7 @@ Nach P5-E.8C ist der **Security-Core für einen locked-state MVP** substanziell 
 | **Admin unlock/relock journey** | NOT RUN | **NOT TESTED** | UI vorbereitet (`p5-e3`) | Kein Staging-Admin-Test | **Ja** (vor Unlock) | Staging Admin Gate |
 | **post_reactions live block** | NOT RUN | **NOT TESTED** | SQL in `release_gate_lock.sql` | Kein FK-Target auf Staging | Nein (locked MVP) | Optional Staging |
 | **Incident Response** | Docs only | **BLOCKING** (Ops) | Kein Runbook im Repo | Kein dokumentierter IR-Prozess | **Ja** (Launch/Ops) | Ops-Dokumentation |
-| **robots.txt / sitemap.xml** | Present | **PARTIAL** | 9 URLs; `Allow: /` | Hubs + dynamische URLs fehlen | **Ja** (SEO Launch) | **P5-E.9D.1** → 9D.4 |
+| **robots.txt / sitemap.xml** | Present | **PARTIAL** | robots STATIC_HARDENED (9D.1); Sitemap 9 URLs | Hubs + dynamische URLs fehlen | **Ja** (SEO Launch) | **P5-E.9D.2** → 9D.4 |
 
 ---
 
@@ -137,9 +137,10 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 10. ~~**P5-E.9C.1** — Monitoring Provider Decision~~ **PASS** — `p5-monitoring-provider-decision.md`
 11. ~~**P5-E.9C.2** — Local Error Capture Stub~~ **PASS** — `js/error-reporter.js` (21/21)
 12. ~~**P5-E.9D** — SEO/CSR Closure Plan~~ **PASS** — `p5-seo-csr-closure-plan.md`
-13. **P5-E.9D.1** — robots/noindex Static Hardening (lokale Dateien, kein Deploy)
-14. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
-15. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
+13. ~~**P5-E.9D.1** — robots/noindex Static Hardening~~ **PASS** — 33/33 fixture
+14. **P5-E.9D.2** — Static Hub Metadata Cleanup (lokale HTML-Meta, kein Deploy)
+15. **P5-E.9C.3** — Staging Monitoring Integration (**STOPP**)
+16. **P5-E.8A.4** — Owner-Capable Investigation (parallel)
 
 ---
 
@@ -330,4 +331,21 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9C.2 PASS + P5-E.9D PASS. Keine Secrets.*
+## 22. P5-E.9D.1 Follow-up (PASS — robots/noindex Static Hardening)
+
+**Gate:** P5-E.9D.1 — robots/noindex Static Hardening. **PASS**.
+
+| Item | Result |
+|------|--------|
+| robots.txt hardened | `[x]` |
+| HTML noindex on sensitive pages | `[x]` |
+| QA Fixture | 33/33 PASS |
+| robots/noindex | **STATIC_HARDENED** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product-Activation-Ready | **FAIL** |
+| Public-Launch-Ready | **NO-GO** |
+| P5-E.9D.1 | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9D PASS + P5-E.9D.1 PASS. Keine Secrets.*

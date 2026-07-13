@@ -1,4 +1,15 @@
 User-agent: *
 Allow: /
 
+Disallow: /wiki/admin/
+Disallow: /public/admin/
+Disallow: /qa/
+Disallow: /wiki/create-post/
+Disallow: /wiki/edit-post/
+Disallow: /wiki/login/
+Disallow: /wiki/register/
+Disallow: /wiki/account/
+Disallow: /wiki/reset-password/
+Disallow: /wiki/search/
+
 Sitemap: https://boundlore.com/sitemap.xml

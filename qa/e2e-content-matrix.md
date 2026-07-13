@@ -2383,7 +2383,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `js/error-reporter.js`, `qa/p5-error-reporter-fixtures.html`
 
-**Next:** P5-E.9D.1 robots/noindex hardening. No push/deploy/launch.
+**Next:** P5-E.9D.2 hub metadata. No push/deploy/launch.
+
+---
+
+## P5-E.9D.1 — robots noindex Static Hardening (PASS)
+
+**Milestone:** P5-E.9D.1 — robots/noindex Static Hardening. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| robots.txt disallows admin/auth/create/edit/search/qa | `robots.txt` | Disallow present | `[x]` |
+| noindex on admin/create/edit/search/auth/account | HTML | noindex,nofollow | `[x]` |
+| QA pages remain noindex | `qa/*.html` | noindex | `[x]` |
+| Homepage is not noindex | `/` | not noindex | `[x]` |
+| Browse hub is not noindex | `/wiki/browse/` | not noindex | `[x]` |
+| Legal pages are not noindex | privacy/imprint | not noindex | `[x]` |
+| No duplicate robots meta tags | checked pages | single tag | `[x]` |
+| Fixture checks | `p5-seo-static-hardening-fixtures.*` | 33/33 PASS | `[x]` |
+| No SQL/DB/Storage/Push/Deploy | gate | none | `[x]` |
+| No Search Console action | gate | none | `[x]` |
+| robots/noindex Static Hardening | status | STATIC_HARDENED | `[x]` |
+| S-05 SEO/CSR | status | OPEN_BLOCKING | `[x]` |
+| Product Activation | status | FAIL | `[x]` FAIL |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9D.1 | gate | PASS | **PASS** |
+
+**Report:** `robots.txt`, `qa/p5-seo-static-hardening-fixtures.html`
+
+**Next:** P5-E.9D.2 hub metadata. No push/deploy/launch.
 
 ---
 
