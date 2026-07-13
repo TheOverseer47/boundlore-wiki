@@ -3260,6 +3260,29 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 99. P5-E.5 — Staged DB Application & Negative RLS/RPC Tests (BLOCKED)
+
+**Milestone:** P5-E.5 — **BLOCKED** at environment proof; no SQL applied.
+
+| Check | Result |
+|-------|--------|
+| User approval staging-only | `[x]` |
+| Isolated staging environment proven | `[ ]` — **BLOCKED** |
+| Staging backup | `[ ]` — not created |
+| SQL applied | `[ ]` — none |
+| Negative RLS/RPC tests | `[ ]` — NOT RUN |
+| Local fixtures PASS | `[x]` |
+| S+-01..04 production-closed | `[ ]` |
+| boundlore.com / production touched | `[x]` — none |
+
+**P5-E.5 blocked.** Only one Supabase project available; same ref as `js/supabase-config.js`. Cannot prove isolated staging. No remote data changes.
+
+**Report:** `docs/architecture/p5-staged-db-application-report.md`
+
+**Next:** Provision dedicated staging; re-run P5-E.5. No push/deploy/launch.
+
+---
+
 ## 98. P5-F.2 — Fable Retest Handoff Package
 
 **Milestone:** P5-F.2 docs-only handoff — Fable S+ Security Retest evidence bundle; **no Fable retest executed**.

@@ -405,8 +405,9 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-E.3 | Frontend/Admin UX | Release lock client + admin panel; see §20 — no DB apply |
 | **Complete** | P5-E.4 | Acceptance sweep | Release gate baseline accepted; see §21 — Live-RLS NOT TESTED |
 | **Complete** | P5-F.1 | Combined S+ retest | All four S+ fixtures + regression; see §22 — not production-closed |
-| **Complete** | P5-F.2 | Fable retest handoff | Evidence bundle + prompt; see §23 — no Fable retest executed |
-| **Next** | Fable Retest 1 | External S+ audit | Use `p5-fable-splus-retest-prompt.md` |
+| **Complete** | P5-F.2 | Fable retest handoff | Evidence bundle + prompt; see §23 |
+| **Blocked** | P5-E.5 | Staged DB apply + negative tests | **BLOCKED** — isolated staging not proven; see §24 |
+| **Next** | P5-E.5 retry | Staging provisioning | Dedicated staging project required before SQL apply |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -820,10 +821,38 @@ For **future implementation gates** (P5-B through P5-E):
 
 ---
 
+## 24. P5-E.5 — Staged DB Application & Negative RLS/RPC Tests (BLOCKED)
+
+**Milestone:** P5-E.5 staging apply + negative tests — **BLOCKED** at environment proof; **no SQL applied**.
+
+**P5-E.5 blocked — isolated staging environment not proven.** User approval received for staging-only work, but investigation found exactly one Supabase project (`ohkoojpzmptdfyowdgog`) wired in `js/supabase-config.js` with no separate staging project, no `.env.staging`, no Supabase CLI, and no documented isolated staging ref. Applying P5 SQL would risk the only available remote database (QA content, pending moderation state). No backup, no SQL apply, no negative RLS/RPC/storage tests executed. Local fixtures remain green.
+
+| Check | Result |
+|-------|--------|
+| User approval staging-only | `[x]` |
+| Isolated staging proven | `[ ]` — **BLOCKED** |
+| Staging backup/dump | `[ ]` — not attempted |
+| SQL files applied | `[ ]` — none |
+| S+-02 negative foreign notification insert | `[ ]` — NOT RUN |
+| S+-04 negative RPC tests | `[ ]` — NOT RUN |
+| S+-01 negative RLS/storage tests | `[ ]` — NOT RUN |
+| S+-03 staging stored-content runtime | `[ ]` — NOT RUN |
+| Local fixtures still PASS | `[x]` |
+| Production closure | `[ ]` — NOT CLOSED |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Authoritative report:** `docs/architecture/p5-staged-db-application-report.md`
+
+**Next:** Provision dedicated staging Supabase project; re-run P5-E.5 with environment proof before SQL. No push/deploy/launch.
+
+---
+
 ## Appendix A — Related architecture docs
 
 | Document | Relevance |
 |----------|-----------|
+| `docs/architecture/p5-staged-db-application-report.md` | P5-E.5 staged DB apply report (BLOCKED) |
 | `docs/architecture/p5-fable-splus-retest-handoff.md` | P5-F.2 Fable S+ retest handoff (authoritative for F.2) |
 | `docs/architecture/p5-fable-splus-retest-prompt.md` | Copy-paste prompt for Fable Retest 1 |
 | `docs/architecture/p5-fable-splus-retest-checklist.md` | Short Fable execution checklist |

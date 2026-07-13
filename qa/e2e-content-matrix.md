@@ -2186,6 +2186,32 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.5 — Staged DB Application & Negative RLS/RPC Tests (BLOCKED)
+
+**Milestone:** P5-E.5 staging apply + negative tests — **BLOCKED** at environment proof; no SQL applied.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| User approval staging-only | gate | explicit approval | `[x]` |
+| Isolated staging proven | Supabase project list + config | separate staging ref | `[ ]` **BLOCKED** |
+| Staging backup | pre-apply dump | created before SQL | `[ ]` — not attempted |
+| SQL apply notifications | `admin_dashboard_notifications.sql` | staging only | `[ ]` — NOT RUN |
+| SQL apply release gate | `release_gate_lock.sql` | staging only | `[ ]` — NOT RUN |
+| SQL apply observation RPC | `phase_a_observations_foundation.sql` | staging only | `[ ]` — NOT RUN |
+| S+-02 foreign notification insert | staging RLS negative | blocked | `[ ]` — NOT RUN |
+| S+-04 RPC without ack / locked | staging RPC negative | blocked | `[ ]` — NOT RUN |
+| S+-01 posts/storage while locked | staging RLS negative | blocked | `[ ]` — NOT RUN |
+| S+-03 stored-content runtime | staging + local | sanitized | `[ ]` — NOT RUN (staging) |
+| Local fixtures (5) | localhost:8080 | all PASS | `[x]` |
+| Production closure | acceptance | NOT CLOSED | `[ ]` |
+| Report | `p5-staged-db-application-report.md` | created | `[x]` |
+
+**P5-E.5 blocked — isolated staging environment not proven.** No SQL execution, no Supabase writes to remote DB, no push/deploy. S+ repo baseline remains PASS; staging evidence FAIL. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next:** Provision dedicated staging Supabase project; re-run P5-E.5. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

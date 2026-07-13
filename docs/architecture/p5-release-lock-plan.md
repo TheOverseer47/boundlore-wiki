@@ -567,3 +567,24 @@ Stop and escalate if:
 **Authoritative combined report:** `docs/architecture/p5-splus-combined-retest.md`
 
 **Next:** **P5-F.2 Fable Retest Handoff Package**. No push/deploy/launch.
+
+---
+
+## 20. P5-E.5 — Staged DB Application (BLOCKED)
+
+**Milestone:** P5-E.5 staging apply + negative RLS/RPC tests — **BLOCKED**; no SQL applied to any remote DB.
+
+| Item | Result |
+|------|--------|
+| Isolated staging proven | `[ ]` — **BLOCKED** |
+| Only Supabase project matches `supabase-config.js` | `[x]` documented — not staging-isolated |
+| SQL apply (`notifications`, `release_gate_lock`, observation RPC) | `[ ]` — none |
+| Negative RLS/RPC/storage tests | `[ ]` — NOT RUN |
+| Local fixtures regression | `[x]` — still PASS |
+| S+-01 production-closed | `[ ]` |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**Report:** `docs/architecture/p5-staged-db-application-report.md`
+
+**Next:** Dedicated staging project required; re-run P5-E.5. No push/deploy/launch.
