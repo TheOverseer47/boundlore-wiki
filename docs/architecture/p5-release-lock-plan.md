@@ -1,7 +1,7 @@
 # P5-E Server-side Release Lock Plan
 
-**Version:** P5-E.3 Frontend/Admin UX baseline  
-**Status:** Frontend/Admin UX baseline implemented — **not applied to DB**, not baseline-accepted, not production-closed  
+**Version:** P5-E.4 acceptance sweep  
+**Status:** **Baseline accepted** at repo level — **not production-closed**, Live-RLS/Live-RPC NOT TESTED  
 **Finding:** S+-01 — Kein serverseitiger, fail-closed Pre-Release-Content-Lock  
 **HEAD reference:** `49097cc` (pre P5-E.2); post-gate commit pending
 
@@ -513,3 +513,34 @@ Stop and escalate if:
 | Public-Launch-Ready | **NO-GO** |
 
 **P5-E.3 verdict:** Release Gate Frontend/Admin UX baseline **implemented**. Client fail-closed even when `release_gate` table not yet applied. Ready for P5-E.4 acceptance sweep. No push/deploy/launch.
+
+---
+
+## 18. P5-E.4 — Release Gate Acceptance Sweep (baseline accepted)
+
+**Milestone:** P5-E.4 local acceptance sweep — **baseline accepted at repo level**, **not production-closed**, Live-RLS/Live-RPC **NOT TESTED**.
+
+**P5-E.4 acceptance sweep completed locally.** The server-side Release Gate baseline is accepted at repository level. P5-E.2 prepared fail-closed DB/RLS/RPC SQL baseline with `release_gate`, `release_gate_audit`, restrictive posts/storage policies, and `bl_register_observation` release assertion. P5-E.3 prepared fail-closed frontend/admin UX guardrails with `BoundLoreReleaseGateClient`, create/edit/support guards, and admin status/unlock/relock UI that was not executed. SQL was not applied; Live-RLS/Live-RPC remain NOT TESTED. S+-01 is **baseline-accepted** but **not production-closed**. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+| Item | Accepted |
+|------|----------|
+| P5-E.2 DB/RLS/RPC SQL baseline | `[x]` — repo level; not executed |
+| `release_gate` default locked / missing config = locked | `[x]` |
+| Fail-closed helpers + restrictive policies | `[x]` |
+| `bl_register_observation` release assert before posts INSERT | `[x]` |
+| Discovery storage bucket-aware gate | `[x]` |
+| comments/reports/report-screenshots NOT TESTED | `[x]` documented |
+| P5-E.3 ReleaseGateClient fail-closed UX | `[x]` |
+| create-post / edit-post / support guards | `[x]` |
+| Admin status panel + unlock/relock UI (not executed) | `[x]` |
+| Release Lock UI fixture 30/30 PASS | `[x]` |
+| Release Lock DB fixture 34/34 PASS | `[x]` |
+| Sanitization 45/45, Observation 17/17, Notification 24/24 | `[x]` |
+| Standard regression smoke | `[x]` |
+| SQL executed / DB migration | `[x]` — none |
+| Unlock/relock executed | `[x]` — none |
+| S+-01 baseline accepted | `[x]` |
+| S+-01 production-closed | `[ ]` |
+| Staged DB apply | `[ ]` — P5-E.5+ with explicit approval |
+
+**P5-E.4 verdict:** S+-01 **baseline accepted** at repository level. **Not production-closed.** Next: **P5-F.1 Combined S+ Security Retest Gate**. No push/deploy/launch.

@@ -2094,6 +2094,40 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.4 — Release Gate Acceptance Sweep
+
+**Milestone:** P5-E.4 local acceptance for S+-01 — **baseline accepted**, **not production-closed**, Live-RLS/Live-RPC **NOT TESTED**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| P5-E.2 SQL baseline | `release_gate_lock.sql` | fail-closed, default locked, helpers, policies | `[x]` accepted |
+| `release_gate_audit` | SQL | planned in baseline | `[x]` accepted |
+| `bl_register_observation` assert | `phase_a_observations_foundation.sql` | before posts INSERT | `[x]` accepted |
+| NOT TESTED gaps | comments/reports/report-screenshots | documented | `[x]` accepted |
+| P5-E.3 ReleaseGateClient | `js/release-gate-client.js` | fail-closed, no bypass | `[x]` accepted |
+| create-post guard | `js/create-post.js` | assert + notice | `[x]` accepted |
+| edit-post guard | `js/edit-post.js` | save blocked when locked | `[x]` accepted |
+| support guard | `js/support.js` | report/upload blocked | `[x]` accepted |
+| Admin panel | `wiki/admin/index.html` | status + unlock UI, not executed | `[x]` accepted |
+| Release Lock UI fixture | `p5-release-lock-ui-fixtures` | 30/30 PASS | `[x]` |
+| Release Lock DB fixture | `p5-release-lock-db-security-fixtures` | 34/34 PASS | `[x]` |
+| Sanitization regression | `p5-sanitization-security-fixtures` | 45/45 PASS | `[x]` |
+| Observation regression | `p5-observation-rpc-security-fixtures` | 17/17 PASS | `[x]` |
+| Notification regression | `p5-notification-security-fixtures` | 24/24 PASS | `[x]` |
+| Standard regression | browse/search/posts/create/admin | no crash | `[x]` |
+| SQL executed / DB migration | ops | none | `[x]` |
+| Unlock/relock executed | ops | none | `[x]` |
+| Supabase writes / deploy / push | ops | none | `[x]` |
+| S+-01 baseline accepted | acceptance | P5-E.4 | `[x]` |
+| S+-01 production-closed | acceptance | staging + Fable | `[ ]` |
+| Live-RLS / Live-RPC | ops | NOT TESTED | `[x]` documented |
+
+**P5-E.4 acceptance sweep completed locally.** The server-side Release Gate baseline is accepted at repository level. P5-E.2 prepared fail-closed DB/RLS/RPC SQL baseline; P5-E.3 prepared fail-closed frontend/admin UX guardrails. SQL was not applied; Live-RLS/Live-RPC remain NOT TESTED. S+-01 is **baseline-accepted** but **not production-closed**. BoundLore remains Product-Activation-Ready = FAIL and Public-Launch-Ready = NO-GO.
+
+**Next candidate:** **P5-F.1 Combined S+ Security Retest Gate**. **LAUNCH-0** required before any push/deploy.
+
+---
+
 ## P1-F.2 — Profession & Capability Model Acceptance Sweep
 
 **Milestone:** P1-F foundation block (F.1 + F.2); registry-only; no SQL, no UI, no data migration.

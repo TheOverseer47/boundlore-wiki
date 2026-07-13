@@ -401,7 +401,8 @@ For **future implementation gates** (P5-B through P5-E):
 | **Complete** | P5-E.1 | Planning gate | Release lock plan; see §18 + `p5-release-lock-plan.md` |
 | **Complete** | P5-E.2 | SQL baseline | `release_gate` DB/RLS/RPC baseline; see §19 — not executed |
 | **Complete** | P5-E.3 | Frontend/Admin UX | Release lock client + admin panel; see §20 — no DB apply |
-| **Next** | P5-E.4 | Acceptance sweep | UI + static fixtures + regression |
+| **Complete** | P5-E.4 | Acceptance sweep | Release gate baseline accepted; see §21 — Live-RLS NOT TESTED |
+| **Next** | P5-F.1 | Combined S+ retest | All four S+ fixtures + regression |
 | **Not now** | Push / Deploy / Launch | Forbidden | Deployment freeze active |
 
 ---
@@ -723,6 +724,38 @@ For **future implementation gates** (P5-B through P5-E):
 **S+-01 status:** **Frontend/Admin UX baseline implemented**. **Not baseline-accepted.** **Not production-closed.**
 
 **Next candidate:** **P5-E.4 Release Gate Acceptance Sweep**. No push/deploy/launch.
+
+---
+
+## 21. P5-E.4 — Release Gate Acceptance Sweep
+
+**Milestone:** P5-E.4 local acceptance for S+-01 — **baseline accepted**, **not production-closed**, Live-RLS/Live-RPC **NOT TESTED**.
+
+**P5-E.4 acceptance sweep completed locally.** P5-E.2 DB/RLS/RPC SQL baseline and P5-E.3 frontend/admin UX baseline accepted at repository level. All P5 fixtures green (Release Lock UI 30/30, DB 34/34, Sanitization 45/45, Observation 17/17, Notification 24/24). Standard regression smoke PASS. No SQL execution, no Supabase writes, no unlock/relock executed. SQL not applied to any environment.
+
+| Check | Result |
+|-------|--------|
+| P5-E.2 SQL baseline accepted (repo) | `[x]` |
+| `release_gate` default locked accepted | `[x]` |
+| missing config = locked accepted | `[x]` |
+| Fail-closed helpers accepted | `[x]` |
+| Posts/storage restrictive policies accepted | `[x]` |
+| `bl_register_observation` release assert accepted | `[x]` |
+| P5-E.3 ReleaseGateClient accepted | `[x]` |
+| create/edit/support guards accepted | `[x]` |
+| Admin panel accepted (unlock not executed) | `[x]` |
+| All P5 fixtures PASS | `[x]` |
+| Standard regression PASS | `[x]` |
+| SQL executed / DB migration | `[x]` — none |
+| Live-RLS / Live-RPC tested | `[x]` — NOT TESTED |
+| S+-01 baseline accepted | `[x]` |
+| S+-01 production-closed | `[ ]` |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+
+**S+-01 status:** **Baseline accepted** at repository level. **Not production-closed.** Staged DB apply remains P5-E.5+ with explicit approval.
+
+**Next candidate:** **P5-F.1 Combined S+ Security Retest Gate**. No push/deploy/launch.
 
 ---
 

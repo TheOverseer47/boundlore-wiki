@@ -3260,6 +3260,47 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 96. P5-E.4 — Release Gate Acceptance Sweep
+
+**Milestone:** P5-E.4 local acceptance for S+-01 — **baseline accepted**, **not production-closed**.
+
+### P5-E.4 acceptance sweep
+
+| Check | Result |
+|-------|--------|
+| P5-E.2 DB/RLS/RPC baseline accepted (repo) | `[x]` |
+| P5-E.3 Frontend/Admin UX baseline accepted | `[x]` |
+| `release_gate` default locked / missing config = locked | `[x]` |
+| Fail-closed helpers + restrictive policies | `[x]` |
+| `bl_register_observation` release assert | `[x]` |
+| ReleaseGateClient + create/edit/support guards | `[x]` |
+| Admin unlock/relock UI prepared, not executed | `[x]` |
+| Release Lock UI fixture 30/30 PASS | `[x]` |
+| Release Lock DB fixture 34/34 PASS | `[x]` |
+| Sanitization/Observation/Notification fixtures PASS | `[x]` |
+| Standard regression smoke | `[x]` |
+| SQL executed / Supabase writes | `[x]` — none |
+| Live-RLS / Live-RPC | `[x]` — NOT TESTED |
+| S+-01 baseline accepted | `[x]` |
+| S+-01 production-closed | `[ ]` |
+
+### Verdict unchanged
+
+| Dimension | Verdict |
+|-----------|---------|
+| Foundation-Ready | PASS |
+| Product-Activation-Ready | FAIL |
+| Public-Launch-Ready | **NO-GO** |
+| S+-01 | **Baseline accepted** — not production-closed |
+
+**P5-E.4 acceptance sweep completed locally.** Release gate baseline accepted at repository level. SQL not applied. No data changes. No deploy. No push.
+
+### Next candidate
+
+**P5-F.1 Combined S+ Security Retest Gate**. No push/deploy/launch.
+
+---
+
 ## 92. P5-D.2 — HTML Sanitization & URL Safety Acceptance Sweep
 
 **Milestone:** P5-D.2 acceptance sweep; confirms P5-D.1 repo baseline is **baseline-accepted** — **not production-closed**.
