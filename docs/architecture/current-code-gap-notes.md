@@ -3393,7 +3393,26 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-search-recall-plan.md`
 
-**Next:** P5-E.9E.1 local search recall fixture. No push/deploy/launch.
+**Next:** P5-E.9E.2 search client recall hardening. No push/deploy/launch.
+
+---
+
+## 149. P5-E.9E.1 — Local Search Recall Fixture (PASS)
+
+**Milestone:** P5-E.9E.1 — Local Search Recall Fixture. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Corpus + Query Matrix | 11 records + 15 hit queries |
+| Browser Fixture | **98/98 PASS** |
+| Node Check | PASS |
+| LOCAL_RECALL_FIXTURE_PASS | **PASS** |
+| S-06 | **OPEN_BLOCKING** |
+| P5-E.9E.1 | **PASS** |
+
+**Report:** `qa/p5-search-recall-fixtures.html`
+
+**Next:** P5-E.9E.2 search client recall hardening. No push/deploy/launch.
 
 ---
 

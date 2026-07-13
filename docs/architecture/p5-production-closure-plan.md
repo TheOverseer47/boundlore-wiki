@@ -85,7 +85,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.3B/3C Generator** | CSR-Shell; 3 SSG-Prototypen + Fixture-Generator PASS | **P5-E.9D.3D** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
-| **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9E Plan PASS** | `monster`→0; Recall-Plan erstellt | **P5-E.9E.1** → **9E.4** | Nein | Nein | Nein | Nein | Ja |
+| **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9E.1 Fixture PASS** | Referenz-Fixture 98/98; Live `monster`→0 | **P5-E.9E.2** → **9E.4** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Provider integration + alerting | **P5-E.9C.3** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
 | **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
@@ -335,7 +335,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9E** — Search Recall Plan~~ **PASS** — `p5-search-recall-plan.md`
 
-**P5-E.9E.1** — Local Search Recall Fixture **oder** **P5-E.9D.3D** Entity Sitemap Integration
+~~**P5-E.9E.1** — Local Search Recall Fixture~~ **PASS** — 98/98 + Node-Check
+
+**P5-E.9E.2** — Search Client Recall Hardening **oder** **P5-E.9D.3D** Entity Sitemap Integration
 
 **P5-E.9C.3** — Staging Monitoring Integration (**STOPP** — Provider-Key + Freigabe)
 
@@ -701,4 +703,20 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-*Dokumentversion: P5-E.9 PASS + … + P5-E.9E PASS. Keine Secrets. Kein DB-Zugriff. Keine Sitemap-Entity-URLs.*
+## 30. P5-E.9E.1 Follow-up (PASS — Local Search Recall Fixture)
+
+**Gate:** P5-E.9E.1 — Local Search Recall Fixture. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Corpus + Query Matrix | `p5-search-recall-corpus.json`, `p5-search-recall-queries.json` |
+| Browser Fixture | 98/98 PASS |
+| Node Check | `p5-search-recall-check.mjs` PASS |
+| Reference Search | QA-only; `js/search.js` unverändert |
+| Local Search Recall Fixture | **LOCAL_RECALL_FIXTURE_PASS** |
+| S-06 | **OPEN_BLOCKING** |
+| P5-E.9E.1 | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.9 PASS + … + P5-E.9E.1 PASS. Keine Secrets. Kein DB-Zugriff.*

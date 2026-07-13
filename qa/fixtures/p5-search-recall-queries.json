@@ -1,0 +1,145 @@
+{
+  "schema": "SearchRecallQueryMatrix",
+  "version": "p5-e9e1",
+  "description": "Expected recall outcomes for QA reference search. Fixture-only.",
+  "expect_hits": [
+    {
+      "id": "q-monster-creature",
+      "query": "monster",
+      "must_include_slugs": ["ember-salamander"],
+      "must_exclude_slugs": ["draft-lurker-beast", "qa-internal-test-entity"],
+      "min_hits": 1,
+      "note": "Synonym monster -> creature"
+    },
+    {
+      "id": "q-creature",
+      "query": "creature",
+      "must_include_slugs": ["ember-salamander"],
+      "min_hits": 1
+    },
+    {
+      "id": "q-salamander",
+      "query": "salamander",
+      "must_include_slugs": ["ember-salamander"],
+      "min_hits": 1
+    },
+    {
+      "id": "q-beast",
+      "query": "beast",
+      "must_include_slugs": ["ember-salamander"],
+      "min_hits": 1,
+      "note": "Alias night-beast / ember beast"
+    },
+    {
+      "id": "q-charm",
+      "query": "charm",
+      "must_include_slugs": ["volcanic-heat-charm"],
+      "min_hits": 1
+    },
+    {
+      "id": "q-artifact",
+      "query": "artifact",
+      "must_include_slugs": ["volcanic-heat-charm"],
+      "min_hits": 1,
+      "note": "Synonym artifact -> item + alias heat-artifact"
+    },
+    {
+      "id": "q-basalt",
+      "query": "basalt",
+      "must_include_slugs": ["cinder-basalt-flats"],
+      "min_hits": 1
+    },
+    {
+      "id": "q-volcanic",
+      "query": "volcanic",
+      "must_include_slugs": ["volcanic-heat-charm", "cinder-basalt-flats"],
+      "min_hits": 2
+    },
+    {
+      "id": "q-resource",
+      "query": "resource",
+      "must_include_slugs": ["molten-ember-shard"],
+      "min_hits": 1
+    },
+    {
+      "id": "q-guide",
+      "query": "guide",
+      "must_include_slugs": ["expedition-survival-guide"],
+      "min_hits": 1
+    },
+    {
+      "id": "q-guild",
+      "query": "guild",
+      "must_include_slugs": ["expedition-survival-guide"],
+      "min_hits": 1,
+      "note": "Tag guild on guide record"
+    },
+    {
+      "id": "q-slug-only",
+      "query": "molten-ember-shard",
+      "must_include_slugs": ["molten-ember-shard"],
+      "min_hits": 1,
+      "match_field": "canonical_slug"
+    },
+    {
+      "id": "q-body-only",
+      "query": "xylophone-veil-moss",
+      "must_include_slugs": ["basalt-warden-notes"],
+      "min_hits": 1,
+      "match_field": "body_text"
+    },
+    {
+      "id": "q-facet-only",
+      "query": "mining",
+      "must_include_slugs": ["molten-ember-shard"],
+      "min_hits": 1,
+      "match_field": "facets"
+    },
+    {
+      "id": "q-alias-only",
+      "query": "night-beast",
+      "must_include_slugs": ["ember-salamander"],
+      "min_hits": 1,
+      "match_field": "aliases"
+    }
+  ],
+  "expect_no_hits": [
+    {
+      "id": "q-garbage",
+      "query": "zzzxxy-no-hit",
+      "max_hits": 0
+    },
+    {
+      "id": "q-unsafe",
+      "query": "<img src=x onerror=alert(1)>",
+      "max_hits": 0,
+      "must_escape_in_empty_state": true
+    }
+  ],
+  "ranking_cases": [
+    {
+      "id": "rank-title-vs-body",
+      "query": "salamander",
+      "first_slug": "ember-salamander",
+      "second_slug": "basalt-warden-notes",
+      "note": "Title match should outrank body-only mention"
+    },
+    {
+      "id": "rank-alias-vs-body",
+      "query": "night-beast",
+      "first_slug": "ember-salamander",
+      "note": "Alias match; no second competitor required"
+    },
+    {
+      "id": "rank-exact-title",
+      "query": "ember salamander",
+      "first_slug": "ember-salamander",
+      "note": "Exact title tokens rank first"
+    }
+  ],
+  "exclusion_slugs": [
+    "draft-lurker-beast",
+    "pending-review-trinket",
+    "qa-internal-test-entity"
+  ]
+}

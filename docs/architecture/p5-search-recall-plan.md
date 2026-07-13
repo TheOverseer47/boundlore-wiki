@@ -13,9 +13,11 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E** | **PASS** (Plan erstellt) |
+| **P5-E.9E.1** | **PASS** |
+| **Local Search Recall Fixture** | **LOCAL_RECALL_FIXTURE_PASS** (98/98) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
-| **Search Implementation** | **PARTIAL** — client-side structured ranking vorhanden; Recall-Lücken bekannt |
-| **Search Runtime Evidence** | **OPEN** — kein abgeschlossener Recall-Fixture-/Staging-Nachweis |
+| **Search Implementation** | **PARTIAL** — produktive `js/search.js` unverändert |
+| **Search Runtime Evidence** | **OPEN** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** (separater Blocker) |
 | **Entity SSG** | **PARTIAL** — fixture-only (`FIXTURE_GENERATOR_PASS`); nicht in Search-Corpus |
 | **Product Activation** | **FAIL** |
@@ -318,6 +320,7 @@ exact title > alias > canonical_slug
 | **Ziel** | Lokaler JSON-Corpus + Browser-Fixture für Normalisierung, Ranking, Snippets, XSS |
 | **DB** | **Nein** |
 | **Deploy** | **Nein** |
+| **Status** | **PASS** — 98/98 Fixture, Node-Check PASS |
 
 ### P5-E.9E.2 — Search Client Recall Hardening
 
@@ -372,8 +375,25 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Category Search | `js/render-posts.js` |
 | Facet Browse | `js/facet-browse.js` |
 | Search Page | `wiki/search/index.html` |
-| Known S-06 Gap | `/wiki/search/?q=monster` → 0 Treffer (Smoke dokumentiert) |
+| Known S-06 Gap (Live) | `/wiki/search/?q=monster` → 0 Treffer — Fixture-Referenz PASS |
+| Recall Fixture | `qa/p5-search-recall-fixtures.html` — 98/98 PASS |
 
 ---
 
-*Dokumentversion: P5-E.9E PASS. Keine Secrets. Keine DB-Verbindung. Keine Search-Implementierung. S-06 bleibt OPEN_BLOCKING.*
+## P5-E.9E.1 — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Corpus | `qa/fixtures/p5-search-recall-corpus.json` — 11 Records |
+| Query Matrix | `qa/fixtures/p5-search-recall-queries.json` |
+| Browser Fixture | **98/98 PASS** |
+| Node Check | `qa/p5-search-recall-check.mjs` PASS |
+| Reference Search | QA-only; produktive `js/search.js` **unverändert** |
+| `monster` → Creature | PASS in Referenzlogik |
+| S-06 | **OPEN_BLOCKING** bis 9E.2 + Runtime |
+
+**Empfohlener nächster Gate:** **P5-E.9E.2** — Search Client Recall Hardening
+
+---
+
+*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS. Keine Secrets. Keine DB-Verbindung. Produktive Search unverändert.*

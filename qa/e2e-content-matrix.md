@@ -2439,7 +2439,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-entity-prerender-ssg-decision.md`
 
-**Next:** P5-E.9E.1 local search recall fixture or P5-E.9D.3D entity sitemap integration. No push/deploy/launch.
+**Next:** P5-E.9E.1 local search recall fixture → **PASS**. Next: P5-E.9E.2.
 
 ---
 
@@ -2467,7 +2467,40 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-recall-plan.md`
 
-**Next:** P5-E.9E.1 local search recall fixture. No push/deploy/launch.
+**Next:** P5-E.9E.2 search client recall hardening. No push/deploy/launch.
+
+---
+
+## P5-E.9E.1 — Local Search Recall Fixture (PASS)
+
+**Milestone:** P5-E.9E.1 — Local Search Recall Fixture. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Search recall corpus exists | `p5-search-recall-corpus.json` | 8-12 records | `[x]` |
+| Query matrix exists | `p5-search-recall-queries.json` | defined | `[x]` |
+| Local browser fixture exists | `p5-search-recall-fixtures.*` | present | `[x]` |
+| Monster query returns creature result | reference search | ember-salamander | `[x]` |
+| Alias query returns expected result | night-beast | ember-salamander | `[x]` |
+| Body-only query returns expected result | xylophone-veil-moss | basalt-warden-notes | `[x]` |
+| Facet-only query returns expected result | mining | molten-ember-shard | `[x]` |
+| Slug-only query returns expected result | molten-ember-shard | match | `[x]` |
+| Draft/Pending/QA excluded | reference search | absent | `[x]` |
+| Unsafe query escaped | empty state | no raw HTML | `[x]` |
+| BLMETA not visibly rendered | snippet | absent | `[x]` |
+| Ranking expectations tested | fixture | title>body | `[x]` |
+| Node check | `p5-search-recall-check.mjs` | PASS | `[x]` |
+| Fixture checks | browser | 98/98 PASS | `[x]` |
+| No DB/Supabase access | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| Productive Search remains PARTIAL | status | PARTIAL | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.1 | gate | PASS | **PASS** |
+
+**Report:** `qa/p5-search-recall-fixtures.html`
+
+**Next:** P5-E.9E.2 search client recall hardening. No push/deploy/launch.
 
 ---
 
