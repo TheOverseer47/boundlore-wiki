@@ -207,4 +207,12 @@ No local writes. Not staging-connected.
 
 ---
 
-*Document version: P5-STAGING.6 Re-run FAIL + 6B PASS + Re-run 2 FAIL. Staging unchanged. No secrets.*
+## 14. P5-STAGING.6C Follow-up (PASS — local policy reconstruction)
+
+**Gate:** P5-STAGING.6C — 84 policies reconstructed. **PASS** (repo only).
+
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.6 Re-run FAIL + 6B PASS + Re-run 2 FAIL + 6C PASS. Staging unchanged. No secrets.*

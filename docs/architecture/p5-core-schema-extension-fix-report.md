@@ -124,18 +124,25 @@ Static scan of `supabase/core_schema_foundation.sql`:
 
 ### Recommendation
 
-- **P5-STAGING.6 Re-run 2** attempted; **FAIL** (truncated policies). Fix via P5-STAGING.6C suggested.
+- **P5-STAGING.6 Re-run 2** attempted; **FAIL** (truncated policies). **P5-STAGING.6C PASS** — policies reconstructed.
 - Staging `public` is still empty until apply succeeds.
-- **No push, deploy, or launch** until full gate sequence passes.
 
 ---
 
-## 8. P5-STAGING.6 Re-run 2 Follow-up (FAIL)
+## 9. P5-STAGING.6 Re-run 2 Follow-up (FAIL)
 
-**Gate:** P5-STAGING.6 Re-run 2 — apply attempted after 6B. **FAIL** — incomplete `CREATE POLICY` bodies from 6A reorder.
+**Gate:** P5-STAGING.6 Re-run 2 — apply attempted after 6B. **FAIL** — truncated policies.
 
 **Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
 
 ---
 
-*Document version: P5-STAGING.6B PASS + Re-run 2 FAIL. No secrets.*
+## 10. P5-STAGING.6C Follow-up (PASS — local policy reconstruction)
+
+**Gate:** P5-STAGING.6C — 84 policies reconstructed from legacy dump. **PASS**.
+
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.6B PASS + Re-run 2 FAIL + 6C PASS. No secrets.*

@@ -3292,7 +3292,23 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-core-schema-reorder-fix-report.md`
 
-**Next:** Repair truncated policies (P5-STAGING.6C) → re-run P5-STAGING.6. No push/deploy/launch.
+**Next:** Re-run P5-STAGING.6 with explicit approval. No push/deploy/launch.
+
+---
+
+## 115. P5-STAGING.6C — Core Schema Policy Reconstruction (PASS)
+
+**Milestone:** P5-STAGING.6C — local policy reconstruction; **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SQL apply / DB access | `[x]` — none |
+| 84 policies reconstructed | `[x]` |
+| Core Schema Policy Fix (6C) | **PASS** |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval |
+| P5-E.5 re-run | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
 
 ---
 

@@ -2294,6 +2294,22 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-STAGING.6C — Core Schema Policy Reconstruction Fix (PASS)
+
+**Milestone:** P5-STAGING.6C — local policy reconstruction; **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| SQL apply / DB access | ops | none | `[x]` |
+| 84 CREATE POLICY complete | file | yes | `[x]` |
+| No truncated policy bodies | file | PASS | `[x]` |
+| Core Schema Policy Fix (6C) | gate | PASS | `[x]` |
+| Ready for P5-STAGING.6 Re-run | gate | YES (explicit approval) | `[x]` |
+
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
+
+---
+
 ## P5-STAGING.6A — Core Schema Reorder Fix (PASS)
 
 **Milestone:** P5-STAGING.6A — local repo reorder; **PASS**.

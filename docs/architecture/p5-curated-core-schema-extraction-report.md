@@ -247,4 +247,12 @@
 
 ---
 
-*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS + Re-run 2 FAIL. No secrets.*
+## 16. P5-STAGING.6C Follow-up (PASS — local policy reconstruction)
+
+**Gate:** P5-STAGING.6C — policy reconstruction. **PASS**.
+
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.5C PASS + 6 FAIL + 6A PASS + 6 Re-run FAIL + 6B PASS + Re-run 2 FAIL + 6C PASS. No secrets.*

@@ -546,26 +546,16 @@ Server: `http://localhost:8080` (existing; not restarted). No Supabase writes.
 
 **Report:** `docs/architecture/p5-staging-base-schema-apply-report.md`
 
-**Next:** Repair truncated policies (P5-STAGING.6C) → re-run P5-STAGING.6.
+**Next:** Re-run P5-STAGING.6 with explicit approval.
 
 ---
 
-### P5-STAGING.6 Re-run 2 follow-up (FAIL)
+### P5-STAGING.6C follow-up (PASS — local policy reconstruction)
 
-**P5-STAGING.6 Re-run 2** (HEAD `afae8c0`). User approval granted. **FAIL** — truncated `CREATE POLICY` statements; 6A/6B blockers passed on apply path.
+**P5-STAGING.6C** — 84 `CREATE POLICY` statements reconstructed from legacy dump. **PASS** (repo only).
 
-| Item | Status |
-|------|--------|
-| Pre-apply backup | `[x]` 185,427 bytes |
-| `core_schema_foundation.sql` only | `[x]` attempted |
-| 6A/6B blockers | `[x]` resolved on apply |
-| New blocker | truncated multi-line policies |
-| Core tables on staging | `[ ]` — none |
-| Test users A/B | `[x]` intact |
-| Base Schema Apply Re-run 2 | **FAIL** |
-
-**Report:** `docs/architecture/p5-staging-base-schema-apply-rerun2-report.md`
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
 
 ---
 
-*Document version: P5-E.5 blocked + 6 Re-run 2 FAIL. Staging unchanged.*
+*Document version: P5-E.5 blocked + 6 Re-run 2 FAIL + 6C PASS. Staging unchanged.*

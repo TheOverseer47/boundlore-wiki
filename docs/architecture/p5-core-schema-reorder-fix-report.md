@@ -156,4 +156,12 @@ Note: `auth.users` appears only as FK references and inside function bodies (sch
 
 ---
 
-*Document version: P5-STAGING.6A PASS + 6 Re-run FAIL + 6B PASS + Re-run 2 FAIL. No secrets.*
+## 11. P5-STAGING.6C Follow-up (PASS — local policy reconstruction)
+
+**Gate:** P5-STAGING.6C — 84 policies reconstructed. **PASS**.
+
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.6A PASS + 6 Re-run FAIL + 6B PASS + Re-run 2 FAIL + 6C PASS. No secrets.*

@@ -166,10 +166,26 @@ No passwords or user IDs documented.
 
 ### Remediation
 
-Repair truncated multi-line `CREATE POLICY` statements in `core_schema_foundation.sql` (restore full `EXISTS (SELECT 1 FROM profiles …)` bodies from legacy schema-only dump). Suggested gate: **P5-STAGING.6C**. Then re-run P5-STAGING.6 with explicit approval.
+~~Repair truncated multi-line `CREATE POLICY` statements~~ → **done in P5-STAGING.6C** → re-run P5-STAGING.6 with explicit approval.
 
 **Not in scope:** Push, deploy, launch, legacy/production touch, P5-E.5 apply.
 
 ---
 
-*Document version: P5-STAGING.6 Re-run 2 FAIL. Staging `public` unchanged. No secrets.*
+## 12. P5-STAGING.6C Follow-up (PASS — local policy reconstruction)
+
+**Gate:** P5-STAGING.6C — policy reconstruction from legacy dump. **PASS** (repo only).
+
+| Item | Status |
+|------|--------|
+| SQL apply / DB access | `[x]` — none |
+| 84 policies reconstructed with `DROP` + full bodies | `[x]` |
+| Orphan `-- === Other ===` section removed | `[x]` |
+| Staging `public` | `[x]` still empty |
+| Ready for P5-STAGING.6 Re-run | **YES** — explicit approval required |
+
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
+
+---
+
+*Document version: P5-STAGING.6 Re-run 2 FAIL + 6C PASS (local). Staging unchanged. No secrets.*

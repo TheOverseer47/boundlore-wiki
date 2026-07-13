@@ -1,7 +1,8 @@
 -- core_schema_foundation.sql
 --
 -- P5-STAGING.5C curated core schema + P5-STAGING.6A dependency reorder
---   + P5-STAGING.6B pg_trgm extension dependency fix.
+--   + P5-STAGING.6B pg_trgm extension dependency fix
+--   + P5-STAGING.6C policy reconstruction fix.
 -- Source: backups/legacy-schema-only/legacy-public-schema-only-20260713-192641.sql
 -- Legacy ref: ohkoojpzmptdfyowdgog (read-only export; not applied in 5C)
 --
@@ -1375,556 +1376,404 @@ CREATE TRIGGER trg_wiki_observations_updated_at BEFORE UPDATE ON public.wiki_obs
 
 -- === Row level security ===
 
-ALTER TABLE public.admin_actions ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4343 (class 3256 OID 18105)
--- Name: admin_actions admin_actions_insert_admins; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY admin_actions_insert_admins ON public.admin_actions FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
-   FROM public.profiles p
-  WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
-
-
-ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4300 (class 3256 OID 17707)
--- Name: comments comments_delete_own_or_admin; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY comments_delete_own_or_admin ON public.comments FOR DELETE USING (((author_id = auth.uid()) OR (EXISTS ( SELECT 1
-   FROM public.profiles
-  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))));
-
-
-ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4341 (class 3256 OID 18087)
--- Name: notifications notifications_insert_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY notifications_insert_authenticated ON public.notifications FOR INSERT WITH CHECK ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.post_reactions ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4338 (class 3256 OID 18060)
--- Name: post_reactions post_reactions_delete_own; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY post_reactions_delete_own ON public.post_reactions FOR DELETE TO authenticated USING ((auth.uid() = user_id));
-
-
-ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4298 (class 3256 OID 17704)
--- Name: posts posts_delete_own_or_admin; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY posts_delete_own_or_admin ON public.posts FOR DELETE USING (((author_id = auth.uid()) OR (EXISTS ( SELECT 1
-   FROM public.profiles
-  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))));
-
-
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4297 (class 3256 OID 17700)
--- Name: profiles profiles_insert_own; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY profiles_insert_own ON public.profiles FOR INSERT WITH CHECK ((auth.uid() = id));
-
-
-ALTER TABLE public.ratings ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4303 (class 3256 OID 17710)
--- Name: ratings ratings_delete_own; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY ratings_delete_own ON public.ratings FOR DELETE USING ((auth.uid() = user_id));
-
-
-ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4331 (class 3256 OID 18002)
--- Name: reports reports_delete_admin; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY reports_delete_admin ON public.reports FOR DELETE TO authenticated USING ((EXISTS ( SELECT 1
-   FROM public.profiles
-  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
-
-
-ALTER TABLE public.user_submission_acks ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4376 (class 3256 OID 18830)
--- Name: user_submission_acks user_submission_acks_insert_own; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_submission_acks_insert_own ON public.user_submission_acks FOR INSERT TO authenticated WITH CHECK ((auth.uid() = user_id));
-
-
-ALTER TABLE public.wiki_category_extensions ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4318 (class 3256 OID 18269)
--- Name: wiki_category_extensions wiki_category_extensions_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_category_extensions_read_authenticated ON public.wiki_category_extensions FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_discovery_evidence ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4350 (class 3256 OID 18266)
--- Name: wiki_discovery_evidence wiki_discovery_evidence_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_discovery_evidence_read_authenticated ON public.wiki_discovery_evidence FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_entities ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4344 (class 3256 OID 18257)
--- Name: wiki_entities wiki_entities_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_entities_read_authenticated ON public.wiki_entities FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_entity_aliases ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4346 (class 3256 OID 18260)
--- Name: wiki_entity_aliases wiki_entity_aliases_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_entity_aliases_read_authenticated ON public.wiki_entity_aliases FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_entity_claims ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4371 (class 3256 OID 18775)
--- Name: wiki_entity_claims wiki_entity_claims_select_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_entity_claims_select_authenticated ON public.wiki_entity_claims FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_entity_history ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4320 (class 3256 OID 18510)
--- Name: wiki_entity_history wiki_entity_history_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_entity_history_read_authenticated ON public.wiki_entity_history FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_entity_merge_history ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4359 (class 3256 OID 18513)
--- Name: wiki_entity_merge_history wiki_entity_merge_history_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_entity_merge_history_read_authenticated ON public.wiki_entity_merge_history FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_entity_relations ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4348 (class 3256 OID 18263)
--- Name: wiki_entity_relations wiki_entity_relations_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_entity_relations_read_authenticated ON public.wiki_entity_relations FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_observation_entities ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4370 (class 3256 OID 18774)
--- Name: wiki_observation_entities wiki_observation_entities_select_own_or_admin; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_observation_entities_select_own_or_admin ON public.wiki_observation_entities FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM public.wiki_observations o
-  WHERE ((o.id = wiki_observation_entities.observation_id) AND ((o.author_id = auth.uid()) OR (EXISTS ( SELECT 1
-           FROM public.profiles
-          WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))))))));
-
-
-ALTER TABLE public.wiki_observations ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4369 (class 3256 OID 18773)
--- Name: wiki_observations wiki_observations_insert_own; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_observations_insert_own ON public.wiki_observations FOR INSERT WITH CHECK ((author_id = auth.uid()));
-
-
-ALTER TABLE public.wiki_patch_mode ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4374 (class 3256 OID 18800)
--- Name: wiki_patch_mode wiki_patch_mode_admin_update; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_patch_mode_admin_update ON public.wiki_patch_mode FOR UPDATE USING ((EXISTS ( SELECT 1
-   FROM public.profiles p
-  WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
-   FROM public.profiles p
-  WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
-
-
-ALTER TABLE public.wiki_relation_types ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4354 (class 3256 OID 18504)
--- Name: wiki_relation_types wiki_relation_types_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_relation_types_read_authenticated ON public.wiki_relation_types FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_schema_versions ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4352 (class 3256 OID 18501)
--- Name: wiki_schema_versions wiki_schema_versions_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_schema_versions_read_authenticated ON public.wiki_schema_versions FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_submission_statuses ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4361 (class 3256 OID 18516)
--- Name: wiki_submission_statuses wiki_submission_statuses_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_submission_statuses_read_authenticated ON public.wiki_submission_statuses FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
-ALTER TABLE public.wiki_sync_logs ENABLE ROW LEVEL SECURITY;
-
---
--- TOC entry 4356 (class 3256 OID 18507)
--- Name: wiki_sync_logs wiki_sync_logs_read_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wiki_sync_logs_read_authenticated ON public.wiki_sync_logs FOR SELECT USING ((auth.role() = 'authenticated'::text));
-
-
--- === Policies ===
+-- === Policies (quoted names) ===
 
 DROP POLICY IF EXISTS "Admins can delete any comment" ON public.comments;
 CREATE POLICY "Admins can delete any comment" ON public.comments FOR DELETE USING (public.is_admin());
 
-
 DROP POLICY IF EXISTS "Admins can delete any post" ON public.posts;
 CREATE POLICY "Admins can delete any post" ON public.posts FOR DELETE USING ((EXISTS ( SELECT 1
-
+   FROM public.profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
 
 DROP POLICY IF EXISTS "Admins can update any post" ON public.posts;
 CREATE POLICY "Admins can update any post" ON public.posts FOR UPDATE USING ((EXISTS ( SELECT 1
-
+   FROM public.profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
 
 DROP POLICY IF EXISTS "Admins can update any profile" ON public.profiles;
 CREATE POLICY "Admins can update any profile" ON public.profiles FOR UPDATE USING (public.is_admin());
 
-
 DROP POLICY IF EXISTS "Admins can view all posts" ON public.posts;
 CREATE POLICY "Admins can view all posts" ON public.posts FOR SELECT USING ((EXISTS ( SELECT 1
-
+   FROM public.profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
 
 DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
 CREATE POLICY "Admins can view all profiles" ON public.profiles FOR SELECT USING (public.is_admin());
 
-
 DROP POLICY IF EXISTS "Anyone can view comments" ON public.comments;
 CREATE POLICY "Anyone can view comments" ON public.comments FOR SELECT USING (true);
-
 
 DROP POLICY IF EXISTS "Anyone can view published posts" ON public.posts;
 CREATE POLICY "Anyone can view published posts" ON public.posts FOR SELECT USING (((status = 'published'::text) AND (deleted_at IS NULL)));
 
-
 DROP POLICY IF EXISTS "Anyone can view ratings" ON public.ratings;
 CREATE POLICY "Anyone can view ratings" ON public.ratings FOR SELECT USING (true);
-
 
 DROP POLICY IF EXISTS "Anyone can view reactions" ON public.post_reactions;
 CREATE POLICY "Anyone can view reactions" ON public.post_reactions FOR SELECT USING (true);
 
-
 DROP POLICY IF EXISTS "Authors can view their own pending posts" ON public.posts;
 CREATE POLICY "Authors can view their own pending posts" ON public.posts FOR SELECT USING ((auth.uid() = author_id));
-
 
 DROP POLICY IF EXISTS "Logged in users can insert a report" ON public.reports;
 CREATE POLICY "Logged in users can insert a report" ON public.reports FOR INSERT WITH CHECK ((auth.uid() = reporter_id));
 
-
 DROP POLICY IF EXISTS "Logged in users can insert their own rating" ON public.ratings;
 CREATE POLICY "Logged in users can insert their own rating" ON public.ratings FOR INSERT WITH CHECK ((auth.uid() = user_id));
 
-
 DROP POLICY IF EXISTS "Only admins can view reports" ON public.reports;
 CREATE POLICY "Only admins can view reports" ON public.reports FOR SELECT USING ((EXISTS ( SELECT 1
-
+   FROM public.profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
 
 DROP POLICY IF EXISTS "Users can delete own comments" ON public.comments;
 CREATE POLICY "Users can delete own comments" ON public.comments FOR DELETE USING ((auth.uid() = author_id));
 
-
 DROP POLICY IF EXISTS "Users can delete own reaction" ON public.post_reactions;
 CREATE POLICY "Users can delete own reaction" ON public.post_reactions FOR DELETE USING ((auth.uid() = user_id));
-
 
 DROP POLICY IF EXISTS "Users can delete their own comment" ON public.comments;
 CREATE POLICY "Users can delete their own comment" ON public.comments FOR DELETE USING ((auth.uid() = author_id));
 
-
 DROP POLICY IF EXISTS "Users can delete their own rating" ON public.ratings;
 CREATE POLICY "Users can delete their own rating" ON public.ratings FOR DELETE USING ((auth.uid() = user_id));
-
 
 DROP POLICY IF EXISTS "Users can insert own reaction" ON public.post_reactions;
 CREATE POLICY "Users can insert own reaction" ON public.post_reactions FOR INSERT WITH CHECK ((auth.uid() = user_id));
 
-
 DROP POLICY IF EXISTS "Users can update own comments" ON public.comments;
 CREATE POLICY "Users can update own comments" ON public.comments FOR UPDATE USING ((auth.uid() = author_id));
-
 
 DROP POLICY IF EXISTS "Users can update own posts" ON public.posts;
 CREATE POLICY "Users can update own posts" ON public.posts FOR UPDATE USING (((auth.uid() = author_id) AND (deleted_at IS NULL) AND (COALESCE(admin_locked, false) = false))) WITH CHECK (((auth.uid() = author_id) AND (deleted_at IS NULL) AND (COALESCE(admin_locked, false) = false)));
 
-
 DROP POLICY IF EXISTS "Users can update own reaction" ON public.post_reactions;
 CREATE POLICY "Users can update own reaction" ON public.post_reactions FOR UPDATE USING ((auth.uid() = user_id));
-
 
 DROP POLICY IF EXISTS "Users can update their own rating" ON public.ratings;
 CREATE POLICY "Users can update their own rating" ON public.ratings FOR UPDATE USING ((auth.uid() = user_id));
 
-
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING ((auth.uid() = id));
 
+-- === RLS enablement and per-table policies ===
 
+ALTER TABLE public.admin_actions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS admin_actions_insert_admins ON public.admin_actions;
+CREATE POLICY admin_actions_insert_admins ON public.admin_actions FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM public.profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
+
+DROP POLICY IF EXISTS admin_actions_select_admins ON public.admin_actions;
 CREATE POLICY admin_actions_select_admins ON public.admin_actions FOR SELECT USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS comments_delete_own_or_admin ON public.comments;
+CREATE POLICY comments_delete_own_or_admin ON public.comments FOR DELETE USING (((author_id = auth.uid()) OR (EXISTS ( SELECT 1
+   FROM public.profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))));
+
+DROP POLICY IF EXISTS comments_insert_auth ON public.comments;
 CREATE POLICY comments_insert_auth ON public.comments FOR INSERT WITH CHECK (((auth.uid() = author_id) AND (NOT ( SELECT profiles.is_banned
    FROM public.profiles
   WHERE (profiles.id = auth.uid())))));
 
-
+DROP POLICY IF EXISTS comments_select_all ON public.comments;
 CREATE POLICY comments_select_all ON public.comments FOR SELECT USING (true);
 
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS notifications_insert_authenticated ON public.notifications;
+CREATE POLICY notifications_insert_authenticated ON public.notifications FOR INSERT WITH CHECK ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS notifications_select_own ON public.notifications;
 CREATE POLICY notifications_select_own ON public.notifications FOR SELECT USING ((auth.uid() = user_id));
 
-
+DROP POLICY IF EXISTS notifications_update_own ON public.notifications;
 CREATE POLICY notifications_update_own ON public.notifications FOR UPDATE USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
 
+ALTER TABLE public.post_reactions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS post_reactions_delete_own ON public.post_reactions;
+CREATE POLICY post_reactions_delete_own ON public.post_reactions FOR DELETE TO authenticated USING ((auth.uid() = user_id));
+
+DROP POLICY IF EXISTS post_reactions_insert_own ON public.post_reactions;
 CREATE POLICY post_reactions_insert_own ON public.post_reactions FOR INSERT TO authenticated WITH CHECK ((auth.uid() = user_id));
 
-
+DROP POLICY IF EXISTS post_reactions_select_all ON public.post_reactions;
 CREATE POLICY post_reactions_select_all ON public.post_reactions FOR SELECT TO authenticated, anon USING (true);
 
-
+DROP POLICY IF EXISTS post_reactions_update_own ON public.post_reactions;
 CREATE POLICY post_reactions_update_own ON public.post_reactions FOR UPDATE TO authenticated USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
 
+ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS posts_delete_own_or_admin ON public.posts;
+CREATE POLICY posts_delete_own_or_admin ON public.posts FOR DELETE USING (((author_id = auth.uid()) OR (EXISTS ( SELECT 1
+   FROM public.profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))));
+
+DROP POLICY IF EXISTS posts_insert_requires_tutorial_ack ON public.posts;
 CREATE POLICY posts_insert_requires_tutorial_ack ON public.posts AS RESTRICTIVE FOR INSERT TO authenticated WITH CHECK (((EXISTS ( SELECT 1
    FROM public.user_submission_acks a
   WHERE (a.user_id = auth.uid()))) OR (EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))));
 
-
+DROP POLICY IF EXISTS posts_insert_verified ON public.posts;
 CREATE POLICY posts_insert_verified ON public.posts FOR INSERT WITH CHECK (((auth.uid() = author_id) AND (status = 'pending'::text) AND (EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.email_verified = true)))) AND (NOT ( SELECT profiles.is_banned
    FROM public.profiles
   WHERE (profiles.id = auth.uid())))));
 
-
+DROP POLICY IF EXISTS posts_select_approved ON public.posts;
 CREATE POLICY posts_select_approved ON public.posts FOR SELECT USING ((((status = 'published'::text) AND (deleted_at IS NULL)) OR (author_id = auth.uid()) OR (EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))));
 
-
+DROP POLICY IF EXISTS posts_update_own_or_admin ON public.posts;
 CREATE POLICY posts_update_own_or_admin ON public.posts FOR UPDATE USING ((((author_id = auth.uid()) AND (deleted_at IS NULL) AND (COALESCE(admin_locked, false) = false)) OR (EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))))) WITH CHECK ((((author_id = auth.uid()) AND (deleted_at IS NULL) AND (COALESCE(admin_locked, false) = false)) OR (EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))));
 
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS profiles_insert_own ON public.profiles;
+CREATE POLICY profiles_insert_own ON public.profiles FOR INSERT WITH CHECK ((auth.uid() = id));
+
+DROP POLICY IF EXISTS profiles_select_all ON public.profiles;
 CREATE POLICY profiles_select_all ON public.profiles FOR SELECT USING (true);
 
-
+DROP POLICY IF EXISTS profiles_update_admin ON public.profiles;
 CREATE POLICY profiles_update_admin ON public.profiles FOR UPDATE USING (public.is_admin());
 
-
+DROP POLICY IF EXISTS profiles_update_own ON public.profiles;
 CREATE POLICY profiles_update_own ON public.profiles FOR UPDATE USING ((auth.uid() = id));
 
+ALTER TABLE public.ratings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ratings_delete_own ON public.ratings;
+CREATE POLICY ratings_delete_own ON public.ratings FOR DELETE USING ((auth.uid() = user_id));
+
+DROP POLICY IF EXISTS ratings_insert_auth ON public.ratings;
 CREATE POLICY ratings_insert_auth ON public.ratings FOR INSERT WITH CHECK ((auth.uid() = user_id));
 
-
+DROP POLICY IF EXISTS ratings_select_all ON public.ratings;
 CREATE POLICY ratings_select_all ON public.ratings FOR SELECT USING (true);
 
+ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS reports_delete_admin ON public.reports;
+CREATE POLICY reports_delete_admin ON public.reports FOR DELETE TO authenticated USING ((EXISTS ( SELECT 1
+   FROM public.profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
+
+DROP POLICY IF EXISTS reports_insert_auth ON public.reports;
 CREATE POLICY reports_insert_auth ON public.reports FOR INSERT WITH CHECK ((auth.uid() = reporter_id));
 
-
+DROP POLICY IF EXISTS reports_select_admin ON public.reports;
 CREATE POLICY reports_select_admin ON public.reports FOR SELECT USING ((EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
 
-
+DROP POLICY IF EXISTS reports_update_admin ON public.reports;
 CREATE POLICY reports_update_admin ON public.reports FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
 
+ALTER TABLE public.user_submission_acks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS user_submission_acks_insert_own ON public.user_submission_acks;
+CREATE POLICY user_submission_acks_insert_own ON public.user_submission_acks FOR INSERT TO authenticated WITH CHECK ((auth.uid() = user_id));
+
+DROP POLICY IF EXISTS user_submission_acks_select_admin ON public.user_submission_acks;
 CREATE POLICY user_submission_acks_select_admin ON public.user_submission_acks FOR SELECT TO authenticated USING ((EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
 
-
+DROP POLICY IF EXISTS user_submission_acks_select_own ON public.user_submission_acks;
 CREATE POLICY user_submission_acks_select_own ON public.user_submission_acks FOR SELECT TO authenticated USING ((auth.uid() = user_id));
 
+ALTER TABLE public.wiki_category_extensions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_category_extensions_read_authenticated ON public.wiki_category_extensions;
+CREATE POLICY wiki_category_extensions_read_authenticated ON public.wiki_category_extensions FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_category_extensions_write_admin ON public.wiki_category_extensions;
 CREATE POLICY wiki_category_extensions_write_admin ON public.wiki_category_extensions USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_discovery_evidence ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_discovery_evidence_read_authenticated ON public.wiki_discovery_evidence;
+CREATE POLICY wiki_discovery_evidence_read_authenticated ON public.wiki_discovery_evidence FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_discovery_evidence_write_admin ON public.wiki_discovery_evidence;
 CREATE POLICY wiki_discovery_evidence_write_admin ON public.wiki_discovery_evidence USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_entities ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_entities_read_authenticated ON public.wiki_entities;
+CREATE POLICY wiki_entities_read_authenticated ON public.wiki_entities FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_entities_write_admin ON public.wiki_entities;
 CREATE POLICY wiki_entities_write_admin ON public.wiki_entities USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_entity_aliases ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_entity_aliases_read_authenticated ON public.wiki_entity_aliases;
+CREATE POLICY wiki_entity_aliases_read_authenticated ON public.wiki_entity_aliases FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_entity_aliases_write_admin ON public.wiki_entity_aliases;
 CREATE POLICY wiki_entity_aliases_write_admin ON public.wiki_entity_aliases USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_entity_claims ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_entity_claims_select_authenticated ON public.wiki_entity_claims;
+CREATE POLICY wiki_entity_claims_select_authenticated ON public.wiki_entity_claims FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_entity_claims_write_admin ON public.wiki_entity_claims;
 CREATE POLICY wiki_entity_claims_write_admin ON public.wiki_entity_claims USING ((EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_entity_history ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_entity_history_read_authenticated ON public.wiki_entity_history;
+CREATE POLICY wiki_entity_history_read_authenticated ON public.wiki_entity_history FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_entity_history_write_admin ON public.wiki_entity_history;
 CREATE POLICY wiki_entity_history_write_admin ON public.wiki_entity_history USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_entity_merge_history ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_entity_merge_history_read_authenticated ON public.wiki_entity_merge_history;
+CREATE POLICY wiki_entity_merge_history_read_authenticated ON public.wiki_entity_merge_history FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_entity_merge_history_write_admin ON public.wiki_entity_merge_history;
 CREATE POLICY wiki_entity_merge_history_write_admin ON public.wiki_entity_merge_history USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_entity_relations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_entity_relations_read_authenticated ON public.wiki_entity_relations;
+CREATE POLICY wiki_entity_relations_read_authenticated ON public.wiki_entity_relations FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_entity_relations_write_admin ON public.wiki_entity_relations;
 CREATE POLICY wiki_entity_relations_write_admin ON public.wiki_entity_relations USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_observation_entities ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_observation_entities_select_own_or_admin ON public.wiki_observation_entities;
+CREATE POLICY wiki_observation_entities_select_own_or_admin ON public.wiki_observation_entities FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM public.wiki_observations o
+  WHERE ((o.id = wiki_observation_entities.observation_id) AND ((o.author_id = auth.uid()) OR (EXISTS ( SELECT 1
+           FROM public.profiles
+          WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))))))));
+
+ALTER TABLE public.wiki_observations ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS wiki_observations_insert_own ON public.wiki_observations;
+CREATE POLICY wiki_observations_insert_own ON public.wiki_observations FOR INSERT WITH CHECK ((author_id = auth.uid()));
+
+DROP POLICY IF EXISTS wiki_observations_select_own_or_admin ON public.wiki_observations;
 CREATE POLICY wiki_observations_select_own_or_admin ON public.wiki_observations FOR SELECT USING (((author_id = auth.uid()) OR (EXISTS ( SELECT 1
    FROM public.profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))));
 
+ALTER TABLE public.wiki_patch_mode ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_patch_mode_admin_update ON public.wiki_patch_mode;
+CREATE POLICY wiki_patch_mode_admin_update ON public.wiki_patch_mode FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM public.profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM public.profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
+
+DROP POLICY IF EXISTS wiki_patch_mode_select_all ON public.wiki_patch_mode;
 CREATE POLICY wiki_patch_mode_select_all ON public.wiki_patch_mode FOR SELECT USING (true);
 
+ALTER TABLE public.wiki_relation_types ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_relation_types_read_authenticated ON public.wiki_relation_types;
+CREATE POLICY wiki_relation_types_read_authenticated ON public.wiki_relation_types FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_relation_types_write_admin ON public.wiki_relation_types;
 CREATE POLICY wiki_relation_types_write_admin ON public.wiki_relation_types USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_schema_versions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_schema_versions_read_authenticated ON public.wiki_schema_versions;
+CREATE POLICY wiki_schema_versions_read_authenticated ON public.wiki_schema_versions FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_schema_versions_write_admin ON public.wiki_schema_versions;
 CREATE POLICY wiki_schema_versions_write_admin ON public.wiki_schema_versions USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_submission_statuses ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_submission_statuses_read_authenticated ON public.wiki_submission_statuses;
+CREATE POLICY wiki_submission_statuses_read_authenticated ON public.wiki_submission_statuses FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_submission_statuses_write_admin ON public.wiki_submission_statuses;
 CREATE POLICY wiki_submission_statuses_write_admin ON public.wiki_submission_statuses USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
 
+ALTER TABLE public.wiki_sync_logs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS wiki_sync_logs_read_authenticated ON public.wiki_sync_logs;
+CREATE POLICY wiki_sync_logs_read_authenticated ON public.wiki_sync_logs FOR SELECT USING ((auth.role() = 'authenticated'::text));
+
+DROP POLICY IF EXISTS wiki_sync_logs_write_admin ON public.wiki_sync_logs;
 CREATE POLICY wiki_sync_logs_write_admin ON public.wiki_sync_logs USING ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM public.profiles p
   WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text)))));
-
-
--- === Other ===
-
-   FROM public.profiles
-  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
-
-
-   FROM public.profiles
-  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
-
-
-   FROM public.profiles
-  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
-
-
-   FROM public.profiles
-  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text)))));
-
 
 commit;

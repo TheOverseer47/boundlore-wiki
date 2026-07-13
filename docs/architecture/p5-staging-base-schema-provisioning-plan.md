@@ -277,7 +277,7 @@ P5-STAGING.6 (Base Schema Apply to Staging) may start only when:
 
 P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `public` still empty. Pre-apply backup: `p5-staging6-preapply-20260713-193900.sql` (185,427 bytes).
 
-**Next:** Repair truncated policies (P5-STAGING.6C) → re-run P5-STAGING.6. No push/deploy/launch.
+**Next:** ~~Repair truncated policies (P5-STAGING.6C)~~ → **6C PASS** → re-run P5-STAGING.6. No push/deploy/launch.
 
 ---
 
@@ -360,10 +360,19 @@ P5-STAGING.6 attempted apply — **FAIL** (function/table order). Staging `publi
 
 ---
 
+## 20. P5-STAGING.6C Follow-up (PASS — local policy reconstruction)
+
+**Gate:** P5-STAGING.6C — 84 policies reconstructed. **PASS** (repo only).
+
+**Report:** `docs/architecture/p5-core-schema-policy-reconstruction-fix-report.md`
+
+---
+
 ## Related Documents
 
 | Document | Role |
 |----------|------|
+| `p5-core-schema-policy-reconstruction-fix-report.md` | P5-STAGING.6C policy fix (PASS) |
 | `p5-staging-base-schema-apply-rerun2-report.md` | P5-STAGING.6 Re-run 2 report (FAIL) |
 | `p5-core-schema-extension-fix-report.md` | P5-STAGING.6B extension fix (PASS) |
 | `p5-staging-base-schema-apply-rerun-report.md` | P5-STAGING.6 Re-run report (FAIL) |
