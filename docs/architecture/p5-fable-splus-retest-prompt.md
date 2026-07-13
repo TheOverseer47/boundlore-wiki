@@ -2,7 +2,7 @@
 
 **Verwendung:** Gesamten Inhalt des Abschnitts „Prompt“ unten kopieren und an Fable übergeben.  
 **Handoff-Referenz:** `docs/architecture/p5-fable-splus-retest-handoff.md`  
-**HEAD zum Handoff-Zeitpunkt:** `8e6a257`
+**HEAD zum Handoff-Zeitpunkt:** `5907174`
 
 ---
 
@@ -20,7 +20,7 @@ Dies ist **kein** vollständiger Launch-Audit, **kein** Product-Activation-Gate 
 
 - Pfad: C:\Users\Julius\Documents\GitHub\boundlore-wiki
 - Branch: main
-- Erwarteter HEAD: 8e6a257 — Document combined S+ security retest
+- Erwarteter HEAD: 5907174 — Document Fable S+ retest handoff
 - Working Tree: sauber außer qa/e2e-baseline-bmeta.snapshot.json (untracked, nicht committen)
 
 ## Aktueller Stand (vom Team dokumentiert, von dir zu verifizieren)

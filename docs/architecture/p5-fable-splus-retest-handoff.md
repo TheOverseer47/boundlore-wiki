@@ -2,7 +2,7 @@
 
 **Gate:** P5-F.2 — Fable Retest Handoff Package  
 **Date:** 2026-07-13  
-**HEAD:** `8e6a257` — Document combined S+ security retest  
+**HEAD:** `5907174` — Document Fable S+ retest handoff  
 **Branch:** `main`  
 **Type:** Docs-only handoff — **no Fable retest executed in this gate**
 
@@ -31,7 +31,7 @@ This document hands off the P5 S+ baseline state to **Fable** for an **independe
 
 | Item | Value |
 |------|-------|
-| HEAD | `8e6a257` — Document combined S+ security retest |
+| HEAD | `5907174` — Document Fable S+ retest handoff |
 | Branch | `main` |
 | Working Tree expectation | Clean except `qa/e2e-baseline-bmeta.snapshot.json` untracked (do not commit) |
 | Deployment freeze | **active** |
@@ -155,7 +155,7 @@ $code | py -
 ### A) Read-only repo verification
 
 1. `git status` — clean except untracked `qa/e2e-baseline-bmeta.snapshot.json`
-2. `git rev-parse --short HEAD` — expect `8e6a257` or later docs-only commit on `main`
+2. `git rev-parse --short HEAD` — expect `5907174` (Fable handoff baseline) on `main`
 3. `git log --oneline -n 20` — confirm P5-B through P5-F.1 gate commits present
 4. Inspect all files in §5 Evidence File Map
 5. Verify no staged changes; no push/deploy commands run
