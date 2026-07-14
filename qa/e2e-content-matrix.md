@@ -2612,7 +2612,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-posts-rls-policy-dependency-fix-report.md`
 
-**Next:** Corpus Populate oder P5-E.9E.4A (STOPP). No push/deploy/launch.
+**Next:** P5-E.9E.4E erledigt. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4E — Staging Search Corpus Populate (PASS)
+
+**Milestone:** P5-E.9E.4E (Staging Write + Cleanup). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fresh staging backup before write | backup | present | `[x]` |
+| Target ref `jzzgoiwfbuwiiyvwgwri` | staging | verified | `[x]` |
+| Corpus slugs controlled | slugs | non-qa/test/fixture | `[x]` |
+| 5 published corpus posts inserted | staging | 5 | `[x]` |
+| Search query matrix re-run | runtime | 14 queries | `[x]` |
+| `monster` tested | runtime | Ember Salamander | `[x]` |
+| `artifact` tested | runtime | Volcanic Heat Charm | `[x]` |
+| `basalt` tested | runtime | Cinder Basalt Flats | `[x]` |
+| unsafe query tested | runtime | escaped | `[x]` |
+| BLMETA not visible | runtime | pass | `[x]` |
+| Cleanup executed | staging | 5 deleted | `[x]` |
+| Cleanup verified | staging | 0 marker | `[x]` |
+| Search Runtime Evidence | status | PASS | `[x]` PASS |
+| S-06 OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.4E | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-search-corpus-populate-report.md`
+
+**Next:** P5-E.9E.4A (STOPP). No push/deploy/launch.
 
 ---
 
