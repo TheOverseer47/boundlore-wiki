@@ -19,7 +19,8 @@
 | **P5-E.9E.4B** | **PASS** |
 | **P5-E.9E.4E** | **PASS** — Corpus Populate |
 | **P5-E.9E.4A** | **PASS** — Search DB/FTS |
-| **P5-E.9E.4G** | **PASS** — RPC Corpus Verification |
+| **P5-E.9E.4H** | **PASS** — Content Migration Plan |
+| **Empfohlener Write-Gate** | **P5-E.9E.4I** |
 | **RPC Corpus Verification** | **RPC_CORPUS_VERIFIED_CLEANED** |
 | **Search DB/FTS Runtime Evidence** | **PASS** (4G Gate) |
 | **Search Runtime Evidence** | **PASS** (Client, 9E.4E) |

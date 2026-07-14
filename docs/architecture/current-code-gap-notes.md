@@ -3478,6 +3478,20 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 163. P5-E.9E.4H — Search Production Content Migration Plan (PASS)
+
+**Milestone:** P5-E.9E.4H (Plan-only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Migration Plan | **DOCUMENTED** |
+| Empfohlener Write-Gate | **P5-E.9E.4I** |
+| P5-E.9E.4H | **PASS** |
+
+**Report:** `docs/architecture/p5-search-production-content-migration-plan.md`
+
+---
+
 ## 162. P5-E.9E.4G — Staging RPC Corpus Verification (PASS)
 
 **Milestone:** P5-E.9E.4G. **PASS**.

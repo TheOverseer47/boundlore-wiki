@@ -396,9 +396,9 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.4A**~~ **PASS** — Search DB/FTS **APPLIED_STAGING_PASS**; Evidence **PARTIAL_EMPTY_CORPUS**
 
-~~**P5-E.9E.4G**~~ **PASS** — Search DB/FTS Runtime Evidence **PASS**
+~~**P5-E.9E.4H**~~ **PASS** — Content Migration Plan
 
-**Production Content Migration**
+**P5-E.9E.4I** — Staging Persistent Canonical Corpus Seed (**STOPP**)
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 

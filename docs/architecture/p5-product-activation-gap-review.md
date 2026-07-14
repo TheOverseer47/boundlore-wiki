@@ -504,6 +504,18 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 43. P5-E.9E.4H Follow-up (PASS — Content Migration Plan)
+
+**Gate:** P5-E.9E.4H. **PASS** (Plan-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Migration Plan | **DOCUMENTED** |
+| Empfohlener Write-Gate | **P5-E.9E.4I** |
+| P5-E.9E.4H | **PASS** |
+
+---
+
 ## 42. P5-E.9E.4G Follow-up (PASS — RPC Corpus Verification)
 
 **Gate:** P5-E.9E.4G. **PASS**.

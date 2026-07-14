@@ -2646,7 +2646,39 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** Production Content Migration. No push/deploy/launch.
+**Next:** P5-E.9E.4I (STOPP). No push/deploy/launch.
+
+---
+
+## P5-E.9E.4H — Search Production Content Migration Plan (PASS)
+
+**Milestone:** P5-E.9E.4H (Plan-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Plan document exists | docs | present | `[x]` |
+| Current evidence summarized | plan | yes | `[x]` |
+| Public-safe data contract defined | plan | yes | `[x]` |
+| Minimal corpus requirements defined | plan | 10–20 | `[x]` |
+| Migration options matrix exists | plan | yes | `[x]` |
+| Recommended first write gate documented | plan | P5-E.9E.4I | `[x]` |
+| Backup plan documented | plan | yes | `[x]` |
+| Rollback plan documented | plan | yes | `[x]` |
+| Rebuild plan documented | plan | yes | `[x]` |
+| RPC-first verification plan documented | plan | yes | `[x]` |
+| SEO/SSG interaction documented | plan | yes | `[x]` |
+| No SQL executed | scope | none | `[x]` |
+| No DB read/write | scope | none | `[x]` |
+| No Production | scope | none | `[x]` |
+| No Legacy | scope | none | `[x]` |
+| no Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4H | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-search-production-content-migration-plan.md`
+
+**Next:** P5-E.9E.4I (STOPP). No push/deploy/launch.
 
 ---
 

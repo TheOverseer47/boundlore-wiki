@@ -33,6 +33,20 @@
 
 ---
 
+**Empfohlener nächster Gate:** **P5-E.9E.4I** — Staging Persistent Canonical Corpus Seed
+
+---
+
+## P5-E.9E.4H — Umsetzungsnachweis (PASS — Plan)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-search-production-content-migration-plan.md` |
+| P5-E.9E.4H | **PASS** |
+| Empfohlener Write-Gate | **P5-E.9E.4I** |
+
+---
+
 ## P5-E.9E.4G — Umsetzungsnachweis (PASS)
 
 | Item | Ergebnis |
