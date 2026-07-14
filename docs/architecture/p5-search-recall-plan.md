@@ -437,7 +437,20 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Search Runtime Evidence | **OPEN** |
 | S-06 | **OPEN_BLOCKING** bis 9E.4 |
 
-**Empfohlener nächster Gate:** **P5-E.9E.3B** — Search SQL Static Review
+**Empfohlener nächster Gate:** **P5-E.9E.4** — Staging Search Verification (read-only bevorzugt; Nutzerfreigabe)
+
+---
+
+## P5-E.9E.3B — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Static Review | `docs/architecture/p5-search-sql-static-review.md` |
+| SQL Draft Status | **DRAFT_ONLY_REVIEWED** |
+| SECURITY DEFINER | **REVIEW_REQUIRED** — INVOKER empfohlen |
+| SQL ausgeführt / DB-Zugriff | **Nein** |
+| P5-E.9E.3B | **PASS** |
+| Nächster Gate | **P5-E.9E.4** |
 
 ---
 
@@ -448,9 +461,9 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | SQL Draft | `docs/architecture/p5-search-sql-draft.md` |
 | DRAFT ONLY | Ja — nicht ausführbar |
 | Migration | **Nein** |
-| SQL Draft Status | **DRAFT_ONLY_CREATED** |
+| SQL Draft Status | **DRAFT_ONLY_REVIEWED** |
 | P5-E.9E.3A | **PASS** |
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS + P5-E.9E.3 PASS + P5-E.9E.3A PASS. Keine Secrets. Keine DB-Verbindung ausgeführt.*
+*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS + P5-E.9E.3 PASS + P5-E.9E.3A PASS + P5-E.9E.3B PASS. Keine Secrets. Keine DB-Verbindung ausgeführt.*

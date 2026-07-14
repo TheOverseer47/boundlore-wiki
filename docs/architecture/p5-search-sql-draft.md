@@ -27,7 +27,8 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E.3A** | **PASS** (DRAFT erstellt) |
-| **SQL Draft Status** | **DRAFT_ONLY_CREATED** |
+| **P5-E.9E.3B** | **PASS** (Static Review) |
+| **SQL Draft Status** | **DRAFT_ONLY_REVIEWED** |
 | **DB Search Strategy** | **DOCUMENTED** (9E.3) |
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (9E.2) |
 | **Search Runtime Evidence** | **OPEN** |
@@ -37,7 +38,7 @@
 | **Public Launch** | **NO-GO** |
 | **Production Closure** | **NOT CLOSED** |
 
-**Kernaussage:** Konkreter SQL-Entwurf für `search_documents`, gewichteten `search_vector`, RLS-Grundmodell und RPC `bl_search_public_content` — **ausschließlich als DRAFT** in diesem Dokument. Keine Migration, kein Apply, keine DB-Verbindung. Nächster Schritt: **P5-E.9E.3B Static Review**.
+**Kernaussage:** Konkreter SQL-Entwurf für `search_documents`, gewichteten `search_vector`, RLS-Grundmodell und RPC `bl_search_public_content` — **ausschließlich als DRAFT** in diesem Dokument. **P5-E.9E.3B Static Review PASS** — Draft reviewfähig, **nicht apply-ready**. `SECURITY DEFINER` am Public-RPC: **REVIEW_REQUIRED** → vor Apply auf **SECURITY INVOKER** umstellen. Nächster Schritt: **P5-E.9E.4** (nach Nutzerfreigabe).
 
 ---
 
@@ -77,9 +78,9 @@
 | `pg_trgm` | `create extension if not exists pg_trgm` in `core_schema_foundation.sql` | Ob auf Staging aktiv nach Apply |
 | `unaccent` | **Nicht** im Schema → Draft **vermeidet** `unaccent`; Client-Normalisierung bleibt | Ob Extension später gewünscht |
 | RPC-Owner | Vermutlich `postgres` / Supabase owner — **nicht final** | Owner-Capability wie Storage-Gate (42501-Risiko) |
-| Release-Gate | `bl_is_release_gate_open()` existiert in `release_gate_lock.sql` | Ob Search-RPC Gate-Status lesen oder nur Public-Index nutzen soll |
-| RLS neue Objekte | Eigene Policies auf `search_documents`; RPC `SECURITY DEFINER` | Policy-Review + negative Tests |
-| `SECURITY DEFINER` | Draft skizziert mit `set search_path = public` — **REVIEW REQUIRED** | Ob `SECURITY INVOKER` + RLS ausreicht |
+| Release-Gate | `bl_is_release_unlocked()` existiert in `release_gate_lock.sql` | Search-RPC read-only — Gate nur für Populate-Job relevant |
+| RLS neue Objekte | Eigene Policies auf `search_documents`; RPC `SECURITY DEFINER` | **9E.3B:** INVOKER bevorzugt; DEFINER nur für Populate |
+| `SECURITY DEFINER` | Draft skizziert mit `set search_path = public` — **REVIEW_REQUIRED** | **9E.3B:** Public-RPC → **SECURITY INVOKER** empfohlen |
 
 ---
 
@@ -507,7 +508,7 @@ Die Tabelle ist eine **denormalisierte Public-Index-Schicht**. Jede Zeile mit `i
 ### Release-Gate
 
 - **Reads:** Search-RPC ist read-only; Release-Gate-Lock blockiert keine Public-Reads.
-- **Index-Refresh:** Bei `contribution_locked = true` sollten **keine neuen** Index-Zeilen aus pending/contribution-Publishes entstehen — Populate-Job muss `bl_is_release_gate_open()` respektieren oder nur bereits published Canonicals reindexieren (9E.3B Klärung).
+- **Index-Refresh:** Bei `contribution_locked = true` sollten **keine neuen** Index-Zeilen aus pending/contribution-Publishes entstehen — Populate-Job muss `bl_is_release_unlocked()` respektieren oder nur bereits published Canonicals reindexieren (9E.3B: Populate separates Gate 9E.4A).
 - **Fail-closed:** Fehlende `release_gate`-Zeile = locked (bestehendes Verhalten).
 
 ### Failure Modes (fail-closed)
@@ -528,7 +529,7 @@ Die Tabelle ist eine **denormalisierte Public-Index-Schicht**. Jede Zeile mit `i
 
 ### `SECURITY DEFINER` — Review-Pflicht
 
-Draft nutzt Definer damit RPC konsistent Ergebnisse liefert unabhängig von direkten Table-Policies. **Gefahr:** überprivilegierte Funktion. **9E.3B** muss prüfen: INVOKER + RLS ausreichend? `SET search_path` fixiert? Keine dynamischen SQL-Fragmente?
+Draft nutzt Definer damit RPC konsistent Ergebnisse liefert unabhängig von direkten Table-Policies. **9E.3B Ergebnis:** **REVIEW_REQUIRED** — Public-RPC sollte auf **SECURITY INVOKER** umgestellt werden; RLS + doppelter WHERE-Filter reichen. DEFINER nur für separates Populate/Rebuild-RPC (Admin-only, Gate 9E.4A). `SET search_path` fixiert — **PASS**. Keine dynamischen SQL-Fragmente — **PASS**. Siehe `p5-search-sql-static-review.md`.
 
 ---
 
@@ -626,8 +627,8 @@ Fixture-Baseline: `qa/p5-search-recall-corpus.json` + `p5-search-client-hardenin
 
 | Gate | Zweck | Apply |
 |------|-------|-------|
-| **P5-E.9E.3B** | Static Review dieses Drafts (RLS, DEFINER, Leakage, Grants) | **Nein** |
-| **P5-E.9E.4** | Staging Search Verification (Runtime) | Read-only bevorzugt; **STOPP** |
+| ~~**P5-E.9E.3B**~~ | Static Review dieses Drafts (RLS, DEFINER, Leakage, Grants) | **PASS** |
+| **P5-E.9E.4** | Staging Search Verification (Runtime) | Read-only bevorzugt; **STOPP** — Nutzerfreigabe |
 | **P5-E.9E.4A** | Staging Search Apply + Populate | **STOPP** — Backup + Freigabe |
 | **P5-E.9E.5** | Production Search Verification | **STOPP** |
 
@@ -640,7 +641,10 @@ Fixture-Baseline: `qa/p5-search-recall-corpus.json` + `p5-search-client-hardenin
 | Item | Status |
 |------|--------|
 | P5-E.9E.3A | **PASS** |
-| Search SQL Draft | **DRAFT_ONLY_CREATED** |
+| P5-E.9E.3B | **PASS** |
+| Search SQL Draft | **DRAFT_ONLY_REVIEWED** |
+| Search SQL Static Review | **PASS** |
+| SECURITY DEFINER (Public-RPC) | **REVIEW_REQUIRED** |
 | Search DB Strategy | **DOCUMENTED** |
 | Search Client Recall | **CLIENT_RECALL_HARDENED** |
 | Search Runtime Evidence | **OPEN** |
@@ -650,7 +654,7 @@ Fixture-Baseline: `qa/p5-search-recall-corpus.json` + `p5-search-client-hardenin
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.3B** — Search SQL Static Review
+**Empfohlener nächster Gate:** **P5-E.9E.4** — Staging Search Verification (read-only bevorzugt; Nutzerfreigabe nötig)
 
 ---
 
@@ -658,6 +662,7 @@ Fixture-Baseline: `qa/p5-search-recall-corpus.json` + `p5-search-client-hardenin
 
 | Artefakt | Pfad |
 |----------|------|
+| Static Review | `docs/architecture/p5-search-sql-static-review.md` |
 | DB Strategy | `docs/architecture/p5-search-db-strategy.md` |
 | Client Recall Utility | `js/search-recall-utils.js` |
 | Posts Schema | `supabase/core_schema_foundation.sql` |
@@ -667,4 +672,4 @@ Fixture-Baseline: `qa/p5-search-recall-corpus.json` + `p5-search-client-hardenin
 
 ---
 
-*Dokumentversion: P5-E.9E.3A PASS. DRAFT ONLY — DO NOT APPLY. Keine Secrets. Kein SQL ausgeführt. Keine Migration erstellt.*
+*Dokumentversion: P5-E.9E.3A PASS + P5-E.9E.3B PASS. DRAFT ONLY — DO NOT APPLY. SQL Draft Status: DRAFT_ONLY_REVIEWED. Keine Secrets. Kein SQL ausgeführt. Keine Migration erstellt. Kein DB-Zugriff.*

@@ -2498,7 +2498,37 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-sql-draft.md`
 
-**Next:** P5-E.9E.3B static review. No push/deploy/launch.
+**Next:** P5-E.9E.4 Staging Search Verification. No push/deploy/launch.
+
+---
+
+## P5-E.9E.3B — Search SQL Static Review (PASS)
+
+**Milestone:** P5-E.9E.3B — Search SQL Static Review (read-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Static review document exists | `p5-search-sql-static-review.md` | complete | `[x]` |
+| SQL draft remains DRAFT ONLY | document header | present | `[x]` |
+| Draft not in `supabase/migrations` | repo | absent | `[x]` |
+| No SQL executed | gate | none | `[x]` |
+| No DB/Supabase access | gate | none | `[x]` |
+| RLS reviewed | static review | PASS/NEEDS_REVIEW | `[x]` |
+| RPC reviewed | static review | PASS/NEEDS_REVIEW | `[x]` |
+| SECURITY DEFINER reviewed | static review | REVIEW_REQUIRED | `[x]` |
+| Grants/Ownership reviewed | static review | NEEDS_REVIEW | `[x]` |
+| Release-Gate compatibility reviewed | static review | PASS | `[x]` |
+| Leakage/privacy reviewed | static review | PASS | `[x]` |
+| Negative tests reviewed | static review | PASS | `[x]` |
+| Required pre-apply evidence documented | static review | present | `[x]` |
+| SQL Draft Status | status | DRAFT_ONLY_REVIEWED | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.3B | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-search-sql-static-review.md`
+
+**Next:** P5-E.9E.4 Staging Search Verification (Nutzerfreigabe). No push/deploy/launch.
 
 ---
 

@@ -14,7 +14,8 @@
 |-----------|---------|
 | **P5-E.9E.3** | **PASS** (Strategie dokumentiert) |
 | **P5-E.9E.3A** | **PASS** |
-| **SQL Draft Status** | **DRAFT_ONLY_CREATED** |
+| **P5-E.9E.3B** | **PASS** |
+| **SQL Draft Status** | **DRAFT_ONLY_REVIEWED** |
 | **DB Search Strategy** | **DOCUMENTED** |
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (P5-E.9E.2) |
 | **Search Implementation** | **PARTIAL** — Client gehärtet; DB-Index fehlt |
@@ -27,7 +28,23 @@
 
 **Kernaussage:** BoundLore sollte für MVP und Full Launch eine **dedizierte, normalisierte Public-Search-Schicht** einführen — bevorzugt **`search_documents` + RPC `bl_search_public_content`**, mit **Postgres FTS (`tsvector`)** und optional **`pg_trgm`** (bereits im Schema für Observations vorhanden). Die clientseitige `BoundLoreSearchRecall`-Utility (9E.2) bleibt als **Ergänzung, Synonym-Fallback und Fixture-Baseline**; die DB liefert die **vollständigere Trefferbasis**, bessere Skalierung und **fail-closed RLS/Release-Gate-Kontrolle**. **Kein SQL in diesem Gate.** Apply erst über explizite Folge-Gates mit Backup und Staging-Freigabe.
 
-**Empfohlener nächster Gate:** **P5-E.9E.3B** — Search SQL Static Review
+**Empfohlener nächster Gate:** **P5-E.9E.4** — Staging Search Verification (read-only bevorzugt; Nutzerfreigabe)
+
+---
+
+## P5-E.9E.3B — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Static Review Document | `docs/architecture/p5-search-sql-static-review.md` |
+| SQL Draft Status | **DRAFT_ONLY_REVIEWED** |
+| SECURITY DEFINER (Public-RPC) | **REVIEW_REQUIRED** → INVOKER empfohlen |
+| Apply-Ready | **Nein** — BLOCKING_BEFORE_APPLY Findings offen |
+| SQL ausgeführt | **Nein** |
+| DB/Supabase-Zugriff | **Nein** |
+| Migration erstellt | **Nein** |
+| P5-E.9E.3B | **PASS** |
+| Nächster Gate | **P5-E.9E.4** (Nutzerfreigabe) |
 
 ---
 
@@ -40,12 +57,12 @@
 | Nicht in `supabase/migrations/` | Bestätigt (Ordner existiert nicht) |
 | Enthält | `search_documents`, `search_vector`, RLS, `bl_search_public_content` |
 | SQL ausgeführt | **Nein** |
-| SQL Draft Status | **DRAFT_ONLY_CREATED** |
-| Nächster Gate | **P5-E.9E.3B** Static Review |
+| SQL Draft Status | **DRAFT_ONLY_REVIEWED** |
+| Nächster Gate | **P5-E.9E.4** Staging Verification |
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.3A PASS. Keine Secrets. Kein SQL ausgeführt.*
+*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.3A PASS + P5-E.9E.3B PASS. Keine Secrets. Kein SQL ausgeführt. Kein DB-Zugriff.*
 
 ---
 
@@ -329,7 +346,7 @@ Abgestimmt auf `BoundLoreSearchRecall.WEIGHTS` (9E.2):
 
 - `posts`: Policies `Anyone can view published posts`, `posts_select_approved` — Autoren sehen eigene pending; **Search-RPC darf nicht `posts` direkt für Anon durchreichen**.
 - `wiki_entity_aliases`: `wiki_entity_aliases_read_authenticated` — Aliases nur für authenticated; **Public Search muss Aliases bereits in `search_documents` denormalisiert haben**.
-- `release_gate`: `bl_is_release_gate_open()` — false = locked; Search-Reads unberührt, aber Index-Builder bei neuen Publishes pausiert oder queue'd.
+- `release_gate`: `bl_is_release_unlocked()` — false = locked; Search-Reads unberührt, aber Index-Builder bei neuen Publishes pausiert oder queue'd.
 - `pg_trgm`: Bereits für Observations — Wiederverwendung für Search optional, nicht zwingend MVP.
 
 ### Abuse / Rate-Limit (Full Launch)
@@ -387,8 +404,8 @@ Abgestimmt auf `BoundLoreSearchRecall.WEIGHTS` (9E.2):
 
 ### Vor jedem SQL-Apply (STOPP)
 
-1. **P5-E.9E.3A** — SQL Draft erstellt, als **DRAFT / NOT FOR APPLY** markiert.
-2. **P5-E.9E.3B** — Static Review: RLS, `SECURITY DEFINER`, Leakage-Patterns, keine `pre_release_test_data_reset.sql`.
+1. ~~**P5-E.9E.3A**~~ — SQL Draft erstellt, als **DRAFT / NOT FOR APPLY** markiert. **PASS**
+2. ~~**P5-E.9E.3B**~~ — Static Review: RLS, `SECURITY DEFINER`, Leakage-Patterns. **PASS** — `p5-search-sql-static-review.md`
 3. Frisches **Staging-Backup** (P5-E.9B Policy).
 4. Explizite **User-Apply-Freigabe**.
 
@@ -421,7 +438,7 @@ Abgestimmt auf `BoundLoreSearchRecall.WEIGHTS` (9E.2):
 | Gate | Ziel | SQL Apply | Freigabe |
 |------|------|-----------|----------|
 | **P5-E.9E.3A** — Search SQL Draft | Nicht angewendeter SQL-Draft (`DRAFT ONLY`); Tabelle + RPC + RLS Skizze | **Nein** | Plan only |
-| **P5-E.9E.3B** — Search SQL Static Review | RLS/RPC/Leakage grep; Parität mit 9E.2 Contract | **Nein** | Review only |
+| **P5-E.9E.3B** — Search SQL Static Review | RLS/RPC/Leakage grep; Parität mit 9E.2 Contract | **Nein** | **PASS** — Review only |
 | **P5-E.9E.4** — Staging Search Verification | Runtime gegen Staging-Daten | Read-only bevorzugt | **STOPP** — Staging-Freigabe |
 | **P5-E.9E.4A** — Staging Search Apply | SQL/RPC anwenden falls nötig | **Ja (Staging only)** | **STOPP** — Backup + explizite Apply-Freigabe |
 | **P5-E.9E.5** — Production Search Verification | Production Smoke | Read-only bevorzugt | **STOPP** — Production-Freigabe |

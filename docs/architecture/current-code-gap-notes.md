@@ -3436,30 +3436,27 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-search-sql-draft.md`
 
-**Next:** P5-E.9E.3B static review. No push/deploy/launch.
+**Next:** P5-E.9E.4 Staging Search Verification. No push/deploy/launch.
 
 ---
 
-## 151. P5-E.9E.3 — Search DB Strategy (PASS)
+## 153. P5-E.9E.3B — Search SQL Static Review (PASS)
 
-**Milestone:** P5-E.9E.3 — Search DB Strategy (planning only). **PASS**.
+**Milestone:** P5-E.9E.3B — Search SQL Static Review (read-only). **PASS**.
 
 | Check | Result |
 |-------|--------|
-| Strategy Document | `p5-search-db-strategy.md` |
-| Architecture Comparison | A–F documented |
-| MVP Recommendation | `search_documents` + `bl_search_public_content` + FTS |
-| Data Contract + Ranking | documented |
-| RLS/Release-Gate Constraints | documented |
-| Migration Risks | 12 risks assessed |
-| DB Search Strategy | **DOCUMENTED** |
-| SQL executed | **Nein** |
+| Static Review Document | `p5-search-sql-static-review.md` |
+| SQL Draft Status | **DRAFT_ONLY_REVIEWED** |
+| SECURITY DEFINER | **REVIEW_REQUIRED** |
+| SQL executed / DB access | **Nein** |
 | S-06 | **OPEN_BLOCKING** |
-| P5-E.9E.3 | **PASS** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.3B | **PASS** |
 
-**Report:** `docs/architecture/p5-search-db-strategy.md`
+**Report:** `docs/architecture/p5-search-sql-static-review.md`
 
-**Next:** P5-E.9E.3A SQL draft. No push/deploy/launch.
+**Next:** P5-E.9E.4 Staging Search Verification (Nutzerfreigabe). No push/deploy/launch.
 
 ---
 
