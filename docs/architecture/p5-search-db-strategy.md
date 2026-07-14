@@ -21,7 +21,8 @@
 | **Search Implementation** | **PARTIAL** — Client gehärtet; DB-Index fehlt |
 | **Search DB/FTS UI Integration** | **RPC_CLIENT_INTEGRATED** (9E.4F) |
 | **Search DB/FTS Evidence** | **PARTIAL_EMPTY_CORPUS** |
-| **S-06 Search Recall** | **OPEN_BLOCKING** |
+| **S-06 Search Recall** | **CLOSED** |
+| **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** (separater Blocker) |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
@@ -33,7 +34,29 @@
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
+**Empfohlener nächster Gate:** **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan
+
+---
+
+## P5-E.9E.5J — Umsetzungsnachweis (PASS — S-06 Final Search Closure Dossier)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-s06-final-search-closure-dossier.md` |
+| HEAD vor Gate | `68c92b1` |
+| Arbeitsmodus | Nur lokales Repo. Dossier/Dokumentation/QA-Matrix. Kein SQL/DB-Read/DB-Write |
+| Staging Evidence (4M) | **STAGING_CLOSED** |
+| Legacy Evidence (5D–5I) | **COMPLETE** — widerspruchsfrei |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Produktiver Runtime-Switch / Push / Deploy / Launch | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5J | **PASS** |
+
+**Empfohlener nächster Gate:** **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan
 
 ---
 

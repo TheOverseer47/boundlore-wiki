@@ -2660,6 +2660,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+---
+
+## P5-E.9E.5J S-06 Final Search Closure Dossier (PASS)
+
+**Milestone:** P5-E.9E.5J (S-06 Final Search Closure Dossier). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| HEAD before gate `68c92b1` | verify | yes | `[x]` |
+| Documentation-only — no DB/SQL/writes | scope | none | `[x]` |
+| Staging evidence (4M) | status | STAGING_CLOSED | `[x]` |
+| Legacy evidence (5D–5I) complete | verify | yes | `[x]` |
+| S-06 Search Recall closed | status | CLOSED | `[x]` |
+| S-06 Final Status | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| Legacy Search Runtime Readiness | status | READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE | `[x]` |
+| Final runtime config staging | verify | `jzzgoiwfbuwiiyvwgwri` | `[x]` |
+| No productive runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Product Activation remains FAIL | status | FAIL | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5J | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
+
+**Next:** P5-E.9F.1 S-05 SEO/CSR Entity Pages Closure Plan. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5I Legacy Runtime Config Cutover Dry Run (PASS)
 
 **Milestone:** P5-E.9E.5I (Legacy Runtime Config Cutover Dry Run). **PASS**.

@@ -24,12 +24,14 @@
 | **Final Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
-| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_CLOSED** via 4M; Production offen) |
+| **S-06 Search Recall** | **CLOSED** |
+| **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
+| **Legacy Search Runtime Readiness** | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F). Content Filter/Rebuild **PASS** (5G, 6 rows). RPC-first Search Verification **PASS** (5H). Runtime Cutover Dry Run **PASS** (5I). Empfohlener nächster Gate: **P5-E.9E.5J**.
+**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F). Content Filter/Rebuild **PASS** (5G, 6 rows). RPC-first Search Verification **PASS** (5H). Runtime Cutover Dry Run **PASS** (5I). S-06 Final Closure **PASS** (5J) — **CLOSED_SEARCH_EVIDENCE**. Empfohlener nächster Gate: **P5-E.9F.1**.
 
 ---
 
@@ -319,7 +321,9 @@ Nur: `title`, `canonical_slug`, `canonical_url`, `excerpt`, `category`, `score`,
 | Search technisch bewiesen | **Ja** (4G) |
 | Persistenter Corpus | **FEHLT** |
 | Search DB/FTS Runtime Evidence | **PASS** (temporär); **PARTIAL_EMPTY** (aktuell) |
-| S-06 Search Recall | **OPEN_BLOCKING** |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
@@ -405,7 +409,31 @@ Content Migration (5G) **PASS** — 6 public-safe Canonicals indexed. RPC Verifi
 
 ---
 
-## Nutzerfreigabe für P5-E.9E.4I (später)
+## P5-E.9E.5J Follow-up (PASS — S-06 Final Search Closure Dossier)
+
+**Gate:** P5-E.9E.5J. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `68c92b1` |
+| Arbeitsmodus | Nur lokales Repo. Dossier/Dokumentation/QA-Matrix. Kein SQL/DB-Read/DB-Write |
+| Staging Evidence (4M) | **STAGING_CLOSED** |
+| Legacy Evidence (5D–5I) | **COMPLETE** — widerspruchsfrei |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Produktiver Runtime-Switch / Push / Deploy / Launch | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.1** |
+
+**Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
+
+---
+
+*Dokumentversion: P5-E.9E.4H + 5G + 5H + 5I + 5J PASS. Plan-only. Kein SQL. Kein DB-Zugriff. S-06 CLOSED_SEARCH_EVIDENCE.*
 
 > „Ja, ich gebe P5-E.9E.4I frei — Staging Persistent Canonical Corpus Seed nach frischem Backup, 10–20 kontrollierte published Canonicals auf Staging `jzzgoiwfbuwiiyvwgwri`, Rebuild von `search_documents`, RPC-first Query-Matrix, persistenter Corpus ohne Cleanup, kein Production, kein Legacy, kein Push, kein Deploy, kein Launch.“
 

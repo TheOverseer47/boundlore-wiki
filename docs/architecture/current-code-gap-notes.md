@@ -3478,6 +3478,35 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+---
+
+## 178. P5-E.9E.5J — S-06 Final Search Closure Dossier (PASS)
+
+**Milestone:** P5-E.9E.5J (S-06 Final Search Closure Dossier). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| HEAD before gate `68c92b1` | **PASS** |
+| Documentation-only — no DB/SQL/writes | **PASS** |
+| Staging evidence (4M) | **STAGING_CLOSED** |
+| Legacy evidence (5D–5I) complete | **PASS** |
+| S-06 Search Recall closed | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final runtime config staging | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| No productive runtime switch | **PASS** |
+| No Push/Deploy/Launch | **PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5J | **PASS** |
+
+**Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
+
+**Next:** P5-E.9F.1 S-05 SEO/CSR Entity Pages Closure Plan. No push/deploy/launch.
+
+---
+
 ## 177. P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run (PASS)
 
 **Milestone:** P5-E.9E.5I (Legacy Runtime Config Cutover Dry Run). **PASS**.

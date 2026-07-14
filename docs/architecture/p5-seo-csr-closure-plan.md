@@ -26,7 +26,7 @@ BoundLore ist eine **statische CSR-Wiki-App** ohne Prerender/SSR/SSG. Für Crawl
 
 **Kernentscheidung:** Entity-Detail-URLs sind **NO-GO für Public SEO**, solange sie CSR-Shells bleiben. Public Launch erfordert Prerender/SSG/SSR **oder** bewusstes Ausschließen aus Index/Sitemap bis P5-E.9D.3+.
 
-**S-06 Search Recall** bleibt **separater OPEN_BLOCKING Gate** — P5-E.9E.3 DB-Strategie **DOCUMENTED**; Runtime über 9E.3A–9E.5.
+**S-06 Search Recall** ist **CLOSED_SEARCH_EVIDENCE** (P5-E.9E.5J PASS) — **S-05 SEO/CSR** bleibt **OPEN_BLOCKING**.
 
 ---
 
@@ -51,7 +51,8 @@ BoundLore ist eine **statische CSR-Wiki-App** ohne Prerender/SSR/SSG. Für Crawl
 |-----------|--------|
 | **P5-E.9D** | **PASS** (Plan only) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
-| **S-06 Search Recall** | **OPEN_BLOCKING** (P5-E.9E.3 DOCUMENTED; Runtime OPEN) |
+| **S-06 Search Recall** | **CLOSED** |
+| **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
 | **Sitemap** | **STATIC_SITEMAP_HUBS_UPDATED** (9D.2) — 14 statische URLs; keine Entity-URLs |
 | **Static Hub Metadata** | **STATIC_HUB_METADATA_HARDENED** (9D.2) — 100/100 Fixture |
 | **robots / noindex** | **STATIC_HARDENED** (9D.1) — CSR Entity-Details weiter OPEN |
@@ -418,7 +419,36 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.5C**~~ **PASS** — Final Target Decision (**LEGACY_CONDITIONAL_TARGET_CANDIDATE**)
 
-**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5J** — S-06 Final Closure Dossier
+~~**P5-E.9E.5J**~~ **PASS** — S-06 Final Search Closure Dossier (**CLOSED_SEARCH_EVIDENCE**)
+
+**Hinweis:** Search-Cutover (5A–5J) **löst S-05 nicht**. Entity Detail SEO/CSR bleibt separater Blocker. Public Launch **NO-GO**.
+
+**Empfohlener nächster Gate (Search-Track):** **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan
+
+---
+
+## P5-E.9E.5J Follow-up (PASS — S-06 Final Search Closure Dossier)
+
+**Gate:** P5-E.9E.5J. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `68c92b1` |
+| Arbeitsmodus | Nur lokales Repo. Dossier/Dokumentation/QA-Matrix. Kein SQL/DB-Read/DB-Write |
+| Staging Evidence (4M) | **STAGING_CLOSED** |
+| Legacy Evidence (5D–5I) | **COMPLETE** — widerspruchsfrei |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Produktiver Runtime-Switch / Push / Deploy / Launch | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.1** |
+
+**Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
+
+**Empfohlener nächster Gate:** **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan
 
 ---
 
@@ -490,4 +520,4 @@ Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9E.5I PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX.*
+*Dokumentversion: P5-E.9D … + P5-E.9E.5J PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*

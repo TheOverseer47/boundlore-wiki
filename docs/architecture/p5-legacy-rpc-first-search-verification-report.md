@@ -249,13 +249,15 @@ Unbekannte Keys werden sicher ignoriert. Kein SQL-Fehler mit sensiblen Details.
 | Legacy Profile/RLS Security | **INTACT** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
-| S-06 Final Status | **OPEN_BLOCKING** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| S-06 Search Recall | **CLOSED** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run
+**Empfohlener nächster Gate:** P5-E.9F.1 — S-05 SEO/CSR Entity Pages Closure Plan
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
@@ -294,4 +296,28 @@ Unbekannte Keys werden sicher ignoriert. Kein SQL-Fehler mit sensiblen Details.
 
 ---
 
-*Dokumentversion: P5-E.9E.5H + 5I PASS. Read-only. Keine Secrets. Kein Write. Kein Rebuild. Kein produktiver Runtime-Switch.*
+## P5-E.9E.5J Follow-up (PASS — S-06 Final Search Closure Dossier)
+
+**Gate:** P5-E.9E.5J. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `68c92b1` |
+| Arbeitsmodus | Nur lokales Repo. Dossier/Dokumentation/QA-Matrix. Kein SQL/DB-Read/DB-Write |
+| Staging Evidence (4M) | **STAGING_CLOSED** |
+| Legacy Evidence (5D–5I) | **COMPLETE** — widerspruchsfrei |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Produktiver Runtime-Switch / Push / Deploy / Launch | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.1** |
+
+**Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5H + 5I + 5J PASS. Read-only. Keine Secrets. S-06 CLOSED_SEARCH_EVIDENCE.*

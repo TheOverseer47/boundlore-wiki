@@ -240,15 +240,37 @@
 | Legacy Runtime Output Contract | **PASS** |
 | Final Runtime Config Status | **STAGING** |
 | Legacy Search Index State | **POPULATED** (6) |
-| S-06 Final Status | **OPEN_BLOCKING** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| S-06 Search Recall | **CLOSED** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9E.5J — S-06 Final Closure Dossier
-
-**Manuelle Nutzerfreigabe nötig:** **Ja**
-
-> „Ja, ich gebe P5-E.9E.5J frei — S-06 Final Closure Dossier auf Basis der Legacy Search Verification Gates 5G–5I, read-only/plan-only, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+**Empfohlener nächster Gate:** P5-E.9F.1 — S-05 SEO/CSR Entity Pages Closure Plan
 
 ---
 
-*Dokumentversion: P5-E.9E.5I PASS. Temporäre Patches revertiert. Keine Secrets. Final Runtime Staging.*
+## P5-E.9E.5J Follow-up (PASS — S-06 Final Search Closure Dossier)
+
+**Gate:** P5-E.9E.5J. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `68c92b1` |
+| Arbeitsmodus | Nur lokales Repo. Dossier/Dokumentation/QA-Matrix. Kein SQL/DB-Read/DB-Write |
+| Staging Evidence (4M) | **STAGING_CLOSED** |
+| Legacy Evidence (5D–5I) | **COMPLETE** — widerspruchsfrei |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Produktiver Runtime-Switch / Push / Deploy / Launch | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.1** |
+
+**Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5I + 5J PASS. Temporäre Patches revertiert. Keine Secrets. Final Runtime Staging. S-06 CLOSED_SEARCH_EVIDENCE.*

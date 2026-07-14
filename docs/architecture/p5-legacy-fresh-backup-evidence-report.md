@@ -18,7 +18,7 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 
 **Legacy Fresh Backup Evidence** darf als **PASS** gewertet werden. **Restore Evidence** und **Production Backup Schedule** bleiben **OPEN**.
 
-**Nächster Gate (post-5I):** **P5-E.9E.5J** — S-06 Final Closure Dossier.
+**Nächster Gate (post-5J):** **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan.
 
 ---
 
@@ -199,18 +199,21 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 | P5-E.9E.5G | **PASS** |
 | P5-E.9E.5H | **PASS** |
 | P5-E.9E.5I | **PASS** |
+| P5-E.9E.5J | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
 | Legacy Search Index State | **POPULATED** (6 via 5G) |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
-| S-06 Final Status | **OPEN_BLOCKING** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| S-06 Search Recall | **CLOSED** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9E.5J — S-06 Final Closure Dossier
+**Empfohlener nächster Gate:** P5-E.9F.1 — S-05 SEO/CSR Entity Pages Closure Plan
 
 ---
 
@@ -269,4 +272,28 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 
 ---
 
-*Dokumentversion: P5-E.9E.5D + 5G + 5H + 5I PASS. Backup-Export only. Keine Secrets. Kein Restore.*
+## P5-E.9E.5J Follow-up (PASS — S-06 Final Search Closure Dossier)
+
+**Gate:** P5-E.9E.5J. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `68c92b1` |
+| Arbeitsmodus | Nur lokales Repo. Dossier/Dokumentation/QA-Matrix. Kein SQL/DB-Read/DB-Write |
+| Staging Evidence (4M) | **STAGING_CLOSED** |
+| Legacy Evidence (5D–5I) | **COMPLETE** — widerspruchsfrei |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Produktiver Runtime-Switch / Push / Deploy / Launch | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.1** |
+
+**Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5D + 5G + 5H + 5I + 5J PASS. Backup-Export only. Keine Secrets. S-06 CLOSED_SEARCH_EVIDENCE.*

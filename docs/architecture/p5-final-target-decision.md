@@ -17,13 +17,15 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **Staging Ref** | `jzzgoiwfbuwiiyvwgwri` (weiterhin Runtime + Evidence) |
 | **Legacy Target Suitability (5B)** | **NEEDS_MIGRATION_DECISION** → aufgelöst als **CONDITIONAL** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5J** — S-06 Final Closure Dossier |
+| **Empfohlener nächster Gate** | **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan |
 | **Legacy Search Index State (5G)** | **POPULATED** (6 rows) |
 | **Legacy Search DB/FTS (5F)** | **APPLIED_LEGACY_PASS** |
 | **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
-| **S-06 Final Status** | **OPEN_BLOCKING** |
+| **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
+| **S-06 Search Recall** | **CLOSED** |
+| **Legacy Search Runtime Readiness** | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
@@ -391,6 +393,7 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | P5-E.9E.5G | **PASS** |
 | P5-E.9E.5H | **PASS** |
 | P5-E.9E.5I | **PASS** |
+| P5-E.9E.5J | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
 | Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
 | Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** |
@@ -401,14 +404,40 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** (war NEEDS_MIGRATION_DECISION) |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
-| S-06 Final Status | **OPEN_BLOCKING** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| S-06 Search Recall | **CLOSED** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9E.5J — S-06 Final Closure Dossier
+**Empfohlener nächster Gate:** P5-E.9F.1 — S-05 SEO/CSR Entity Pages Closure Plan
 
 ---
 
-*Dokumentversion: P5-E.9E.5C + 5D + 5E + 5F + 5G + 5H + 5I PASS. Keine Secrets.*
+## P5-E.9E.5J Follow-up (PASS — S-06 Final Search Closure Dossier)
+
+**Gate:** P5-E.9E.5J. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `68c92b1` |
+| Arbeitsmodus | Nur lokales Repo. Dossier/Dokumentation/QA-Matrix. Kein SQL/DB-Read/DB-Write |
+| Staging Evidence (4M) | **STAGING_CLOSED** |
+| Legacy Evidence (5D–5I) | **COMPLETE** — widerspruchsfrei |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Produktiver Runtime-Switch / Push / Deploy / Launch | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.1** |
+
+**Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5C + 5D + 5E + 5F + 5G + 5H + 5I + 5J PASS. Keine Secrets. S-06 CLOSED_SEARCH_EVIDENCE.*

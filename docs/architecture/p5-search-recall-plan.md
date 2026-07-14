@@ -19,7 +19,9 @@
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (92/92 Hardening-Fixture) |
 | **P5-E.9E.1** | **PASS** |
 | **Local Search Recall Fixture** | **LOCAL_RECALL_FIXTURE_PASS** (98/98) |
-| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_CLOSED** via 4M) |
+| **S-06 Search Recall** | **CLOSED** (Staging **STAGING_CLOSED** via 4M; Final **CLOSED_SEARCH_EVIDENCE** via 5J) |
+| **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
+| **Legacy Search Runtime Readiness** | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
 | **Search Implementation** | **PARTIAL** — produktive `js/search.js` unverändert |
 | **Search Runtime Evidence** | **OPEN** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** (separater Blocker) |
@@ -441,7 +443,29 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
+**Empfohlener nächster Gate:** **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan
+
+---
+
+## P5-E.9E.5J — Umsetzungsnachweis (PASS — S-06 Final Search Closure Dossier)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-s06-final-search-closure-dossier.md` |
+| HEAD vor Gate | `68c92b1` |
+| Arbeitsmodus | Nur lokales Repo. Dossier/Dokumentation/QA-Matrix. Kein SQL/DB-Read/DB-Write |
+| Staging Evidence (4M) | **STAGING_CLOSED** |
+| Legacy Evidence (5D–5I) | **COMPLETE** — widerspruchsfrei |
+| S-06 Search Recall | **CLOSED** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Legacy Search Runtime Readiness | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Produktiver Runtime-Switch / Push / Deploy / Launch | **Nein** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5J | **PASS** |
+
+**Empfohlener nächster Gate:** **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan
 
 ---
 
