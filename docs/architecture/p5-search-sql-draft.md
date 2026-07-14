@@ -629,7 +629,7 @@ Fixture-Baseline: `qa/p5-search-recall-corpus.json` + `p5-search-client-hardenin
 |------|-------|-------|
 | ~~**P5-E.9E.3B**~~ | Static Review dieses Drafts (RLS, DEFINER, Leakage, Grants) | **PASS** |
 | **P5-E.9E.4** | Staging Search Verification (Runtime) | Read-only bevorzugt; **STOPP** — Nutzerfreigabe |
-| **P5-E.9E.4A** | Staging Search Apply + Populate | **STOPP** — Backup + Freigabe |
+| ~~**P5-E.9E.4A**~~ | Staging Search Apply + Populate | **PASS** — `p5-search-db-fts-staging-apply-report.md` |
 | **P5-E.9E.5** | Production Search Verification | **STOPP** |
 
 **S-06** bleibt **OPEN_BLOCKING** bis mindestens 9E.3B + 9E.4 PASS.

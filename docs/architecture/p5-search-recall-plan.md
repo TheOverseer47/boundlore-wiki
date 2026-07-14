@@ -437,7 +437,18 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Search Runtime Evidence | **PARTIAL** (42501 profiles blockiert Corpus) |
 | S-06 | **OPEN_BLOCKING** |
 
-**Empfohlener nächster Gate:** Staging Corpus Populate oder P5-E.9E.4A (STOPP)
+**Empfohlener nächster Gate:** Client RPC Integration (`js/search.js` → `bl_search_public_content`)
+
+---
+
+## P5-E.9E.4A — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-search-db-fts-staging-apply-report.md` |
+| Search DB/FTS | **APPLIED_STAGING_PASS** |
+| DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
+| P5-E.9E.4A | **PASS** |
 
 ---
 

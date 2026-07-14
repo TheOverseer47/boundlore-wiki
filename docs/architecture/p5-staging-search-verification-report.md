@@ -18,12 +18,14 @@
 | **P5-E.9E.4 Re-run** | **PASS** |
 | **P5-E.9E.4B** | **PASS** |
 | **P5-E.9E.4E** | **PASS** — Corpus Populate |
-| **Search Runtime Evidence** | **PASS** |
+| **P5-E.9E.4A** | **PASS** — Search DB/FTS |
+| **Search Runtime Evidence** | **PASS** (Client, 9E.4E) |
+| **Search DB/FTS Evidence** | **PARTIAL_EMPTY_CORPUS** |
 | **Staging Ref in Client Runtime** | **VERIFIZIERT** (`STAGING_REF_VERIFIED`) |
 | **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 98/98) |
 | **Wiki Search Runtime Matrix** | **AUSGEFÜHRT** (14 Queries) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
-| **P5-E.9E.4A** | **STOPP** |
+| **P5-E.9E.4A** | **PASS** — Search DB/FTS |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
@@ -214,7 +216,7 @@
 |------|-------|----------|
 | **P5-E.9E.4B** (~~empfohlen~~) | ~~Staging-Runtime-Config~~ | **PASS** |
 | **P5-E.9E.4** (Re-run) | Query-Matrix gegen `/wiki/search/` | **READY** |
-| **P5-E.9E.4A** | Staging Search SQL Apply + Populate | **STOPP** — Backup + Draft-Fixes + Apply-Freigabe |
+| ~~**P5-E.9E.4A**~~ | Staging Search SQL Apply + Populate | **PASS** — `p5-search-db-fts-staging-apply-report.md` |
 
 **Freigabeformulierung (9E.4B):**
 > „Ja, ich gebe P5-E.9E.4B frei — Staging Runtime Config für lokale Search-Verifikation, nur Staging-Ref `jzzgoiwfbuwiiyvwgwri`, kein Legacy, kein Production, keine Secrets im Repo, kein SQL Apply, kein DB-Write.“
@@ -374,11 +376,8 @@
 | ~~**P5-E.9E.4 Re-run**~~ | Query-Matrix | **PASS** |
 | ~~**P5-E.9E.4C**~~ | Read Path Fix Draft | **PASS** — `p5-staging-search-read-path-fix-draft.md` |
 | ~~**P5-E.9E.4D**~~ | Posts RLS Policy Fix | **PASS** — `p5-posts-rls-policy-dependency-fix-report.md` |
-| **Staging Corpus Populate** | Published Canonicals für Recall | Separates Gate |
-| **P5-E.9E.4A** | Search SQL Apply + `search_documents` | **STOPP** — Backup + Draft-Fixes |
-
-**Freigabeformulierung (4A — später):**
-> „Ja, ich gebe P5-E.9E.4A frei — Staging Search Apply nach Backup und Draft-Fixes, nur Staging, kein Production, kein Legacy.“
+| ~~**P5-E.9E.4A**~~ | Search SQL Apply + `search_documents` | **PASS** — `p5-search-db-fts-staging-apply-report.md` |
+| **Client RPC Integration** | `js/search.js` → `bl_search_public_content` | Separates Gate |
 
 ---
 

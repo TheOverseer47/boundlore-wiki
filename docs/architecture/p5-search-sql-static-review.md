@@ -286,7 +286,7 @@ Vor **P5-E.9E.4A** Staging Apply müssen vorliegen:
 | Apply-Ready | **Nein** |
 | SECURITY DEFINER (Public-RPC) | **REVIEW_REQUIRED** → vor Apply entfernen |
 | P5-E.9E.4 vorbereitbar | **Ja** — nach expliziter Nutzerfreigabe, read-only bevorzugt |
-| P5-E.9E.4A | **STOPP** — Backup + Apply-Freigabe + Draft-Fixes |
+| P5-E.9E.4A | **PASS** — Applied on staging; DEFINER design decision documented |
 
 **Begründung:** Review vollständig; kein SQL/DB-Zugriff; Draft safety PASS; strukturell sound; BLOCKING Findings dokumentiert und lösbar ohne Runtime. S-06 bleibt OPEN_BLOCKING.
 
@@ -298,7 +298,7 @@ Vor **P5-E.9E.4A** Staging Apply müssen vorliegen:
 |------|--------|----------|
 | ~~**P5-E.9E.3B**~~ | **PASS** | — |
 | **P5-E.9E.4** — Staging Search Verification | **STOPP** | Explizite Nutzerfreigabe |
-| **P5-E.9E.4A** — Staging Search Apply | **STOPP** | Backup + Draft-Fixes + Apply-Freigabe |
+| **P5-E.9E.4A** — Staging Search Apply | **PASS** — `p5-search-db-fts-staging-apply-report.md` |
 | **P5-E.9E.5** — Production Verification | **STOPP** | Nach 9E.4 PASS |
 
 ---
@@ -310,24 +310,20 @@ Vor **P5-E.9E.4A** Staging Apply müssen vorliegen:
 | P5-E.9E.3B | **PASS** |
 | Search SQL Draft | **DRAFT_ONLY_REVIEWED** |
 | Search SQL Static Review | **PASS** |
-| SECURITY DEFINER (Public-RPC) | **REVIEW_REQUIRED** |
-| Apply-Ready | **Nein** |
-| Search Runtime Evidence | **OPEN** |
+| SECURITY DEFINER (Public-RPC) | **DESIGN_DECISION_DEFINER** |
+| Apply-Ready | **Ja** (Staging applied) |
+| Search DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
+| P5-E.9E.4A | **PASS** |
+| Search Runtime Evidence | **PASS** (Client, 9E.4E) |
 | S-06 Search Recall | **OPEN_BLOCKING** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.4** — Staging Search Verification (read-only bevorzugt)
+**Empfohlener nächster Gate:** **Client RPC Integration** — `js/search.js` → `bl_search_public_content`
 
-**Manuelle Nutzerfreigabe nötig:** **Ja** — vor P5-E.9E.4 und zwingend vor P5-E.9E.4A
-
-**Freigabeformulierung (9E.4):**
-> „Ja, ich gebe P5-E.9E.4 frei — Staging Search Verification, read-only bevorzugt, kein SQL Apply, kein Staging Write, kein Production, kein Legacy.“
-
-**Freigabeformulierung (9E.4A — separat, später):**
-> „Ja, ich gebe P5-E.9E.4A frei — Staging Search Apply nach Backup und Draft-Fixes (INVOKER, Filter, Grants), nur Staging, kein Production, kein Legacy.“
+**Manuelle Nutzerfreigabe nötig:** **Nein** — für Client-RPC-Integration separat nach Bedarf
 
 ---
 

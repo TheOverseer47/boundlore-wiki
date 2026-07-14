@@ -2612,7 +2612,41 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-posts-rls-policy-dependency-fix-report.md`
 
-**Next:** P5-E.9E.4E erledigt. No push/deploy/launch.
+**Next:** P5-E.9E.4A erledigt. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4A — Staging Search DB/FTS Apply (PASS)
+
+**Milestone:** P5-E.9E.4A (Staging Apply). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fresh staging backup before apply | backup | present | `[x]` |
+| Target ref `jzzgoiwfbuwiiyvwgwri` | staging | verified | `[x]` |
+| Legacy not used | staging | not `ohkoojpzmptdfyowdgog` | `[x]` |
+| Production not used | staging | not boundlore.com | `[x]` |
+| Final SQL reviewed | docs | PASS | `[x]` |
+| P5-E.9E.3B fixes applied or BLOCKED documented | SQL | #2-#5 + DEFINER decision | `[x]` |
+| No profiles anon/public grant | grant | none | `[x]` |
+| No direct unsafe search_documents public raw access | grant | none | `[x]` |
+| Search DB objects inventoried before/after | staging | yes | `[x]` |
+| RLS enabled | staging | yes | `[x]` |
+| Grants reviewed | staging | EXECUTE only public RPC | `[x]` |
+| Public RPC verified | RPC | safe | `[x]` |
+| Populate/Rebuild checked | staging | POPULATE_EMPTY_CORPUS | `[x]` |
+| Empty Corpus handled if 0 published posts | staging | 0 rows | `[x]` |
+| Unsafe query tested via RPC | RPC | 0 results | `[x]` |
+| Long query tested via RPC | RPC | truncated/rejected | `[x]` |
+| BLMETA/search_text/search_vector not exposed | RPC | safe fields only | `[x]` |
+| no Storage/Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 status updated | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4A | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
+
+**Next:** Client RPC Integration. No push/deploy/launch.
 
 ---
 

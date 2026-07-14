@@ -3474,7 +3474,21 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-staging-runtime-config-report.md`
 
-**Next:** P5-E.9E.4A (STOPP) oder Staging posts read path. No push/deploy/launch.
+**Next:** Client RPC Integration. No push/deploy/launch.
+
+---
+
+## 160. P5-E.9E.4A — Staging Search DB/FTS Apply (PASS)
+
+**Milestone:** P5-E.9E.4A. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Search DB/FTS | **APPLIED_STAGING_PASS** |
+| DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
+| P5-E.9E.4A | **PASS** |
+
+**Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
 ---
 

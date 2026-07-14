@@ -504,6 +504,18 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 40. P5-E.9E.4A Follow-up (PASS — Search DB/FTS Apply)
+
+**Gate:** P5-E.9E.4A. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Search DB/FTS | **APPLIED_STAGING_PASS** |
+| DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
+| P5-E.9E.4A | **PASS** |
+
+---
+
 ## 39. P5-E.9E.4E Follow-up (PASS — Corpus Populate)
 
 **Gate:** P5-E.9E.4E. **PASS**.

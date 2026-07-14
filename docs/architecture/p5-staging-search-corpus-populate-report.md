@@ -188,7 +188,8 @@ AND content LIKE '%P5E9E4E_STAGING_SEARCH_CORPUS%';
 
 | Gate | Zweck |
 |------|-------|
-| **P5-E.9E.4A** | `search_documents` / FTS — **STOPP** |
+| ~~**P5-E.9E.4A**~~ | `search_documents` / FTS — **PASS** |
+| Client RPC Integration | `js/search.js` → RPC |
 | Production Corpus | Echter published Content |
 
 ---
@@ -199,7 +200,8 @@ AND content LIKE '%P5E9E4E_STAGING_SEARCH_CORPUS%';
 |------|--------|
 | P5-E.9E.4E | **PASS** |
 | Corpus Populate | **POPULATED_VERIFIED_CLEANED** |
-| Search Runtime Evidence | **PASS** |
+| Search DB/FTS | **APPLIED_STAGING_PASS** (9E.4A) |
+| Search DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
 | S-06 Search Recall | **OPEN_BLOCKING** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
