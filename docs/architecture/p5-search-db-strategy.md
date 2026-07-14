@@ -37,6 +37,17 @@
 
 ---
 
+## P5-E.9E.4M — Umsetzungsnachweis (PASS — S-06 Staging Dossier)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-s06-staging-search-evidence-closure-dossier.md` |
+| S-06 Staging Evidence | **STAGING_CLOSED** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| P5-E.9E.4M | **PASS** |
+
+---
+
 ## P5-E.9E.4L — Umsetzungsnachweis (PASS)
 
 | Item | Ergebnis |

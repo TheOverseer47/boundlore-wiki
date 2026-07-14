@@ -2646,7 +2646,38 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** P5-E.9E.4L erledigt. No push/deploy/launch.
+**Next:** P5-E.9E.4M erledigt. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4M — S-06 Staging Search Evidence Closure Dossier (PASS)
+
+**Milestone:** P5-E.9E.4M (Dossier-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Dossier document exists | docs | present | `[x]` |
+| Evidence timeline complete | dossier | 9E.1–4L | `[x]` |
+| Closed staging findings documented | dossier | yes | `[x]` |
+| Remaining production findings documented | dossier | yes | `[x]` |
+| S-06 closure criteria documented | dossier | yes | `[x]` |
+| Marker risk closed on staging | status | CLOSED_STAGING | `[x]` |
+| Search DB/FTS runtime staging pass documented | status | STAGING_PASS | `[x]` |
+| No SQL executed | scope | none | `[x]` |
+| No DB read/write | scope | none | `[x]` |
+| No inserts/updates/deletes | scope | none | `[x]` |
+| No rebuild | scope | none | `[x]` |
+| No Production | scope | none | `[x]` |
+| No Legacy | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 Staging Evidence | status | STAGING_CLOSED | `[x]` |
+| S-06 remains OPEN_BLOCKING final | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4M | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-s06-staging-search-evidence-closure-dossier.md`
+
+**Next:** Production Content Migration. No push/deploy/launch.
 
 ---
 

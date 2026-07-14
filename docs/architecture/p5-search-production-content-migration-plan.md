@@ -16,14 +16,14 @@
 | **P5-E.9E.4I** | **PASS** — Staging Persistent Canonical Corpus Seed |
 | **Search technisch bewiesen** | **Ja** (4G + 4I persistent) |
 | **Persistenter Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 Canonicals) |
-| **P5-E.9E.4L** | **PASS** — Staging Marker Deindex Fix |
-| **Empfohlener nächster Gate** | Production Content Migration |
-| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_PASS**; Production offen) |
+| **P5-E.9E.4M** | **PASS** — S-06 Staging Evidence Dossier |
+| **S-06 Staging Evidence** | **STAGING_CLOSED** |
+| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_CLOSED** via 4M; Production offen) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** RPC-first Search + DB/FTS + Rebuild sind technisch verifiziert (P5-E.9E.4G). Staging ist nach Cleanup wieder leer. S-06 kann erst geschlossen werden, wenn **persistenter published Canonical-Content** (10–20 Einträge) mit Backup, Rebuild und RPC-Query-Matrix verifiziert ist. **Nicht direkt Production.** Empfohlener erster Write-Gate: **P5-E.9E.4I** auf Staging only.
+**Kernaussage:** RPC-first Search + DB/FTS + Rebuild sind auf Staging vollständig verifiziert (4A–4L). Persistenter 12-Canonical-Corpus, Query-Matrix und Marker-Deindex **STAGING_CLOSED** (P5-E.9E.4M). **S-06 Final** bleibt **OPEN_BLOCKING** — Production Content Migration und Production Search Evidence fehlen. Empfohlener nächster Gate: **Production Content Migration**.
 
 ---
 

@@ -3478,6 +3478,20 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 168. P5-E.9E.4M — S-06 Staging Search Evidence Closure Dossier (PASS)
+
+**Milestone:** P5-E.9E.4M (Dossier-only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| S-06 Staging Evidence | **STAGING_CLOSED** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| P5-E.9E.4M | **PASS** |
+
+**Report:** `docs/architecture/p5-s06-staging-search-evidence-closure-dossier.md`
+
+---
+
 ## 167. P5-E.9E.4L — Staging Marker Deindex Fix (PASS)
 
 **Milestone:** P5-E.9E.4L. **PASS**.

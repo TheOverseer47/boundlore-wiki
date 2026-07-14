@@ -19,7 +19,7 @@
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (92/92 Hardening-Fixture) |
 | **P5-E.9E.1** | **PASS** |
 | **Local Search Recall Fixture** | **LOCAL_RECALL_FIXTURE_PASS** (98/98) |
-| **S-06 Search Recall** | **OPEN_BLOCKING** |
+| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_CLOSED** via 4M) |
 | **Search Implementation** | **PARTIAL** — produktive `js/search.js` unverändert |
 | **Search Runtime Evidence** | **OPEN** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** (separater Blocker) |
@@ -442,6 +442,17 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 ---
 
 **Empfohlener nächster Gate:** Production Content Migration
+
+---
+
+## P5-E.9E.4M — Umsetzungsnachweis (PASS — S-06 Staging Dossier)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-s06-staging-search-evidence-closure-dossier.md` |
+| S-06 Staging Evidence | **STAGING_CLOSED** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| P5-E.9E.4M | **PASS** |
 
 ---
 

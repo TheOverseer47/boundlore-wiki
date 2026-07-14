@@ -504,6 +504,20 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 48. P5-E.9E.4M Follow-up (PASS — S-06 Staging Evidence Dossier)
+
+**Gate:** P5-E.9E.4M. **PASS** (Dossier-only).
+
+| Item | Ergebnis |
+|------|----------|
+| S-06 Staging Evidence | **STAGING_CLOSED** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| P5-E.9E.4M | **PASS** |
+
+**Report:** `docs/architecture/p5-s06-staging-search-evidence-closure-dossier.md`
+
+---
+
 ## 47. P5-E.9E.4L Follow-up (PASS — Staging Marker Deindex Fix)
 
 **Gate:** P5-E.9E.4L. **PASS**.

@@ -406,6 +406,8 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.4L**~~ **PASS** — Staging Marker Deindex Fix
 
+~~**P5-E.9E.4M**~~ **PASS** — S-06 Staging Search Evidence Closure Dossier
+
 **Empfohlener nächster Gate:** Production Content Migration
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
