@@ -2650,6 +2650,42 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+---
+
+## P5-E.9E.5D — Legacy Fresh Backup Evidence (PASS)
+
+**Milestone:** P5-E.9E.5D (Backup-Export only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | backup | yes | `[x]` |
+| Staging ref not used | backup | yes | `[x]` |
+| Backup artifact created | backup | yes | `[x]` |
+| Backup path under `backups/legacy/` | backup | yes | `[x]` |
+| Backup size documented | backup | 433,643 bytes | `[x]` |
+| SHA256 documented | backup | yes | `[x]` |
+| TOC checked | backup | 701 entries | `[x]` |
+| Backup gitignored | backup | yes | `[x]` |
+| No restore | scope | none | `[x]` |
+| No SQL apply | scope | none | `[x]` |
+| No DDL/DML | scope | none | `[x]` |
+| No DB write | scope | none | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| No `.env` changes | scope | none | `[x]` |
+| No secrets in docs | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5D | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
+
+**Backup:** `backups/legacy/p5-e9e5d-legacy-prewrite-20260714-152031.dump` — SHA256 `3B5A5E6B59463505A42E812596BED4B41603CC0F189A18D99A5B0E1B0C852F7B` — **not committed**.
+
+**Next:** P5-E.9E.5E Legacy Profile/RLS Security Hardening. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5C — Final Target Decision (PASS)
 
 **Milestone:** P5-E.9E.5C (Plan-only). **PASS**.
@@ -2676,7 +2712,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-final-target-decision.md`
 
-**Next:** P5-E.9E.5D Legacy Fresh Backup Evidence. No push/deploy/launch.
+**Next:** P5-E.9E.5E Legacy Profile/RLS Security Hardening. No push/deploy/launch.
 
 ---
 
@@ -2709,7 +2745,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
 
-**Next:** P5-E.9E.5D Legacy Fresh Backup Evidence. No push/deploy/launch.
+**Next:** P5-E.9E.5E Legacy Profile/RLS Security Hardening. No push/deploy/launch.
 
 ---
 

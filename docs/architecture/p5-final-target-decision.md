@@ -17,7 +17,8 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **Staging Ref** | `jzzgoiwfbuwiiyvwgwri` (weiterhin Runtime + Evidence) |
 | **Legacy Target Suitability (5B)** | **NEEDS_MIGRATION_DECISION** → aufgelöst als **CONDITIONAL** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5D** — Legacy Fresh Backup Evidence |
+| **Empfohlener nächster Gate** | **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening |
+| **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
@@ -173,7 +174,7 @@
 | 1 | ~~P5-E.9E.5A~~ | Plan | Cutover Plan — **PASS** |
 | 2 | ~~P5-E.9E.5B~~ | Read-only | Legacy Inventory — **PASS** |
 | 3 | ~~P5-E.9E.5C~~ | Plan-only | Final Target Decision — **PASS** |
-| 4 | **P5-E.9E.5D** | Backup Evidence | Frischer Backup `ohkoojpzmptdfyowdgog` — kein Restore |
+| 4 | ~~P5-E.9E.5D~~ | Backup Evidence | Frischer Backup `ohkoojpzmptdfyowdgog` — **PASS** |
 | 5 | **P5-E.9E.5E** | Apply (Freigabe) | Profile/RLS Security Hardening + Posts-RLS-Fix — **kein Search Apply** |
 | 6 | **P5-E.9E.5F** | Apply (Freigabe) | Search DB/FTS MVP analog Staging — **keine Content-Migration** |
 | 7 | **P5-E.9E.5G** | Apply (Freigabe) | Content Cleanup / Canonical-Auswahl + Rebuild |
@@ -238,7 +239,7 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 | Gate | Freigabe |
 |------|----------|
-| **P5-E.9E.5D** | Backup Legacy — **Ja** (Write-frei, nur Export) |
+| ~~**P5-E.9E.5D**~~ | Backup Legacy — **PASS** (433,643 bytes; SHA256 dokumentiert) |
 | **P5-E.9E.5E** | Security Hardening Legacy — **Ja** (Legacy-Write) |
 | **P5-E.9E.5F–5J** | Je Gate explizit |
 | **S-05, Launch** | Separat |
@@ -251,11 +252,31 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 ---
 
+## P5-E.9E.5D Follow-up (PASS — Legacy Fresh Backup Evidence)
+
+**Gate:** P5-E.9E.5D. **PASS** (Backup-Export only).
+
+| Item | Ergebnis |
+|------|----------|
+| Backup-Pfad | `backups/legacy/p5-e9e5d-legacy-prewrite-20260714-152031.dump` |
+| Größe | **433,643 bytes** |
+| SHA256 | `3B5A5E6B59463505A42E812596BED4B41603CC0F189A18D99A5B0E1B0C852F7B` |
+| TOC Entries | **701** |
+| Restore | **Nein** |
+| SQL Apply / DB-Write | **Nein** (read-only export) |
+| Empfohlener nächster Gate | **P5-E.9E.5E** |
+
+**Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
+
+---
+
 ## Status Matrix
 
 | Item | Status |
 |------|--------|
 | P5-E.9E.5C | **PASS** |
+| P5-E.9E.5D | **PASS** |
+| Legacy Fresh Backup Evidence | **COMPLETE** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** (war NEEDS_MIGRATION_DECISION) |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
@@ -267,4 +288,4 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 ---
 
-*Dokumentversion: P5-E.9E.5C PASS. Plan-only. Kein DB-Zugriff. Keine Secrets.*
+*Dokumentversion: P5-E.9E.5C + 5D PASS. Keine Secrets.*

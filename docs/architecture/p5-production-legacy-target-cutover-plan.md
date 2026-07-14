@@ -18,7 +18,8 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5D** — Legacy Fresh Backup Evidence |
+| **Empfohlener nächster Gate** | **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening |
+| **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
@@ -114,7 +115,7 @@
 | 1 | ~~P5-E.9E.5A~~ | Plan | Cutover Plan — **PASS** |
 | 2 | ~~P5-E.9E.5B~~ | Read-only | Legacy Inventory — **PASS** |
 | 3 | ~~P5-E.9E.5C~~ | Plan-only | Final Target Decision — **PASS** |
-| 4 | **P5-E.9E.5D** | Backup Evidence | Frischer Backup `ohkoojpzmptdfyowdgog` |
+| 4 | ~~P5-E.9E.5D~~ | Backup Evidence | **PASS** — 433,643 bytes |
 | 5 | **P5-E.9E.5E** | Apply (Freigabe) | Profile/RLS Security Hardening + Posts-RLS-Fix |
 | 6 | **P5-E.9E.5F** | Apply (Freigabe) | Search DB/FTS MVP analog Staging |
 | 7 | **P5-E.9E.5G** | Apply (Freigabe) | Content Cleanup + Rebuild |
@@ -294,7 +295,7 @@ Final Target muss erhalten (analog Staging 4A):
 | `profiles_select_all` | **Kritisch** (`qual=true`) |
 | Published canonical candidates | **6** |
 | SQL Apply / Write | **Nein** |
-| Empfohlener nächster Gate | **P5-E.9E.5D** |
+| Empfohlener nächster Gate | **P5-E.9E.5C** |
 
 **Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
 
@@ -306,4 +307,20 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5C PASS. LEGACY_CONDITIONAL_TARGET_CANDIDATE. Kein Write.*
+## P5-E.9E.5D Follow-up (PASS — Legacy Fresh Backup Evidence)
+
+**Gate:** P5-E.9E.5D. **PASS** (Backup-Export only).
+
+| Item | Ergebnis |
+|------|----------|
+| Backup-Pfad | `backups/legacy/p5-e9e5d-legacy-prewrite-20260714-152031.dump` |
+| Größe / SHA256 | 433,643 bytes / `3B5A5E6B59463505A42E812596BED4B41603CC0F189A18D99A5B0E1B0C852F7B` |
+| TOC | **701** |
+| Restore / SQL Apply | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5E** |
+
+**Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5A–5D PASS. LEGACY_CONDITIONAL_TARGET_CANDIDATE. Kein Write.*

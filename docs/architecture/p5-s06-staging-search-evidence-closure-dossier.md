@@ -264,7 +264,7 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 | Legacy `ohkoojpzmptdfyowdgog` angefasst | **Nein** |
 | DB-Zugriff / SQL / Write | **Nein** |
 | S-06 Final Status | **OPEN_BLOCKING** (unverändert) |
-| Empfohlener nächster Gate | **P5-E.9E.5D** |
+| Empfohlener nächster Gate | **P5-E.9E.5B** |
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
@@ -282,7 +282,7 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 | Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
 | Legacy read-only DB-Zugriff | **Ja** (kein Write) |
 | S-06 Final Status | **OPEN_BLOCKING** (unverändert) |
-| Empfohlener nächster Gate | **P5-E.9E.5D** |
+| Empfohlener nächster Gate | **P5-E.9E.5C** |
 
 ## P5-E.9E.5C Follow-up (PASS — Final Target Decision)
 
@@ -297,4 +297,19 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 
 ---
 
-*Dokumentversion: P5-E.9E.4M + 5A + 5B + 5C PASS. LEGACY_CONDITIONAL_TARGET_CANDIDATE. Kein DB-Write.*
+## P5-E.9E.5D Follow-up (PASS — Legacy Fresh Backup Evidence)
+
+**Gate:** P5-E.9E.5D. **PASS** (Backup-Export only).
+
+| Item | Ergebnis |
+|------|----------|
+| Legacy Fresh Backup Evidence | **COMPLETE** |
+| Backup | 433,643 bytes; SHA256 dokumentiert; TOC **701** |
+| Restore / SQL Apply | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5E** |
+
+**Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.4M + 5A + 5B + 5C + 5D PASS. Kein DB-Write.*

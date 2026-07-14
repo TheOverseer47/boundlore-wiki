@@ -441,7 +441,7 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
+**Empfohlener nächster Gate:** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
 
 ---
 
@@ -476,7 +476,7 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | P5-E.9E.5A | **PASS** |
 | DB-Zugriff / SQL / Write | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
+**Empfohlener nächster Gate:** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
 
 ---
 

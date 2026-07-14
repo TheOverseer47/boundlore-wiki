@@ -3478,6 +3478,30 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 172. P5-E.9E.5D — Legacy Fresh Backup Evidence (PASS)
+
+**Milestone:** P5-E.9E.5D (Backup-Export only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | **PASS** |
+| Staging ref not used | **PASS** |
+| Backup artifact created | **PASS** — 433,643 bytes |
+| SHA256 documented | **PASS** |
+| TOC checked | **PASS** — 701 entries |
+| Backup gitignored | **PASS** |
+| Restore / SQL Apply / DB-Write | **Nein** |
+| Legacy Fresh Backup Evidence | **COMPLETE** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5D | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
+
+**Next:** P5-E.9E.5E Legacy Profile/RLS Security Hardening. No push/deploy/launch.
+
+---
+
 ## 171. P5-E.9E.5C — Final Target Decision (PASS)
 
 **Milestone:** P5-E.9E.5C (Plan-only). **PASS**.
@@ -3492,7 +3516,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-final-target-decision.md`
 
-**Next:** P5-E.9E.5D Legacy Fresh Backup Evidence. No push/deploy/launch.
+**Next:** P5-E.9E.5E Legacy Profile/RLS Security Hardening. No push/deploy/launch.
 
 ---
 

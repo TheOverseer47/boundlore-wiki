@@ -518,7 +518,7 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 **Report:** `docs/architecture/p5-final-target-decision.md`
 
-**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
+**Empfohlener nächster Gate:** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
 
 ---
 
@@ -536,7 +536,7 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 **Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
 
-**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
+**Empfohlener nächster Gate:** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
 
 ---
 
@@ -557,7 +557,7 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
-**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
+**Empfohlener nächster Gate:** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
 
 ---
 

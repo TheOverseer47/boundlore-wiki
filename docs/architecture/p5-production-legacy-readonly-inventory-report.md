@@ -20,7 +20,8 @@
 | **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5D** — Legacy Fresh Backup Evidence |
+| **Empfohlener nächster Gate** | **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening |
+| **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **Public Launch** | **NO-GO** |
 
 **Kernaussage:** Legacy `ohkoojpzmptdfyowdgog` ist **schema-mäßig kompatibel** mit dem BoundLore-Wiki-Fundament (24 Tabellen, RLS aktiv, `pg_trgm` vorhanden), aber **Search MVP fehlt vollständig** (`search_documents`, `bl_search_public_content`, `bl_rebuild_search_documents` nicht vorhanden). **Kritische Befunde:** `profiles_select_all` mit `qual=true`, **anon SELECT auf `profiles`**, `posts_select_approved` mit Invoker-`profiles`-Subquery (42501-Risiko analog Staging vor 4D). **Content:** nur **9 published** Posts, davon **3 QA-Slugs**; **6 canonical candidates** ohne QA-Muster. **Kein sofortiger Cutover** — Upgrade-Pfad (Option A) ist möglich, erfordert aber RLS/Grant-Härtung, Search Apply, Content-Cleanup und Backup vor jedem Write.
@@ -259,7 +260,7 @@
 | Posts RLS Dependency Fix nötig? | **Ja** (analog 4D — `is_admin()` statt profiles-Subquery) |
 | Content Migration nötig? | **Ja** — Rebuild aus published-only; QA-Slugs ausschließen |
 | Runtime Config Guard Update? | **Ja** bei Cutover (5H) — derzeit Staging aktiv |
-| Backup vor Apply? | **Ja** (Pflicht 5D) |
+| Backup vor Apply? | **Ja** — **5D PASS** (433,643 bytes; SHA256 dokumentiert) |
 
 **Aktuelle Runtime:** `js/supabase-config.js` → `jzzgoiwfbuwiiyvwgwri` (Staging). Legacy **nicht** in aktiver Runtime.
 
@@ -285,7 +286,7 @@
 | Risiko | Befund | Schwere | Nächster Gate |
 |--------|--------|---------|---------------|
 | Falscher Final Target | Ref verifiziert `ohkoojpzmptdfyowdgog` | — | 5C Decision |
-| Fehlender Backup-Nachweis | Kein frischer Legacy-Backup in 5B | **Hoch** | 5D |
+| Fehlender Backup-Nachweis | ~~Kein frischer Legacy-Backup in 5B~~ — **5D PASS** | — | — |
 | Fehlende Search-Objekte | Vollständig absent | **Hoch** | 5E Apply |
 | RLS profiles Dependency | `posts_select_approved` → profiles | **Hoch** | 5E (RLS-Fix) |
 | Zu breite Profile-Grants | `profiles_select_all=true`, anon SELECT | **Kritisch** | 5E / Security Gate |
@@ -294,7 +295,7 @@
 | Zu wenig published Content | 6 canonical candidates | **Mittel** | 5C Decision |
 | SEO/CSR offen | S-05 OPEN_BLOCKING | **Hoch** | S-05 separat |
 | Runtime-Switch-Risiko | Staging aktiv, Legacy unverifiziert | **Hoch** | 5H Dry Run |
-| Rollback/Restore | Kein Backup in diesem Gate | **Hoch** | 5D |
+| Rollback/Restore | Backup in 5D; Restore separat | **Mittel** | Restore-Gate |
 | Release Gate fehlt | `release_gate` absent | **Mittel** | Separates Apply-Gate |
 
 ---
@@ -337,6 +338,8 @@
 | Item | Status |
 |------|--------|
 | P5-E.9E.5B | **PASS** |
+| P5-E.9E.5D | **PASS** |
+| Legacy Fresh Backup Evidence | **COMPLETE** |
 | Production / Legacy Inventory | **COMPLETE** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
@@ -348,4 +351,18 @@
 
 ---
 
-*Dokumentversion: P5-E.9E.5B PASS + P5-E.9E.5C Decision LEGACY_CONDITIONAL_TARGET_CANDIDATE. Kein Write.*
+*Dokumentversion: P5-E.9E.5B PASS + 5C Decision + 5D Backup PASS. Kein Write.*
+
+---
+
+## P5-E.9E.5D Follow-up (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Backup | `backups/legacy/p5-e9e5d-legacy-prewrite-20260714-152031.dump` — 433,643 bytes |
+| SHA256 | `3B5A5E6B59463505A42E812596BED4B41603CC0F189A18D99A5B0E1B0C852F7B` |
+| TOC | **701** entries |
+| Restore | **Nein** |
+| Nächster Gate | **P5-E.9E.5E** |
+
+**Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
