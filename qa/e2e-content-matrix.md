@@ -2709,7 +2709,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
 
-**Next:** P5-E.9E.5C Final Target Decision. No push/deploy/launch.
+**Next:** P5-E.9E.5D Legacy Fresh Backup Evidence. No push/deploy/launch.
 
 ---
 
@@ -2738,7 +2738,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
-**Next:** P5-E.9E.5B erledigt. No push/deploy/launch.
+**Next:** P5-E.9E.5C erledigt. No push/deploy/launch.
 
 ---
 
