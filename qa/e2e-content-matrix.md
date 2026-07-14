@@ -2664,6 +2664,43 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+---
+
+## P5-E.9F.2 Entity SSG SEO Technical Closure Implementation (PASS)
+
+**Milestone:** P5-E.9F.2 (Entity SSG / SEO Technical Closure Implementation). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| HEAD before gate `17d9b1d` | verify | yes | `[x]` |
+| Fixture corpus exists | verify | yes | `[x]` |
+| Fixture count >= 6 | verify | yes | `[x]` |
+| SSG generator exists | verify | yes | `[x]` |
+| Generator uses local fixtures only | scope | yes | `[x]` |
+| Static entity pages generated | verify | 6 | `[x]` |
+| Each entity page has title/description/canonical | verify | yes | `[x]` |
+| OpenGraph + Twitter metadata | verify | yes | `[x]` |
+| Static HTML contains SEO core content | verify | yes | `[x]` |
+| Fixture sitemap includes entity URLs | verify | yes | `[x]` |
+| Production sitemap excludes fixture entities | verify | yes | `[x]` |
+| robots/noindex boundary documented | verify | yes | `[x]` |
+| QA fixture exists | verify | yes | `[x]` |
+| Node/Python static QA passes | verify | 12/12 | `[x]` |
+| Local server verification passes | verify | yes | `[x]` |
+| No BLMETA/search_text/search_vector/PII | verify | none | `[x]` |
+| No DB access / no runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| S-06 remains CLOSED_SEARCH_EVIDENCE | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9F.2 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-entity-ssg-seo-technical-implementation-report.md`
+
+**Next:** P5-E.9F.3 Entity SEO Evidence Re-run. No push/deploy/launch.
+
+---
+
 ## P5-E.9F.1 S-05 SEO CSR Entity Pages Closure Plan (PASS)
 
 **Milestone:** P5-E.9F.1 (S-05 SEO/CSR Entity Pages Closure Plan / Revalidation). **PASS**.

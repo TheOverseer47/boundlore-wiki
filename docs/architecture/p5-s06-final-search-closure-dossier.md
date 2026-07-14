@@ -293,7 +293,7 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 | Gate | Scope |
 |------|-------|
 | **P5-E.9F.1** | S-05 SEO/CSR Entity Pages Closure Plan / Revalidation — **PASS** |
-| **P5-E.9F.2** | Entity SSG / SEO Technical Closure Implementation |
+| **P5-E.9F.3** | Entity SEO Evidence Re-run |
 | **P5-E.9F.2** | Entity SSG / SEO Runtime Evidence |
 | **P5-E.9G** | Production Closure / Release Gate Legacy Assessment |
 | **P5-E.9H** | Productive Runtime Cutover Plan |
@@ -319,29 +319,26 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9F.2 — Entity SSG / SEO Technical Closure Implementation
+**Empfohlener nächster Gate:** P5-E.9F.3 — Entity SEO Evidence Re-run
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.2 frei — Entity SSG / SEO Technical Closure Implementation auf Fixture-/static-Basis, lokal, kein DB-Zugriff, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+> „Ja, ich gebe P5-E.9F.3 frei — Entity SEO Evidence Re-run lokal, crawl/static checks, no-leak, noindex/robots/sitemap checks, kein DB-Zugriff, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
 
 ---
 
-## P5-E.9F.1 Follow-up (PASS — S-05 SEO/CSR Entity Pages Closure Plan / Revalidation)
+## P5-E.9F.2 Follow-up (PASS — Entity SSG / SEO Technical Closure Implementation)
 
-**Gate:** P5-E.9F.1. **PASS**.
+**Gate:** P5-E.9F.2. **PASS**.
 
 | Item | Ergebnis |
 |------|----------|
-| HEAD vor Gate | `a2cf8b1` |
-| Plan/Revalidation only | **Ja** — kein DB/SQL/Write/Runtime-Switch |
+| Entity SSG Technical Implementation | **FIXTURE_SSG_PASS** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** (unverändert) |
-| S-06 Search Recall | **CLOSED** (unverändert) |
-| Public Launch | **NO-GO** |
-| Empfohlener nächster Gate | **P5-E.9F.2** |
+| Empfohlener nächster Gate | **P5-E.9F.3** |
 
-**Report:** `docs/architecture/p5-s05-seo-csr-entity-pages-closure-plan.md`
+**Report:** `docs/architecture/p5-entity-ssg-seo-technical-implementation-report.md`
 
 ---
 
-*Dokumentversion: P5-E.9E.5J + P5-E.9F.1 PASS. Kein DB-Zugriff. Kein Runtime-Switch. S-06 Search Recall CLOSED. S-05 OPEN_BLOCKING. Launch NO-GO.*
+*Dokumentversion: P5-E.9E.5J + P5-E.9F.1 + P5-E.9F.2 PASS. S-06 CLOSED. S-05 OPEN_BLOCKING. Launch NO-GO.*

@@ -33,7 +33,7 @@ function main() {
 
   const fixture = JSON.parse(read(FIXTURE_PATH));
   const entities = fixture.entities || [];
-  if (entities.length !== 3) fail("Expected 3 fixture entities");
+  if (entities.length !== 3) fail("Expected 3 fixture entities (use --legacy on generator for p5 fixture)");
 
   const sitemap = read(SITEMAP_PATH);
 

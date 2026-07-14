@@ -298,18 +298,39 @@ S-05 darf erst **CLOSED** werden, wenn **alle** Kriterien erfüllt sind:
 | S-06 Search Recall | **CLOSED** |
 | S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
 | Final Runtime Config Status | **STAGING** |
-| Entity SSG Implementation | **PARTIAL** (fixture-only) |
-| Entity Sitemap URLs | **EXCLUDED** |
+| Entity SSG Technical Implementation | **FIXTURE_SSG_PASS** (9F.2) |
+| Entity SEO Technical Evidence | **PARTIAL** (9F.3 pending) |
+| Entity Sitemap (Fixture) | **FIXTURE_SITEMAP_PASS** — `qa/entity-ssg-sitemap.fixture.xml` |
+| Production `sitemap.xml` Entity URLs | **EXCLUDED** (korrekt) |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.2** — Entity SSG / SEO Technical Closure Implementation
+**Empfohlener nächster Gate:** **P5-E.9F.3** — Entity SEO Evidence Re-run
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.2 frei — Entity SSG / SEO Technical Closure Implementation auf Fixture-/static-Basis, lokal, kein DB-Zugriff, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+> „Ja, ich gebe P5-E.9F.3 frei — Entity SEO Evidence Re-run lokal, crawl/static checks, no-leak, noindex/robots/sitemap checks, kein DB-Zugriff, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
 
 ---
 
-*Dokumentversion: P5-E.9F.1 PASS. Kein DB-Zugriff. S-05 OPEN_BLOCKING. S-06 CLOSED_SEARCH_EVIDENCE. Launch NO-GO.*
+## P5-E.9F.2 Follow-up (PASS — Entity SSG / SEO Technical Closure Implementation)
+
+**Gate:** P5-E.9F.2. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `17d9b1d` |
+| Fixture Corpus | 6 Entities — `qa/fixtures/entity-ssg-fixtures.json` |
+| Generator | `scripts/build-entity-ssg-fixtures.mjs` (+ Python fallback) |
+| Generated Pages | 6 + `_ssg-not-found` |
+| Fixture Sitemap | `qa/entity-ssg-sitemap.fixture.xml` |
+| QA | **12/12 PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-entity-ssg-seo-technical-implementation-report.md`
+
+---
+
+*Dokumentversion: P5-E.9F.1 + P5-E.9F.2 PASS. S-05 OPEN_BLOCKING. Launch NO-GO.*

@@ -20,7 +20,7 @@
 | **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
 | **S-06 Search Recall** | **CLOSED** |
 | **Legacy Search Runtime Readiness** | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
-| **Empfohlener nächster Gate** | **P5-E.9F.2** — Entity SSG / SEO Technical Closure Implementation |
+| **Empfohlener nächster Gate** | **P5-E.9F.3** — Entity SEO Evidence Re-run |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -448,4 +448,18 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5I + 5J + 9F.1 PASS. Kein Content Row Write. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*
+## P5-E.9F.2 Follow-up (PASS — Entity SSG / SEO Technical Closure Implementation)
+
+**Gate:** P5-E.9F.2. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Entity SSG Technical Implementation | **FIXTURE_SSG_PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Empfohlener nächster Gate | **P5-E.9F.3** |
+
+**Report:** `docs/architecture/p5-entity-ssg-seo-technical-implementation-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5A–5I + 5J + 9F.1 + 9F.2 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*

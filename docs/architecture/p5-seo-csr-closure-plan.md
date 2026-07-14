@@ -353,7 +353,9 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 | **P5-E.9D.3C** | **PASS** |
 | Static Entity HTML Prototype | **PROTOTYPE_PASS** (84/84 Fixture) |
 | Entity SSG Fixture Generator | **FIXTURE_GENERATOR_PASS** |
-| Entity SSG Implementation | **PARTIAL** (fixture-only; kein Generator für echte Daten) |
+| Entity SSG Technical Implementation | **FIXTURE_SSG_PASS** (9F.2) |
+| Entity SEO Technical Evidence | **PARTIAL** (9F.3 pending) |
+| Entity SSG Implementation (legacy 9D) | **PARTIAL** (3 QA prototypes) |
 | Entity SSG Prototype Plan | **CREATED** |
 | Entity Prerender/SSG Decision | **DECISION DOCUMENTED** — Hybrid SSG empfohlen |
 | robots/noindex Static Hardening | **STATIC_HARDENED** (33/33) |
@@ -423,7 +425,26 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 **Hinweis:** Search-Cutover (5A–5J) **löst S-05 nicht**. Entity Detail SEO/CSR bleibt separater Blocker. Public Launch **NO-GO**.
 
-**Empfohlener nächster Gate (Search-Track):** ~~**P5-E.9F.1**~~ **PASS** — `p5-s05-seo-csr-entity-pages-closure-plan.md`
+~~**P5-E.9F.2**~~ **PASS** — Entity SSG / SEO Technical Closure Implementation
+
+**Empfohlener nächster Gate:** **P5-E.9F.3** — Entity SEO Evidence Re-run
+
+---
+
+## P5-E.9F.2 Follow-up (PASS — Entity SSG / SEO Technical Closure Implementation)
+
+**Gate:** P5-E.9F.2. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `17d9b1d` |
+| 6 Entity Fixtures + Generator + Sitemap | **PASS** |
+| QA Node/Python | **12/12 PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.3** |
+
+**Report:** `docs/architecture/p5-entity-ssg-seo-technical-implementation-report.md`
 
 ---
 
@@ -543,4 +564,4 @@ Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9E.5J + P5-E.9F.1 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*
+*Dokumentversion: P5-E.9D … + P5-E.9F.1 + P5-E.9F.2 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*
