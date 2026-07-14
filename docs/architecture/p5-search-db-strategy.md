@@ -33,7 +33,18 @@
 
 ---
 
-**Empfohlener nächster Gate:** Production Content Migration oder Marker-Feld-Follow-up
+**Empfohlener nächster Gate:** **P5-E.9E.4L** — Staging Marker Deindex Fix
+
+---
+
+## P5-E.9E.4K — Umsetzungsnachweis (PASS — Plan)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-marker-searchability-mitigation-plan.md` |
+| MARKER_SEARCHABLE_RISK | **OPEN** |
+| Empfohlener Fix-Gate | **P5-E.9E.4L** |
+| P5-E.9E.4K | **PASS** |
 
 ---
 

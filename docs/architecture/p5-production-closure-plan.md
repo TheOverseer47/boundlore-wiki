@@ -367,7 +367,11 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9E.4J**~~ **PASS** — Persistent Staging Search Re-run (read-only)
 
-**Empfohlener nächster Gate:** Production Content Migration
+~~**P5-E.9E.4K**~~ **PASS** — Marker Searchability Mitigation Plan
+
+**P5-E.9E.4L** — Staging Marker Deindex Fix (**STOPP** — Freigabe)
+
+**Empfohlener nächster Gate:** **P5-E.9E.4L**
 
 **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Freigabe für Writes)
 

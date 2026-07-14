@@ -504,6 +504,21 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 46. P5-E.9E.4K Follow-up (PASS — Marker Searchability Mitigation Plan)
+
+**Gate:** P5-E.9E.4K. **PASS** (Plan-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Mitigation Plan | **DOCUMENTED** |
+| MARKER_SEARCHABLE_RISK | **OPEN** |
+| Empfohlener Fix-Gate | **P5-E.9E.4L** |
+| P5-E.9E.4K | **PASS** |
+
+**Report:** `docs/architecture/p5-marker-searchability-mitigation-plan.md`
+
+---
+
 ## 45. P5-E.9E.4J Follow-up (PASS — Persistent Staging Search Re-run)
 
 **Gate:** P5-E.9E.4J. **PASS** (read-only).

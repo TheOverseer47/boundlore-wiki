@@ -3478,6 +3478,21 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 166. P5-E.9E.4K — Marker Searchability Mitigation Plan (PASS)
+
+**Milestone:** P5-E.9E.4K (Plan-only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Mitigation Plan | **DOCUMENTED** |
+| MARKER_SEARCHABLE_RISK | **OPEN** |
+| Empfohlener Fix-Gate | **P5-E.9E.4L** |
+| P5-E.9E.4K | **PASS** |
+
+**Report:** `docs/architecture/p5-marker-searchability-mitigation-plan.md`
+
+---
+
 ## 165. P5-E.9E.4J — Persistent Staging Search Re-run (PASS)
 
 **Milestone:** P5-E.9E.4J (read-only). **PASS**.

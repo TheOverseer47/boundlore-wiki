@@ -254,6 +254,8 @@
 
 ---
 
+**Follow-up P5-E.9E.4K:** Mitigation Plan **PASS** — Option A empfohlen (Marker aus `content` entfernen). Fix-Gate **P5-E.9E.4L**. Report: `p5-marker-searchability-mitigation-plan.md`.
+
 **Follow-up P5-E.9E.4J:** Read-only Re-run **PASS** — Query-Matrix 27/27. **MARKER_SEARCHABLE_RISK** (Marker RPC-indexiert, nicht in UI). Report: `p5-persistent-staging-search-rerun-report.md`.
 
 ---

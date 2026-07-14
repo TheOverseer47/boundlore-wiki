@@ -148,7 +148,8 @@
 | Keine Profile-PII | **PASS** |
 | Unsafe Query fail-closed | **PASS** |
 | Kein Script ausgeführt | **PASS** |
-| **MARKER_SEARCHABLE_RISK** | Query `P5E9E4I` → **12 RPC-Treffer** (Marker in indexiertem `content`, nicht in excerpt/UI) |
+| **MARKER_SEARCHABLE_RISK** | **OPEN** — Fix-Gate **P5-E.9E.4L** empfohlen |
+| **P5-E.9E.4K** | **PASS** — Mitigation Plan |
 
 ---
 
@@ -166,7 +167,7 @@
 ## Limitations
 
 1. **Read-only** — kein erneuter DB-Inventar-Lauf per SQL (Corpus-Kontext aus P5-E.9E.4I).
-2. **MARKER_SEARCHABLE_RISK** — Marker in `content` ist FTS-indexiert; Suche nach `P5E9E4I` findet alle 12 Seed-Posts per RPC, erscheint aber nicht in UI-Snippets.
+2. **MARKER_SEARCHABLE_RISK** — Mitigation Plan **P5-E.9E.4K PASS**; Fix-Gate **P5-E.9E.4L** empfohlen (Option A: Marker aus `content` entfernen).
 3. **Staging-only** — kein Production-Recall-Nachweis.
 4. **S-06 / S-05** unverändert **OPEN_BLOCKING**.
 

@@ -2646,7 +2646,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** P5-E.9E.4J (read-only). No push/deploy/launch.
+**Next:** P5-E.9E.4K (Plan-only). No push/deploy/launch.
+
+---
+
+## P5-E.9E.4K — Marker Searchability Mitigation Plan (PASS)
+
+**Milestone:** P5-E.9E.4K (Plan-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Plan document exists | docs | present | `[x]` |
+| Marker risk classified | plan | MARKER_SEARCHABLE_RISK | `[x]` |
+| Mitigation options matrix exists | plan | A–E | `[x]` |
+| Recommended fix gate documented | plan | P5-E.9E.4L | `[x]` |
+| Production content guidance documented | plan | yes | `[x]` |
+| No SQL executed | scope | none | `[x]` |
+| No DB write | scope | none | `[x]` |
+| No inserts/updates/deletes | scope | none | `[x]` |
+| No rebuild | scope | none | `[x]` |
+| No Production | scope | none | `[x]` |
+| No Legacy | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| MARKER_SEARCHABLE_RISK remains OPEN | status | OPEN | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4K | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-marker-searchability-mitigation-plan.md`
+
+**Next:** P5-E.9E.4L (STOPP). No push/deploy/launch.
 
 ---
 
@@ -2685,7 +2714,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-persistent-staging-search-rerun-report.md`
 
-**Next:** Production Content Migration. No push/deploy/launch.
+**Next:** P5-E.9E.4K erledigt. P5-E.9E.4L (STOPP). No push/deploy/launch.
 
 ---
 

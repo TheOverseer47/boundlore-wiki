@@ -402,7 +402,11 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.4J**~~ **PASS** — Persistent Staging Search Re-run (read-only)
 
-**Empfohlener nächster Gate:** Production Content Migration
+~~**P5-E.9E.4K**~~ **PASS** — Marker Searchability Mitigation Plan
+
+**P5-E.9E.4L** — Staging Marker Deindex Fix (**STOPP**)
+
+**Empfohlener nächster Gate:** **P5-E.9E.4L**
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 

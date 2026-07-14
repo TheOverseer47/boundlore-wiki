@@ -16,8 +16,8 @@
 | **P5-E.9E.4I** | **PASS** — Staging Persistent Canonical Corpus Seed |
 | **Search technisch bewiesen** | **Ja** (4G + 4I persistent) |
 | **Persistenter Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 Canonicals) |
-| **P5-E.9E.4J** | **PASS** — Persistent Staging Search Re-run (read-only) |
-| **Empfohlener nächster Gate** | Production Content Migration oder Marker-Feld-Follow-up |
+| **P5-E.9E.4K** | **PASS** — Marker Searchability Mitigation Plan |
+| **Empfohlener nächster Gate** | **P5-E.9E.4L** — Staging Marker Deindex Fix |
 | **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_PASS**; Production offen) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -85,7 +85,7 @@ Vor P5-E.9E.4I muss die Content-Quelle explizit festgelegt werden:
 |------|-------------|
 | `title` | Pflicht; kein `Contribution:`-Präfix |
 | `slug` | Pflicht; kein `qa-`, `test-`, `fixture-`, `contribution-` |
-| `content` | Pflicht; plain/safe HTML oder Text; Marker für Seed optional |
+| `content` | Pflicht; plain/safe HTML oder Text; **keine Audit-/Seed-Marker in Production** (siehe P5-E.9E.4K) |
 | `excerpt` | Empfohlen; public-safe Snippet |
 | `category` | Pflicht für `post_type=wiki`; NULL für `guide` |
 | `post_type` | `wiki` oder `guide` (CHECK-konform) |
@@ -98,6 +98,17 @@ Vor P5-E.9E.4I muss die Content-Quelle explizit festgelegt werden:
 
 - `entity_domain`, `entity_subtype` (via BLMETA nur intern beim Populate — nicht in RPC-Output)
 - Public-safe relations/facets in Body-Text (nicht als rohes BLMETA)
+
+### Production Content Guidance (P5-E.9E.4K)
+
+| Regel | Detail |
+|-------|--------|
+| Keine Marker in indexierten Feldern | `content`, `excerpt`, `title` dürfen keine Gate-Marker enthalten |
+| Rollback | Slug-Liste + Import-Manifest im Repo — nicht Marker im Body |
+| Search-Output | Nie Marker, BLMETA, `search_text`, `search_vector`, PII |
+| Staging-Fix | **P5-E.9E.4L** — Marker aus 4I-Posts entfernen (Option A) |
+
+---
 
 ### Ausgeschlossen (niemals in Search-Output / Index-Leak)
 
