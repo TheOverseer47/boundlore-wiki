@@ -296,4 +296,33 @@ RPC-Output-Felder: whitelisted (`id`, `source_type`, `canonical_slug`, `canonica
 
 ---
 
-*Dokumentversion: P5-E.9E.5G PASS. Keine Secrets. Kein Content Row Write. Kein Runtime-Switch.*
+---
+
+## P5-E.9E.5H Follow-up (PASS — Legacy RPC-first Search Verification)
+
+**Gate:** P5-E.9E.5H. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `454d052` |
+| Arbeitsmodus | Read-only auf `ohkoojpzmptdfyowdgog` |
+| Core Query Matrix | **12/12 PASS** |
+| Safety / Exclusion | **10/10 PASS** |
+| RPC Output Contract | **PASS** |
+| `search_documents` rows | **6** (unverändert) |
+| Published posts | **9** (unverändert) |
+| Rebuild in 5H | **Nein** |
+| Writes in 5H | **Nein** |
+| Runtime-Switch | **Nein** |
+| Legacy Profile/RLS Security | **INTACT** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9E.5I** |
+
+**Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5G + 5H PASS. Keine Secrets. Kein Content Row Write. Kein Runtime-Switch.*

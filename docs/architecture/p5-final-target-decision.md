@@ -17,7 +17,7 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **Staging Ref** | `jzzgoiwfbuwiiyvwgwri` (weiterhin Runtime + Evidence) |
 | **Legacy Target Suitability (5B)** | **NEEDS_MIGRATION_DECISION** → aufgelöst als **CONDITIONAL** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5H** — Legacy RPC-first Search Verification |
+| **Empfohlener nächster Gate** | **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run |
 | **Legacy Search Index State (5G)** | **POPULATED** (6 rows) |
 | **Legacy Search DB/FTS (5F)** | **APPLIED_LEGACY_PASS** |
 | **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
@@ -331,6 +331,36 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 ---
 
+**Empfohlener nächster Gate:** P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run
+
+---
+
+## P5-E.9E.5H Follow-up (PASS — Legacy RPC-first Search Verification)
+
+**Gate:** P5-E.9E.5H. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `454d052` |
+| Arbeitsmodus | Read-only auf `ohkoojpzmptdfyowdgog` |
+| Core Query Matrix | **12/12 PASS** |
+| Safety / Exclusion | **10/10 PASS** |
+| RPC Output Contract | **PASS** |
+| Legacy RPC-first Search Verification | **VERIFIED_PASS** |
+| `search_documents` rows | **6** (unverändert) |
+| Published posts | **9** (unverändert) |
+| Rebuild / Writes / Runtime-Switch | **Nein** |
+| Legacy Profile/RLS Security | **INTACT** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9E.5I** |
+
+**Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+---
+
 ## Status Matrix
 
 | Item | Status |
@@ -340,10 +370,12 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | P5-E.9E.5E | **PASS** |
 | P5-E.9E.5F | **PASS** |
 | P5-E.9E.5G | **PASS** |
+| P5-E.9E.5H | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
 | Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
 | Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** |
 | Legacy Search Index State | **POPULATED** (6) |
+| Legacy RPC-first Search Verification | **VERIFIED_PASS** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** (war NEEDS_MIGRATION_DECISION) |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
@@ -353,8 +385,8 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9E.5H — Legacy RPC-first Search Verification
+**Empfohlener nächster Gate:** P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run
 
 ---
 
-*Dokumentversion: P5-E.9E.5C + 5D + 5E + 5F + 5G PASS. Keine Secrets.*
+*Dokumentversion: P5-E.9E.5C + 5D + 5E + 5F + 5G + 5H PASS. Keine Secrets.*

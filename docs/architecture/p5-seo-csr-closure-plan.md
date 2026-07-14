@@ -418,7 +418,32 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.5C**~~ **PASS** — Final Target Decision (**LEGACY_CONDITIONAL_TARGET_CANDIDATE**)
 
-**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5H** — Legacy RPC-first Search Verification
+**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run
+
+---
+
+## P5-E.9E.5H Follow-up (PASS — Legacy RPC-first Search Verification)
+
+**Gate:** P5-E.9E.5H. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `454d052` |
+| Core Query Matrix | **12/12 PASS** |
+| Safety / Exclusion | **10/10 PASS** |
+| RPC Output Contract | **PASS** |
+| Legacy RPC-first Search Verification | **VERIFIED_PASS** |
+| `search_documents` rows | **6** (unverändert) |
+| Rebuild / Writes / Runtime-Switch | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+**Empfohlener nächster Gate:** **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run
+
+Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
@@ -443,4 +468,4 @@ Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9E.5G PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX.*
+*Dokumentversion: P5-E.9D … + P5-E.9E.5H PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX.*

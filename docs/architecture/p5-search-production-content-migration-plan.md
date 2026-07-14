@@ -29,7 +29,7 @@
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F). Content Filter/Rebuild **PASS** (5G, 6 rows). Empfohlener nächster Gate: **P5-E.9E.5H**.
+**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F). Content Filter/Rebuild **PASS** (5G, 6 rows). RPC-first Search Verification **PASS** (5H). Empfohlener nächster Gate: **P5-E.9E.5I**.
 
 ---
 
@@ -347,7 +347,7 @@ Nur: `title`, `canonical_slug`, `canonical_url`, `excerpt`, `category`, `score`,
 
 **Report:** `docs/architecture/p5-final-target-decision.md`
 
-Content Migration (5G) **PASS** — 6 public-safe Canonicals indexed. Nächster Gate: **5H**.
+Content Migration (5G) **PASS** — 6 public-safe Canonicals indexed. RPC Verification (5H) **PASS**. Nächster Gate: **5I**.
 
 ---
 
@@ -368,10 +368,30 @@ Content Migration (5G) **PASS** — 6 public-safe Canonicals indexed. Nächster 
 
 ---
 
+## P5-E.9E.5H Follow-up (PASS — Legacy RPC-first Search Verification)
+
+**Gate:** P5-E.9E.5H. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `454d052` |
+| Core Query Matrix | **12/12 PASS** |
+| Safety / Exclusion | **10/10 PASS** |
+| RPC Output Contract | **PASS** |
+| Legacy RPC-first Search Verification | **VERIFIED_PASS** |
+| `search_documents` rows | **6** (unverändert) |
+| Published posts | **9** (unverändert) |
+| Rebuild / Writes / Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5I** |
+
+**Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+---
+
 ## Nutzerfreigabe für P5-E.9E.4I (später)
 
 > „Ja, ich gebe P5-E.9E.4I frei — Staging Persistent Canonical Corpus Seed nach frischem Backup, 10–20 kontrollierte published Canonicals auf Staging `jzzgoiwfbuwiiyvwgwri`, Rebuild von `search_documents`, RPC-first Query-Matrix, persistenter Corpus ohne Cleanup, kein Production, kein Legacy, kein Push, kein Deploy, kein Launch.“
 
 ---
 
-*Dokumentversion: P5-E.9E.4H + 5G PASS. Plan-only. Kein SQL. Kein DB-Zugriff.*
+*Dokumentversion: P5-E.9E.4H + 5G + 5H PASS. Plan-only. Kein SQL. Kein DB-Zugriff.*

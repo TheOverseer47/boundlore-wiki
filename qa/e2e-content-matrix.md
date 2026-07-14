@@ -2658,6 +2658,44 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9E.5H Legacy RPC-first Search Verification (PASS)
+
+**Milestone:** P5-E.9E.5H (Legacy RPC-first Search Verification). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | verify | yes | `[x]` |
+| Staging ref not used | verify | yes | `[x]` |
+| HEAD before gate `454d052` | verify | yes | `[x]` |
+| Read-only verification only | scope | yes | `[x]` |
+| 5D/5F/5G backup baseline intact | verify | yes | `[x]` |
+| 5E/5F/5G integrity verified | verify | yes | `[x]` |
+| RPC-first via `bl_search_public_content` | verify | yes | `[x]` |
+| No `.from('posts')` search path | verify | yes | `[x]` |
+| No direct public SELECT on `search_documents` | verify | yes | `[x]` |
+| Core query matrix | verify | 12/12 PASS | `[x]` |
+| Safety / exclusion matrix | verify | 10/10 PASS | `[x]` |
+| RPC output contract | verify | PASS | `[x]` |
+| Filter argument safety | verify | PASS | `[x]` |
+| No leaks (search_text/vector/BLMETA/PII) | verify | none | `[x]` |
+| No rebuild in 5H | scope | none | `[x]` |
+| No writes in 5H | scope | none | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| `search_documents` rows unchanged | verify | 6 | `[x]` |
+| Published posts unchanged | verify | 9 | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Product Activation remains FAIL | status | FAIL | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5H | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+**Next:** P5-E.9E.5I Legacy Runtime Config Cutover Dry Run. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5G — Legacy Content Filter Rebuild (PASS)
 
 **Milestone:** P5-E.9E.5G (Legacy Content Filter + Rebuild). **PASS**.

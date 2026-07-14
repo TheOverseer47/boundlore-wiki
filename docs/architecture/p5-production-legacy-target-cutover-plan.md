@@ -18,7 +18,7 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5H** — Legacy RPC-first Search Verification |
+| **Empfohlener nächster Gate** | **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -370,4 +370,22 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5G PASS. Kein Content Row Write.*
+## P5-E.9E.5H Follow-up (PASS — Legacy RPC-first Search Verification)
+
+**Gate:** P5-E.9E.5H. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Core Query Matrix | **12/12 PASS** |
+| Safety / Exclusion | **10/10 PASS** |
+| RPC Output Contract | **PASS** |
+| Legacy RPC-first Search Verification | **VERIFIED_PASS** |
+| `search_documents` rows | **6** (unverändert) |
+| Rebuild / Writes / Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5I** |
+
+**Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5A–5H PASS. Kein Content Row Write.*

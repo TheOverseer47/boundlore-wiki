@@ -3478,6 +3478,39 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 176. P5-E.9E.5H — Legacy RPC-first Search Verification (PASS)
+
+**Milestone:** P5-E.9E.5H (Legacy RPC-first Search Verification). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | **PASS** |
+| Staging ref not used | **PASS** |
+| HEAD before gate `454d052` | **PASS** |
+| Read-only verification | **PASS** |
+| 5E/5F/5G integrity intact | **PASS** |
+| Core query matrix | **PASS** — 12/12 |
+| Safety / exclusion matrix | **PASS** — 10/10 |
+| RPC output contract | **PASS** |
+| Filter argument safety | **PASS** |
+| No rebuild in 5H | **PASS** |
+| No writes in 5H | **PASS** |
+| No runtime switch | **PASS** |
+| `search_documents` rows unchanged | **PASS** — 6 |
+| Published posts unchanged | **PASS** — 9 |
+| Legacy RPC-first Search Verification | **VERIFIED_PASS** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5H | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+**Next:** P5-E.9E.5I Legacy Runtime Config Cutover Dry Run. No push/deploy/launch.
+
+---
+
 ## 175. P5-E.9E.5G — Legacy Content Filter + Rebuild (PASS)
 
 **Milestone:** P5-E.9E.5G (Legacy Content Filter + Rebuild). **PASS**.

@@ -212,6 +212,7 @@
 | Posts RLS Dependency (SELECT) | **CLOSED** |
 | Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** (5F); Index **POPULATED** (5G) |
 | P5-E.9E.5G | **PASS** |
+| P5-E.9E.5H | **PASS** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
 | S-06 Final Status | **OPEN_BLOCKING** |
@@ -220,7 +221,7 @@
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9E.5H — Legacy RPC-first Search Verification
+**Empfohlener nächster Gate:** P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run
 
 ---
 
@@ -240,4 +241,24 @@
 
 ---
 
-*Dokumentversion: P5-E.9E.5E + 5G PASS. Keine Secrets. 5E Security INTACT.*
+---
+
+## P5-E.9E.5H Follow-up (PASS — Legacy RPC-first Search Verification)
+
+**Gate:** P5-E.9E.5H. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| 5E Profile/RLS Security | **INTACT** |
+| Core Query Matrix | **12/12 PASS** |
+| Safety / Exclusion | **10/10 PASS** |
+| RPC Output Contract | **PASS** |
+| `search_documents` rows | **6** (unverändert) |
+| Rebuild / Writes / Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5I** |
+
+**Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5E + 5G + 5H PASS. Keine Secrets. 5E Security INTACT.*
