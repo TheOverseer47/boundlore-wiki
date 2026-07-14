@@ -13,6 +13,8 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E.3** | **PASS** (Strategie dokumentiert) |
+| **P5-E.9E.3A** | **PASS** |
+| **SQL Draft Status** | **DRAFT_ONLY_CREATED** |
 | **DB Search Strategy** | **DOCUMENTED** |
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (P5-E.9E.2) |
 | **Search Implementation** | **PARTIAL** — Client gehärtet; DB-Index fehlt |
@@ -25,7 +27,25 @@
 
 **Kernaussage:** BoundLore sollte für MVP und Full Launch eine **dedizierte, normalisierte Public-Search-Schicht** einführen — bevorzugt **`search_documents` + RPC `bl_search_public_content`**, mit **Postgres FTS (`tsvector`)** und optional **`pg_trgm`** (bereits im Schema für Observations vorhanden). Die clientseitige `BoundLoreSearchRecall`-Utility (9E.2) bleibt als **Ergänzung, Synonym-Fallback und Fixture-Baseline**; die DB liefert die **vollständigere Trefferbasis**, bessere Skalierung und **fail-closed RLS/Release-Gate-Kontrolle**. **Kein SQL in diesem Gate.** Apply erst über explizite Folge-Gates mit Backup und Staging-Freigabe.
 
-**Empfohlener nächster Gate:** **P5-E.9E.3A** — Search SQL Draft (nicht angewendet) **oder** **P5-E.9E.3B** — Search SQL Static Review.
+**Empfohlener nächster Gate:** **P5-E.9E.3B** — Search SQL Static Review
+
+---
+
+## P5-E.9E.3A — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| SQL Draft Document | `docs/architecture/p5-search-sql-draft.md` |
+| Markierung | **DRAFT ONLY — DO NOT APPLY** |
+| Nicht in `supabase/migrations/` | Bestätigt (Ordner existiert nicht) |
+| Enthält | `search_documents`, `search_vector`, RLS, `bl_search_public_content` |
+| SQL ausgeführt | **Nein** |
+| SQL Draft Status | **DRAFT_ONLY_CREATED** |
+| Nächster Gate | **P5-E.9E.3B** Static Review |
+
+---
+
+*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.3A PASS. Keine Secrets. Kein SQL ausgeführt.*
 
 ---
 

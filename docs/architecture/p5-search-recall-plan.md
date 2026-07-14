@@ -437,8 +437,20 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Search Runtime Evidence | **OPEN** |
 | S-06 | **OPEN_BLOCKING** bis 9E.4 |
 
-**Empfohlener nächster Gate:** **P5-E.9E.3A** — Search SQL Draft (nicht angewendet) **oder** **P5-E.9E.3B** — Search SQL Static Review
+**Empfohlener nächster Gate:** **P5-E.9E.3B** — Search SQL Static Review
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS + P5-E.9E.3 PASS. Keine Secrets. Keine DB-Verbindung ausgeführt.*
+## P5-E.9E.3A — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| SQL Draft | `docs/architecture/p5-search-sql-draft.md` |
+| DRAFT ONLY | Ja — nicht ausführbar |
+| Migration | **Nein** |
+| SQL Draft Status | **DRAFT_ONLY_CREATED** |
+| P5-E.9E.3A | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS + P5-E.9E.3 PASS + P5-E.9E.3A PASS. Keine Secrets. Keine DB-Verbindung ausgeführt.*

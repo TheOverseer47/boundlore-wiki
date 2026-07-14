@@ -3416,7 +3416,50 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-search-db-strategy.md`
 
-**Next:** P5-E.9E.3A SQL draft or P5-E.9E.3B static review. No push/deploy/launch.
+**Next:** P5-E.9E.3A SQL draft. No push/deploy/launch.
+
+---
+
+## 152. P5-E.9E.3A — Search SQL Draft (PASS)
+
+**Milestone:** P5-E.9E.3A — Search SQL Draft (DRAFT ONLY). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| SQL Draft Document | `p5-search-sql-draft.md` |
+| DRAFT ONLY / DO NOT APPLY | Markiert |
+| Not in `supabase/migrations/` | Bestätigt |
+| `search_documents` + RPC draft | Enthalten |
+| SQL executed | **Nein** |
+| SQL Draft Status | **DRAFT_ONLY_CREATED** |
+| P5-E.9E.3A | **PASS** |
+
+**Report:** `docs/architecture/p5-search-sql-draft.md`
+
+**Next:** P5-E.9E.3B static review. No push/deploy/launch.
+
+---
+
+## 151. P5-E.9E.3 — Search DB Strategy (PASS)
+
+**Milestone:** P5-E.9E.3 — Search DB Strategy (planning only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Strategy Document | `p5-search-db-strategy.md` |
+| Architecture Comparison | A–F documented |
+| MVP Recommendation | `search_documents` + `bl_search_public_content` + FTS |
+| Data Contract + Ranking | documented |
+| RLS/Release-Gate Constraints | documented |
+| Migration Risks | 12 risks assessed |
+| DB Search Strategy | **DOCUMENTED** |
+| SQL executed | **Nein** |
+| S-06 | **OPEN_BLOCKING** |
+| P5-E.9E.3 | **PASS** |
+
+**Report:** `docs/architecture/p5-search-db-strategy.md`
+
+**Next:** P5-E.9E.3A SQL draft. No push/deploy/launch.
 
 ---
 

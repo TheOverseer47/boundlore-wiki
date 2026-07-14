@@ -2467,7 +2467,38 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-recall-plan.md`
 
-**Next:** P5-E.9E.2 search client recall hardening. No push/deploy/launch.
+**Next:** P5-E.9E.3A SQL draft. No push/deploy/launch.
+
+---
+
+## P5-E.9E.3A — Search SQL Draft (PASS)
+
+**Milestone:** P5-E.9E.3A — Search SQL Draft (DRAFT ONLY). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Search SQL draft document exists | `p5-search-sql-draft.md` | complete | `[x]` |
+| Draft marked DRAFT ONLY / DO NOT APPLY | document header | present | `[x]` |
+| Draft is not in `supabase/migrations` | repo | absent | `[x]` |
+| Draft includes `search_documents` | SQL blocks | present | `[x]` |
+| Draft includes search vector strategy | `bl_build_search_vector` | present | `[x]` |
+| Draft includes RPC strategy | `bl_search_public_content` | present | `[x]` |
+| Draft includes RLS/security model | document section | present | `[x]` |
+| Draft excludes draft/pending/QA/test/admin | exclusion helper | present | `[x]` |
+| Draft documents BLMETA no-raw-output rule | RPC contract | present | `[x]` |
+| Draft documents negative tests | requirements table | present | `[x]` |
+| No SQL executed | gate | none | `[x]` |
+| No DB/Supabase access | gate | none | `[x]` |
+| No migration file created | gate | none | `[x]` |
+| No SQL/DB/Storage/Push/Deploy performed | gate | none | `[x]` |
+| SQL Draft Status | status | DRAFT_ONLY_CREATED | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.3A | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-search-sql-draft.md`
+
+**Next:** P5-E.9E.3B static review. No push/deploy/launch.
 
 ---
 

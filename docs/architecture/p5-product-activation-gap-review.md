@@ -504,4 +504,21 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.3 PASS. Keine Secrets. Keine Sitemap-Entity-URLs.*
+## 32. P5-E.9E.3A Follow-up (PASS — Search SQL Draft)
+
+**Gate:** P5-E.9E.3A — Search SQL Draft. **PASS**.
+
+| Item | Result |
+|------|--------|
+| SQL Draft | `p5-search-sql-draft.md` — DRAFT ONLY |
+| Migration created | **Nein** |
+| SQL executed | **Nein** |
+| SQL Draft Status | **DRAFT_ONLY_CREATED** |
+| Next Gate | **P5-E.9E.3B** |
+| S-06 | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.3A | **PASS** |
+
+---
+
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.3A PASS. Keine Secrets.*
