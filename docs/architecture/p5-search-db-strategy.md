@@ -33,7 +33,21 @@
 
 ---
 
-**Empfohlener nächster Gate:** Production Content Migration
+**Empfohlener nächster Gate:** **P5-E.9E.5B** — Read-only Legacy Inventory
+
+---
+
+## P5-E.9E.5A — Umsetzungsnachweis (PASS — Cutover Plan)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-production-legacy-target-cutover-plan.md` |
+| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Search Feature Promotion Plan | **DOCUMENTED** |
+| P5-E.9E.5A | **PASS** |
+| DB-Zugriff / SQL / Write | **Nein** |
+
+**Empfohlener nächster Gate:** **P5-E.9E.5B** — Read-only Legacy Inventory (`ohkoojpzmptdfyowdgog`)
 
 ---
 

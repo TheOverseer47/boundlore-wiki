@@ -17,13 +17,15 @@
 | **Search technisch bewiesen** | **Ja** (4G + 4I persistent) |
 | **Persistenter Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 Canonicals) |
 | **P5-E.9E.4M** | **PASS** — S-06 Staging Evidence Dossier |
+| **P5-E.9E.5A** | **PASS** — Production / Legacy Target & Cutover Plan |
+| **Production / Legacy Target Decision** | **NOT_DECIDED** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_CLOSED** via 4M; Production offen) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** RPC-first Search + DB/FTS + Rebuild sind auf Staging vollständig verifiziert (4A–4L). Persistenter 12-Canonical-Corpus, Query-Matrix und Marker-Deindex **STAGING_CLOSED** (P5-E.9E.4M). **S-06 Final** bleibt **OPEN_BLOCKING** — Production Content Migration und Production Search Evidence fehlen. Empfohlener nächster Gate: **Production Content Migration**.
+**Kernaussage:** RPC-first Search + DB/FTS + Rebuild sind auf Staging vollständig verifiziert (4A–4L). Persistenter 12-Canonical-Corpus, Query-Matrix und Marker-Deindex **STAGING_CLOSED** (P5-E.9E.4M). **S-06 Final** bleibt **OPEN_BLOCKING** — Final Target noch nicht entschieden; Production Content Migration und Production Search Evidence fehlen. Empfohlener nächster Gate: **P5-E.9E.5B** — Read-only Legacy Inventory (`ohkoojpzmptdfyowdgog`).
 
 ---
 
@@ -318,6 +320,24 @@ Nur: `title`, `canonical_slug`, `canonical_url`, `excerpt`, `category`, `score`,
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
+| P5-E.9E.5A | **PASS** |
+| Production / Legacy Target Decision | **NOT_DECIDED** |
+
+---
+
+## P5-E.9E.5A Follow-up (PASS — Cutover Plan)
+
+**Gate:** P5-E.9E.5A. **PASS** (Plan-only). Kein DB-Zugriff. Kein SQL. Kein Write.
+
+| Item | Ergebnis |
+|------|----------|
+| Final Target | **NOT_DECIDED** — Option A–E in Cutover Plan |
+| Content Source Decision | **Offen** — 5B Inventory + 5C Decision |
+| Empfohlener nächster Gate | **P5-E.9E.5B** |
+
+**Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
+
+Content Migration (5F) folgt **nach** Final Target Decision (5C) und Search Apply (5E).
 
 ---
 

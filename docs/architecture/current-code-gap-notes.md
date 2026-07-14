@@ -3478,6 +3478,28 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 169. P5-E.9E.5A — Production / Legacy Target & Cutover Plan (PASS)
+
+**Milestone:** P5-E.9E.5A (Plan-only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Cutover plan document exists | **PASS** |
+| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Legacy `ohkoojpzmptdfyowdgog` angefasst | **Nein** |
+| DB-Zugriff / SQL / Write | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5A | **PASS** |
+
+**Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
+
+**Next:** P5-E.9E.5B Read-only Legacy Inventory (Nutzerfreigabe). No push/deploy/launch.
+
+---
+
 ## 168. P5-E.9E.4M — S-06 Staging Search Evidence Closure Dossier (PASS)
 
 **Milestone:** P5-E.9E.4M (Dossier-only). **PASS**.

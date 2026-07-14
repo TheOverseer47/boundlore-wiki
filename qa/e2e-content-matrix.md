@@ -2646,7 +2646,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** P5-E.9E.4M erledigt. No push/deploy/launch.
+**Next:** P5-E.9E.5A erledigt. No push/deploy/launch.
+
+---
+
+## P5-E.9E.5A — Production Legacy Target Cutover Plan (PASS)
+
+**Milestone:** P5-E.9E.5A (Plan-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Plan document exists | docs | present | `[x]` |
+| Staging/Legacy/Production terminology defined | plan | yes | `[x]` |
+| Target options matrix exists | plan | A–E | `[x]` |
+| Recommended cutover path documented | plan | 5B–5I | `[x]` |
+| Search feature promotion plan documented | plan | yes | `[x]` |
+| Runtime config switch plan documented | plan | yes | `[x]` |
+| Backup/rollback boundaries documented | plan | yes | `[x]` |
+| SEO/SSG interaction documented | plan | yes | `[x]` |
+| No SQL executed | scope | none | `[x]` |
+| No DB read/write | scope | none | `[x]` |
+| No Production | scope | none | `[x]` |
+| No Legacy access | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5A | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
+
+**Next:** P5-E.9E.5B Read-only Legacy Inventory (Nutzerfreigabe). No push/deploy/launch.
 
 ---
 

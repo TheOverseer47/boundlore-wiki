@@ -408,7 +408,11 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.4M**~~ **PASS** — S-06 Staging Search Evidence Closure Dossier
 
-**Empfohlener nächster Gate:** Production Content Migration
+~~**P5-E.9E.5A**~~ **PASS** — Production / Legacy Target & Cutover Plan
+
+**Hinweis:** Search-Cutover (5A–5I) **löst S-05 nicht**. Entity Detail SEO/CSR bleibt separater Blocker. Public Launch **NO-GO** auch wenn S-06 später geschlossen wird.
+
+**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5B** — Read-only Legacy Inventory
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 

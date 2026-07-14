@@ -504,6 +504,27 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 49. P5-E.9E.5A Follow-up (PASS — Production / Legacy Target & Cutover Plan)
+
+**Gate:** P5-E.9E.5A. **PASS** (Plan-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Legacy `ohkoojpzmptdfyowdgog` angefasst | **Nein** |
+| DB-Zugriff / SQL / Write | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5A | **PASS** |
+
+**Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
+
+**Empfohlener nächster Gate:** **P5-E.9E.5B** — Read-only Legacy Inventory (Nutzerfreigabe erforderlich)
+
+---
+
 ## 48. P5-E.9E.4M Follow-up (PASS — S-06 Staging Evidence Dossier)
 
 **Gate:** P5-E.9E.4M. **PASS** (Dossier-only).

@@ -249,7 +249,27 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
+| P5-E.9E.5A | **PASS** (Plan-only) |
+| Production / Legacy Target Decision | **NOT_DECIDED** |
 
 ---
 
-*Dokumentversion: P5-E.9E.4M PASS. S-06 Staging Evidence STAGING_CLOSED. Kein DB-Write. Keine Secrets.*
+## P5-E.9E.5A Follow-up (PASS — Production / Legacy Target & Cutover Plan)
+
+**Gate:** P5-E.9E.5A. **PASS** (Plan-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Legacy `ohkoojpzmptdfyowdgog` angefasst | **Nein** |
+| DB-Zugriff / SQL / Write | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** (unverändert) |
+| Empfohlener nächster Gate | **P5-E.9E.5B** — Read-only Legacy Inventory |
+
+**Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
+
+**Kernaussage:** Staging Evidence **STAGING_CLOSED** bleibt gültig. Cutover auf Production/Legacy ist **jetzt verboten** — zuerst read-only Inventory (5B), dann Final Target Decision (5C). **Launch ≠ Cutover.**
+
+---
+
+*Dokumentversion: P5-E.9E.4M PASS + P5-E.9E.5A PASS. S-06 Staging Evidence STAGING_CLOSED. Kein DB-Write. Keine Secrets.*
