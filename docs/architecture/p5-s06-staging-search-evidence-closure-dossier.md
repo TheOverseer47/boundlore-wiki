@@ -250,7 +250,7 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 | P5-E.9E.5A | **PASS** (Plan-only) |
-| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Production / Legacy Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 
 ---
 
@@ -260,11 +260,11 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 
 | Item | Ergebnis |
 |------|----------|
-| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Production / Legacy Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy `ohkoojpzmptdfyowdgog` angefasst | **Nein** |
 | DB-Zugriff / SQL / Write | **Nein** |
 | S-06 Final Status | **OPEN_BLOCKING** (unverändert) |
-| Empfohlener nächster Gate | **P5-E.9E.5C** |
+| Empfohlener nächster Gate | **P5-E.9E.5D** |
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
@@ -282,10 +282,19 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 | Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
 | Legacy read-only DB-Zugriff | **Ja** (kein Write) |
 | S-06 Final Status | **OPEN_BLOCKING** (unverändert) |
-| Empfohlener nächster Gate | **P5-E.9E.5C** |
+| Empfohlener nächster Gate | **P5-E.9E.5D** |
 
-**Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
+## P5-E.9E.5C Follow-up (PASS — Final Target Decision)
+
+**Gate:** P5-E.9E.5C. **PASS** (Plan-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| Empfohlener nächster Gate | **P5-E.9E.5D** |
+
+**Report:** `docs/architecture/p5-final-target-decision.md`
 
 ---
 
-*Dokumentversion: P5-E.9E.4M + 5A + 5B PASS. S-06 Staging Evidence STAGING_CLOSED. Kein DB-Write. Keine Secrets.*
+*Dokumentversion: P5-E.9E.4M + 5A + 5B + 5C PASS. LEGACY_CONDITIONAL_TARGET_CANDIDATE. Kein DB-Write.*

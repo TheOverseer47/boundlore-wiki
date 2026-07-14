@@ -441,7 +441,17 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision
+**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
+
+---
+
+## P5-E.9E.5C — Umsetzungsnachweis (PASS — Final Target Decision)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-final-target-decision.md` |
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| P5-E.9E.5C | **PASS** |
 
 ---
 
@@ -461,12 +471,12 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Item | Ergebnis |
 |------|----------|
 | Report | `p5-production-legacy-target-cutover-plan.md` |
-| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Production / Legacy Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Search Promotion to Final Target | **PLANNED** (5E–5G) |
 | P5-E.9E.5A | **PASS** |
 | DB-Zugriff / SQL / Write | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision
+**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
 
 ---
 

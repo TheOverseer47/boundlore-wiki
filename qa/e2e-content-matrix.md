@@ -2650,6 +2650,36 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9E.5C — Final Target Decision (PASS)
+
+**Milestone:** P5-E.9E.5C (Plan-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Decision document exists | docs | present | `[x]` |
+| 5B inventory summarized | decision | yes | `[x]` |
+| Target options matrix exists | decision | A–E | `[x]` |
+| Final target candidate documented | decision | LEGACY_CONDITIONAL | `[x]` |
+| Security fixes before cutover documented | decision | yes | `[x]` |
+| Search promotion steps documented | decision | yes | `[x]` |
+| Content work documented | decision | yes | `[x]` |
+| Updated gate sequence documented | decision | 5D–5J | `[x]` |
+| Runtime switch conditions documented | decision | yes | `[x]` |
+| No SQL executed | scope | none | `[x]` |
+| No DB read/write | scope | none | `[x]` |
+| No Runtime switch | scope | none | `[x]` |
+| No Production/Legacy write | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5C | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-final-target-decision.md`
+
+**Next:** P5-E.9E.5D Legacy Fresh Backup Evidence. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5B — Production Legacy Read-only Inventory (PASS)
 
 **Milestone:** P5-E.9E.5B (Read-only). **PASS**.

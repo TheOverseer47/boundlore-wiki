@@ -13,15 +13,17 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E.5A** | **PASS** (Plan-only) |
-| **Production / Legacy Target Decision** | **NOT_DECIDED** |
-| **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
+| **P5-E.9E.5C** | **PASS** (Plan-only Decision) |
+| **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
+| **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5C** — Final Target Decision (Plan-only) |
+| **Empfohlener nächster Gate** | **P5-E.9E.5D** — Legacy Fresh Backup Evidence |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging `jzzgoiwfbuwiiyvwgwri` hat Search technisch bewiesen (S-06 **STAGING_CLOSED**). Legacy `ohkoojpzmptdfyowdgog` read-only inventarisiert (5B): Search-Objekte fehlen, `profiles_select_all` kritisch, 6 canonical candidates. Cutover weiter **verboten** bis Final Target Decision (5C), Backup, Apply und Verification.
+**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy `ohkoojpzmptdfyowdgog` ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C) — primärer Upgrade-Pfad, aber **kein** Runtime-Switch vor 5D–5J. Staging-Promotion abgelehnt; neuer Ref bleibt Fallback.
 
 ---
 
@@ -64,7 +66,7 @@
 | **Staging** | Isolierte Verifikations-DB für kontrollierte Gates | `jzzgoiwfbuwiiyvwgwri` |
 | **Legacy / alte DB** | Ursprüngliche Supabase-Instanz; historischer Datenbestand | `ohkoojpzmptdfyowdgog` |
 | **Production** | Live-Betrieb für Endnutzer; **noch nicht final geschlossen** | boundlore.com — **tabu** |
-| **Final DB Target** | Die DB, auf die Runtime nach Cutover zeigt — **muss durch eigenen Gate bestätigt werden** | **NOT_DECIDED** |
+| **Final DB Target** | `ohkoojpzmptdfyowdgog` — **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C); Runtime bleibt Staging |
 | **Cutover** | Kontrollierter Wechsel der Runtime-Config auf Final Target **nach** Backup, Apply, Verification | Separates Gate (5H+) |
 | **Launch** | Public Go-Live — **nicht** automatisch durch Cutover; eigener Launch-Gate | **NO-GO** |
 
@@ -80,7 +82,7 @@
 | Kein frischer Backup-Nachweis Final Target | Pflicht vor jedem Write |
 | Search DB/FTS nur auf Staging | Nicht auf Legacy/Production migriert |
 | Production Content Migration offen | Kein finaler published Corpus |
-| Final Target nicht entschieden | Option A–E offen |
+| Final Target nicht entschieden | **Aufgelöst** — LEGACY_CONDITIONAL (5C); Härtung/Apply offen |
 | S-06 Final | **OPEN_BLOCKING** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Production Closure | **NOT CLOSED** |
@@ -105,20 +107,26 @@
 
 ---
 
-## Recommended Cutover Path
+## Recommended Cutover Path (updated 5C)
 
 | # | Gate | Modus | Scope |
 |---|------|-------|-------|
-| 1 | **P5-E.9E.5B** | Read-only Inventory | Legacy `ohkoojpzmptdfyowdgog` — Schema, Policies, Content Counts, Search Readiness, RLS, Backup-Status |
-| 2 | **P5-E.9E.5C** | Plan-only Decision | Final Target: A/B/C/D — dokumentierte Entscheidung |
-| 3 | **P5-E.9E.5D** | Backup Evidence | Frischer Backup-Nachweis Final Target — kein Restore |
-| 4 | **P5-E.9E.5E** | Apply (Freigabe) | Search DB/FTS MVP analog Staging — kein Launch |
-| 5 | **P5-E.9E.5F** | Content + Rebuild | Public-safe published Content, `bl_rebuild_search_documents()` |
-| 6 | **P5-E.9E.5G** | Verification | RPC-first Query Matrix, Safety, No-Leak — S-06 Production Evidence |
-| 7 | **P5-E.9E.5H** | Runtime Dry Run | Lokale Runtime auf Final Target — kein Deploy |
-| 8 | **P5-E.9E.5I** | Dossier | S-06 Final Closure — nur wenn 5G PASS |
-| 9 | **S-05** | Separat | SEO/CSR Entity Pages — bleibt Blocker |
-| 10 | **Launch Gate** | Explizit | Product Activation + alle Blocker — **NO-GO** bis dahin |
+| 1 | ~~P5-E.9E.5A~~ | Plan | Cutover Plan — **PASS** |
+| 2 | ~~P5-E.9E.5B~~ | Read-only | Legacy Inventory — **PASS** |
+| 3 | ~~P5-E.9E.5C~~ | Plan-only | Final Target Decision — **PASS** |
+| 4 | **P5-E.9E.5D** | Backup Evidence | Frischer Backup `ohkoojpzmptdfyowdgog` |
+| 5 | **P5-E.9E.5E** | Apply (Freigabe) | Profile/RLS Security Hardening + Posts-RLS-Fix |
+| 6 | **P5-E.9E.5F** | Apply (Freigabe) | Search DB/FTS MVP analog Staging |
+| 7 | **P5-E.9E.5G** | Apply (Freigabe) | Content Cleanup + Rebuild |
+| 8 | **P5-E.9E.5H** | Verification | RPC Query Matrix, Safety, No-Leak |
+| 9 | **P5-E.9E.5I** | Runtime Dry Run | Lokal auf Legacy — kein Deploy |
+| 10 | **P5-E.9E.5J** | Dossier | S-06 Final Closure |
+| 11 | **S-05** | Separat | SEO/CSR |
+| 12 | **Launch** | Explizit | Product Activation + alle Blocker |
+
+---
+
+## Recommended Cutover Path (historical 5A)
 
 **STOPP zwischen jedem Gate ohne Nutzerfreigabe.**
 
@@ -246,14 +254,31 @@ Final Target muss erhalten (analog Staging 4A):
 | P5-E.9E.5A | **PASS** |
 | P5-E.9E.5B | **PASS** (Read-only Inventory) |
 | Production / Legacy Inventory | **COMPLETE** |
-| Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
-| Production / Legacy Target Decision | **NOT_DECIDED** |
+| P5-E.9E.5C | **PASS** |
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| Legacy Target Suitability | **CONDITIONAL** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
 | S-06 Final Status | **OPEN_BLOCKING** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
+
+---
+
+## P5-E.9E.5C Follow-up (PASS — Final Target Decision)
+
+**Gate:** P5-E.9E.5C. **PASS** (Plan-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| Staging als Production | **REJECT_FOR_NOW** |
+| Neuer Ref Fallback | **FALLBACK_OPTION** |
+| SQL Apply / Write | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5D** |
+
+**Report:** `docs/architecture/p5-final-target-decision.md`
 
 ---
 
@@ -269,7 +294,7 @@ Final Target muss erhalten (analog Staging 4A):
 | `profiles_select_all` | **Kritisch** (`qual=true`) |
 | Published canonical candidates | **6** |
 | SQL Apply / Write | **Nein** |
-| Empfohlener nächster Gate | **P5-E.9E.5C** |
+| Empfohlener nächster Gate | **P5-E.9E.5D** |
 
 **Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
 
@@ -281,4 +306,4 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-*Dokumentversion: P5-E.9E.5A PASS + P5-E.9E.5B PASS. Legacy read-only inventarisiert. Kein Write.*
+*Dokumentversion: P5-E.9E.5A–5C PASS. LEGACY_CONDITIONAL_TARGET_CANDIDATE. Kein Write.*

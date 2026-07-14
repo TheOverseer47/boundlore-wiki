@@ -416,7 +416,9 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 **Hinweis:** Search-Cutover (5A–5I) **löst S-05 nicht**. Legacy Inventory: Search-Objekte fehlen, `profiles_select_all` kritisch.
 
-**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5C** — Final Target Decision
+~~**P5-E.9E.5C**~~ **PASS** — Final Target Decision (**LEGACY_CONDITIONAL_TARGET_CANDIDATE**)
+
+**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 

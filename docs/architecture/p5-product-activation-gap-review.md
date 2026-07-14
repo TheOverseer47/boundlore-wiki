@@ -504,6 +504,24 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 51. P5-E.9E.5C Follow-up (PASS — Final Target Decision)
+
+**Gate:** P5-E.9E.5C. **PASS** (Plan-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| Final Target Ref | `ohkoojpzmptdfyowdgog` (conditional) |
+| Staging als Production | **REJECT_FOR_NOW** |
+| SQL Apply / Write | **Nein** |
+| P5-E.9E.5C | **PASS** |
+
+**Report:** `docs/architecture/p5-final-target-decision.md`
+
+**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
+
+---
+
 ## 50. P5-E.9E.5B Follow-up (PASS — Read-only Legacy Inventory)
 
 **Gate:** P5-E.9E.5B. **PASS** (Read-only).
@@ -513,12 +531,12 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 | Inventory Status | **COMPLETE** |
 | Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
 | Legacy read-only Zugriff | **Ja** (kein Write) |
-| Final Target Decision | **NOT_DECIDED** |
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | P5-E.9E.5B | **PASS** |
 
 **Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
 
-**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision (Plan-only)
+**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
 
 ---
 
@@ -528,7 +546,7 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 | Item | Ergebnis |
 |------|----------|
-| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Production / Legacy Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy `ohkoojpzmptdfyowdgog` angefasst | **Nein** |
 | DB-Zugriff / SQL / Write | **Nein** |
 | S-06 Final Status | **OPEN_BLOCKING** |
@@ -539,7 +557,7 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
-**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision (Plan-only)
+**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
 
 ---
 

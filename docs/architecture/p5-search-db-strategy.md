@@ -33,7 +33,17 @@
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision (Plan-only)
+**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
+
+---
+
+## P5-E.9E.5C — Umsetzungsnachweis (PASS — Final Target Decision)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-final-target-decision.md` |
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| P5-E.9E.5C | **PASS** |
 
 ---
 
@@ -47,7 +57,7 @@
 | P5-E.9E.5B | **PASS** |
 | Write / Apply | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision
+**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
 
 ---
 
@@ -56,12 +66,12 @@
 | Item | Ergebnis |
 |------|----------|
 | Report | `p5-production-legacy-target-cutover-plan.md` |
-| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Production / Legacy Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Search Feature Promotion Plan | **DOCUMENTED** |
 | P5-E.9E.5A | **PASS** |
 | DB-Zugriff / SQL / Write | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision
+**Empfohlener nächster Gate:** **P5-E.9E.5D** — Legacy Fresh Backup Evidence
 
 ---
 

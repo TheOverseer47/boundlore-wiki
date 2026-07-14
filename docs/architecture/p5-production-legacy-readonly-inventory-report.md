@@ -17,10 +17,10 @@
 | **Target Ref** | `ohkoojpzmptdfyowdgog` — verifiziert |
 | **Staging Ref used** | **Nein** |
 | **Final Target Suitability** | **NEEDS_MIGRATION_DECISION** |
-| **Production / Legacy Target Decision** | **NOT_DECIDED** (→ 5C) |
+| **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5C** — Final Target Decision (Plan-only) |
+| **Empfohlener nächster Gate** | **P5-E.9E.5D** — Legacy Fresh Backup Evidence |
 | **Public Launch** | **NO-GO** |
 
 **Kernaussage:** Legacy `ohkoojpzmptdfyowdgog` ist **schema-mäßig kompatibel** mit dem BoundLore-Wiki-Fundament (24 Tabellen, RLS aktiv, `pg_trgm` vorhanden), aber **Search MVP fehlt vollständig** (`search_documents`, `bl_search_public_content`, `bl_rebuild_search_documents` nicht vorhanden). **Kritische Befunde:** `profiles_select_all` mit `qual=true`, **anon SELECT auf `profiles`**, `posts_select_approved` mit Invoker-`profiles`-Subquery (42501-Risiko analog Staging vor 4D). **Content:** nur **9 published** Posts, davon **3 QA-Slugs**; **6 canonical candidates** ohne QA-Muster. **Kein sofortiger Cutover** — Upgrade-Pfad (Option A) ist möglich, erfordert aber RLS/Grant-Härtung, Search Apply, Content-Cleanup und Backup vor jedem Write.
@@ -338,7 +338,7 @@
 |------|--------|
 | P5-E.9E.5B | **PASS** |
 | Production / Legacy Inventory | **COMPLETE** |
-| Final Target Decision | **NOT_DECIDED** |
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
 | S-06 Final Status | **OPEN_BLOCKING** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
@@ -348,4 +348,4 @@
 
 ---
 
-*Dokumentversion: P5-E.9E.5B PASS. Read-only Inventory. Keine Secrets. Keine PII. Kein Write.*
+*Dokumentversion: P5-E.9E.5B PASS + P5-E.9E.5C Decision LEGACY_CONDITIONAL_TARGET_CANDIDATE. Kein Write.*

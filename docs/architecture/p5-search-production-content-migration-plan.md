@@ -20,14 +20,16 @@
 | **P5-E.9E.5A** | **PASS** — Production / Legacy Target & Cutover Plan |
 | **P5-E.9E.5B** | **PASS** — Legacy Read-only Inventory |
 | **Final Target Suitability** | **NEEDS_MIGRATION_DECISION** |
-| **Production / Legacy Target Decision** | **NOT_DECIDED** |
+| **P5-E.9E.5C** | **PASS** — Final Target Decision |
+| **Final Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_CLOSED** via 4M; Production offen) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** RPC-first Search + DB/FTS + Rebuild sind auf Staging vollständig verifiziert (4A–4L). Legacy `ohkoojpzmptdfyowdgog` read-only inventarisiert (5B): 6 canonical candidates, Search-Objekte fehlen, `profiles_select_all` kritisch. **S-06 Final** bleibt **OPEN_BLOCKING**. Empfohlener nächster Gate: **P5-E.9E.5C** — Final Target Decision.
+**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Content-Migration auf Legacy folgt 5D–5G. Empfohlener nächster Gate: **P5-E.9E.5D** — Legacy Fresh Backup Evidence.
 
 ---
 
@@ -323,7 +325,7 @@ Nur: `title`, `canonical_slug`, `canonical_url`, `excerpt`, `category`, `score`,
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 | P5-E.9E.5A | **PASS** |
-| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Production / Legacy Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 
 ---
 
@@ -333,19 +335,19 @@ Nur: `title`, `canonical_slug`, `canonical_url`, `excerpt`, `category`, `score`,
 
 | Item | Ergebnis |
 |------|----------|
-| Final Target | **NOT_DECIDED** — Option A–E in Cutover Plan |
+| Final Target | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** — `ohkoojpzmptdfyowdgog` |
 | Content Source Decision | **Offen** — 5B Inventory + 5C Decision |
-| Empfohlener nächster Gate | **P5-E.9E.5C** |
+| Empfohlener nächster Gate | **P5-E.9E.5D** |
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
-## P5-E.9E.5B Follow-up (PASS — Legacy Inventory)
+## P5-E.9E.5C Follow-up (PASS — Final Target Decision)
 
-**Gate:** P5-E.9E.5B. **PASS**. Legacy: 9 published, 6 canonical candidates, Search-Objekte fehlen, `profiles_select_all` kritisch. **Kein Write.**
+**Gate:** P5-E.9E.5C. **PASS**. **LEGACY_CONDITIONAL_TARGET_CANDIDATE**. Kein Write.
 
-**Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
+**Report:** `docs/architecture/p5-final-target-decision.md`
 
-Content Migration (5F) folgt **nach** Final Target Decision (5C) und Search Apply (5E).
+Content Migration (5G) folgt **nach** Backup (5D), Security (5E), Search Apply (5F).
 
 ---
 

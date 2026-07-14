@@ -3478,6 +3478,24 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 171. P5-E.9E.5C — Final Target Decision (PASS)
+
+**Milestone:** P5-E.9E.5C (Plan-only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
+| SQL Apply / Write | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5C | **PASS** |
+
+**Report:** `docs/architecture/p5-final-target-decision.md`
+
+**Next:** P5-E.9E.5D Legacy Fresh Backup Evidence. No push/deploy/launch.
+
+---
+
 ## 170. P5-E.9E.5B — Production / Legacy Read-only Inventory (PASS)
 
 **Milestone:** P5-E.9E.5B (Read-only). **PASS**.
@@ -3505,7 +3523,7 @@ The future Draft Inspector / Preview must **NOT**:
 | Check | Result |
 |-------|--------|
 | Cutover plan document exists | **PASS** |
-| Production / Legacy Target Decision | **NOT_DECIDED** |
+| Production / Legacy Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy `ohkoojpzmptdfyowdgog` angefasst | **Nein** |
 | DB-Zugriff / SQL / Write | **Nein** |
 | S-06 Final Status | **OPEN_BLOCKING** |
