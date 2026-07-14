@@ -269,7 +269,7 @@ function renderStructuredDiscoveryPD(post, postMeta) {
       const relLabel = escapeHtml(String(rel.relation_type || rel.group || "related_to").replace(/_/g, " "));
       const title = escapeHtml(rel.title || "Entry");
       if (rel.slug) {
-        html += '<li><strong>' + relLabel + ':</strong> <a href="/wiki/post/?slug=' + encodeURIComponent(rel.slug) + '">' + title + '</a></li>';
+        html += '<li><strong>' + relLabel + ':</strong> <a href="' + BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug }) + '">' + title + '</a></li>';
       } else {
         html += '<li><strong>' + relLabel + ':</strong> ' + title + '</li>';
       }
@@ -310,7 +310,7 @@ function renderGuideReferencesPD(post, postMeta) {
       const label = escapeHtml(ref.title || "Entry");
       const type = escapeHtml(ref.post_type === "guide" ? "Guide" : (ref.category || "Entry"));
       if (ref.slug) {
-        return '<li><a href="/wiki/post/?slug=' + encodeURIComponent(ref.slug) + '">' + label + '</a> <span style="color:var(--text-muted);">(' + type + ')</span></li>';
+        return '<li><a href="' + BoundLoreEntityRoutes.buildEntityPostHref({ slug: ref.slug }) + '">' + label + '</a> <span style="color:var(--text-muted);">(' + type + ')</span></li>';
       }
       return '<li>' + label + ' <span style="color:var(--text-muted);">(' + type + ')</span></li>';
     }).join('') +
@@ -547,7 +547,9 @@ function appendRelatedGroupPD(container, heading, items, usedIds) {
 function renderRelatedItemPD(item) {
   const link = document.createElement("a");
   link.className = "bl-related-item";
-  link.href = item.href || (item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id)));
+  link.href = item.href || (item.slug
+    ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: item.slug })
+    : BoundLoreEntityRoutes.buildEntityPostHref({ id: item.id }));
   const label = item.label || item.title || "Untitled";
   const meta = item.meta || getSeeAlsoLabelPD(item);
   const datePart = item.created_at ? (' • ' + new Date(item.created_at).toLocaleDateString()) : "";
@@ -809,8 +811,8 @@ function wireCommentForm(postId) {
         title: "New comment on your post",
         message: "Someone commented on \"" + currentPost.title + "\".",
         target_url: currentPost.slug
-          ? ("/wiki/post/?slug=" + encodeURIComponent(currentPost.slug))
-          : ("/wiki/post/?id=" + encodeURIComponent(currentPost.id)),
+          ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: currentPost.slug })
+          : BoundLoreEntityRoutes.buildEntityPostHref({ id: currentPost.id }),
       });
     }
 

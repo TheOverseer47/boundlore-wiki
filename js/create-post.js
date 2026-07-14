@@ -673,7 +673,7 @@ async function handleSubmit(e) {
   }
 
   if (data && data.slug) {
-    window.location.href = `/wiki/post/?slug=${data.slug}`;
+    window.location.href = BoundLoreEntityRoutes.buildEntityPostHref({ slug: data.slug });
     return;
   }
 
@@ -1831,8 +1831,7 @@ function buildStructuredDiscoveryContent(title, category, payload, relations, im
     relations.forEach(function(rel) {
       const relLabel = escapeHtmlCP(rel.relation_type || "related_to");
       if (rel.slug) {
-        const safeSlug = encodeURIComponent(rel.slug);
-        html += '<li><strong>' + relLabel + ':</strong> <a href="/wiki/post/?slug=' + safeSlug + '">' + escapeHtmlCP(rel.title || "Entry") + '</a></li>';
+        html += '<li><strong>' + relLabel + ':</strong> <a href="' + BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug }) + '">' + escapeHtmlCP(rel.title || "Entry") + '</a></li>';
       } else {
         html += '<li><strong>' + relLabel + ':</strong> ' + escapeHtmlCP(rel.title || "Entry") + '</li>';
       }

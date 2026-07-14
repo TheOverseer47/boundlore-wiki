@@ -19,7 +19,7 @@ async function loadHomepageDiscoveries() {
   data.forEach(function(post) {
     const card = document.createElement("a");
     card.className = "recent-card";
-    card.href = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+    card.href = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
 
     const label = typeof getPostCategoryLabel === "function"
       ? getPostCategoryLabel(post)

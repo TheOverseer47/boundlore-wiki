@@ -1,0 +1,172 @@
+{
+  "schema": "RealContentEntitySsgRecord",
+  "version": "p5-e9f6",
+  "description": "P5-E.9F.6 sanitized real-content entity SSG export from legacy ohkoojpzmptdfyowdgog",
+  "entities": [
+    {
+      "canonical_slug": "ogre-mage",
+      "title": "Ogre Mage",
+      "category": "creatures",
+      "entity_domain": "creature",
+      "entity_subtype": "creature",
+      "excerpt": "Ogre Mage in Swamplands near a Campfire",
+      "body_html_sanitized": "<section class=\"discovery-entry-head\"><p>Community Discovery</p><h2>Ogre Mage in Swamplands near a Campfire</h2></section><h3>Structured Findings</h3><ul><li><strong>Discovery type:</strong> monster</li><li><strong>Creature / NPC name:</strong> Ogre Mage</li><li><strong>World:</strong> Swamplands</li><li><strong>Region / zone:</strong> Swamplands</li><li><strong>Where found:</strong> Swamplands near a Campfire</li><li><strong>Coordinates (optional):</strong> unclear</li><li><strong>Time of day:</strong> daytime</li><li><strong>Weather condition:</strong> sunny-clear</li><li><strong>Biome / environment:</strong> swamp</li><li><strong>Spawn conditions:</strong> the spawn conditions for this monster are unkown</li><li><strong>How to tame / verify behavior:</strong> this monster is not tameable</li><li><strong>Can be mounted?:</strong> no</li><li><strong>Health (if known):</strong> 250</li><li><strong>What happened after defeat?:</strong> dropped-loot</li><li><strong>Dropped items / loot:</strong> Staff of Fire</li><li><strong>Drop rate observation:</strong> single-kill</li><li><strong>Reproduction steps:</strong> It can be assumed that this monster respawns without a special event.</li><li><strong>Observed result:</strong> It can be assumed that this monster respawns without a special event.</li><li><strong>Expected result:</strong> It can be assumed that this monster respawns without a special event.</li><li><strong>Confidence level:</strong> 2-single-observation</li><li><strong>Impact area:</strong> gameplay</li><li><strong>Rarity (optional):</strong> rare</li></ul><h3>Related Entries</h3><ul><li><strong>drops:</strong><a href=\"/wiki/post/staff-of-fire-2f316b0d/\">Staff of Fire</a></li><li><strong>found_in:</strong><a href=\"/wiki/post/swamplands-near-a-campfire-787bbd19/\">Swamplands near a Campfire</a></li><li><strong>found_in:</strong><a href=\"/wiki/post/swamplands-94dadc07/\">Swamplands</a></li></ul>",
+      "updated_at": "2026-07-09 11:47:37Z",
+      "published_at": "2026-07-09 11:47:37Z",
+      "content_origin": "real_content_export",
+      "status": "published",
+      "canonical_url": "https://boundlore.com/wiki/post/ogre-mage/",
+      "image_url": "https://boundlore.com/public/images/social-preview.png",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "url": "https://boundlore.com/"
+        },
+        {
+          "name": "Browse",
+          "url": "https://boundlore.com/wiki/browse/"
+        },
+        {
+          "name": "Creatures",
+          "url": "https://boundlore.com/wiki/creatures/"
+        },
+        {
+          "name": "Ogre Mage",
+          "url": "https://boundlore.com/wiki/post/ogre-mage/"
+        }
+      ]
+    },
+    {
+      "canonical_slug": "smought",
+      "title": "Smought",
+      "category": "creatures",
+      "entity_domain": "creature",
+      "entity_subtype": "creature",
+      "excerpt": "Smought was reported in unclear, confidence is marked as single observation.",
+      "body_html_sanitized": "<section class=\"bl-discovery-entry-head\"><p class=\"bl-discovery-kicker\">Community Discovery</p><h2>Discovery</h2><p class=\"bl-discovery-summary\">Smought was reported in unclear, confidence is marked as single observation.</p></section><section class=\"bl-discovery-fact-grid\"><div class=\"bl-discovery-fact-card\"><h3>Identity</h3><dl><div><dt>Discovery type</dt><dd>creature</dd></div><div><dt>Creature / NPC name</dt><dd>Smought</dd></div><div><dt>Rarity (optional)</dt><dd>rare</dd></div><div><dt>Confidence level</dt><dd>2-single-observation</dd></div><div><dt>Impact area</dt><dd>gameplay</dd></div></dl></div><div class=\"bl-discovery-fact-card\"><h3>Location</h3><dl><div><dt>World</dt><dd>Pinewoods</dd></div><div><dt>Region / zone</dt><dd>Central</dd></div><div><dt>Where found</dt><dd>unclear</dd></div></dl></div><div class=\"bl-discovery-fact-card\"><h3>Encounter</h3><dl><div><dt>Spawn conditions</dt><dd>It must be Daytime and Sunny Weather</dd></div><div><dt>Requirements / prerequisites (optional)</dt><dd>to tame you need a dragon heart medallion</dd></div><div><dt>What happened after defeat?</dt><dd>tamed-or-fled</dd></div><div><dt>Can be mounted?</dt><dd>yes</dd></div><div><dt>Health (if known)</dt><dd>790</dd></div><div><dt>How to tame</dt><dd>Bring the Creature down to about 10% HP, than hand it a Dragon Heard Medallion</dd></div></dl></div><div class=\"bl-discovery-fact-card\"><h3>Loot &amp; Rewards</h3><dl><div><dt>Drop rate observation</dt><dd>unknown</dd></div></dl></div><div class=\"bl-discovery-fact-card\"><h3>Verification</h3><dl><div><dt>Reproduction steps</dt><dd>1. Find the Creature in the Pinewoods on the day while the weather is sunny 2. Attack the Creature and bring it down to about 10% of its HP, then it will get stunned 3. use the Item &quot;Dragon Heart Medallion&quot; on the Creature 4. it will now follow you around and you can ride it and fly with it.</dd></div><div><dt>Observed result</dt><dd>The Dragon was tamed an can be used as a mount</dd></div><div><dt>Expected result</dt><dd>unclear</dd></div><div><dt>Automation tags (optional)</dt><dd>#mount,#day_only,#dragon</dd></div></dl></div></section><hr></hr>",
+      "updated_at": "2026-07-09 11:47:37Z",
+      "published_at": "2026-07-09 11:47:37Z",
+      "content_origin": "real_content_export",
+      "status": "published",
+      "canonical_url": "https://boundlore.com/wiki/post/smought/",
+      "image_url": "https://boundlore.com/public/images/social-preview.png",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "url": "https://boundlore.com/"
+        },
+        {
+          "name": "Browse",
+          "url": "https://boundlore.com/wiki/browse/"
+        },
+        {
+          "name": "Creatures",
+          "url": "https://boundlore.com/wiki/creatures/"
+        },
+        {
+          "name": "Smought",
+          "url": "https://boundlore.com/wiki/post/smought/"
+        }
+      ]
+    },
+    {
+      "canonical_slug": "staff-of-fire-2f316b0d",
+      "title": "Staff of Fire",
+      "category": "items",
+      "entity_domain": "item",
+      "entity_subtype": "item",
+      "excerpt": "Staff of FireThis related entry was prepared automatically from a discovery relation.Relation type: drops",
+      "body_html_sanitized": "<section class=\"discovery-entry-head\"><p>Knowledge Node</p><h2>Staff of Fire</h2></section><p>This related entry was prepared automatically from a discovery relation.</p><p>Relation type: <strong>drops</strong></p>",
+      "updated_at": "2026-07-09 02:28:25Z",
+      "published_at": "2026-07-09 02:28:25Z",
+      "content_origin": "real_content_export",
+      "status": "published",
+      "canonical_url": "https://boundlore.com/wiki/post/staff-of-fire-2f316b0d/",
+      "image_url": "https://boundlore.com/public/images/social-preview.png",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "url": "https://boundlore.com/"
+        },
+        {
+          "name": "Browse",
+          "url": "https://boundlore.com/wiki/browse/"
+        },
+        {
+          "name": "Items",
+          "url": "https://boundlore.com/wiki/items/"
+        },
+        {
+          "name": "Staff of Fire",
+          "url": "https://boundlore.com/wiki/post/staff-of-fire-2f316b0d/"
+        }
+      ]
+    },
+    {
+      "canonical_slug": "swamplands-94dadc07",
+      "title": "Swamplands",
+      "category": "locations",
+      "entity_domain": "location",
+      "entity_subtype": "location",
+      "excerpt": "SwamplandsThis related entry was prepared automatically from a discovery relation.Relation type: found in",
+      "body_html_sanitized": "<section class=\"discovery-entry-head\"><p>Knowledge Node</p><h2>Swamplands</h2></section><p>This related entry was prepared automatically from a discovery relation.</p><p>Relation type: <strong>found in</strong></p>",
+      "updated_at": "2026-07-09 13:43:58Z",
+      "published_at": "2026-07-09 13:43:58Z",
+      "content_origin": "real_content_export",
+      "status": "published",
+      "canonical_url": "https://boundlore.com/wiki/post/swamplands-94dadc07/",
+      "image_url": "https://boundlore.com/public/images/social-preview.png",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "url": "https://boundlore.com/"
+        },
+        {
+          "name": "Browse",
+          "url": "https://boundlore.com/wiki/browse/"
+        },
+        {
+          "name": "Locations",
+          "url": "https://boundlore.com/wiki/locations/"
+        },
+        {
+          "name": "Swamplands",
+          "url": "https://boundlore.com/wiki/post/swamplands-94dadc07/"
+        }
+      ]
+    },
+    {
+      "canonical_slug": "swamplands-near-a-campfire-787bbd19",
+      "title": "Swamplands near a Campfire",
+      "category": "locations",
+      "entity_domain": "location",
+      "entity_subtype": "location",
+      "excerpt": "Swamplands near a CampfireThis related entry was prepared automatically from a discovery relation.Relation type: found in",
+      "body_html_sanitized": "<section class=\"discovery-entry-head\"><p>Knowledge Node</p><h2>Swamplands near a Campfire</h2></section><p>This related entry was prepared automatically from a discovery relation.</p><p>Relation type: <strong>found in</strong></p>",
+      "updated_at": "2026-07-09 11:47:37Z",
+      "published_at": "2026-07-09 11:47:37Z",
+      "content_origin": "real_content_export",
+      "status": "published",
+      "canonical_url": "https://boundlore.com/wiki/post/swamplands-near-a-campfire-787bbd19/",
+      "image_url": "https://boundlore.com/public/images/social-preview.png",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "url": "https://boundlore.com/"
+        },
+        {
+          "name": "Browse",
+          "url": "https://boundlore.com/wiki/browse/"
+        },
+        {
+          "name": "Locations",
+          "url": "https://boundlore.com/wiki/locations/"
+        },
+        {
+          "name": "Swamplands near a Campfire",
+          "url": "https://boundlore.com/wiki/post/swamplands-near-a-campfire-787bbd19/"
+        }
+      ]
+    }
+  ]
+}

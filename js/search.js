@@ -91,7 +91,12 @@ async function runSearch(query, resultsBox) {
 }
 
 function buildPostPath(post) {
-  return `/wiki/post/?slug=${post.slug}`;
+  if (post && post.slug && typeof BoundLoreEntityRoutes !== "undefined") {
+    var path = BoundLoreEntityRoutes.buildCanonicalEntityPath(post.slug);
+    if (path) return path;
+  }
+  if (post && post.slug) return "/wiki/post/" + encodeURIComponent(post.slug) + "/";
+  return "/wiki/post/";
 }
 
 function escapeHtml(str) {

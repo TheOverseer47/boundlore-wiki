@@ -563,7 +563,7 @@ async function handleEditSubmit(e) {
   const redirectSlug = editPost.slug;
   if (redirectSlug) {
     setTimeout(function () {
-      window.location.href = "/wiki/post/?slug=" + encodeURIComponent(redirectSlug);
+      window.location.href = BoundLoreEntityRoutes.buildEntityPostHref({ slug: redirectSlug });
     }, 900);
     return;
   }
@@ -1482,7 +1482,7 @@ function buildEditStructuredDiscoveryContent(title, category, payload, relations
     relations.forEach(function(rel) {
       const relLabel = escapeHtmlEP(rel.relation_type || "related_to");
       if (rel.slug) {
-        html += '<li><strong>' + relLabel + ':</strong> <a href="/wiki/post/?slug=' + encodeURIComponent(rel.slug) + '">' + escapeHtmlEP(rel.title || "Entry") + '</a></li>';
+        html += '<li><strong>' + relLabel + ':</strong> <a href="' + BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug }) + '">' + escapeHtmlEP(rel.title || "Entry") + '</a></li>';
       } else {
         html += '<li><strong>' + relLabel + ':</strong> ' + escapeHtmlEP(rel.title || "Entry") + '</li>';
       }

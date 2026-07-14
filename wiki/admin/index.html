@@ -227,6 +227,7 @@
 <script src="/js/avatar-utils.js"></script>
 <script src="/js/auth-nav.js"></script>
 <script src="/js/notifications.js"></script>
+<script src="/js/entity-routes.js?v=p5-e9g2"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script src="/js/main.js"></script>
 <script>
@@ -1877,7 +1878,7 @@ async function notifyPostOwner(post, type, title, message, url) {
 
 function buildPostUrl(post) {
   if (!post) return "/wiki/post/";
-  return post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : ("/wiki/post/?id=" + encodeURIComponent(post.id));
+  return BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug, id: post.id });
 }
 
 function escapeHtmlA(str) {

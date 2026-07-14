@@ -106,7 +106,7 @@ async function renderCategoryPosts(categorySlug) {
       ? renderAvatar(post.profiles, "bl-avatar-sm")
       : "";
     const statBarHtml = renderRatingSummary(post);
-    const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+    const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
     const dateLabel = new Date(post.created_at).toLocaleDateString();
     const openLabel = getOpenLabelForPost(post, categorySlug);
 
@@ -138,7 +138,7 @@ async function renderCategoryPosts(categorySlug) {
 }
 
 function renderGuildCard(post) {
-  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
   const authorName = post.profiles ? post.profiles.username : "Unknown";
   const dateLabel = new Date(post.created_at).toLocaleDateString();
   const plainText = post.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -236,7 +236,7 @@ function renderCategoryCard(post, categorySlug) {
     ? renderAvatar(post.profiles, "bl-avatar-sm")
     : "";
   const statBarHtml = renderRatingSummary(post);
-  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
   const dateLabel = new Date(post.created_at).toLocaleDateString();
   const openLabel = getOpenLabelForPost(post, categorySlug);
 
