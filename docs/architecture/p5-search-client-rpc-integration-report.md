@@ -16,7 +16,8 @@
 | **Client RPC Integration** | **RPC_CLIENT_INTEGRATED** |
 | **Search DB/FTS UI Integration** | **RPC_CLIENT_INTEGRATED** |
 | **Search DB/FTS Evidence** | **PASS** (12 persistente Docs, 4I) |
-| **P5-E.9E.4J** | **PASS** — Persistent Staging Search Re-run |
+| **P5-E.9E.4L** | **PASS** — Marker Deindex Fix |
+| **MARKER_SEARCHABLE_RISK** | **CLOSED_STAGING** |
 | **Search DB/FTS Runtime Evidence** | **STAGING_PASS** (P5-E.9E.4J) |
 | **P5-E.9E.4G** | **PASS** — RPC Corpus Verification |
 | **P5-E.9E.4I** | **PASS** — Persistent Canonical Corpus Seed |

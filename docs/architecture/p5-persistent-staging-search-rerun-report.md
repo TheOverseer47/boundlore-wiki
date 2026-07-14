@@ -13,7 +13,9 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E.4J** | **PASS** |
-| **Persistent Staging Search Re-run** | **PARTIAL** (MARKER_SEARCHABLE_RISK) |
+| **Persistent Staging Search Re-run** | **PASS** (4L deindex) |
+| **MARKER_SEARCHABLE_RISK** | **CLOSED_STAGING** |
+| **P5-E.9E.4L** | **PASS** — Marker Deindex Fix |
 | **Persistent Canonical Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (unverändert) |
 | **Search DB/FTS Evidence** | **PASS** (12 persistente Docs) |
 | **Search DB/FTS Runtime Evidence** | **STAGING_PASS** |

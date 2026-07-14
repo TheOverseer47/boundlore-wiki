@@ -3478,6 +3478,20 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 167. P5-E.9E.4L — Staging Marker Deindex Fix (PASS)
+
+**Milestone:** P5-E.9E.4L. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| MARKER_DEINDEX_STAGING_PASS | **PASS** |
+| MARKER_SEARCHABLE_RISK | **CLOSED_STAGING** |
+| P5-E.9E.4L | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-marker-deindex-fix-report.md`
+
+---
+
 ## 166. P5-E.9E.4K — Marker Searchability Mitigation Plan (PASS)
 
 **Milestone:** P5-E.9E.4K (Plan-only). **PASS**.

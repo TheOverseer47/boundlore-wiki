@@ -504,6 +504,20 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 47. P5-E.9E.4L Follow-up (PASS — Staging Marker Deindex Fix)
+
+**Gate:** P5-E.9E.4L. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| MARKER_DEINDEX_STAGING_PASS | **PASS** |
+| MARKER_SEARCHABLE_RISK | **CLOSED_STAGING** |
+| P5-E.9E.4L | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-marker-deindex-fix-report.md`
+
+---
+
 ## 46. P5-E.9E.4K Follow-up (PASS — Marker Searchability Mitigation Plan)
 
 **Gate:** P5-E.9E.4K. **PASS** (Plan-only).

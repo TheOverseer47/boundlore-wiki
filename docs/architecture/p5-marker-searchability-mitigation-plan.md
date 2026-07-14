@@ -13,8 +13,9 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E.4K** | **PASS** (Plan-only) |
-| **MARKER_SEARCHABLE_RISK** | **OPEN** — bis P5-E.9E.4L |
-| **Empfohlener Fix-Gate** | **P5-E.9E.4L** — Staging Marker Deindex Fix |
+| **MARKER_SEARCHABLE_RISK** | **CLOSED_STAGING** (P5-E.9E.4L) |
+| **P5-E.9E.4L** | **PASS** — Staging Marker Deindex Fix |
+| **Empfohlener Fix-Gate** | ~~P5-E.9E.4L~~ **PASS** |
 | **Search DB/FTS Runtime Evidence** | **STAGING_PASS** (Recall OK; Index-Hygiene offen) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |

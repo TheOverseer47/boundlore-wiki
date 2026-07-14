@@ -24,8 +24,9 @@
 | **RPC Corpus Verification** | **RPC_CORPUS_VERIFIED_CLEANED** (4G) |
 | **Persistent Canonical Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 posts) |
 | **P5-E.9E.4J** | **PASS** — Persistent Staging Search Re-run |
-| **P5-E.9E.4K** | **PASS** — Marker Searchability Mitigation Plan |
-| **MARKER_SEARCHABLE_RISK** | **OPEN** — Fix-Gate **P5-E.9E.4L** |
+| **P5-E.9E.4L** | **PASS** — Marker Deindex Fix |
+| **MARKER_SEARCHABLE_RISK** | **CLOSED_STAGING** |
+| **Persistent Staging Search Re-run** | **PASS** |
 | **Search DB/FTS Runtime Evidence** | **STAGING_PASS** (4J) |
 | **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 48/48 + 48/48) |
 | **Wiki Search Runtime Matrix** | **AUSGEFÜHRT** (27 Queries, 4J) |

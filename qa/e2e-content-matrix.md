@@ -2646,7 +2646,42 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** P5-E.9E.4K (Plan-only). No push/deploy/launch.
+**Next:** P5-E.9E.4L erledigt. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4L — Staging Marker Deindex Fix (PASS)
+
+**Milestone:** P5-E.9E.4L (Staging UPDATE + Rebuild). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fresh staging backup before update | backup | present | `[x]` |
+| Target ref `jzzgoiwfbuwiiyvwgwri` | staging | verified | `[x]` |
+| Legacy not used | staging | not legacy | `[x]` |
+| Production not used | staging | not production | `[x]` |
+| Update limited to 12 P5-E.9E.4I posts | staging | 12 slugs | `[x]` |
+| Marker removed from content | staging | 0 with marker | `[x]` |
+| No deletes | scope | none | `[x]` |
+| No cleanup | scope | none | `[x]` |
+| No schema/policy/grant changes | scope | none | `[x]` |
+| `bl_rebuild_search_documents()` executed | staging | 12 rows | `[x]` |
+| Marker full query returns 0 | runtime | 0 hits | `[x]` |
+| Core query matrix still passes | runtime | PASS | `[x]` |
+| RPC-first client used | runtime | RPC | `[x]` |
+| no BLMETA exposed | runtime | absent | `[x]` |
+| no search_text/search_vector exposed | runtime | absent | `[x]` |
+| no Profile-PII exposed | runtime | absent | `[x]` |
+| no Storage/Push/Deploy/Launch | scope | none | `[x]` |
+| MARKER_DEINDEX_STAGING_PASS | status | PASS | `[x]` |
+| MARKER_SEARCHABLE_RISK | status | CLOSED_STAGING | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4L | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-marker-deindex-fix-report.md`
+
+**Next:** Production Content Migration. No push/deploy/launch.
 
 ---
 
@@ -2675,7 +2710,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-marker-searchability-mitigation-plan.md`
 
-**Next:** P5-E.9E.4L (STOPP). No push/deploy/launch.
+**Next:** P5-E.9E.4L erledigt. No push/deploy/launch.
 
 ---
 
@@ -2714,7 +2749,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-persistent-staging-search-rerun-report.md`
 
-**Next:** P5-E.9E.4K erledigt. P5-E.9E.4L (STOPP). No push/deploy/launch.
+**Next:** P5-E.9E.4L erledigt. No push/deploy/launch.
 
 ---
 

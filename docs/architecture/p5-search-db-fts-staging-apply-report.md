@@ -218,7 +218,8 @@ Angewendete Objekte:
 | Search DB/FTS Apply | **APPLIED_STAGING_PASS** |
 | Search DB/FTS Evidence | **PASS** (12 persistente Docs, P5-E.9E.4I) |
 | Search DB/FTS Runtime Evidence | **STAGING_PASS** (P5-E.9E.4J) |
-| **P5-E.9E.4J** | **PASS** — Persistent Staging Search Re-run |
+| **P5-E.9E.4L** | **PASS** — Marker Deindex Fix |
+| **MARKER_SEARCHABLE_RISK** | **CLOSED_STAGING** |
 | **P5-E.9E.4I** | **PASS** — Persistent Canonical Corpus Seed |
 | **P5-E.9E.4G** | **PASS** — RPC Corpus Verification |
 | S-06 Search Recall | **OPEN_BLOCKING** |

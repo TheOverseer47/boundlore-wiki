@@ -16,8 +16,8 @@
 | **P5-E.9E.4I** | **PASS** — Staging Persistent Canonical Corpus Seed |
 | **Search technisch bewiesen** | **Ja** (4G + 4I persistent) |
 | **Persistenter Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 Canonicals) |
-| **P5-E.9E.4K** | **PASS** — Marker Searchability Mitigation Plan |
-| **Empfohlener nächster Gate** | **P5-E.9E.4L** — Staging Marker Deindex Fix |
+| **P5-E.9E.4L** | **PASS** — Staging Marker Deindex Fix |
+| **Empfohlener nächster Gate** | Production Content Migration |
 | **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_PASS**; Production offen) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |

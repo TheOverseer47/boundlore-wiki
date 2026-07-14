@@ -33,7 +33,18 @@
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.4L** — Staging Marker Deindex Fix
+**Empfohlener nächster Gate:** Production Content Migration
+
+---
+
+## P5-E.9E.4L — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-staging-marker-deindex-fix-report.md` |
+| MARKER_DEINDEX_STAGING_PASS | **PASS** |
+| MARKER_SEARCHABLE_RISK | **CLOSED_STAGING** |
+| P5-E.9E.4L | **PASS** |
 
 ---
 
