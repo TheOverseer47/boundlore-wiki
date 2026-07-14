@@ -340,4 +340,21 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 
 ---
 
-*Dokumentversion: P5-E.9E.4M + 5A–5F PASS. Kein Content Write.*
+## P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Rebuild | **6** Zeilen |
+| Index State | **POPULATED** |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5H** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.4M + 5A–5G PASS. Kein Content Row Write.*

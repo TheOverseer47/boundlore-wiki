@@ -2656,6 +2656,45 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+---
+
+## P5-E.9E.5G — Legacy Content Filter Rebuild (PASS)
+
+**Milestone:** P5-E.9E.5G (Legacy Content Filter + Rebuild). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | apply | yes | `[x]` |
+| Staging ref not used | apply | yes | `[x]` |
+| HEAD before gate `a8b90fc` | apply | yes | `[x]` |
+| fresh 5G backup created | apply | yes | `[x]` |
+| 5E/5F security/DDL still verified | apply | yes | `[x]` |
+| no filter DDL changes | scope | none | `[x]` |
+| `bl_rebuild_search_documents()` executed | apply | 6 rows | `[x]` |
+| 6 indexed canonical slugs | apply | yes | `[x]` |
+| excluded deleted/pending/draft | filter | yes | `[x]` |
+| excluded Contribution titles | filter | yes | `[x]` |
+| excluded QA/test/fixture slugs | filter | yes | `[x]` |
+| RPC smoke PASS | apply | yes | `[x]` |
+| no content row writes | scope | none | `[x]` |
+| no runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Product Activation remains FAIL | status | FAIL | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5G | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+**5G Backup:** `backups/legacy/p5-e9e5g-content-rebuild-prewrite-20260714-154908.dump` — SHA256 `CD0F19681B35DEE1ECD325DD9F7EA882A48306540D8B70F44877F06BA695BA42` — **not committed**.
+
+**Indexed slugs:** near-a-campfire-787bbd19, ogre-mage-9651e6, smought-835df97a, staff-of-fire-2f316b0d, swamplands-94dadc07, why-boundlore-is-the-best-wiki-there-is-d16ea72a
+
+**Next:** P5-E.9E.5H Legacy RPC-first Search Verification. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5F — Legacy Search DB FTS Apply (PASS)
 
 **Milestone:** P5-E.9E.5F (Legacy Search DDL). **PASS**.

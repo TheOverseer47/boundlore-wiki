@@ -182,10 +182,10 @@
 
 | Risiko | Status | Nächster Gate |
 |--------|--------|---------------|
-| Search MVP auf Legacy | **DDL applied (5F)**; Index **leer** bis 5G | **P5-E.9E.5G** |
+| Search MVP auf Legacy | **DDL applied (5F)**; Index **POPULATED (6)** via 5G | **P5-E.9E.5H** |
 | UPDATE/DELETE-Policies auf `posts` mit Invoker-`profiles`-Subquery | **Offen** (außerhalb 5E SELECT-Scope) | Optional späteres Gate |
 | `anon` hat weiterhin INSERT/UPDATE/DELETE Table-Grants auf `profiles` | **Residual** — RLS blockiert, aber Grants breit | Optional Grant-Härtung |
-| Content QA/BLMETA | **Offen** | **P5-E.9E.5G** |
+| Content QA/BLMETA | **Aus Index ausgeschlossen (5G)** | 5H Verification |
 | Release Gate fehlt | **Offen** | Separates Apply-Gate |
 | S-06 Final / Launch | **Offen** | 5G–5J + Launch |
 
@@ -196,7 +196,7 @@
 | Gate | Freigabe |
 |------|----------|
 | ~~**P5-E.9E.5F**~~ | Legacy Search DB/FTS Apply — **PASS** |
-| **P5-E.9E.5G** | Content Cleanup + Rebuild — **Ja** |
+| ~~**P5-E.9E.5G**~~ | Content Cleanup + Rebuild — **PASS** |
 | **P5-E.9E.5H–5J** | Verification / Dry Run / S-06 Final |
 | **S-05, Launch** | Separat |
 
@@ -210,7 +210,8 @@
 | Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
 | Public Profile Leak | **CLOSED** |
 | Posts RLS Dependency (SELECT) | **CLOSED** |
-| Legacy Search DB/FTS | **NOT_APPLIED** |
+| Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** (5F); Index **POPULATED** (5G) |
+| P5-E.9E.5G | **PASS** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
 | S-06 Final Status | **OPEN_BLOCKING** |
@@ -219,6 +220,24 @@
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
+**Empfohlener nächster Gate:** P5-E.9E.5H — Legacy RPC-first Search Verification
+
 ---
 
-*Dokumentversion: P5-E.9E.5E PASS. Keine Secrets. Keine Row-Dumps. Kein Search Apply.*
+## P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| 5E Profile/RLS Security | **INTACT** — `profiles_select_all` **0**, anon SELECT profiles **false**, Posts SELECT ohne `profiles`-Subquery |
+| Rebuild | **6** Zeilen; keine Content-Row-Writes |
+| RPC Smoke | **PASS** |
+| Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5H** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5E + 5G PASS. Keine Secrets. 5E Security INTACT.*

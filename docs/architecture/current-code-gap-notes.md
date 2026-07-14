@@ -3478,6 +3478,36 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 175. P5-E.9E.5G — Legacy Content Filter + Rebuild (PASS)
+
+**Milestone:** P5-E.9E.5G (Legacy Content Filter + Rebuild). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Target ref verified | **PASS** |
+| Staging ref not used | **PASS** |
+| Fresh 5G backup created | **PASS** — 451,890 bytes |
+| 5E/5F integrity intact | **PASS** |
+| No filter DDL changes | **PASS** |
+| Rebuild returned 6 rows | **PASS** |
+| 6 indexed canonical slugs | **PASS** |
+| Excluded deleted/pending/draft/Contribution/QA | **PASS** |
+| RPC smoke | **PASS** |
+| No content row writes | **PASS** |
+| No runtime switch | **PASS** |
+| Legacy Search Index State | **POPULATED** (6) |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5G | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+**5G Backup:** `backups/legacy/p5-e9e5g-content-rebuild-prewrite-20260714-154908.dump` — SHA256 `CD0F19681B35DEE1ECD325DD9F7EA882A48306540D8B70F44877F06BA695BA42` — **not committed**.
+
+**Next:** P5-E.9E.5H Legacy RPC-first Search Verification. No push/deploy/launch.
+
+---
+
 ## 174. P5-E.9E.5F — Legacy Search DB/FTS Apply (PASS)
 
 **Milestone:** P5-E.9E.5F (Legacy Search DDL). **PASS**.

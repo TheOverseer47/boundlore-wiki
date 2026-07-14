@@ -441,7 +441,24 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild
+**Empfohlener nächster Gate:** **P5-E.9E.5H** — Legacy RPC-first Search Verification
+
+---
+
+## P5-E.9E.5G — Umsetzungsnachweis (PASS — Legacy Content Filter + Rebuild)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-legacy-content-filter-rebuild-report.md` |
+| Rebuild | **6** Zeilen |
+| Legacy Search Index State | **POPULATED** |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5G | **PASS** |
+
+**Empfohlener nächster Gate:** **P5-E.9E.5H** — Legacy RPC-first Search Verification
 
 ---
 

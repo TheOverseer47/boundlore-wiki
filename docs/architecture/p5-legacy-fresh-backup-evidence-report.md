@@ -18,7 +18,7 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 
 **Legacy Fresh Backup Evidence** darf als **PASS** gewertet werden. **Restore Evidence** und **Production Backup Schedule** bleiben **OPEN**.
 
-**Nächster Gate (post-5F):** **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild.
+**Nächster Gate (post-5G):** **P5-E.9E.5H** — Legacy RPC-first Search Verification.
 
 ---
 
@@ -184,8 +184,8 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 | Gate | Freigabe |
 |------|----------|
 | ~~**P5-E.9E.5E**~~ | Profile/RLS Security Hardening — **PASS** |
-| **P5-E.9E.5G** | Content Cleanup + Rebuild — **Ja** |
-| **P5-E.9E.5G–5J** | Je Gate explizit |
+| ~~**P5-E.9E.5G**~~ | Content Cleanup + Rebuild — **PASS** |
+| **P5-E.9E.5H–5J** | Je Gate explizit |
 | **Restore Evidence** | Separates Gate |
 | **S-05, Launch** | Separat |
 
@@ -196,7 +196,9 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 | Item | Status |
 |------|--------|
 | P5-E.9E.5D | **PASS** |
+| P5-E.9E.5G | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
+| Legacy Search Index State | **POPULATED** (6 via 5G) |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
@@ -206,6 +208,26 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
+**Empfohlener nächster Gate:** P5-E.9E.5H — Legacy RPC-first Search Verification
+
 ---
 
-*Dokumentversion: P5-E.9E.5D PASS. Backup-Export only. Keine Secrets. Kein Restore.*
+## P5-E.9E.5G Backup Reference (PASS — Content Rebuild Prewrite)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Wert |
+|------|------|
+| Pfad | `backups/legacy/p5-e9e5g-content-rebuild-prewrite-20260714-154908.dump` |
+| Größe | **451,890 bytes** |
+| SHA256 | `CD0F19681B35DEE1ECD325DD9F7EA882A48306540D8B70F44877F06BA695BA42` |
+| TOC Entries | **715** |
+| Gitignored | **Ja** |
+| Restore | **Nein** |
+| Committed | **Nein** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5D + 5G PASS. Backup-Export only. Keine Secrets. Kein Restore.*

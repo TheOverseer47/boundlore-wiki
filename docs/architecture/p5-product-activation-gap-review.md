@@ -504,6 +504,29 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 52. P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Rebuild | **6** Zeilen |
+| Legacy Search Index State | **POPULATED** |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| Runtime-Switch | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5G | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+**Empfohlener nächster Gate:** **P5-E.9E.5H** — Legacy RPC-first Search Verification
+
+---
+
 ## 51. P5-E.9E.5C Follow-up (PASS — Final Target Decision)
 
 **Gate:** P5-E.9E.5C. **PASS** (Plan-only).

@@ -29,7 +29,7 @@
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F, empty index). Content-Migration/Rebuild folgt **5G**. Empfohlener nächster Gate: **P5-E.9E.5G**.
+**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F). Content Filter/Rebuild **PASS** (5G, 6 rows). Empfohlener nächster Gate: **P5-E.9E.5H**.
 
 ---
 
@@ -347,7 +347,24 @@ Nur: `title`, `canonical_slug`, `canonical_url`, `excerpt`, `category`, `score`,
 
 **Report:** `docs/architecture/p5-final-target-decision.md`
 
-Content Migration (5G) folgt **nach** Backup (5D), Security (5E), Search Apply (5F).
+Content Migration (5G) **PASS** — 6 public-safe Canonicals indexed. Nächster Gate: **5H**.
+
+---
+
+## P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Rebuild | **6** Zeilen |
+| Indexierte Slugs | near-a-campfire-787bbd19, ogre-mage-9651e6, smought-835df97a, staff-of-fire-2f316b0d, swamplands-94dadc07, why-boundlore-is-the-best-wiki-there-is-d16ea72a |
+| Ausgeschlossen | deleted, pending/draft, Contribution titles, QA/test/fixture slugs |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5H** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
 
 ---
 
@@ -357,4 +374,4 @@ Content Migration (5G) folgt **nach** Backup (5D), Security (5E), Search Apply (
 
 ---
 
-*Dokumentversion: P5-E.9E.4H PASS. Plan-only. Kein SQL. Kein DB-Zugriff.*
+*Dokumentversion: P5-E.9E.4H + 5G PASS. Plan-only. Kein SQL. Kein DB-Zugriff.*

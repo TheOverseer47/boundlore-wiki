@@ -203,8 +203,8 @@
 
 | Risiko | Status | Nächster Gate |
 |--------|--------|---------------|
-| Leerer Search-Index | **Offen** | **P5-E.9E.5G** Rebuild |
-| QA/Contribution-Content auf Legacy | **Offen** | 5G Content Cleanup + Filter |
+| Leerer Search-Index | **Geschlossen (5G)** — 6 rows | **P5-E.9E.5H** Verification |
+| QA/Contribution-Content auf Legacy | **Geschlossen (5G)** — aus Index ausgeschlossen | 5H Verification |
 | Recall nicht verifiziert | **Offen** | 5H Verification |
 | S-06 Final / Launch | **Offen** | 5H–5J |
 
@@ -214,7 +214,7 @@
 
 | Gate | Freigabe |
 |------|----------|
-| **P5-E.9E.5G** | Content Cleanup + Rebuild — **Ja** (separat) |
+| ~~**P5-E.9E.5G**~~ | Content Cleanup + Rebuild — **PASS** |
 | **P5-E.9E.5H–5J** | Verification / Dry Run / S-06 Final |
 | **S-05, Launch** | Separat |
 
@@ -227,8 +227,9 @@
 | P5-E.9E.5F | **PASS** |
 | Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** |
 | Legacy Search RPC | **PRESENT** |
-| Legacy Search Index State | **EMPTY** |
+| Legacy Search Index State | **POPULATED** (6 rows via 5G) |
 | Legacy Profile/RLS Security | **INTACT** |
+| P5-E.9E.5G | **PASS** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
 | S-06 Final Status | **OPEN_BLOCKING** |
@@ -237,6 +238,29 @@
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
+**Empfohlener nächster Gate:** P5-E.9E.5H — Legacy RPC-first Search Verification
+
 ---
 
-*Dokumentversion: P5-E.9E.5F PASS. Keine Secrets. Kein Rebuild. Kein Content Write.*
+## P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `a8b90fc` |
+| 5G Backup | 451,890 bytes; SHA256 `CD0F19681B35DEE1ECD325DD9F7EA882A48306540D8B70F44877F06BA695BA42`; TOC **715** |
+| Filter DDL geändert | **Nein** (bestehender Filter ausreichend) |
+| Rebuild | **6** Zeilen |
+| Indexierte Slugs | 6 public-safe Canonicals (siehe Report) |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| 5E/5F Integrity | **INTACT** |
+| Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5H** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5F + 5G PASS. Keine Secrets. Kein Content Row Write. Kein Runtime-Switch.*

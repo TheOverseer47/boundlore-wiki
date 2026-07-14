@@ -20,7 +20,8 @@
 | **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild |
+| **Empfohlener nächster Gate** | **P5-E.9E.5H** — Legacy RPC-first Search Verification |
+| **Legacy Search Index State (5G)** | **POPULATED** (6 rows) |
 | **Legacy Search DB/FTS (5F)** | **APPLIED_LEGACY_PASS** |
 | **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
@@ -396,3 +397,20 @@
 | Nächster Gate | **P5-E.9E.5G** |
 
 **Report:** `docs/architecture/p5-legacy-search-db-fts-apply-report.md`
+
+---
+
+## P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Rebuild | **6** Zeilen — 6 canonical candidates indexed |
+| Ausgeschlossen | deleted, pending/draft, Contribution titles, QA/test/fixture slugs |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| Runtime-Switch | **Nein** |
+| Nächster Gate | **P5-E.9E.5H** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`

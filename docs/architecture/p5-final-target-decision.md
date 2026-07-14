@@ -17,7 +17,8 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **Staging Ref** | `jzzgoiwfbuwiiyvwgwri` (weiterhin Runtime + Evidence) |
 | **Legacy Target Suitability (5B)** | **NEEDS_MIGRATION_DECISION** → aufgelöst als **CONDITIONAL** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild |
+| **Empfohlener nächster Gate** | **P5-E.9E.5H** — Legacy RPC-first Search Verification |
+| **Legacy Search Index State (5G)** | **POPULATED** (6 rows) |
 | **Legacy Search DB/FTS (5F)** | **APPLIED_LEGACY_PASS** |
 | **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
@@ -308,6 +309,28 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 ---
 
+## P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `a8b90fc` |
+| Target | `ohkoojpzmptdfyowdgog` only; Staging unverändert |
+| 5G Backup | 451,890 bytes; SHA256 dokumentiert; TOC **715** |
+| Filter DDL | **Keine Änderung** |
+| Rebuild | **6** Zeilen |
+| Ausgeschlossen | deleted, pending/draft, Contribution titles, QA/test/fixture slugs |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| 5E/5F Integrity | **INTACT** |
+| Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5H** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+---
+
 ## Status Matrix
 
 | Item | Status |
@@ -316,9 +339,11 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | P5-E.9E.5D | **PASS** |
 | P5-E.9E.5E | **PASS** |
 | P5-E.9E.5F | **PASS** |
+| P5-E.9E.5G | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
 | Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
 | Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** |
+| Legacy Search Index State | **POPULATED** (6) |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** (war NEEDS_MIGRATION_DECISION) |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
@@ -328,6 +353,8 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
+**Empfohlener nächster Gate:** P5-E.9E.5H — Legacy RPC-first Search Verification
+
 ---
 
-*Dokumentversion: P5-E.9E.5C + 5D PASS. Keine Secrets.*
+*Dokumentversion: P5-E.9E.5C + 5D + 5E + 5F + 5G PASS. Keine Secrets.*

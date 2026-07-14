@@ -418,10 +418,29 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.5C**~~ **PASS** — Final Target Decision (**LEGACY_CONDITIONAL_TARGET_CANDIDATE**)
 
-**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild
+**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5H** — Legacy RPC-first Search Verification
+
+---
+
+## P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Rebuild | **6** Zeilen |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+**Empfohlener nächster Gate:** **P5-E.9E.5H** — Legacy RPC-first Search Verification
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9E.4C PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX.*
+*Dokumentversion: P5-E.9D … + P5-E.9E.5G PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX.*

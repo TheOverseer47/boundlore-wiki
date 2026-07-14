@@ -18,7 +18,7 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild |
+| **Empfohlener nächster Gate** | **P5-E.9E.5H** — Legacy RPC-first Search Verification |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -353,4 +353,21 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5F PASS. Kein Content Write.*
+## P5-E.9E.5G Follow-up (PASS — Legacy Content Filter + Rebuild)
+
+**Gate:** P5-E.9E.5G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Content Filter/Rebuild | **REBUILD_PASS** |
+| `search_documents` rows | **6** |
+| RPC Smoke | **PASS** |
+| Content-Row-Writes | **Nein** |
+| Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5H** |
+
+**Report:** `docs/architecture/p5-legacy-content-filter-rebuild-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5A–5G PASS. Kein Content Row Write.*
