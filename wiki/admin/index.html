@@ -310,7 +310,8 @@
 <script src="/js/observation-context-registry.js?v=1"></script>
 <script src="/js/creature-encounter-registry.js?v=1"></script>
 <script src="/js/requirement-unlock-registry.js?v=1"></script>
-<script src="/js/knowledge-relations.js?v=20"></script>
+  <script src="/js/entity-routes.js?v=p5-e9g2"></script>
+  <script src="/js/knowledge-relations.js?v=20"></script>
 <script src="/js/entity-core.js?v=11"></script>
 <script src="/js/versioning-model.js?v=3"></script>
 <script src="/js/evidence-rank.js?v=2"></script>
@@ -3309,7 +3310,7 @@ async function notifyPostOwner(post, type, title, message, url) {
 
 function buildPostUrl(post) {
   if (!post) return "/wiki/post/";
-  return post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : ("/wiki/post/?id=" + encodeURIComponent(post.id));
+  return BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug, id: post.id });
 }
 
 function escapeHtmlA(str) {

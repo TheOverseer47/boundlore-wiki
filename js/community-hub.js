@@ -23,7 +23,7 @@ async function loadCommunityDiscoveries() {
   data.forEach(function(post) {
     const card = document.createElement("a");
     card.className = "recent-card";
-    card.href = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+    card.href = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
 
     const label = typeof getPostCategoryLabel === "function"
       ? getPostCategoryLabel(post)
@@ -61,7 +61,7 @@ async function loadCommunityGuides() {
   container.innerHTML = "";
   data.forEach(function(post) {
     const li = document.createElement("li");
-    const href = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+    const href = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
     const meta = parsePostMetaCH(post.content || "");
     const subcategory = post.guide_subcategory || (meta && meta.subcategory) || "";
     const label = subcategory && typeof getGuideSubcategoryLabel === "function"

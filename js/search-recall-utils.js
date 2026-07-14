@@ -306,6 +306,10 @@ window.BoundLoreSearchRecall = (function() {
     if (rec.url && String(rec.url).indexOf("/wiki/post/" + slug + "/") === 0) {
       return String(rec.url);
     }
+    if (typeof BoundLoreEntityRoutes !== "undefined") {
+      var canonical = BoundLoreEntityRoutes.buildCanonicalEntityPath(slug);
+      if (canonical) return canonical;
+    }
     return "/wiki/post/" + slug + "/";
   }
 

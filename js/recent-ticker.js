@@ -25,8 +25,8 @@ async function loadRecentTicker() {
       ? getPostCategoryLabel(post)
       : (post.category || "Post");
     const href = post.slug
-      ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug))
-      : ("/wiki/post/?id=" + encodeURIComponent(post.id));
+      ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug })
+      : BoundLoreEntityRoutes.buildEntityPostHref({ id: post.id });
 
     return '<a class="recent-card" href="' + href + '">' +
       '<span class="recent-tag">' + escapeHtmlRT(label) + '</span>' +

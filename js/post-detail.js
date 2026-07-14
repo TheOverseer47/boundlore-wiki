@@ -846,8 +846,8 @@ function inferRelationTargetTypePD(rel) {
 
 function buildDiscoveryRelationHrefPD(rel) {
   if (!rel) return "";
-  if (rel.slug) return "/wiki/post/?slug=" + encodeURIComponent(rel.slug);
-  if (rel.id) return "/wiki/post/?id=" + encodeURIComponent(rel.id);
+  if (rel.slug) return BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug });
+  if (rel.id) return BoundLoreEntityRoutes.buildEntityPostHref({ id: rel.id });
   const group = String(rel.group || "").toLowerCase();
   const title = String(rel.title || "").trim();
   if (!title) return "";
@@ -1019,7 +1019,7 @@ function renderGuideReferencesPD(post, postMeta) {
       const label = escapeHtml(ref.title || "Entry");
       const type = escapeHtml(ref.post_type === "guide" ? "Guide" : (ref.category || "Entry"));
       if (ref.slug) {
-        return '<li><a href="/wiki/post/?slug=' + encodeURIComponent(ref.slug) + '">' + label + '</a> <span style="color:var(--text-muted);">(' + type + ')</span></li>';
+        return '<li><a href="' + BoundLoreEntityRoutes.buildEntityPostHref({ slug: ref.slug }) + '">' + label + '</a> <span style="color:var(--text-muted);">(' + type + ')</span></li>';
       }
       return '<li>' + label + ' <span style="color:var(--text-muted);">(' + type + ')</span></li>';
     }).join('') +
@@ -1427,7 +1427,7 @@ function appendRelatedGroupPD(container, heading, items, usedIds) {
 function renderRelatedItemPD(item) {
   const link = document.createElement("a");
   link.className = "bl-related-item";
-  link.href = item.href || (item.slug ? ("/wiki/post/?slug=" + encodeURIComponent(item.slug)) : ("/wiki/post/?id=" + encodeURIComponent(item.id)));
+  link.href = item.href || BoundLoreEntityRoutes.buildEntityPostHref({ slug: item.slug, id: item.id });
   const label = (typeof EntityCore !== "undefined" && item.content)
     ? EntityCore.getDisplayName(parsePostMetaPD(item.content || ""), item)
     : (item.label || item.title || "Untitled");
@@ -1690,9 +1690,7 @@ function wireCommentForm(postId) {
         type: "comment",
         title: "New comment on your post",
         message: "Someone commented on \"" + currentPost.title + "\".",
-        target_url: currentPost.slug
-          ? ("/wiki/post/?slug=" + encodeURIComponent(currentPost.slug))
-          : ("/wiki/post/?id=" + encodeURIComponent(currentPost.id)),
+        target_url: BoundLoreEntityRoutes.buildEntityPostHref({ slug: currentPost.slug, id: currentPost.id }),
       });
     }
 

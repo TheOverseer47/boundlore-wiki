@@ -205,18 +205,26 @@ function buildPostPath(postOrDoc, row) {
       const doc = postOrDoc && (postOrDoc.document || postOrDoc);
       if (!rec && doc && (doc.slug || doc.title || doc.url)) {
         if (doc.url) return doc.url;
+        if (doc.slug && typeof BoundLoreEntityRoutes !== "undefined") {
+          var canonical = BoundLoreEntityRoutes.buildCanonicalEntityPath(doc.slug);
+          if (canonical) return canonical;
+        }
         if (doc.slug) return "/wiki/post/" + encodeURIComponent(doc.slug) + "/";
       }
       if (rec && BoundLoreSearchRecall.isPublicSearchable(rec)) {
         return BoundLoreSearchRecall.getCanonicalResultUrl(rec);
       }
     } catch (e) {
-      // fail-closed: fall back to safe CSR path
+      // fail-closed: fall back to safe path
     }
   }
   const doc = postOrDoc && (postOrDoc.document || postOrDoc);
   if (doc && doc.url) return doc.url;
   const slug = postOrDoc && (postOrDoc.slug || (postOrDoc.document && postOrDoc.document.slug));
+  if (slug && typeof BoundLoreEntityRoutes !== "undefined") {
+    var path = BoundLoreEntityRoutes.buildCanonicalEntityPath(slug);
+    if (path) return path;
+  }
   if (slug) return "/wiki/post/" + encodeURIComponent(slug) + "/";
   return "/wiki/post/";
 }

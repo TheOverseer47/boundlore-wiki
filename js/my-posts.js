@@ -36,7 +36,7 @@ async function renderMyPosts(userId) {
 
     const actions = [];
     if (post.status === "published") {
-      const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+      const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
       actions.push("<a href=\"" + postUrl + "\" style=\"color:var(--accent);font-size:0.85rem;\">View &rarr;</a>");
     }
       const editUrl = post.slug ? `/wiki/edit-post/?slug=${encodeURIComponent(post.slug)}` : `/wiki/edit-post/?id=${post.id}`;

@@ -717,7 +717,7 @@ async function submitContributionCP(errorEl) {
           deleted_at: new Date().toISOString(),
         }).eq("id", created.id);
         window.location.href = mergeResult.target && mergeResult.target.slug
-          ? "/wiki/post/?slug=" + encodeURIComponent(mergeResult.target.slug) + "&merged=contribution"
+          ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: mergeResult.target.slug, query: { merged: "contribution" } })
           : "/wiki/account/";
         return true;
       }
@@ -727,7 +727,7 @@ async function submitContributionCP(errorEl) {
   }
 
   window.location.href = context.targetSlug
-    ? "/wiki/post/?slug=" + encodeURIComponent(context.targetSlug) + "&submitted=contribution"
+    ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: context.targetSlug, query: { submitted: "contribution" } })
     : "/wiki/account/";
   return true;
 }
@@ -1567,7 +1567,7 @@ async function handleSubmit(e) {
         relatedEntities: relatedEntities,
       });
       if (obsResult && obsResult.post_slug) {
-        window.location.href = "/wiki/post/?slug=" + encodeURIComponent(obsResult.post_slug);
+        window.location.href = BoundLoreEntityRoutes.buildEntityPostHref({ slug: obsResult.post_slug });
         return;
       }
       if (obsResult && obsResult.post_id) {
@@ -1619,7 +1619,7 @@ async function handleSubmit(e) {
 
 function redirectToCreatedPostCP(data) {
   if (data && data.slug) {
-    window.location.href = "/wiki/post/?slug=" + encodeURIComponent(data.slug);
+    window.location.href = BoundLoreEntityRoutes.buildEntityPostHref({ slug: data.slug });
     return;
   }
   if (data && data.id) {
@@ -3068,8 +3068,8 @@ function buildStructuredDiscoveryContent(title, category, payload, relations, im
     relations.forEach(function(rel) {
       const relLabel = escapeHtmlCP(humanizeDiscoveryKeyCP(rel.relation_type || "related_to"));
       const href = rel.slug
-        ? ("/wiki/post/?slug=" + encodeURIComponent(rel.slug))
-        : (rel.id ? ("/wiki/post/?id=" + encodeURIComponent(rel.id)) : "");
+        ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug })
+        : (rel.id ? BoundLoreEntityRoutes.buildEntityPostHref({ id: rel.id }) : "");
       if (href) {
         html += '<li><strong>' + relLabel + ':</strong> <a href="' + href + '">' + escapeHtmlCP(rel.title || "Entry") + '</a></li>';
       } else {

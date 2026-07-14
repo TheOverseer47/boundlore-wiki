@@ -101,7 +101,7 @@ window.WikiEntryLayout = (function() {
     const sourcePage = opts.sourcePage
       || (typeof window !== "undefined" && window.location
         ? window.location.pathname + window.location.search
-        : (post.slug ? "/wiki/post/?slug=" + encodeURIComponent(post.slug) : ""));
+        : BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug }));
     if (sourcePage) params.set("source_page", sourcePage);
     return "/wiki/create-post/?" + params.toString();
   }
@@ -682,7 +682,7 @@ window.WikiEntryLayout = (function() {
   function renderRelationLink(rel) {
     const href = typeof KnowledgeRelations !== "undefined"
       ? KnowledgeRelations.buildRelationHref(rel)
-      : (rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : "");
+      : BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug });
     const label = typeof EntityCore !== "undefined"
       ? EntityCore.getRelationDisplayName(rel)
       : (rel.canonical_target_name || rel.title || "Entry");
@@ -889,7 +889,7 @@ window.WikiEntryLayout = (function() {
       }).join(", ");
     }
     if (fact.relation_ref && fact.relation_ref.slug) {
-      return '<a class="bl-wiki-rel-link" href="/wiki/post/?slug=' + encodeURIComponent(fact.relation_ref.slug) + '">' +
+      return '<a class="bl-wiki-rel-link" href="' + BoundLoreEntityRoutes.buildEntityPostHref({ slug: fact.relation_ref.slug }) + '">' +
         escapeHtml(fact.value) + "</a>";
     }
     if (fact.relation_ref && fact.relation_ref.title) {
@@ -1019,7 +1019,7 @@ window.WikiEntryLayout = (function() {
     const rel = key ? relIndex[key] : null;
     const href = rel && typeof KnowledgeRelations !== "undefined"
       ? KnowledgeRelations.buildRelationHref(rel)
-      : (rel && rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : "");
+      : (rel && rel.slug ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug }) : "");
     if (href && rel) return renderRelationLink(rel);
 
     const kind = context && context.kind === "station" ? "station" : "ingredient";
@@ -1132,7 +1132,7 @@ window.WikiEntryLayout = (function() {
     return inbound.map(function(rel) {
       const href = typeof KnowledgeRelations !== "undefined"
         ? KnowledgeRelations.buildRelationHref(rel)
-        : (rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : "");
+        : BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug });
       return {
         title: typeof EntityCore !== "undefined"
           ? EntityCore.getRelationDisplayName(rel)
@@ -1569,8 +1569,8 @@ window.WikiEntryLayout = (function() {
     const sourceDiscovery = meta.knowledge_entry && (meta.knowledge_entry.source_post_slug || meta.knowledge_entry.source_post_id);
     const sourceUrl = sourceDiscovery
       ? (meta.knowledge_entry.source_post_slug
-        ? "/wiki/post/?slug=" + encodeURIComponent(meta.knowledge_entry.source_post_slug)
-        : "/wiki/post/?id=" + encodeURIComponent(meta.knowledge_entry.source_post_id))
+        ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: meta.knowledge_entry.source_post_slug })
+        : BoundLoreEntityRoutes.buildEntityPostHref({ id: meta.knowledge_entry.source_post_id }))
       : "";
 
     let resolved = null;

@@ -145,7 +145,7 @@ async function renderCategoryPosts(categorySlug) {
       ? renderAvatar(post.profiles, "bl-avatar-sm")
       : "";
     const statBarHtml = renderRatingSummary(post);
-    const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+    const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
     const dateLabel = new Date(post.created_at).toLocaleDateString();
     const openLabel = getOpenLabelForPost(post, categorySlug);
 
@@ -177,7 +177,7 @@ async function renderCategoryPosts(categorySlug) {
 }
 
 function renderGuildCard(post) {
-  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
   const authorName = post.profiles ? post.profiles.username : "Unknown";
   const dateLabel = new Date(post.created_at).toLocaleDateString();
   const plainText = post.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -324,7 +324,7 @@ function renderCompactKnowledgeRowRP(post, categorySlug) {
   const meta = parsePostMetaRP(post.content || "");
   const payload = meta.discovery_payload && typeof meta.discovery_payload === "object" ? meta.discovery_payload : {};
   const subcategoryLabel = getPostSubcategoryLabel(post) || getCategorySubcategoryLabelRP(categorySlug, getRenderableSubcategorySlug(post)) || "-";
-  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
   const dateLabel = post.updated_at
     ? new Date(post.updated_at).toLocaleDateString()
     : (post.created_at ? new Date(post.created_at).toLocaleDateString() : "-");
@@ -445,7 +445,7 @@ function renderCategoryCard(post, categorySlug) {
     ? renderAvatar(post.profiles, "bl-avatar-sm")
     : "";
   const statBarHtml = renderRatingSummary(post);
-  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
   const dateLabel = new Date(post.created_at).toLocaleDateString();
   const openLabel = getOpenLabelForPost(post, categorySlug);
 
@@ -989,7 +989,7 @@ function extractResourceUsagesRP(relations) {
     seen.add(key);
     const href = typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.buildRelationHref
       ? KnowledgeRelations.buildRelationHref(rel)
-      : (rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : "");
+      : (rel.slug ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug }) : "");
     usages.push({
       title: title,
       href: href,
@@ -1133,7 +1133,7 @@ function renderResourceCardRP(post) {
   const displayName = typeof EntityCore !== "undefined"
     ? EntityCore.getDisplayName(meta, post)
     : (post.title || "Untitled");
-  const postUrl = post.slug ? ("/wiki/post/?slug=" + encodeURIComponent(post.slug)) : "/wiki/post/";
+  const postUrl = BoundLoreEntityRoutes.buildEntityPostHref({ slug: post.slug });
   const sourceTypeLabel = facts.sourceType
     ? humanizeCompactValueRP(facts.sourceType)
     : "Unknown source";

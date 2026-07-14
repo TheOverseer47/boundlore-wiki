@@ -472,8 +472,8 @@
     }
 
     const target = result.slug
-      ? ("/wiki/post/?slug=" + encodeURIComponent(result.slug))
-      : ("/wiki/post/?id=" + encodeURIComponent(result.id));
+      ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: result.slug })
+      : BoundLoreEntityRoutes.buildEntityPostHref({ id: result.id });
     setStatus("Biome example " + result.mode + " successfully. Open: " + target, "success");
   }
 

@@ -1229,8 +1229,8 @@ window.KnowledgeRelations = (function() {
 
   function buildRelationHref(rel) {
     if (!rel) return "";
-    if (rel.slug) return "/wiki/post/?slug=" + encodeURIComponent(rel.slug);
-    if (rel.id) return "/wiki/post/?id=" + encodeURIComponent(rel.id);
+    if (rel.slug) return BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug });
+    if (rel.id) return BoundLoreEntityRoutes.buildEntityPostHref({ id: rel.id });
     return "";
   }
 

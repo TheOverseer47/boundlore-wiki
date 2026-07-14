@@ -129,7 +129,7 @@ window.ResourceQuickAdd = (function() {
       slug: slug,
       category: row.category || "items",
       subtype: subtype || "item",
-      href: slug ? "/wiki/post/?slug=" + encodeURIComponent(slug) : null,
+      href: slug ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: slug }) : null,
       score: 0,
     };
   }

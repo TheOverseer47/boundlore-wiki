@@ -150,7 +150,7 @@ window.BoundLoreUnresolvedTargets = (function() {
       if (!key) return;
       const href = typeof KnowledgeRelations !== "undefined" && KnowledgeRelations.buildRelationHref
         ? KnowledgeRelations.buildRelationHref(rel)
-        : (rel.slug ? "/wiki/post/?slug=" + encodeURIComponent(rel.slug) : (rel.id ? "/wiki/post/?id=" + encodeURIComponent(rel.id) : ""));
+        : (rel.slug ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: rel.slug }) : (rel.id ? BoundLoreEntityRoutes.buildEntityPostHref({ id: rel.id }) : ""));
       if (!index[key] || href) index[key] = Object.assign({}, rel, { _href: href });
     });
     return index;
@@ -175,7 +175,7 @@ window.BoundLoreUnresolvedTargets = (function() {
   function createContextEntry(sourcePost, meta, label, extra) {
     const display = getPostDisplayName(sourcePost, meta) || sourcePost.title || "Entry";
     const slug = sourcePost.slug || "";
-    const url = slug ? "/wiki/post/?slug=" + encodeURIComponent(slug) : "";
+    const url = slug ? BoundLoreEntityRoutes.buildEntityPostHref({ slug: slug }) : "";
     return Object.assign({
       source_title: display,
       source_slug: slug,
