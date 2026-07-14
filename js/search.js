@@ -1,12 +1,41 @@
 // ============================================
 // FILE: js/search.js
-// Global search + structured signal ranking (P0.5-E)
-// Falls back to title/excerpt ilike when search-signals unavailable.
+// Global search — RPC-first via bl_search_public_content (P5-E.9E.4F).
+// Local recall-utils remain for QA fixtures only; runtime uses RPC, not posts.
 // ============================================
 
 let searchDebounceTimer = null;
-let structuredSearchCache = { posts: null, documents: null, at: 0 };
-const STRUCTURED_SEARCH_CACHE_MS = 120000;
+
+const SEARCH_RPC_NAME = "bl_search_public_content";
+const SEARCH_RPC_QUERY_MAX_LEN = 120;
+
+const SEARCH_RPC_BLOCKED_RESULT_FIELDS = new Set([
+  "search_text",
+  "search_vector",
+  "content",
+  "body",
+  "body_text",
+  "email",
+  "user_email",
+  "profile",
+  "profile_id",
+  "author_email",
+  "blmeta",
+  "blmeta_signals",
+]);
+
+const SEARCH_RPC_ALLOWED_RESULT_FIELDS = new Set([
+  "title",
+  "canonical_slug",
+  "canonical_url",
+  "excerpt",
+  "category",
+  "entity_domain",
+  "entity_subtype",
+  "score",
+  "source_type",
+  "matched_fields",
+]);
 
 const faqSearchIndex = [
   { title: "Why was my account banned?", url: "/wiki/support/#faq-banned" },
@@ -36,23 +65,155 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+function isRpcAvailable() {
+  return (
+    window.BOUNDLORE_SUPABASE_CONFIG_STATUS === "STAGING_REF_VERIFIED" &&
+    typeof supabase !== "undefined" &&
+    supabase &&
+    typeof supabase.rpc === "function"
+  );
+}
+
+function normalizeRpcQuery(query) {
+  let raw = String(query || "").trim();
+  if (hasRecallUtils() && BoundLoreSearchRecall.isUnsafeQuery(raw)) {
+    return "";
+  }
+  if (raw.length > SEARCH_RPC_QUERY_MAX_LEN) {
+    raw = raw.slice(0, SEARCH_RPC_QUERY_MAX_LEN);
+  }
+  return raw;
+}
+
+function containsLeakMarkers(value) {
+  const text = String(value || "");
+  if (!text) return false;
+  if (/<!--\s*BLMETA/i.test(text)) return true;
+  if (/\bBLMETA\b/i.test(text)) return true;
+  if (/search_text|search_vector/i.test(text)) return true;
+  if (/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(text)) return true;
+  return false;
+}
+
+function mapRpcResult(row) {
+  if (!row || typeof row !== "object") return null;
+
+  const keys = Object.keys(row);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    if (SEARCH_RPC_BLOCKED_RESULT_FIELDS.has(key) && row[key] != null && row[key] !== "") {
+      return null;
+    }
+    if (!SEARCH_RPC_ALLOWED_RESULT_FIELDS.has(key) && key !== "id") {
+      return null;
+    }
+  }
+
+  if (containsLeakMarkers(JSON.stringify(row))) return null;
+
+  const slug = String(row.canonical_slug || "").trim();
+  const title = String(row.title || "Untitled").trim();
+  const excerpt = String(row.excerpt || "").slice(0, 200);
+  let url = String(row.canonical_url || "").trim();
+  if (!url && slug) url = "/wiki/post/" + slug + "/";
+  if (!url) url = "/wiki/post/";
+
+  if (containsLeakMarkers(title) || containsLeakMarkers(excerpt)) return null;
+  if (/^Contribution:/i.test(title)) return null;
+  if (/^(qa-|test-|fixture-|contribution-)/i.test(slug)) return null;
+
+  return {
+    document: {
+      kind: "post",
+      slug: slug,
+      title: title,
+      category: row.category || "",
+      post_type: row.source_type || "",
+      entity_domain: row.entity_domain || "",
+      entity_subtype: row.entity_subtype || "",
+      excerpt: excerpt,
+      url: url,
+    },
+    score: typeof row.score === "number" ? row.score : Number(row.score) || 0,
+    explanation: excerpt ? escapeHtml(excerpt).slice(0, 140) : "",
+  };
+}
+
+function reportSearchRpcEvent(reasonCode, extra) {
+  if (typeof window.BoundLoreErrorReporter === "undefined" || !BoundLoreErrorReporter.captureMessage) {
+    return;
+  }
+  try {
+    BoundLoreErrorReporter.captureMessage("search_rpc_event", Object.assign({
+      feature: "search",
+      gate_code: "P5-E.9E.4F",
+      reason_code: reasonCode,
+      rpc: SEARCH_RPC_NAME,
+      redacted: true,
+    }, extra || {}));
+  } catch (reportErr) {
+    // fail-closed: reporting must not break search
+  }
+}
+
+async function callSearchRpc(query, options) {
+  const opts = options || {};
+
+  if (!isRpcAvailable()) {
+    return { results: [], error: "rpc_unavailable", failClosed: true, usedRpc: false };
+  }
+
+  const normalized = normalizeRpcQuery(query);
+  if (!normalized) {
+    return { results: [], error: null, failClosed: false, usedRpc: true };
+  }
+
+  const limit = typeof opts.limit === "number"
+    ? Math.min(Math.max(opts.limit, 1), 50)
+    : 24;
+
+  try {
+    const { data, error } = await supabase.rpc(SEARCH_RPC_NAME, {
+      search_query: normalized,
+      search_filters: { limit: limit },
+    });
+
+    if (error) {
+      reportSearchRpcEvent("rpc_error", { code: error.code || "unknown" });
+      return { results: [], error: error, failClosed: true, usedRpc: true };
+    }
+
+    const mapped = (Array.isArray(data) ? data : [])
+      .map(mapRpcResult)
+      .filter(Boolean);
+
+    return { results: mapped, error: null, failClosed: false, usedRpc: true };
+  } catch (err) {
+    reportSearchRpcEvent("rpc_exception", { reason: "exception" });
+    return { results: [], error: err, failClosed: true, usedRpc: true };
+  }
+}
+
 function buildPostPath(postOrDoc, row) {
   if (hasRecallUtils()) {
     try {
       let rec = row && row.recallRecord;
       const doc = postOrDoc && (postOrDoc.document || postOrDoc);
-      if (!rec && doc && (doc.slug || doc.title || doc.content)) {
-        rec = BoundLoreSearchRecall.postToRecallRecord(doc);
+      if (!rec && doc && (doc.slug || doc.title || doc.url)) {
+        if (doc.url) return doc.url;
+        if (doc.slug) return "/wiki/post/" + encodeURIComponent(doc.slug) + "/";
       }
       if (rec && BoundLoreSearchRecall.isPublicSearchable(rec)) {
         return BoundLoreSearchRecall.getCanonicalResultUrl(rec);
       }
     } catch (e) {
-      // fail-open: fall back to CSR path
+      // fail-closed: fall back to safe CSR path
     }
   }
+  const doc = postOrDoc && (postOrDoc.document || postOrDoc);
+  if (doc && doc.url) return doc.url;
   const slug = postOrDoc && (postOrDoc.slug || (postOrDoc.document && postOrDoc.document.slug));
-  if (slug) return "/wiki/post/?slug=" + encodeURIComponent(slug);
+  if (slug) return "/wiki/post/" + encodeURIComponent(slug) + "/";
   return "/wiki/post/";
 }
 
@@ -61,30 +222,10 @@ function renderEmptySearchHtml(query) {
     try {
       return BoundLoreSearchRecall.renderEmptyStateHtml(query);
     } catch (e) {
-      // fail-open
+      // fail-closed
     }
   }
   return '<div class="search-empty">No results found for "' + escapeHtml(query) + '"</div>';
-}
-
-function rankPostsWithRecall(query, posts, documents, limit) {
-  const records = posts
-    .map(function(post) { return BoundLoreSearchRecall.postToRecallRecord(post); })
-    .filter(function(rec) { return BoundLoreSearchRecall.isPublicSearchable(rec); });
-  const recallHits = BoundLoreSearchRecall.searchRecords(records, query, { limit: limit });
-  const docBySlug = {};
-  (documents || []).forEach(function(doc) {
-    if (doc && doc.slug) docBySlug[doc.slug] = doc;
-  });
-  return recallHits.map(function(hit) {
-    const slug = hit.record.canonical_slug || hit.record.slug;
-    return {
-      document: docBySlug[slug] || BoundLoreSearchRecall.recallRecordToSearchDocument(hit.record),
-      score: hit.score,
-      explanation: hit.snippet || BoundLoreSearchRecall.renderSafeSnippet(hit.record, query),
-      recallRecord: hit.record,
-    };
-  });
 }
 
 function getPostCategoryLabelSafe(post) {
@@ -112,37 +253,13 @@ function renderFaqResults(faqResults) {
     .join("");
 }
 
-async function fetchStructuredSearchCorpus() {
-  if (
-    structuredSearchCache.posts &&
-    structuredSearchCache.documents &&
-    Date.now() - structuredSearchCache.at < STRUCTURED_SEARCH_CACHE_MS
-  ) {
-    return structuredSearchCache;
-  }
-
-  const { data, error } = await supabase
-    .from("posts")
-    .select("id, title, category, post_type, slug, excerpt, content, status, deleted_at")
-    .eq("status", "published")
-    .is("deleted_at", null)
-    .limit(500);
-
-  if (error) throw error;
-
-  const posts = Array.isArray(data) ? data : [];
-  const documents = BoundLoreSearchSignals.buildSearchDocuments(posts);
-  structuredSearchCache = { posts: posts, documents: documents, at: Date.now() };
-  return structuredSearchCache;
-}
-
 function renderStructuredPostResult(row, options) {
   const opts = options || {};
   const doc = row.document || {};
   const path = buildPostPath(doc, row);
   const categoryLabel = getPostCategoryLabelSafe(doc);
   const hint = opts.showHints && row.explanation
-    ? '<span class="search-result-hint">' + escapeHtml(row.explanation) + "</span>"
+    ? '<span class="search-result-hint">' + row.explanation + "</span>"
     : "";
 
   return '<a href="' + path + '" class="search-result-item">' +
@@ -172,54 +289,43 @@ function renderMissingEntrySuggestion(row, options) {
     "</div>";
 }
 
+async function runRpcSearch(query, options) {
+  const opts = Object.assign({ postLimit: 24, missingLimit: 0 }, options || {});
+  const rpc = await callSearchRpc(query, { limit: opts.postLimit });
+  return {
+    postResults: rpc.results,
+    missingResults: [],
+    rpcMeta: {
+      failClosed: rpc.failClosed,
+      usedRpc: rpc.usedRpc,
+      error: rpc.error || null,
+    },
+  };
+}
+
 async function runStructuredSearch(query, options) {
   const opts = Object.assign({
     postLimit: 12,
-    missingLimit: 4,
+    missingLimit: 0,
     showHints: true,
     showStartLink: true,
   }, options || {});
 
-  const corpus = await fetchStructuredSearchCorpus();
-  let postResults;
-
-  if (hasRecallUtils()) {
-    try {
-      if (BoundLoreSearchRecall.isUnsafeQuery(query)) {
-        postResults = [];
-      } else {
-        postResults = rankPostsWithRecall(query, corpus.posts, corpus.documents, opts.postLimit);
-      }
-    } catch (err) {
-      console.warn("Recall ranking failed, falling back to search signals:", err);
-      postResults = BoundLoreSearchSignals.searchDocuments(query, corpus.documents, {
-        limit: opts.postLimit,
-      });
-    }
-  } else {
-    postResults = BoundLoreSearchSignals.searchDocuments(query, corpus.documents, {
-      limit: opts.postLimit,
-    });
-  }
-
-  const missingResults = BoundLoreSearchSignals.findMissingEntrySuggestions(query, corpus.posts, {
-    limit: opts.missingLimit,
-  });
-
-  return { postResults: postResults, missingResults: missingResults, corpus: corpus };
+  return runRpcSearch(query, opts);
 }
 
 async function runLegacySearch(query) {
-  const { data, error } = await supabase
-    .from("posts")
-    .select("id, title, category, post_type, slug, excerpt")
-    .eq("status", "published")
-    .is("deleted_at", null)
-    .or("title.ilike.%" + query + "%,excerpt.ilike.%" + query + "%")
-    .limit(8);
-
-  if (error) throw error;
-  return Array.isArray(data) ? data : [];
+  const rpc = await callSearchRpc(query, { limit: 8 });
+  return rpc.results.map(function(row) {
+    const doc = row.document || {};
+    return {
+      title: doc.title,
+      slug: doc.slug,
+      category: doc.category,
+      post_type: doc.post_type,
+      excerpt: doc.excerpt,
+    };
+  });
 }
 
 function renderSearchResultsHtml(query, postResults, missingResults, options) {
@@ -245,57 +351,25 @@ function renderSearchResultsHtml(query, postResults, missingResults, options) {
 }
 
 async function runSearch(query, resultsBox, options) {
-  const opts = Object.assign({ postLimit: 8, missingLimit: 2, showHints: false, showStartLink: true }, options || {});
+  const opts = Object.assign({ postLimit: 8, missingLimit: 0, showHints: false, showStartLink: true }, options || {});
 
   try {
-    if (hasStructuredSearch()) {
-      const structured = await runStructuredSearch(query, opts);
-      const hasPosts = structured.postResults.length > 0;
-      const hasMissing = structured.missingResults.length > 0;
-      const faqResults = filterFaqResults(query);
+    const structured = await runStructuredSearch(query, opts);
+    const hasPosts = structured.postResults.length > 0;
+    const hasMissing = structured.missingResults.length > 0;
+    const faqResults = filterFaqResults(query);
 
-      if (!hasPosts && !hasMissing && faqResults.length === 0) {
-        resultsBox.innerHTML = renderEmptySearchHtml(query);
-        resultsBox.style.display = "block";
-        return;
-      }
-
-      resultsBox.innerHTML = renderSearchResultsHtml(query, structured.postResults, structured.missingResults, opts);
-      resultsBox.style.display = "block";
-      return;
-    }
-
-    const data = await runLegacySearch(query);
-    if (!data.length) {
-      const faqResults = filterFaqResults(query);
-      if (faqResults.length > 0) {
-        resultsBox.innerHTML = renderFaqResults(faqResults);
-        resultsBox.style.display = "block";
-        return;
-      }
+    if (!hasPosts && !hasMissing && faqResults.length === 0) {
       resultsBox.innerHTML = renderEmptySearchHtml(query);
       resultsBox.style.display = "block";
       return;
     }
 
-    const faqHtml = renderFaqResults(filterFaqResults(query));
-    resultsBox.innerHTML = faqHtml + data
-      .filter(function(post) {
-        if (/^contribution-/i.test(String(post.slug || ""))) return false;
-        if (/^Contribution:/i.test(String(post.title || ""))) return false;
-        return true;
-      })
-      .map(function(post) {
-        const path = buildPostPath(post);
-        const categoryLabel = getPostCategoryLabelSafe(post);
-        return '<a href="' + path + '" class="search-result-item">' +
-          '<span class="search-result-title">' + escapeHtml(post.title) + "</span>" +
-          '<span class="search-result-cat">' + escapeHtml(categoryLabel) + "</span></a>";
-      })
-      .join("");
+    resultsBox.innerHTML = renderSearchResultsHtml(query, structured.postResults, structured.missingResults, opts);
     resultsBox.style.display = "block";
   } catch (err) {
     console.error("Search failed:", err);
+    reportSearchRpcEvent("search_run_failed", { reason: "exception" });
     resultsBox.innerHTML = '<div class="search-empty">Search unavailable, please try again.</div>';
     resultsBox.style.display = "block";
   }
@@ -315,7 +389,7 @@ function initSearch() {
       return;
     }
     searchDebounceTimer = setTimeout(function() {
-      runSearch(query, resultsBox, { postLimit: 8, missingLimit: 2, showHints: false, showStartLink: true });
+      runSearch(query, resultsBox, { postLimit: 8, missingLimit: 0, showHints: false, showStartLink: true });
     }, 300);
   });
 
@@ -350,7 +424,7 @@ async function initSearchPage() {
     }
 
     pageResults.innerHTML = '<p class="search-page-loading">Searching...</p>';
-    if (pageSummary) pageSummary.textContent = 'Results for "' + query + '"';
+    if (pageSummary) pageSummary.textContent = 'Results for "' + escapeHtml(query) + '"';
 
     const intentEl = document.getElementById("searchPageIntent");
     if (intentEl) {
@@ -365,15 +439,15 @@ async function initSearchPage() {
       }
     }
 
-    if (!hasStructuredSearch()) {
-      pageResults.innerHTML = '<p class="search-page-empty">Structured search is unavailable on this page.</p>';
+    if (!isRpcAvailable()) {
+      pageResults.innerHTML = '<p class="search-page-empty">Search is unavailable. Please try again later.</p>';
       return;
     }
 
     try {
       const structured = await runStructuredSearch(query, {
         postLimit: 24,
-        missingLimit: 6,
+        missingLimit: 0,
         showHints: true,
         showStartLink: true,
       });
@@ -404,6 +478,7 @@ async function initSearchPage() {
       pageResults.innerHTML = html;
     } catch (err) {
       console.error("Search page failed:", err);
+      reportSearchRpcEvent("search_page_failed", { reason: "exception" });
       pageResults.innerHTML = '<p class="search-page-empty">Search unavailable, please try again.</p>';
     }
   }
@@ -430,9 +505,17 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 window.BoundLoreSearch = {
+  SEARCH_RPC_NAME: SEARCH_RPC_NAME,
+  SEARCH_RPC_QUERY_MAX_LEN: SEARCH_RPC_QUERY_MAX_LEN,
+  SEARCH_RPC_BLOCKED_RESULT_FIELDS: SEARCH_RPC_BLOCKED_RESULT_FIELDS,
+  SEARCH_RPC_ALLOWED_RESULT_FIELDS: SEARCH_RPC_ALLOWED_RESULT_FIELDS,
+  isRpcAvailable: isRpcAvailable,
+  normalizeRpcQuery: normalizeRpcQuery,
+  mapRpcResult: mapRpcResult,
+  callSearchRpc: callSearchRpc,
+  runRpcSearch: runRpcSearch,
   runSearch: runSearch,
   runStructuredSearch: runStructuredSearch,
-  fetchStructuredSearchCorpus: fetchStructuredSearchCorpus,
   renderMissingEntrySuggestion: renderMissingEntrySuggestion,
   renderStructuredPostResult: renderStructuredPostResult,
 };

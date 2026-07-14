@@ -184,9 +184,9 @@ Angewendete Objekte:
 
 | Check | Ergebnis |
 |-------|----------|
-| `js/search.js` nutzt RPC | **Nein** — weiterhin `posts`-Corpus |
-| Client-RPC-Integration | **Separater Gate** (P5-E.9E.4F o. ä.) |
-| Lokale Fixtures | Unverändert PASS (21/21, 92/92, 98/98) |
+| `js/search.js` nutzt RPC | **Ja** — RPC-first (9E.4F) |
+| Client-RPC-Integration | **RPC_CLIENT_INTEGRATED** |
+| Lokale Fixtures | PASS (21/21, 92/92, 98/98, 47/47 RPC) |
 
 ---
 
@@ -203,7 +203,7 @@ Angewendete Objekte:
 
 | Gate | Zweck |
 |------|-------|
-| **Client RPC Integration** | `js/search.js` → `bl_search_public_content` |
+| **Client RPC Integration** | **RPC_CLIENT_INTEGRATED** (9E.4F) |
 | **Populate mit echten published posts** | Production/Staging Content-Migration |
 | **P5-E.9E.4 Re-run** | Nach Client-Integration + Corpus |
 

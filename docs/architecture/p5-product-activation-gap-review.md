@@ -504,6 +504,18 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 41. P5-E.9E.4F Follow-up (PASS — Client RPC Integration)
+
+**Gate:** P5-E.9E.4F. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Client RPC Integration | **RPC_CLIENT_INTEGRATED** |
+| Search DB/FTS UI Integration | **RPC_CLIENT_INTEGRATED** |
+| P5-E.9E.4F | **PASS** |
+
+---
+
 ## 40. P5-E.9E.4A Follow-up (PASS — Search DB/FTS Apply)
 
 **Gate:** P5-E.9E.4A. **PASS**.

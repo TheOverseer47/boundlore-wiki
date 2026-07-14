@@ -2646,11 +2646,44 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** Client RPC Integration. No push/deploy/launch.
+**Next:** Persistenter Corpus + Re-run. No push/deploy/launch.
 
 ---
 
-## P5-E.9E.4E — Staging Search Corpus Populate (PASS)
+## P5-E.9E.4F — Client RPC Integration (PASS)
+
+**Milestone:** P5-E.9E.4F (Client RPC). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Search page uses `bl_search_public_content` RPC-first | `js/search.js` | yes | `[x]` |
+| Direct `posts` read no longer primary runtime search path | `js/search.js` | no `.from('posts')` | `[x]` |
+| Query length capped | client | 120 chars | `[x]` |
+| Unsafe query escaped | client | escaped | `[x]` |
+| Empty corpus handled | runtime | empty state | `[x]` |
+| RPC errors fail closed | runtime | no crash | `[x]` |
+| No `search_text` exposed | RPC mapping | discarded | `[x]` |
+| No `search_vector` exposed | RPC mapping | discarded | `[x]` |
+| No BLMETA exposed | runtime | absent | `[x]` |
+| No Profile-PII exposed | runtime | absent | `[x]` |
+| No DB write | scope | none | `[x]` |
+| No SQL apply | scope | none | `[x]` |
+| no Storage/Push/Deploy/Launch | scope | none | `[x]` |
+| Existing fixtures still PASS | qa | 21/92/98 | `[x]` |
+| New RPC integration fixture PASS | qa | 47/47 | `[x]` |
+| Staging smoke against empty corpus PASS | runtime | 0 hits OK | `[x]` |
+| Client RPC Integration | status | RPC_CLIENT_INTEGRATED | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4F | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-search-client-rpc-integration-report.md`
+
+**Next:** Persistenter Corpus + Re-run. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4A — Staging Search DB/FTS Apply (PASS)
 
 **Milestone:** P5-E.9E.4E (Staging Write + Cleanup). **PASS**.
 

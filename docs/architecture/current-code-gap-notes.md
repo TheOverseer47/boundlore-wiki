@@ -3478,6 +3478,20 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 161. P5-E.9E.4F — Client RPC Integration (PASS)
+
+**Milestone:** P5-E.9E.4F. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Client RPC Integration | **RPC_CLIENT_INTEGRATED** |
+| Search DB/FTS UI Integration | **RPC_CLIENT_INTEGRATED** |
+| P5-E.9E.4F | **PASS** |
+
+**Report:** `docs/architecture/p5-search-client-rpc-integration-report.md`
+
+---
+
 ## 160. P5-E.9E.4A — Staging Search DB/FTS Apply (PASS)
 
 **Milestone:** P5-E.9E.4A. **PASS**.

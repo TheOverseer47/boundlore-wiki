@@ -85,7 +85,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.3B/3C Generator** | CSR-Shell; 3 SSG-Prototypen + Fixture-Generator PASS | **P5-E.9D.3D** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
-| **S-06 Search Recall** | S | **OPEN_BLOCKING** | **P5-E.9E.4A PASS** — DB/FTS applied; **PARTIAL_EMPTY_CORPUS** | Client-RPC-Integration + persistenter Corpus | **Client RPC Integration** | Nein | Nein | Nein | Nein | Ja |
+| **S-06 Search Recall** | S | **OPEN_BLOCKING** | **P5-E.9E.4F PASS** — RPC_CLIENT_INTEGRATED; **PARTIAL_EMPTY_CORPUS** | Persistenter Corpus + Re-run | **Persistenter Corpus** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Provider integration + alerting | **P5-E.9C.3** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
 | **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
@@ -359,7 +359,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9E.4A**~~ **PASS** — `p5-search-db-fts-staging-apply-report.md`
 
-**Client RPC Integration** — `js/search.js` → `bl_search_public_content`
+~~**P5-E.9E.4F**~~ **PASS** — `p5-search-client-rpc-integration-report.md`
+
+**Persistenter Corpus + P5-E.9E.4 Re-run**
 
 **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Freigabe für Writes)
 

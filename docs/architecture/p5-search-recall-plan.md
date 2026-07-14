@@ -437,7 +437,17 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Search Runtime Evidence | **PARTIAL** (42501 profiles blockiert Corpus) |
 | S-06 | **OPEN_BLOCKING** |
 
-**Empfohlener nächster Gate:** Client RPC Integration (`js/search.js` → `bl_search_public_content`)
+**Empfohlener nächster Gate:** Persistenter published Corpus + P5-E.9E.4 Re-run
+
+---
+
+## P5-E.9E.4F — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-search-client-rpc-integration-report.md` |
+| Client RPC Integration | **RPC_CLIENT_INTEGRATED** |
+| P5-E.9E.4F | **PASS** |
 
 ---
 

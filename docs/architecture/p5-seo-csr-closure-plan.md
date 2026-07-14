@@ -396,7 +396,9 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.4A**~~ **PASS** — Search DB/FTS **APPLIED_STAGING_PASS**; Evidence **PARTIAL_EMPTY_CORPUS**
 
-**Client RPC Integration** — `js/search.js` → `bl_search_public_content`
+~~**P5-E.9E.4F**~~ **PASS** — **RPC_CLIENT_INTEGRATED**
+
+**Persistenter Corpus + P5-E.9E.4 Re-run**
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 

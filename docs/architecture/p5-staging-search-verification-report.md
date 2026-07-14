@@ -19,13 +19,14 @@
 | **P5-E.9E.4B** | **PASS** |
 | **P5-E.9E.4E** | **PASS** — Corpus Populate |
 | **P5-E.9E.4A** | **PASS** — Search DB/FTS |
+| **P5-E.9E.4F** | **PASS** — Client RPC Integration |
+| **Client RPC Integration** | **RPC_CLIENT_INTEGRATED** |
 | **Search Runtime Evidence** | **PASS** (Client, 9E.4E) |
 | **Search DB/FTS Evidence** | **PARTIAL_EMPTY_CORPUS** |
 | **Staging Ref in Client Runtime** | **VERIFIZIERT** (`STAGING_REF_VERIFIED`) |
-| **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 98/98) |
+| **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 98/98 + 47/47) |
 | **Wiki Search Runtime Matrix** | **AUSGEFÜHRT** (14 Queries) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
-| **P5-E.9E.4A** | **PASS** — Search DB/FTS |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
@@ -377,7 +378,8 @@
 | ~~**P5-E.9E.4C**~~ | Read Path Fix Draft | **PASS** — `p5-staging-search-read-path-fix-draft.md` |
 | ~~**P5-E.9E.4D**~~ | Posts RLS Policy Fix | **PASS** — `p5-posts-rls-policy-dependency-fix-report.md` |
 | ~~**P5-E.9E.4A**~~ | Search SQL Apply + `search_documents` | **PASS** — `p5-search-db-fts-staging-apply-report.md` |
-| **Client RPC Integration** | `js/search.js` → `bl_search_public_content` | Separates Gate |
+| **Client RPC Integration** | **RPC_CLIENT_INTEGRATED** — `p5-search-client-rpc-integration-report.md` |
+| **Persistenter Corpus + Re-run** | Query-Matrix über RPC-Index |
 
 ---
 
