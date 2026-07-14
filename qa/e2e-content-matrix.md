@@ -2584,7 +2584,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-staging-search-read-path-fix-draft.md`
 
-**Next:** P5-E.9E.4D (STOPP). No push/deploy/launch.
+**Next:** P5-E.9E.4D Posts RLS Fix. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4D — Posts RLS Policy Dependency Fix (PASS)
+
+**Milestone:** P5-E.9E.4D (Staging Apply). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fresh staging backup before apply | backup | present | `[x]` |
+| Target ref `jzzgoiwfbuwiiyvwgwri` | staging | verified | `[x]` |
+| Legacy not used | gate | yes | `[x]` |
+| posts policies inventoried | staging | before/after | `[x]` |
+| profiles dependency addressed | RLS | is_admin() | `[x]` |
+| no anon/public grant on profiles | grant | none | `[x]` |
+| SQL apply limited to read path | gate | yes | `[x]` |
+| Search no profiles 42501 | runtime | pass | `[x]` |
+| Search query matrix re-run | runtime | 14 queries | `[x]` |
+| unsafe query tested | runtime | escaped | `[x]` |
+| BLMETA not visible | runtime | pass | `[x]` |
+| Search Runtime Evidence | status | PARTIAL | `[x]` PARTIAL |
+| S-06 OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.4D | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-posts-rls-policy-dependency-fix-report.md`
+
+**Next:** Corpus Populate oder P5-E.9E.4A (STOPP). No push/deploy/launch.
 
 ---
 

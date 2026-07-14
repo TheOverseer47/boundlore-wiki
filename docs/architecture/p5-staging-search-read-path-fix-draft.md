@@ -17,8 +17,8 @@
 | **Root Cause (statisch)** | **CONFIRMED_STATIC** — RLS-Policy-Abhängigkeit auf `profiles`, nicht Client-Embedded-Select |
 | **Code-only Fix für Search** | **NICHT AUSREICHEND** — `search.js` fordert bereits keine `profiles` an |
 | **Empfohlener Minimal-Fix** | **RLS-Policy-Refactor** (`is_admin()` / rollenspezifische Policies) |
-| **Search Runtime Evidence** | **PARTIAL** / **BLOCKED_UNTIL_FIX** |
-| **S-06 Search Recall** | **OPEN_BLOCKING** |
+| **P5-E.9E.4D** | **PASS** — Fix angewendet |
+| **Search Runtime Evidence** | **PARTIAL** (Read-Pfad offen; Corpus leer) |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 

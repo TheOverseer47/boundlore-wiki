@@ -3478,6 +3478,22 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 158. P5-E.9E.4D — Posts RLS Policy Dependency Fix (PASS)
+
+**Milestone:** P5-E.9E.4D. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Backup vor Apply | Ja |
+| RLS Fix applied | **APPLIED_STAGING_PASS** |
+| 42501 behoben | Ja |
+| Search Runtime Evidence | **PARTIAL** |
+| P5-E.9E.4D | **PASS** |
+
+**Report:** `docs/architecture/p5-posts-rls-policy-dependency-fix-report.md`
+
+---
+
 ## 157. P5-E.9E.4C — Staging Search Read Path Fix Draft (PASS)
 
 **Milestone:** P5-E.9E.4C. **PASS**.

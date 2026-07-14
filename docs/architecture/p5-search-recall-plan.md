@@ -437,7 +437,18 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Search Runtime Evidence | **PARTIAL** (42501 profiles blockiert Corpus) |
 | S-06 | **OPEN_BLOCKING** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.4D** — Posts RLS Policy Dependency Fix (Draft: `p5-staging-search-read-path-fix-draft.md`)
+**Empfohlener nächster Gate:** Staging Corpus Populate oder P5-E.9E.4A (STOPP)
+
+---
+
+## P5-E.9E.4D — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Apply Report | `p5-posts-rls-policy-dependency-fix-report.md` |
+| Fix Status | **APPLIED_STAGING_PASS** |
+| Search Runtime Evidence | **PARTIAL** |
+| P5-E.9E.4D | **PASS** |
 
 ---
 
@@ -514,4 +525,4 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4C PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX. Kein DB-Write.*
+*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4D PASS. Search Runtime Evidence PARTIAL.*

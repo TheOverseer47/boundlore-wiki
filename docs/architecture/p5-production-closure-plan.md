@@ -85,7 +85,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.3B/3C Generator** | CSR-Shell; 3 SSG-Prototypen + Fixture-Generator PASS | **P5-E.9D.3D** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
-| **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9E.4C PASS** — Root Cause **CONFIRMED_STATIC** (RLS Policy) | Corpus-Fetch `42501`; Fix Draft → **9E.4D** | **P5-E.9E.4D** RLS Fix | Nein | Nein | Nein | Nein | Ja |
+| **S-06 Search Recall** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9E.4D PASS** — 42501 behoben; Corpus **0 published** | Recall vs echte Daten + DB/FTS | **Corpus Populate** oder **9E.4A** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Provider integration + alerting | **P5-E.9C.3** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
 | **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
@@ -353,7 +353,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9E.4C**~~ **PASS** — Read Path Fix Draft (`p5-staging-search-read-path-fix-draft.md`)
 
-**P5-E.9E.4D** — Posts RLS Policy Dependency Fix (**STOPP** — DB-Apply + Freigabe)
+~~**P5-E.9E.4D**~~ **PASS** — `p5-posts-rls-policy-dependency-fix-report.md`
+
+**Staging Corpus Populate** — published Canonicals für Recall-Runtime
 
 **P5-E.9E.4A** — Staging Search Apply (**STOPP** — Backup + Draft-Fixes + Freigabe)
 

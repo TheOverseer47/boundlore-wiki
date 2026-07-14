@@ -504,6 +504,19 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 38. P5-E.9E.4D Follow-up (PASS — Posts RLS Fix Applied)
+
+**Gate:** P5-E.9E.4D. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Posts RLS Fix | **APPLIED_STAGING_PASS** |
+| 42501 | **Behoben** |
+| Search Runtime Evidence | **PARTIAL** |
+| P5-E.9E.4D | **PASS** |
+
+---
+
 ## 37. P5-E.9E.4C Follow-up (PASS — Read Path Fix Draft)
 
 **Gate:** P5-E.9E.4C. **PASS**.
