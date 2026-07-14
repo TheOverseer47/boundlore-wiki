@@ -349,28 +349,16 @@ P5-E.9F.4 entschied **Option B**: Fixture SSG/SEO technisch geschlossen (`CLOSED
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
-
-**Manuelle Nutzerfreigabe nötig:** **Ja**
-
-> „Ja, ich gebe P5-E.9F.7 frei — Real-Content Entity SEO Evidence Re-run, crawl/static checks auf exportierte echte Entity-Seiten, kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
+**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
 
 ---
 
-## P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
+## P5-E.9F.7 Follow-up (PASS — Real-Content Entity SEO Evidence Re-run)
 
-**Gate:** P5-E.9F.6. **PASS**.
+**Gate:** P5-E.9F.7. **PASS**. 5/5 real-content entity SEO evidence re-run complete.
 
-| Item | Ergebnis |
-|------|----------|
-| Real-content pages | **5** — `wiki/post/<entity-slug>/` |
-| Sanitized export | `qa/fixtures/real-content-entity-ssg-export.json` |
-| Fixture quarantine | **9** fixture/prototype pages moved |
-| S-05 | **PARTIAL** — open until 9F.7/9F.8 |
-| Public Launch | **NO-GO** |
-
-**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
+**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
 
 ---
 
-*Dokumentversion: P5-E.9F.6 PASS. Read-only export + local SSG. Kein Write. Launch NO-GO.*
+*Dokumentversion: P5-E.9F.6 + P5-E.9F.7 PASS. Read-only export + local evidence. Launch NO-GO.*

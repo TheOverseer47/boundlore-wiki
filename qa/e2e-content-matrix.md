@@ -2668,6 +2668,50 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9F.7 Real-Content Entity SEO Evidence Re-run
+
+**Milestone:** P5-E.9F.7 (Real-Content Entity SEO Evidence Re-run). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| 9F.6 baseline verified | verify | yes | `[x]` |
+| No DB access | scope | none | `[x]` |
+| No SQL | scope | none | `[x]` |
+| No MCP read | scope | none | `[x]` |
+| No DB write | scope | none | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| Python cache cleaned or untracked | verify | yes | `[x]` |
+| 5 real entity pages exist | verify | 5 | `[x]` |
+| Static QA re-run PASS | verify | 15+ assertions | `[x]` |
+| Local HTTP crawl PASS | verify | 5×200 + 404 | `[x]` |
+| Metadata present | verify | yes | `[x]` |
+| Canonical uses entity slug | verify | yes | `[x]` |
+| OG/Twitter present | verify | yes | `[x]` |
+| JSON-LD public-safe | verify | yes | `[x]` |
+| Static body present | verify | yes | `[x]` |
+| No CSR-only core | verify | yes | `[x]` |
+| Sitemap artifact contains 5 real URLs | verify | yes | `[x]` |
+| Root sitemap decision documented | verify | unchanged | `[x]` |
+| Fixture pages quarantined from production-like path | verify | yes | `[x]` |
+| No BLMETA | verify | yes | `[x]` |
+| No search_text/search_vector | verify | yes | `[x]` |
+| No PII | verify | yes | `[x]` |
+| No secrets | verify | yes | `[x]` |
+| No Supabase storage URLs | verify | yes | `[x]` |
+| No script/eventhandler/javascript injection | verify | yes | `[x]` |
+| Robots/noindex boundary verified | verify | yes | `[x]` |
+| S-05 remains open until 9F.8 | status | OPEN_BLOCKING_REAL_CONTENT_RUNTIME | `[x]` |
+| S-06 remains CLOSED_SEARCH_EVIDENCE | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9F.7 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
+
+**Next:** P5-E.9F.8 S-05 Final Closure Decision Dossier. No push/deploy/launch.
+
+---
+
 ## P5-E.9F.6 Real-Content Entity SSG Export
 
 **Milestone:** P5-E.9F.6 (Real-Content Entity SSG Apply / Export). **PASS**.

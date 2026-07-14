@@ -317,11 +317,11 @@ Alle 6 Fixture-SSG-Seiten enthalten statisch (ohne JS):
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.7 frei — Real-Content Entity SEO Evidence Re-run, crawl/static checks auf exportierte echte Entity-Seiten, kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
+> „Ja, ich gebe P5-E.9F.8 frei — S-05 Final Closure Decision Dossier auf Basis der Real-Content Entity SEO Evidence (9F.6 + 9F.7), kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
 
 ---
 
@@ -355,8 +355,16 @@ Alle 6 Fixture-SSG-Seiten enthalten statisch (ohne JS):
 
 **Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
 
-**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
 
 ---
 
-*Dokumentversion: P5-E.9F.4 + P5-E.9F.5 + P5-E.9F.6 PASS. S-05 PARTIAL. Launch NO-GO.*
+## P5-E.9F.7 Follow-up (PASS — Real-Content Entity SEO Evidence Re-run)
+
+**Gate:** P5-E.9F.7. **PASS**. Real-content SEO evidence re-run on 5 exported pages.
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
+
+---
+
+*Dokumentversion: P5-E.9F.4 + P5-E.9F.5 + P5-E.9F.6 + P5-E.9F.7 PASS. S-05 PARTIAL. Launch NO-GO.*

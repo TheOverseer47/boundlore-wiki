@@ -274,15 +274,15 @@ Alle 6 Seiten enthalten statisch (ohne JS):
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
 
 ---
 
-## P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
+## P5-E.9F.7 Follow-up (PASS — Real-Content Entity SEO Evidence Re-run)
 
-**Gate:** P5-E.9F.6. **PASS**. Real-content export + local SSG generation complete.
+**Gate:** P5-E.9F.7. **PASS**. 5/5 real-content pages — REAL_CONTENT_SEO_EVIDENCE_PASS.
 
-**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
+**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
 
 ---
 

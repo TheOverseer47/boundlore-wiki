@@ -431,7 +431,17 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9F.6**~~ **PASS** — Real-Content Entity SSG Export (**5 pages**)
 
-**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+~~**P5-E.9F.7**~~ **PASS** — Real-Content Entity SEO Evidence Re-run
+
+**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
+
+---
+
+## P5-E.9F.7 Follow-up (PASS — Real-Content Entity SEO Evidence Re-run)
+
+**Gate:** P5-E.9F.7. **PASS**. 5/5 real-content pages static SEO evidence PASS.
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
 
 ---
 

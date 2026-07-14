@@ -3486,6 +3486,29 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 185. P5-E.9F.7 — Real-Content Entity SEO Evidence Re-run (PASS)
+
+**Milestone:** P5-E.9F.7 (Real-Content Entity SEO Evidence Re-run). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| HEAD before gate `daeb9e7` | **PASS** |
+| No DB access / no MCP | **PASS** |
+| 5/5 real entity pages verified | **PASS** |
+| Static QA re-run | **PASS** |
+| Local HTTP crawl | **PASS** |
+| No-leak deep check | **PASS** |
+| CSR dependency | **PASS** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.7 | **PASS** |
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
+
+**Next:** P5-E.9F.8 S-05 Final Closure Decision Dossier. No push/deploy/launch.
+
+---
+
 ## 184. P5-E.9F.6 — Real-Content Entity SSG Export (PASS)
 
 **Milestone:** P5-E.9F.6 (Real-Content Entity SSG Apply / Export). **PASS**.

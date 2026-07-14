@@ -530,6 +530,25 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 61. P5-E.9F.7 Follow-up (PASS — Real-Content Entity SEO Evidence Re-run)
+
+**Gate:** P5-E.9F.7. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Real-content SEO evidence | **REAL_CONTENT_SEO_EVIDENCE_PASS** |
+| Pages verified | **5/5** |
+| No DB access | **PASS** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.7 | **PASS** |
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
+
+**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
+
+---
+
 ## 60. P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
 
 **Gate:** P5-E.9F.6. **PASS**.
@@ -543,8 +562,6 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 | P5-E.9F.6 | **PASS** |
 
 **Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
-
-**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
 
 ---
 

@@ -255,6 +255,8 @@ Entity SEO Technical Evidence remains **CLOSED_TECHNICAL_FIXTURE** for fixture p
 | Item | Status |
 |------|--------|
 | P5-E.9F.6 | **PASS** |
+| P5-E.9F.7 | **PASS** |
+| Real-Content Entity SEO Evidence | **REAL_CONTENT_SEO_EVIDENCE_PASS** |
 | Real-Content Entity SSG Export | **PASS** — 5 pages |
 | Real-Content Entity Source Decision | **HYBRID_WIKI_ENTITIES_PLUS_POSTS** |
 | Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
@@ -266,12 +268,20 @@ Entity SEO Technical Evidence remains **CLOSED_TECHNICAL_FIXTURE** for fixture p
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.7 frei — Real-Content Entity SEO Evidence Re-run, crawl/static checks auf exportierte echte Entity-Seiten, kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
+> „Ja, ich gebe P5-E.9F.8 frei — S-05 Final Closure Decision Dossier auf Basis der Real-Content Entity SEO Evidence (9F.6 + 9F.7), kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
 
 ---
 
-*Dokumentversion: P5-E.9F.6 PASS. No push/deploy/launch. S-05 open until 9F.7/9F.8.*
+## P5-E.9F.7 Follow-up (PASS — Real-Content Entity SEO Evidence Re-run)
+
+**Gate:** P5-E.9F.7. **PASS**. Static QA + HTTP crawl + no-leak on 5 real entity pages.
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
+
+---
+
+*Dokumentversion: P5-E.9F.6 + P5-E.9F.7 PASS. Read-only export + local evidence. Launch NO-GO.*
