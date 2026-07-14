@@ -3456,7 +3456,27 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-search-sql-static-review.md`
 
-**Next:** P5-E.9E.4 Staging Search Verification (Nutzerfreigabe). No push/deploy/launch.
+**Next:** P5-E.9E.4B Staging Runtime Config. No push/deploy/launch.
+
+---
+
+## 154. P5-E.9E.4 — Staging Search Verification (BLOCKED)
+
+**Milestone:** P5-E.9E.4 — Staging Search Verification (read-only). **BLOCKED**.
+
+| Check | Result |
+|-------|--------|
+| Verification Report | `p5-staging-search-verification-report.md` |
+| Staging Ref dokumentiert | `jzzgoiwfbuwiiyvwgwri` |
+| Staging Ref in Runtime | **NEIN** — Legacy in `supabase-config.js` |
+| Lokale Fixtures | 92/92 + 98/98 PASS |
+| Wiki Query Matrix | **NOT RUN** |
+| Search Runtime Evidence | **FAIL** |
+| P5-E.9E.4 | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-search-verification-report.md`
+
+**Next:** P5-E.9E.4B Staging Runtime Config. No push/deploy/launch.
 
 ---
 

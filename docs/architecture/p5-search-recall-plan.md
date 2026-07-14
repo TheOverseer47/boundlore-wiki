@@ -434,10 +434,23 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Verification Plan | Fixture-Baseline + Staging/Production Gates |
 | SQL ausgeführt | **Nein** |
 | DB Search Strategy | **DOCUMENTED** |
-| Search Runtime Evidence | **OPEN** |
-| S-06 | **OPEN_BLOCKING** bis 9E.4 |
+| Search Runtime Evidence | **FAIL** (9E.4 BLOCKED — Runtime nicht Staging) |
+| S-06 | **OPEN_BLOCKING** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.4** — Staging Search Verification (read-only bevorzugt; Nutzerfreigabe)
+**Empfohlener nächster Gate:** **P5-E.9E.4B** — Staging Runtime Config
+
+---
+
+## P5-E.9E.4 — Umsetzungsnachweis (BLOCKED)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `docs/architecture/p5-staging-search-verification-report.md` |
+| Staging Ref in Runtime | **NEIN** — `supabase-config.js` → Legacy |
+| Lokale Fixtures | 92/92 + 98/98 PASS |
+| Wiki Query Matrix | **SKIP** (STOPP) |
+| Search Runtime Evidence | **FAIL** |
+| P5-E.9E.4 | **BLOCKED** |
 
 ---
 
@@ -466,4 +479,4 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS + P5-E.9E.3 PASS + P5-E.9E.3A PASS + P5-E.9E.3B PASS. Keine Secrets. Keine DB-Verbindung ausgeführt.*
+*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS + P5-E.9E.3 PASS + P5-E.9E.3A PASS + P5-E.9E.3B PASS + P5-E.9E.4 BLOCKED. Keine Secrets. Kein DB-Write.*

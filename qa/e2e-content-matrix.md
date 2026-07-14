@@ -2528,7 +2528,35 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-sql-static-review.md`
 
-**Next:** P5-E.9E.4 Staging Search Verification (Nutzerfreigabe). No push/deploy/launch.
+**Next:** P5-E.9E.4B Staging Runtime Config. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4 — Staging Search Verification (BLOCKED)
+
+**Milestone:** P5-E.9E.4 — Staging Search Verification (read-only). **BLOCKED**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Staging ref verified as `jzzgoiwfbuwiiyvwgwri` | docs/MCP | documented | `[x]` |
+| Legacy ref not used at runtime | `supabase-config.js` | absent | `[ ]` **FAIL** |
+| Production not used | config | absent | `[x]` |
+| Local hardening fixture PASS | hardening fixture | 92/92 | `[x]` |
+| Local recall fixture PASS | recall fixture | 98/98 | `[x]` |
+| `/wiki/search/` loads | wiki search | tested | `[ ]` SKIP |
+| Core recall queries tested | runtime | tested | `[ ]` SKIP |
+| Safety/no-leak runtime checks | runtime | verified | `[ ]` SKIP |
+| No SQL executed | gate | none | `[x]` |
+| No DB write | gate | none | `[x]` |
+| No Supabase write | gate | none | `[x]` |
+| Search Runtime Evidence | status | FAIL | `[x]` FAIL |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.4 | gate | BLOCKED | **BLOCKED** |
+
+**Report:** `docs/architecture/p5-staging-search-verification-report.md`
+
+**Next:** P5-E.9E.4B Staging Runtime Config. No push/deploy/launch.
 
 ---
 
