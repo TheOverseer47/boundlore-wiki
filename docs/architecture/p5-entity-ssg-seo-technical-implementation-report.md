@@ -242,11 +242,19 @@ Kein Crash. Statischer SEO-Kerninhalt im HTML vorhanden.
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
+**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
 
 ---
 
-## P5-E.9F.4 Follow-up (PASS — S-05 Closure Dossier / Decision)
+## P5-E.9F.5 Follow-up (PASS — Real-Content Entity SEO Source Inventory)
+
+**Gate:** P5-E.9F.5. **PASS**. Hybrid source: `wiki_entities` + `posts`.
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-source-inventory-report.md`
+
+---
+
+## P5-E.9F.3 Follow-up (PASS — Entity SEO Evidence Re-run)
 
 **Gate:** P5-E.9F.4. **PASS**. S-05 **Option B** — PARTIAL_TECHNICAL_EVIDENCE; Entity SEO **CLOSED_TECHNICAL_FIXTURE**.
 

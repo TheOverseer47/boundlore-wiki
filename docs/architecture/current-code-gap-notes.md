@@ -3486,6 +3486,28 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 183. P5-E.9F.5 — Real-Content Entity SEO Source Inventory (PASS)
+
+**Milestone:** P5-E.9F.5 (Read-only Legacy Inventory + Source Decision). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| HEAD before gate `4fb3b3e` | **PASS** |
+| Target ref `ohkoojpzmptdfyowdgog` | **PASS** |
+| Read-only inventory | **PASS** |
+| Source Decision | **HYBRID_WIKI_ENTITIES_PLUS_POSTS** |
+| Export-ready estimate | **~5 entities** |
+| No writes / no export | **PASS** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.5 | **PASS** |
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-source-inventory-report.md`
+
+**Next:** P5-E.9F.6 Real-Content Entity SSG Apply / Export. No push/deploy/launch.
+
+---
+
 ## 182. P5-E.9F.4 — S-05 Closure Dossier / Decision (PASS)
 
 **Milestone:** P5-E.9F.4 (S-05 Closure Dossier / Decision). **PASS**.

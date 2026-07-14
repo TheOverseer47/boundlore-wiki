@@ -309,11 +309,15 @@ S-05 darf erst **CLOSED** werden, wenn **alle** Kriterien erfüllt sind:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
+**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
 
-**Manuelle Nutzerfreigabe nötig:** **Ja**
+---
 
-> „Ja, ich gebe P5-E.9F.5 frei — Real-Content Entity SEO Source Decision / Read-only Inventory, read-only nur mit Freigabe, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+## P5-E.9F.5 Follow-up (PASS — Real-Content Entity SEO Source Inventory)
+
+**Gate:** P5-E.9F.5. **PASS**. Source Decision: **Hybrid** (`wiki_entities` + `posts`).
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-source-inventory-report.md`
 
 ---
 

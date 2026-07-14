@@ -317,12 +317,28 @@ Alle 6 Fixture-SSG-Seiten enthalten statisch (ohne JS):
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
+**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.5 frei — Real-Content Entity SEO Source Decision / Read-only Inventory, read-only nur mit Freigabe, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+> „Ja, ich gebe P5-E.9F.6 frei — Real-Content Entity SSG Apply / Export auf Basis der Hybrid-Source-Decision (wiki_entities + posts), privileged read-only Export, kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
 
 ---
 
-*Dokumentversion: P5-E.9F.4 PASS. S-05 PARTIAL_TECHNICAL_EVIDENCE. Entity SEO CLOSED_TECHNICAL_FIXTURE. Launch NO-GO.*
+## P5-E.9F.5 Follow-up (PASS — Real-Content Entity SEO Source Inventory)
+
+**Gate:** P5-E.9F.5. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Target Ref | `ohkoojpzmptdfyowdgog` — verifiziert |
+| Source Decision | **Option C — Hybrid** (`wiki_entities` + `posts` join) |
+| Export-ready estimate | **~5 entities** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** (unverändert) |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-source-inventory-report.md`
+
+---
+
+*Dokumentversion: P5-E.9F.4 + P5-E.9F.5 PASS. S-05 PARTIAL. Launch NO-GO.*

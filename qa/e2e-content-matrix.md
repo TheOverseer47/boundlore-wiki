@@ -2668,6 +2668,40 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9F.5 Real Content Entity SEO Source Inventory (PASS)
+
+**Milestone:** P5-E.9F.5 (Real-Content Entity SEO Source Inventory). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| HEAD before gate `4fb3b3e` | verify | yes | `[x]` |
+| Target ref `ohkoojpzmptdfyowdgog` verified | verify | yes | `[x]` |
+| Read-only guard documented | verify | yes | `[x]` |
+| Candidate source tables inventoried | verify | yes | `[x]` |
+| `wiki_entities` inventory documented | verify | 14 total | `[x]` |
+| `posts` inventory documented | verify | 6 SEO candidates | `[x]` |
+| Relations inventory documented | verify | 6 relations | `[x]` |
+| SEO field readiness assessed | verify | yes | `[x]` |
+| Public-safety/no-leak assessed | verify | yes | `[x]` |
+| Source options matrix exists | verify | yes | `[x]` |
+| Recommended source decision documented | verify | Hybrid C | `[x]` |
+| Transform/export rules documented | verify | yes | `[x]` |
+| No SQL apply / no DDL/DML | scope | none | `[x]` |
+| No writes / no content export | scope | none | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| Fable-5 S-05 impact documented | verify | yes | `[x]` |
+| S-05 remains open until real-content evidence | status | OPEN_BLOCKING_REAL_CONTENT_RUNTIME | `[x]` |
+| S-06 remains CLOSED_SEARCH_EVIDENCE | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9F.5 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-source-inventory-report.md`
+
+**Next:** P5-E.9F.6 Real-Content Entity SSG Apply / Export. No push/deploy/launch.
+
+---
+
 ## P5-E.9F.4 S-05 Closure Dossier (PASS)
 
 **Milestone:** P5-E.9F.4 (S-05 Closure Dossier / Decision). **PASS**.

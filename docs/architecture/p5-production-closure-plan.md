@@ -381,13 +381,24 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9E.5J**~~ **PASS** — S-06 Final Search Closure Dossier (**CLOSED_SEARCH_EVIDENCE**)
 
-~~**P5-E.9F.4**~~ **PASS** — S-05 Closure Dossier (**PARTIAL_TECHNICAL_EVIDENCE**)
+~~**P5-E.9F.5**~~ **PASS** — Real-Content Entity SEO Source Inventory
 
-**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
+**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
 
-**P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Freigabe für Writes)
+---
 
-Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
+## 22. P5-E.9F.5 Follow-up (PASS — Real-Content Entity SEO Source Inventory)
+
+**Gate:** P5-E.9F.5. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Report | `p5-real-content-entity-seo-source-inventory-report.md` |
+| Source Decision | **HYBRID_WIKI_ENTITIES_PLUS_POSTS** |
+| Export-ready estimate | **~5 entities** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.5 | **PASS** |
 
 ---
 

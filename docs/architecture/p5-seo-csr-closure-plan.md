@@ -427,9 +427,24 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9F.2**~~ **PASS** — Entity SSG / SEO Technical Closure Implementation
 
-~~**P5-E.9F.4**~~ **PASS** — S-05 Closure Dossier (**PARTIAL_TECHNICAL_EVIDENCE**)
+~~**P5-E.9F.5**~~ **PASS** — Real-Content Entity SEO Source Inventory (**HYBRID_WIKI_ENTITIES_PLUS_POSTS**)
 
-**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
+**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
+
+---
+
+## P5-E.9F.5 Follow-up (PASS — Real-Content Entity SEO Source Inventory)
+
+**Gate:** P5-E.9F.5. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Source Decision | **Option C — Hybrid** |
+| Export-ready estimate | **~5 entities** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-source-inventory-report.md`
 
 ---
 
@@ -596,4 +611,4 @@ Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9F.1 + P5-E.9F.2 + P5-E.9F.3 + P5-E.9F.4 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 PARTIAL_TECHNICAL_EVIDENCE.*
+*Dokumentversion: P5-E.9D … + P5-E.9F.1 + P5-E.9F.2 + P5-E.9F.3 + P5-E.9F.4 + P5-E.9F.5 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 PARTIAL.*

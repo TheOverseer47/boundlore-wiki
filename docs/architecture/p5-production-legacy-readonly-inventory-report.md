@@ -358,7 +358,25 @@
 
 ---
 
-*Dokumentversion: P5-E.9E.5B PASS + 5C + 5D + 5E. Kein Content Write.*
+## P5-E.9F.5 Follow-up (PASS — Real-Content Entity SEO Source Inventory)
+
+**Gate:** P5-E.9F.5. **PASS** (Read-only SEO source inventory).
+
+| Item | Ergebnis |
+|------|----------|
+| wiki_entities | **14** total; **7** unique public-safe slugs |
+| posts SEO candidates | **6** (5G confirmed) |
+| wiki_entity_relations | **6** active |
+| Source Decision | **Hybrid** — `wiki_entities` + `posts` join |
+| Export-ready estimate | **~5 entities** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Nächster Gate | **P5-E.9F.6** |
+
+**Report:** `docs/architecture/p5-real-content-entity-seo-source-inventory-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5B PASS + … + P5-E.9F.5 PASS. S-05 PARTIAL. Launch NO-GO.*
 
 ---
 
