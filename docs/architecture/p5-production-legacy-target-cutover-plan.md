@@ -20,7 +20,7 @@
 | **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
 | **S-06 Search Recall** | **CLOSED** |
 | **Legacy Search Runtime Readiness** | **READY_FOR_SEPARATE_PRODUCTIVE_CUTOVER_GATE** |
-| **Empfohlener nächster Gate** | **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan |
+| **Empfohlener nächster Gate** | **P5-E.9F.2** — Entity SSG / SEO Technical Closure Implementation |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -425,10 +425,27 @@ Final Target muss erhalten (analog Staging 4A):
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
-| Empfohlener nächster Gate | **P5-E.9F.1** |
+| Empfohlener nächster Gate | **P5-E.9F.2** |
 
 **Report:** `docs/architecture/p5-s06-final-search-closure-dossier.md`
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5I + 5J PASS. Kein Content Row Write. S-06 CLOSED_SEARCH_EVIDENCE.*
+## P5-E.9F.1 Follow-up (PASS — S-05 SEO/CSR Entity Pages Closure Plan / Revalidation)
+
+**Gate:** P5-E.9F.1. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `a2cf8b1` |
+| Plan/Revalidation only | **Ja** — kein DB/SQL/Write/Runtime-Switch |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.2** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-entity-pages-closure-plan.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5A–5I + 5J + 9F.1 PASS. Kein Content Row Write. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*

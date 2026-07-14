@@ -2662,6 +2662,39 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+---
+
+## P5-E.9F.1 S-05 SEO CSR Entity Pages Closure Plan (PASS)
+
+**Milestone:** P5-E.9F.1 (S-05 SEO/CSR Entity Pages Closure Plan / Revalidation). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| HEAD before gate `a2cf8b1` | verify | yes | `[x]` |
+| Plan-only — no DB/SQL/writes | scope | none | `[x]` |
+| Plan document exists | verify | yes | `[x]` |
+| Prior SEO/CSR evidence summarized | verify | yes | `[x]` |
+| S-05 closure criteria defined | verify | yes | `[x]` |
+| Gap analysis exists | verify | yes | `[x]` |
+| Entity page strategy documented | verify | yes | `[x]` |
+| SSG strategy documented | verify | yes | `[x]` |
+| Metadata/sitemap/robots strategy documented | verify | yes | `[x]` |
+| Content source strategy documented | verify | yes | `[x]` |
+| Future gates defined (9F.2–9F.4) | verify | yes | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains CLOSED_SEARCH_EVIDENCE | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Product Activation remains FAIL | status | FAIL | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9F.1 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-entity-pages-closure-plan.md`
+
+**Next:** P5-E.9F.2 Entity SSG / SEO Technical Closure Implementation. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5J S-06 Final Search Closure Dossier (PASS)
 
 **Milestone:** P5-E.9E.5J (S-06 Final Search Closure Dossier). **PASS**.

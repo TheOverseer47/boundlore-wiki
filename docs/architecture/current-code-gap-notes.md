@@ -3480,6 +3480,34 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+---
+
+## 179. P5-E.9F.1 — S-05 SEO/CSR Entity Pages Closure Plan / Revalidation (PASS)
+
+**Milestone:** P5-E.9F.1 (Plan/Revalidation only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| HEAD before gate `a2cf8b1` | **PASS** |
+| Plan document | `p5-s05-seo-csr-entity-pages-closure-plan.md` |
+| Prior 9D evidence summarized | **PASS** |
+| S-05 closure criteria defined | **PASS** |
+| Gap analysis | **PASS** |
+| Entity/SSG/metadata/sitemap strategy | **PASS** |
+| Future gates 9F.2–9F.4 defined | **PASS** |
+| No DB/SQL/writes/runtime switch | **PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.1 | **PASS** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-entity-pages-closure-plan.md`
+
+**Next:** P5-E.9F.2 Entity SSG / SEO Technical Closure Implementation. No push/deploy/launch.
+
+---
+
 ## 178. P5-E.9E.5J — S-06 Final Search Closure Dossier (PASS)
 
 **Milestone:** P5-E.9E.5J (S-06 Final Search Closure Dossier). **PASS**.

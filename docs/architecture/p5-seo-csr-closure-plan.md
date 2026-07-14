@@ -423,7 +423,30 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 **Hinweis:** Search-Cutover (5A–5J) **löst S-05 nicht**. Entity Detail SEO/CSR bleibt separater Blocker. Public Launch **NO-GO**.
 
-**Empfohlener nächster Gate (Search-Track):** **P5-E.9F.1** — S-05 SEO/CSR Entity Pages Closure Plan
+**Empfohlener nächster Gate (Search-Track):** ~~**P5-E.9F.1**~~ **PASS** — `p5-s05-seo-csr-entity-pages-closure-plan.md`
+
+---
+
+## P5-E.9F.1 Follow-up (PASS — S-05 SEO/CSR Entity Pages Closure Plan / Revalidation)
+
+**Gate:** P5-E.9F.1. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `a2cf8b1` |
+| Arbeitsmodus | Plan/Revalidation only — kein SQL/DB/Write/Runtime-Switch |
+| Prior 9D Evidence revalidiert | **Ja** — 9D.1/9D.2/9D.3/9D.3A/9D.3B/9D.3C |
+| S-05 Closure Criteria definiert | **Ja** |
+| Gap Analysis | **Ja** — Entity/Sitemap/Real-Content Gaps dokumentiert |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Final Runtime Config | **STAGING** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.2** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-entity-pages-closure-plan.md`
+
+**Empfohlener nächster Gate:** **P5-E.9F.2** — Entity SSG / SEO Technical Closure Implementation
 
 ---
 
@@ -520,4 +543,4 @@ Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9E.5J PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*
+*Dokumentversion: P5-E.9D … + P5-E.9E.5J + P5-E.9F.1 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*

@@ -292,7 +292,8 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 
 | Gate | Scope |
 |------|-------|
-| **P5-E.9F.1** | S-05 SEO/CSR Entity Pages Closure Plan / Revalidation |
+| **P5-E.9F.1** | S-05 SEO/CSR Entity Pages Closure Plan / Revalidation — **PASS** |
+| **P5-E.9F.2** | Entity SSG / SEO Technical Closure Implementation |
 | **P5-E.9F.2** | Entity SSG / SEO Runtime Evidence |
 | **P5-E.9G** | Production Closure / Release Gate Legacy Assessment |
 | **P5-E.9H** | Productive Runtime Cutover Plan |
@@ -318,12 +319,29 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9F.1 — S-05 SEO/CSR Entity Pages Closure Plan / Revalidation
+**Empfohlener nächster Gate:** P5-E.9F.2 — Entity SSG / SEO Technical Closure Implementation
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.1 frei — S-05 SEO/CSR Entity Pages Closure Plan auf Basis des geschlossenen S-06 Search Evidence, read-only/plan-only, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+> „Ja, ich gebe P5-E.9F.2 frei — Entity SSG / SEO Technical Closure Implementation auf Fixture-/static-Basis, lokal, kein DB-Zugriff, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
 
 ---
 
-*Dokumentversion: P5-E.9E.5J PASS. Kein DB-Zugriff. Kein Runtime-Switch. S-06 Search Recall CLOSED. Launch NO-GO.*
+## P5-E.9F.1 Follow-up (PASS — S-05 SEO/CSR Entity Pages Closure Plan / Revalidation)
+
+**Gate:** P5-E.9F.1. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `a2cf8b1` |
+| Plan/Revalidation only | **Ja** — kein DB/SQL/Write/Runtime-Switch |
+| S-05 SEO/CSR | **OPEN_BLOCKING** (unverändert) |
+| S-06 Search Recall | **CLOSED** (unverändert) |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9F.2** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-entity-pages-closure-plan.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5J + P5-E.9F.1 PASS. Kein DB-Zugriff. Kein Runtime-Switch. S-06 Search Recall CLOSED. S-05 OPEN_BLOCKING. Launch NO-GO.*
