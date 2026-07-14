@@ -216,7 +216,8 @@ Angewendete Objekte:
 | P5-E.9E.4A | **PASS** |
 | Search DB/FTS Apply | **APPLIED_STAGING_PASS** |
 | Search DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
-| Search Runtime Evidence (Client) | **PASS** |
+| Search DB/FTS Runtime Evidence | **PASS** (P5-E.9E.4G RPC Corpus Gate) |
+| **P5-E.9E.4G** | **PASS** — RPC Corpus Verification |
 | S-06 Search Recall | **OPEN_BLOCKING** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |

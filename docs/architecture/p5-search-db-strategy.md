@@ -33,6 +33,17 @@
 
 ---
 
+## P5-E.9E.4G — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-staging-rpc-corpus-verification-report.md` |
+| RPC Corpus Verification | **RPC_CORPUS_VERIFIED_CLEANED** |
+| Search DB/FTS Runtime Evidence | **PASS** |
+| P5-E.9E.4G | **PASS** |
+
+---
+
 ## P5-E.9E.4F — Umsetzungsnachweis (PASS)
 
 | Item | Ergebnis |

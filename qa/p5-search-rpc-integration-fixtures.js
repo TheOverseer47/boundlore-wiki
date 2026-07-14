@@ -92,6 +92,17 @@
       private_note: "secret",
     }) === null);
 
+    assert("allow-matched-fields", "matched_fields search_vector Metadatum erlaubt", S.mapRpcResult({
+      title: "Ember Salamander",
+      canonical_slug: "staging-rpc-ember-salamander-p5e9e4g",
+      canonical_url: "/wiki/post/staging-rpc-ember-salamander-p5e9e4g/",
+      excerpt: "monster creature beast",
+      category: "creatures",
+      score: 18.3,
+      source_type: "post",
+      matched_fields: ["search_vector"],
+    }) !== null);
+
     assert("whitelist-only", "Nur whitelisted Felder in Output", function() {
       if (!safeMapped || !safeMapped.document) return false;
       var docKeys = Object.keys(safeMapped.document);

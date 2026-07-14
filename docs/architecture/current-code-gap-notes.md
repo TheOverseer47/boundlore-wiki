@@ -3478,6 +3478,20 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 162. P5-E.9E.4G — Staging RPC Corpus Verification (PASS)
+
+**Milestone:** P5-E.9E.4G. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| RPC Corpus Verification | **RPC_CORPUS_VERIFIED_CLEANED** |
+| Search DB/FTS Runtime Evidence | **PASS** |
+| P5-E.9E.4G | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-rpc-corpus-verification-report.md`
+
+---
+
 ## 161. P5-E.9E.4F — Client RPC Integration (PASS)
 
 **Milestone:** P5-E.9E.4F. **PASS**.

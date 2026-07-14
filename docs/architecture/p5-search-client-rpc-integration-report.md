@@ -16,7 +16,8 @@
 | **Client RPC Integration** | **RPC_CLIENT_INTEGRATED** |
 | **Search DB/FTS UI Integration** | **RPC_CLIENT_INTEGRATED** |
 | **Search DB/FTS Evidence** | **PARTIAL_EMPTY_CORPUS** |
-| **Search DB/FTS Runtime Evidence** | **PARTIAL_EMPTY_CORPUS** |
+| **Search DB/FTS Runtime Evidence** | **PASS** (P5-E.9E.4G) |
+| **P5-E.9E.4G** | **PASS** — RPC Corpus Verification |
 | **Search Runtime Evidence (Client)** | **PASS** (Recall-Fixtures, 9E.4E) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -170,7 +171,7 @@ supabase.rpc("bl_search_public_content", {
 | Client RPC Integration | **RPC_CLIENT_INTEGRATED** |
 | Search DB/FTS UI Integration | **RPC_CLIENT_INTEGRATED** |
 | Search DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
-| Search DB/FTS Runtime Evidence | **PARTIAL_EMPTY_CORPUS** |
+| Search DB/FTS Runtime Evidence | **PASS** (P5-E.9E.4G) |
 | Search Runtime Evidence (Client) | **PASS** |
 | S-06 Search Recall | **OPEN_BLOCKING** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |

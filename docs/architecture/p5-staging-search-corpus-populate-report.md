@@ -189,7 +189,8 @@ AND content LIKE '%P5E9E4E_STAGING_SEARCH_CORPUS%';
 | Gate | Zweck |
 |------|-------|
 | ~~**P5-E.9E.4A**~~ | `search_documents` / FTS — **PASS** |
-| Client RPC Integration | `js/search.js` → RPC |
+| **P5-E.9E.4G** | RPC Corpus Verification — **PASS** |
+| Client RPC Integration | **RPC_CLIENT_INTEGRATED** |
 | Production Corpus | Echter published Content |
 
 ---

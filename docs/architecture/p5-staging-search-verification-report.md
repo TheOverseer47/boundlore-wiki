@@ -19,8 +19,9 @@
 | **P5-E.9E.4B** | **PASS** |
 | **P5-E.9E.4E** | **PASS** — Corpus Populate |
 | **P5-E.9E.4A** | **PASS** — Search DB/FTS |
-| **P5-E.9E.4F** | **PASS** — Client RPC Integration |
-| **Client RPC Integration** | **RPC_CLIENT_INTEGRATED** |
+| **P5-E.9E.4G** | **PASS** — RPC Corpus Verification |
+| **RPC Corpus Verification** | **RPC_CORPUS_VERIFIED_CLEANED** |
+| **Search DB/FTS Runtime Evidence** | **PASS** (4G Gate) |
 | **Search Runtime Evidence** | **PASS** (Client, 9E.4E) |
 | **Search DB/FTS Evidence** | **PARTIAL_EMPTY_CORPUS** |
 | **Staging Ref in Client Runtime** | **VERIFIZIERT** (`STAGING_REF_VERIFIED`) |

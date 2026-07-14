@@ -109,8 +109,6 @@ function mapRpcResult(row) {
     }
   }
 
-  if (containsLeakMarkers(JSON.stringify(row))) return null;
-
   const slug = String(row.canonical_slug || "").trim();
   const title = String(row.title || "Untitled").trim();
   const excerpt = String(row.excerpt || "").slice(0, 200);
@@ -121,6 +119,12 @@ function mapRpcResult(row) {
   if (containsLeakMarkers(title) || containsLeakMarkers(excerpt)) return null;
   if (/^Contribution:/i.test(title)) return null;
   if (/^(qa-|test-|fixture-|contribution-)/i.test(slug)) return null;
+
+  const leakProbe = Object.assign({}, row);
+  delete leakProbe.matched_fields;
+  delete leakProbe.id;
+  delete leakProbe.score;
+  if (containsLeakMarkers(JSON.stringify(leakProbe))) return null;
 
   return {
     document: {

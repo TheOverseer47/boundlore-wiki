@@ -504,6 +504,18 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 42. P5-E.9E.4G Follow-up (PASS — RPC Corpus Verification)
+
+**Gate:** P5-E.9E.4G. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| RPC Corpus Verification | **RPC_CORPUS_VERIFIED_CLEANED** |
+| Search DB/FTS Runtime Evidence | **PASS** |
+| P5-E.9E.4G | **PASS** |
+
+---
+
 ## 41. P5-E.9E.4F Follow-up (PASS — Client RPC Integration)
 
 **Gate:** P5-E.9E.4F. **PASS**.

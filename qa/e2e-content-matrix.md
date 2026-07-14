@@ -2646,7 +2646,46 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** Persistenter Corpus + Re-run. No push/deploy/launch.
+**Next:** Production Content Migration. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4G — Staging RPC Corpus Verification (PASS)
+
+**Milestone:** P5-E.9E.4G (Staging RPC Corpus). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fresh staging backup before write | backup | present | `[x]` |
+| Target ref `jzzgoiwfbuwiiyvwgwri` | staging | verified | `[x]` |
+| Legacy not used | staging | not legacy | `[x]` |
+| Production not used | staging | not production | `[x]` |
+| 5 controlled published posts inserted | staging | 5 | `[x]` |
+| `bl_rebuild_search_documents()` executed | staging | 5 rows | `[x]` |
+| Index contains controlled corpus | staging | 5 slugs | `[x]` |
+| RPC-first client used | runtime | RPC | `[x]` |
+| Query matrix passed | runtime | core+safety | `[x]` |
+| `monster` returns Ember Salamander | runtime | yes | `[x]` |
+| `artifact` returns Volcanic Heat Charm | runtime | yes | `[x]` |
+| `basalt` returns Cinder Basalt Flats | runtime | yes | `[x]` |
+| `resource` returns Molten Ember Shard | runtime | yes | `[x]` |
+| `guide/guild` returns Ember Wardens Field Guide | runtime | yes | `[x]` |
+| unsafe query tested | runtime | 0 hits | `[x]` |
+| no BLMETA exposed | runtime | absent | `[x]` |
+| no search_text/search_vector exposed | runtime | absent | `[x]` |
+| no Profile-PII exposed | runtime | absent | `[x]` |
+| Cleanup executed | staging | 5 deleted | `[x]` |
+| Rebuild after cleanup executed | staging | 0 rows | `[x]` |
+| Cleanup verified | staging | 0 slugs/marker | `[x]` |
+| RPC Corpus Verification | status | RPC_CORPUS_VERIFIED_CLEANED | `[x]` |
+| Search DB/FTS Runtime Evidence | status | PASS | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4G | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-rpc-corpus-verification-report.md`
+
+**Next:** Production Content Migration. No push/deploy/launch.
 
 ---
 
