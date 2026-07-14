@@ -504,6 +504,20 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 37. P5-E.9E.4C Follow-up (PASS — Read Path Fix Draft)
+
+**Gate:** P5-E.9E.4C. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Draft | `p5-staging-search-read-path-fix-draft.md` |
+| Root Cause | **CONFIRMED_STATIC** — RLS Policy Dependency |
+| Code-only Fix | **Nicht ausreichend** |
+| Next Gate | **P5-E.9E.4D** |
+| P5-E.9E.4C | **PASS** |
+
+---
+
 ## 36. P5-E.9E.4 Re-run Follow-up (PASS)
 
 **Gate:** P5-E.9E.4 Re-run. **PASS**.
@@ -582,4 +596,4 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.4 Re-run PASS. Search Runtime Evidence PARTIAL.*
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.4C PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX.*

@@ -19,7 +19,7 @@
 | **DB Search Strategy** | **DOCUMENTED** |
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (P5-E.9E.2) |
 | **Search Implementation** | **PARTIAL** — Client gehärtet; DB-Index fehlt |
-| **Search Runtime Evidence** | **PARTIAL** (9E.4 Re-run) |
+| **Search Runtime Evidence** | **PARTIAL** / **BLOCKED_UNTIL_FIX** (9E.4 Re-run + 9E.4C Draft) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** (separater Blocker) |
 | **Product Activation** | **FAIL** |
@@ -28,7 +28,19 @@
 
 **Kernaussage:** BoundLore sollte für MVP und Full Launch eine **dedizierte, normalisierte Public-Search-Schicht** einführen — bevorzugt **`search_documents` + RPC `bl_search_public_content`**, mit **Postgres FTS (`tsvector`)** und optional **`pg_trgm`** (bereits im Schema für Observations vorhanden). Die clientseitige `BoundLoreSearchRecall`-Utility (9E.2) bleibt als **Ergänzung, Synonym-Fallback und Fixture-Baseline**; die DB liefert die **vollständigere Trefferbasis**, bessere Skalierung und **fail-closed RLS/Release-Gate-Kontrolle**. **Kein SQL in diesem Gate.** Apply erst über explizite Folge-Gates mit Backup und Staging-Freigabe.
 
-**Empfohlener nächster Gate:** Staging `posts`-Read-Pfad für Anon-Search (RLS/Grant) oder **P5-E.9E.4A** (STOPP)
+**Empfohlener nächster Gate:** **P5-E.9E.4D** — Posts RLS Policy Dependency Fix
+
+---
+
+## P5-E.9E.4C — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Draft | `p5-staging-search-read-path-fix-draft.md` |
+| Root Cause | RLS `posts` SELECT-Policies mit `profiles` Invoker-Subquery |
+| Client Select Pruning für Search | **Nicht nötig** — bereits ohne `profiles` |
+| DB-Fix erforderlich | **Ja** — Option F (RLS Policy Refactor) |
+| P5-E.9E.4C | **PASS** |
 
 ---
 
@@ -103,7 +115,7 @@
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4 Re-run PASS. Search Runtime Evidence PARTIAL. Kein DB-Write.*
+*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4C PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX. Kein DB-Write.*
 
 ---
 

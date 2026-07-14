@@ -2558,7 +2558,33 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-staging-runtime-config-report.md`
 
-**Next:** P5-E.9E.4A (STOPP) oder Staging posts read path. No push/deploy/launch.
+**Next:** P5-E.9E.4C Read Path Fix Draft. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4C — Staging Search Read Path Fix Draft (PASS)
+
+**Milestone:** P5-E.9E.4C (Analyse + Draft). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Read path fix draft exists | docs | present | `[x]` |
+| 42501 profiles blocker documented | draft | yes | `[x]` |
+| Search read path reviewed statically | `js/search.js` | no profiles embed | `[x]` |
+| Profiles dependency analyzed | draft | RLS not client | `[x]` |
+| Fix options matrix exists | draft | yes | `[x]` |
+| Minimal recommended fix documented | draft | 9E.4D RLS | `[x]` |
+| No SQL executed | gate | none | `[x]` |
+| No DB/Supabase access | gate | none | `[x]` |
+| No migration created | gate | none | `[x]` |
+| Search Runtime Evidence | status | PARTIAL/BLOCKED | `[x]` |
+| S-06 OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.4C | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-search-read-path-fix-draft.md`
+
+**Next:** P5-E.9E.4D (STOPP). No push/deploy/launch.
 
 ---
 
@@ -2585,7 +2611,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-staging-search-verification-report.md`
 
-**Next:** P5-E.9E.4A (STOPP). No push/deploy/launch.
+**Next:** P5-E.9E.4C Read Path Fix Draft. No push/deploy/launch.
 
 ---
 

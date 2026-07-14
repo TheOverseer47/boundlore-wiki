@@ -3478,6 +3478,22 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 157. P5-E.9E.4C — Staging Search Read Path Fix Draft (PASS)
+
+**Milestone:** P5-E.9E.4C. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Read Path Fix Draft | `p5-staging-search-read-path-fix-draft.md` |
+| Root Cause | **CONFIRMED_STATIC** — RLS `posts` → `profiles` |
+| Code-only Fix | **Nicht ausreichend** |
+| Search Runtime Evidence | **PARTIAL** / **BLOCKED_UNTIL_FIX** |
+| P5-E.9E.4C | **PASS** |
+
+**Next:** P5-E.9E.4D Posts RLS Policy Fix. No push/deploy/launch.
+
+---
+
 ## 156. P5-E.9E.4 Re-run — Staging Search Query Matrix (PASS)
 
 **Milestone:** P5-E.9E.4 Re-run. **PASS**.
