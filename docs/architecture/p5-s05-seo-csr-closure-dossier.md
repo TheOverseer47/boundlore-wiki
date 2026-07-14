@@ -355,16 +355,16 @@ Alle 6 Fixture-SSG-Seiten enthalten statisch (ohne JS):
 
 **Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
 
-**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
+**Empfohlener nächster Gate:** **Production Runtime Cutover** (separate Production-Gate)
 
 ---
 
-## P5-E.9F.7 Follow-up (PASS — Real-Content Entity SEO Evidence Re-run)
+## P5-E.9F.8 Follow-up (PASS — S-05 Final Closure Decision)
 
-**Gate:** P5-E.9F.7. **PASS**. Real-content SEO evidence re-run on 5 exported pages.
+**Gate:** P5-E.9F.8. **PASS**. **Option A** — S-05 **CLOSED_BY_REAL_CONTENT_EVIDENCE**; Fable-5 S-05 **CLOSED_FOR_CODE_AND_CONTENT_EVIDENCE**. Launch **NO-GO**.
 
-**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
+**Report:** `docs/architecture/p5-s05-final-closure-decision-dossier.md`
 
 ---
 
-*Dokumentversion: P5-E.9F.4 + P5-E.9F.5 + P5-E.9F.6 + P5-E.9F.7 PASS. S-05 PARTIAL. Launch NO-GO.*
+*Dokumentversion: P5-E.9F.4–9F.8. S-05 CLOSED_BY_REAL_CONTENT_EVIDENCE (9F.8). Launch NO-GO.*

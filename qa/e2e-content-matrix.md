@@ -2668,6 +2668,43 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9F.8 S-05 Final Closure Decision Dossier
+
+**Milestone:** P5-E.9F.8 (S-05 Final Closure Decision Dossier). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Final decision dossier exists | verify | yes | `[x]` |
+| 9F.6 evidence included | verify | yes | `[x]` |
+| 9F.7 evidence included | verify | yes | `[x]` |
+| Fable-5 S-05 requirement documented | verify | yes | `[x]` |
+| Closure criteria matrix completed | verify | yes | `[x]` |
+| Real-content SEO evidence assessed | verify | REAL_CONTENT_SEO_EVIDENCE_PASS | `[x]` |
+| CSR/thin-shell boundary assessed | verify | separate production gate | `[x]` |
+| Sitemap/root-indexing boundary assessed | verify | OPEN_SEPARATE_LAUNCH_GATE | `[x]` |
+| No-leak evidence included | verify | PASS | `[x]` |
+| S-05 decision documented | verify | Option A | `[x]` |
+| S-05 SEO/CSR | status | CLOSED_BY_REAL_CONTENT_EVIDENCE | `[x]` |
+| S-05 Fable-5 Launch Blocker | status | CLOSED_FOR_CODE_AND_CONTENT_EVIDENCE | `[x]` |
+| Remaining non-S05 blockers separated | verify | yes | `[x]` |
+| What-this-does-not-approve documented | verify | yes | `[x]` |
+| No DB access | scope | none | `[x]` |
+| No SQL | scope | none | `[x]` |
+| No MCP read | scope | none | `[x]` |
+| No writes | scope | none | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains CLOSED_SEARCH_EVIDENCE | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| Product Activation remains FAIL | status | FAIL | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9F.8 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-s05-final-closure-decision-dossier.md`
+
+**Next:** Production Runtime Cutover / Launch gates (separate). No push/deploy/launch.
+
+---
+
 ## P5-E.9F.7 Real-Content Entity SEO Evidence Re-run
 
 **Milestone:** P5-E.9F.7 (Real-Content Entity SEO Evidence Re-run). **PASS**.

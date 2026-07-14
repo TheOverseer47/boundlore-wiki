@@ -3486,6 +3486,26 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 186. P5-E.9F.8 — S-05 Final Closure Decision Dossier (PASS)
+
+**Milestone:** P5-E.9F.8 (S-05 Final Closure Decision Dossier). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| HEAD before gate `78a45b4` | **PASS** |
+| Decision Option | **Option A — CLOSED_BY_REAL_CONTENT_EVIDENCE** |
+| S-05 SEO/CSR | **CLOSED_BY_REAL_CONTENT_EVIDENCE** |
+| S-05 Fable-5 Launch Blocker | **CLOSED_FOR_CODE_AND_CONTENT_EVIDENCE** |
+| Runtime/Launch boundary | **Separate gates — OPEN** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.8 | **PASS** |
+
+**Report:** `docs/architecture/p5-s05-final-closure-decision-dossier.md`
+
+**Next:** Production Runtime Cutover (separate gate). No push/deploy/launch.
+
+---
+
 ## 185. P5-E.9F.7 — Real-Content Entity SEO Evidence Re-run (PASS)
 
 **Milestone:** P5-E.9F.7 (Real-Content Entity SEO Evidence Re-run). **PASS**.

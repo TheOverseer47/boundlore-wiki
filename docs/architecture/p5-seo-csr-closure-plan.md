@@ -433,7 +433,17 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9F.7**~~ **PASS** — Real-Content Entity SEO Evidence Re-run
 
-**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
+~~**P5-E.9F.8**~~ **PASS** — S-05 Final Closure Decision (**Option A — CLOSED_BY_REAL_CONTENT_EVIDENCE**)
+
+**Empfohlener nächster Gate:** **Production Runtime Cutover** (separate Production-Gate)
+
+---
+
+## P5-E.9F.8 Follow-up (PASS — S-05 Final Closure Decision)
+
+**Gate:** P5-E.9F.8. **PASS**. S-05 closed code/content/evidence-seitig; Runtime/Launch separate.
+
+**Report:** `docs/architecture/p5-s05-final-closure-decision-dossier.md`
 
 ---
 

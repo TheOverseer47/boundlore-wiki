@@ -15,14 +15,14 @@
 | **Real-Content Entity SEO Evidence Re-run** | **REAL_CONTENT_SEO_EVIDENCE_PASS** |
 | **Real-Content Entity SSG Export** | **PASS** (9F.6 baseline) |
 | **Entity SEO Technical Evidence** | **CLOSED_TECHNICAL_FIXTURE** + **REAL_CONTENT_SEO_EVIDENCE_PASS** |
-| **S-05 SEO/CSR** | **PARTIAL_TECHNICAL_EVIDENCE** |
-| **S-05 Fable-5 Launch Blocker** | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| **S-05 SEO/CSR** | **CLOSED_BY_REAL_CONTENT_EVIDENCE** (9F.8 Option A) |
+| **S-05 Fable-5 Launch Blocker** | **CLOSED_FOR_CODE_AND_CONTENT_EVIDENCE** |
 | **S-06 Search Recall** | **CLOSED_SEARCH_EVIDENCE** |
 | **Final Runtime Config** | **STAGING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Static QA, Export-JSON Safety, Deep HTML SEO, Local HTTP/Crawl, Sitemap, Fixture Quarantine, No-Leak und CSR Dependency bestätigen **5/5** exportierte Real-Content Entity-Seiten als statisch crawlbar und SEO-tauglich. **Kein S-05 Final Closure**, **kein Launch**, **kein DB-Zugriff**.
+**Kernaussage:** Static QA, Export-JSON Safety, Deep HTML SEO, Local HTTP/Crawl, Sitemap, Fixture Quarantine, No-Leak und CSR Dependency bestätigen **5/5** exportierte Real-Content Entity-Seiten als statisch crawlbar und SEO-tauglich. **S-05 final closure decision in 9F.8 (Option A).** **Kein Launch**, **kein DB-Zugriff**.
 
 ---
 
@@ -265,20 +265,24 @@ Fixture technical evidence remains **CLOSED_TECHNICAL_FIXTURE**; real-content ev
 | Real-Content Entity SSG Export | **PASS** |
 | Real-Content Entity Source Decision | **HYBRID_WIKI_ENTITIES_PLUS_POSTS** |
 | Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
-| S-05 SEO/CSR | **PARTIAL_TECHNICAL_EVIDENCE** |
-| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| S-05 SEO/CSR | **CLOSED_BY_REAL_CONTENT_EVIDENCE** |
+| S-05 Fable-5 Launch Blocker | **CLOSED_FOR_CODE_AND_CONTENT_EVIDENCE** |
 | S-06 Search Recall | **CLOSED_SEARCH_EVIDENCE** |
 | Final Runtime Config | **STAGING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
-
-**Manuelle Nutzerfreigabe nötig:** **Ja**
-
-> „Ja, ich gebe P5-E.9F.8 frei — S-05 Final Closure Decision Dossier auf Basis der Real-Content Entity SEO Evidence (9F.6 + 9F.7), kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
+**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier ✅ → **Production Runtime Cutover** (separate gate)
 
 ---
 
-*Dokumentversion: P5-E.9F.7 PASS. No DB access. S-05 open until 9F.8. Launch NO-GO.*
+## P5-E.9F.8 Follow-up (PASS — S-05 Final Closure Decision)
+
+**Gate:** P5-E.9F.8. **PASS**. **Option A** — S-05 **CLOSED_BY_REAL_CONTENT_EVIDENCE**.
+
+**Report:** `docs/architecture/p5-s05-final-closure-decision-dossier.md`
+
+---
+
+*Dokumentversion: P5-E.9F.7 PASS. S-05 closed by real-content evidence in 9F.8. Launch NO-GO.*

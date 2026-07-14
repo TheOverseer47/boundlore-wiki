@@ -260,19 +260,23 @@ Entity SEO Technical Evidence remains **CLOSED_TECHNICAL_FIXTURE** for fixture p
 | Real-Content Entity SSG Export | **PASS** — 5 pages |
 | Real-Content Entity Source Decision | **HYBRID_WIKI_ENTITIES_PLUS_POSTS** |
 | Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
-| S-05 SEO/CSR | **PARTIAL_TECHNICAL_EVIDENCE** |
-| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| S-05 SEO/CSR | **CLOSED_BY_REAL_CONTENT_EVIDENCE** |
+| S-05 Fable-5 Launch Blocker | **CLOSED_FOR_CODE_AND_CONTENT_EVIDENCE** |
 | S-06 Search Recall | **CLOSED_SEARCH_EVIDENCE** |
 | Final Runtime Config | **STAGING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
+**Empfohlener nächster Gate:** **Production Runtime Cutover** (separate Production-Gate)
 
-**Manuelle Nutzerfreigabe nötig:** **Ja**
+---
 
-> „Ja, ich gebe P5-E.9F.8 frei — S-05 Final Closure Decision Dossier auf Basis der Real-Content Entity SEO Evidence (9F.6 + 9F.7), kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
+## P5-E.9F.8 Follow-up (PASS — S-05 Final Closure Decision)
+
+**Gate:** P5-E.9F.8. **PASS**. Option A — S-05 **CLOSED_BY_REAL_CONTENT_EVIDENCE**.
+
+**Report:** `docs/architecture/p5-s05-final-closure-decision-dossier.md`
 
 ---
 
@@ -284,4 +288,4 @@ Entity SEO Technical Evidence remains **CLOSED_TECHNICAL_FIXTURE** for fixture p
 
 ---
 
-*Dokumentversion: P5-E.9F.6 + P5-E.9F.7 PASS. Read-only export + local evidence. Launch NO-GO.*
+*Dokumentversion: P5-E.9F.6–9F.8. S-05 CLOSED_BY_REAL_CONTENT_EVIDENCE. Launch NO-GO.*

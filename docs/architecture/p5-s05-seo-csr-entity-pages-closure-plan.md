@@ -309,15 +309,15 @@ S-05 darf erst **CLOSED** werden, wenn **alle** Kriterien erfüllt sind:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.8** — S-05 Final Closure Decision Dossier
+**Empfohlener nächster Gate:** **Production Runtime Cutover** (separate)
 
 ---
 
-## P5-E.9F.7 Follow-up (PASS — Real-Content Entity SEO Evidence Re-run)
+## P5-E.9F.8 Follow-up (PASS — S-05 Final Closure Decision)
 
-**Gate:** P5-E.9F.7. **PASS**. 5/5 real-content pages — static SEO + crawl evidence.
+**Gate:** P5-E.9F.8. **PASS**. S-05 **CLOSED_BY_REAL_CONTENT_EVIDENCE**.
 
-**Report:** `docs/architecture/p5-real-content-entity-seo-evidence-rerun-report.md`
+**Report:** `docs/architecture/p5-s05-final-closure-decision-dossier.md`
 
 ---
 
