@@ -33,7 +33,21 @@
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5B** — Read-only Legacy Inventory
+**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision (Plan-only)
+
+---
+
+## P5-E.9E.5B — Umsetzungsnachweis (PASS — Read-only Inventory)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-production-legacy-readonly-inventory-report.md` |
+| Inventory Status | **COMPLETE** |
+| Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
+| P5-E.9E.5B | **PASS** |
+| Write / Apply | **Nein** |
+
+**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision
 
 ---
 
@@ -47,7 +61,7 @@
 | P5-E.9E.5A | **PASS** |
 | DB-Zugriff / SQL / Write | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5B** — Read-only Legacy Inventory (`ohkoojpzmptdfyowdgog`)
+**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision
 
 ---
 

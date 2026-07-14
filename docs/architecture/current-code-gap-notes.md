@@ -3478,6 +3478,26 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 170. P5-E.9E.5B — Production / Legacy Read-only Inventory (PASS)
+
+**Milestone:** P5-E.9E.5B (Read-only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | **PASS** |
+| Inventory Status | **COMPLETE** |
+| Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
+| SQL Apply / Write | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5B | **PASS** |
+
+**Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
+
+**Next:** P5-E.9E.5C Final Target Decision. No push/deploy/launch.
+
+---
+
 ## 169. P5-E.9E.5A — Production / Legacy Target & Cutover Plan (PASS)
 
 **Milestone:** P5-E.9E.5A (Plan-only). **PASS**.
@@ -3496,7 +3516,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
-**Next:** P5-E.9E.5B Read-only Legacy Inventory (Nutzerfreigabe). No push/deploy/launch.
+**Next:** P5-E.9E.5C Final Target Decision. No push/deploy/launch.
 
 ---
 

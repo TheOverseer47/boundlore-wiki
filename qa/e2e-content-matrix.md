@@ -2650,6 +2650,39 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9E.5B — Production Legacy Read-only Inventory (PASS)
+
+**Milestone:** P5-E.9E.5B (Read-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | inventory | yes | `[x]` |
+| Staging ref not used | inventory | yes | `[x]` |
+| Read-only inventory only | scope | yes | `[x]` |
+| No SQL apply | scope | none | `[x]` |
+| No DDL/DML | scope | none | `[x]` |
+| No writes | scope | none | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| Schema inventory documented | report | yes | `[x]` |
+| Core table inventory documented | report | yes | `[x]` |
+| Content counts documented | report | yes | `[x]` |
+| RLS/policies/grants documented | report | yes | `[x]` |
+| Search object inventory documented | report | yes | `[x]` |
+| Runtime compatibility assessed | report | yes | `[x]` |
+| Content migration assessed | report | yes | `[x]` |
+| Risk register exists | report | yes | `[x]` |
+| Final target suitability classified | report | NEEDS_MIGRATION_DECISION | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5B | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
+
+**Next:** P5-E.9E.5C Final Target Decision. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5A — Production Legacy Target Cutover Plan (PASS)
 
 **Milestone:** P5-E.9E.5A (Plan-only). **PASS**.
@@ -2675,7 +2708,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
-**Next:** P5-E.9E.5B Read-only Legacy Inventory (Nutzerfreigabe). No push/deploy/launch.
+**Next:** P5-E.9E.5B erledigt. No push/deploy/launch.
 
 ---
 

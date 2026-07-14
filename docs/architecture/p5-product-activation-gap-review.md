@@ -504,6 +504,24 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 50. P5-E.9E.5B Follow-up (PASS — Read-only Legacy Inventory)
+
+**Gate:** P5-E.9E.5B. **PASS** (Read-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Inventory Status | **COMPLETE** |
+| Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
+| Legacy read-only Zugriff | **Ja** (kein Write) |
+| Final Target Decision | **NOT_DECIDED** |
+| P5-E.9E.5B | **PASS** |
+
+**Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
+
+**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision (Plan-only)
+
+---
+
 ## 49. P5-E.9E.5A Follow-up (PASS — Production / Legacy Target & Cutover Plan)
 
 **Gate:** P5-E.9E.5A. **PASS** (Plan-only).
@@ -521,7 +539,7 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
-**Empfohlener nächster Gate:** **P5-E.9E.5B** — Read-only Legacy Inventory (Nutzerfreigabe erforderlich)
+**Empfohlener nächster Gate:** **P5-E.9E.5C** — Final Target Decision (Plan-only)
 
 ---
 

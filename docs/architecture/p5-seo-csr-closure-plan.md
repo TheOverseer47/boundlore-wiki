@@ -412,7 +412,11 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 **Hinweis:** Search-Cutover (5A–5I) **löst S-05 nicht**. Entity Detail SEO/CSR bleibt separater Blocker. Public Launch **NO-GO** auch wenn S-06 später geschlossen wird.
 
-**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5B** — Read-only Legacy Inventory
+~~**P5-E.9E.5B**~~ **PASS** — Production / Legacy Read-only Inventory
+
+**Hinweis:** Search-Cutover (5A–5I) **löst S-05 nicht**. Legacy Inventory: Search-Objekte fehlen, `profiles_select_all` kritisch.
+
+**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5C** — Final Target Decision
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 

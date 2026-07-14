@@ -18,6 +18,8 @@
 | **Persistenter Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 Canonicals) |
 | **P5-E.9E.4M** | **PASS** — S-06 Staging Evidence Dossier |
 | **P5-E.9E.5A** | **PASS** — Production / Legacy Target & Cutover Plan |
+| **P5-E.9E.5B** | **PASS** — Legacy Read-only Inventory |
+| **Final Target Suitability** | **NEEDS_MIGRATION_DECISION** |
 | **Production / Legacy Target Decision** | **NOT_DECIDED** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_CLOSED** via 4M; Production offen) |
@@ -25,7 +27,7 @@
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** RPC-first Search + DB/FTS + Rebuild sind auf Staging vollständig verifiziert (4A–4L). Persistenter 12-Canonical-Corpus, Query-Matrix und Marker-Deindex **STAGING_CLOSED** (P5-E.9E.4M). **S-06 Final** bleibt **OPEN_BLOCKING** — Final Target noch nicht entschieden; Production Content Migration und Production Search Evidence fehlen. Empfohlener nächster Gate: **P5-E.9E.5B** — Read-only Legacy Inventory (`ohkoojpzmptdfyowdgog`).
+**Kernaussage:** RPC-first Search + DB/FTS + Rebuild sind auf Staging vollständig verifiziert (4A–4L). Legacy `ohkoojpzmptdfyowdgog` read-only inventarisiert (5B): 6 canonical candidates, Search-Objekte fehlen, `profiles_select_all` kritisch. **S-06 Final** bleibt **OPEN_BLOCKING**. Empfohlener nächster Gate: **P5-E.9E.5C** — Final Target Decision.
 
 ---
 
@@ -333,9 +335,15 @@ Nur: `title`, `canonical_slug`, `canonical_url`, `excerpt`, `category`, `score`,
 |------|----------|
 | Final Target | **NOT_DECIDED** — Option A–E in Cutover Plan |
 | Content Source Decision | **Offen** — 5B Inventory + 5C Decision |
-| Empfohlener nächster Gate | **P5-E.9E.5B** |
+| Empfohlener nächster Gate | **P5-E.9E.5C** |
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
+
+## P5-E.9E.5B Follow-up (PASS — Legacy Inventory)
+
+**Gate:** P5-E.9E.5B. **PASS**. Legacy: 9 published, 6 canonical candidates, Search-Objekte fehlen, `profiles_select_all` kritisch. **Kein Write.**
+
+**Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
 
 Content Migration (5F) folgt **nach** Final Target Decision (5C) und Search Apply (5E).
 

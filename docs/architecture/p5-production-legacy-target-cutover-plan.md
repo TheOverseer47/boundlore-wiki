@@ -16,12 +16,12 @@
 | **Production / Legacy Target Decision** | **NOT_DECIDED** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5B** — Production/Legacy Read-only Inventory |
+| **Empfohlener nächster Gate** | **P5-E.9E.5C** — Final Target Decision (Plan-only) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging `jzzgoiwfbuwiiyvwgwri` hat Search technisch bewiesen (S-06 **STAGING_CLOSED**). Die alte DB `ohkoojpzmptdfyowdgog` wurde **nicht angefasst**. Ein Cutover auf Production/Legacy ist **jetzt verboten** — zuerst read-only Inventory, dann Final-Target-Entscheidung, dann Backup/Apply/Verification-Gates. **Launch ≠ Cutover.**
+**Kernaussage:** Staging `jzzgoiwfbuwiiyvwgwri` hat Search technisch bewiesen (S-06 **STAGING_CLOSED**). Legacy `ohkoojpzmptdfyowdgog` read-only inventarisiert (5B): Search-Objekte fehlen, `profiles_select_all` kritisch, 6 canonical candidates. Cutover weiter **verboten** bis Final Target Decision (5C), Backup, Apply und Verification.
 
 ---
 
@@ -46,7 +46,7 @@
 | Item | Status |
 |------|--------|
 | Staging Ref | `jzzgoiwfbuwiiyvwgwri` — Search **STAGING_CLOSED** (4A–4M) |
-| Legacy / alte DB Ref | `ohkoojpzmptdfyowdgog` — **nicht angefasst** in 9E.4/9E.5A |
+| Legacy / alte DB Ref | `ohkoojpzmptdfyowdgog` — **read-only inventarisiert** (5B) |
 | Search DB/FTS auf Staging | **Applied + verified** |
 | Search DB/FTS auf Legacy/Production | **NOT APPLIED** |
 | Persistenter Staging-Corpus | 12 Canonicals (`-p5e9e4i`) |
@@ -244,6 +244,9 @@ Final Target muss erhalten (analog Staging 4A):
 | Item | Status |
 |------|--------|
 | P5-E.9E.5A | **PASS** |
+| P5-E.9E.5B | **PASS** (Read-only Inventory) |
+| Production / Legacy Inventory | **COMPLETE** |
+| Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
 | Production / Legacy Target Decision | **NOT_DECIDED** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
 | S-06 Final Status | **OPEN_BLOCKING** |
@@ -254,10 +257,28 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-## Nutzerfreigabe für P5-E.9E.5B (STOPP bis Freigabe)
+## P5-E.9E.5B Follow-up (PASS — Read-only Legacy Inventory)
+
+**Gate:** P5-E.9E.5B. **PASS** (Read-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Inventory Status | **COMPLETE** |
+| Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
+| Search-Objekte auf Legacy | **Fehlen** |
+| `profiles_select_all` | **Kritisch** (`qual=true`) |
+| Published canonical candidates | **6** |
+| SQL Apply / Write | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5C** |
+
+**Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
+
+---
+
+## Nutzerfreigabe für P5-E.9E.5B (erfüllt)
 
 > „Ja, ich gebe P5-E.9E.5B frei — Production/Legacy Read-only Inventory gegen `ohkoojpzmptdfyowdgog`, read-only only, kein SQL Apply, kein Write, kein Staging-Write, kein Production-Write, kein Legacy-Write, kein Runtime-Switch, kein Push, kein Deploy, kein Launch.“
 
 ---
 
-*Dokumentversion: P5-E.9E.5A PASS. Plan-only. Kein DB-Zugriff. Keine Secrets.*
+*Dokumentversion: P5-E.9E.5A PASS + P5-E.9E.5B PASS. Legacy read-only inventarisiert. Kein Write.*

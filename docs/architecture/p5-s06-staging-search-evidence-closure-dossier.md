@@ -264,7 +264,7 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 | Legacy `ohkoojpzmptdfyowdgog` angefasst | **Nein** |
 | DB-Zugriff / SQL / Write | **Nein** |
 | S-06 Final Status | **OPEN_BLOCKING** (unverändert) |
-| Empfohlener nächster Gate | **P5-E.9E.5B** — Read-only Legacy Inventory |
+| Empfohlener nächster Gate | **P5-E.9E.5C** |
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 
@@ -272,4 +272,20 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 
 ---
 
-*Dokumentversion: P5-E.9E.4M PASS + P5-E.9E.5A PASS. S-06 Staging Evidence STAGING_CLOSED. Kein DB-Write. Keine Secrets.*
+## P5-E.9E.5B Follow-up (PASS — Read-only Legacy Inventory)
+
+**Gate:** P5-E.9E.5B. **PASS** (Read-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Legacy Inventory | **COMPLETE** |
+| Final Target Suitability | **NEEDS_MIGRATION_DECISION** |
+| Legacy read-only DB-Zugriff | **Ja** (kein Write) |
+| S-06 Final Status | **OPEN_BLOCKING** (unverändert) |
+| Empfohlener nächster Gate | **P5-E.9E.5C** |
+
+**Report:** `docs/architecture/p5-production-legacy-readonly-inventory-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.4M + 5A + 5B PASS. S-06 Staging Evidence STAGING_CLOSED. Kein DB-Write. Keine Secrets.*
