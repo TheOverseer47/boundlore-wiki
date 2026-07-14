@@ -434,10 +434,21 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Verification Plan | Fixture-Baseline + Staging/Production Gates |
 | SQL ausgeführt | **Nein** |
 | DB Search Strategy | **DOCUMENTED** |
-| Search Runtime Evidence | **FAIL_UNTIL_RERUN** |
+| Search Runtime Evidence | **PARTIAL** (42501 profiles blockiert Corpus) |
 | S-06 | **OPEN_BLOCKING** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.4 Re-run** — Staging Search Query Matrix
+**Empfohlener nächster Gate:** Staging posts read path (RLS/Grant) oder P5-E.9E.4A (STOPP)
+
+---
+
+## P5-E.9E.4 Re-run — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Query Matrix | 14 Queries — read-only |
+| Staging Runtime | `STAGING_REF_VERIFIED` |
+| Search Runtime Evidence | **PARTIAL** |
+| P5-E.9E.4 Re-run | **PASS** |
 
 ---
 
@@ -491,4 +502,4 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4 BLOCKED + P5-E.9E.4B PASS. Keine Secrets. Kein DB-Write.*
+*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4 Re-run PASS. Search Runtime Evidence PARTIAL. Kein DB-Write.*

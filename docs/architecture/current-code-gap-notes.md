@@ -3474,7 +3474,22 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-staging-runtime-config-report.md`
 
-**Next:** P5-E.9E.4 Re-run. No push/deploy/launch.
+**Next:** P5-E.9E.4A (STOPP) oder Staging posts read path. No push/deploy/launch.
+
+---
+
+## 156. P5-E.9E.4 Re-run — Staging Search Query Matrix (PASS)
+
+**Milestone:** P5-E.9E.4 Re-run. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Query Matrix | 14 Queries |
+| Search Runtime Evidence | **PARTIAL** |
+| Corpus blocker | `42501 profiles` |
+| P5-E.9E.4 Re-run | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-search-verification-report.md`
 
 ---
 

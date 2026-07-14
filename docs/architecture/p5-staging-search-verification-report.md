@@ -1,29 +1,32 @@
 # P5-E.9E.4 — Staging Search Verification Report
 
-**Gate:** P5-E.9E.4 — Staging Search Verification (read-only bevorzugt). **BLOCKED**.
+**Gate:** P5-E.9E.4 — Staging Search Verification (read-only). **Re-run PASS** (Erstlauf BLOCKED).
 
-**HEAD vor Gate:** `3af3414` — Review search SQL draft statically
+**HEAD vor Erstlauf:** `3af3414` — Review search SQL draft statically
 
-**Arbeitsmodus:** Nur Staging-Ziel `jzzgoiwfbuwiiyvwgwri`. Read-only bevorzugt. Kein SQL Apply. Kein SQL ausführen. Kein DB-Write. Keine Supabase-Writes. Kein Production. Kein Legacy. Kein Push/Deploy/Launch.
+**HEAD vor Re-run:** `1695cf2` — Configure staging runtime for search verification
+
+**Arbeitsmodus:** Nur Staging-Ziel `jzzgoiwfbuwiiyvwgwri`. Read-only. Kein SQL Apply. Kein DB-Write.
 
 ---
 
-## Executive Verdict
+## Executive Verdict (aktuell nach Re-run)
 
 | Dimension | Verdict |
 |-----------|---------|
-| **P5-E.9E.4** | **BLOCKED** (Re-run **READY** nach 9E.4B) |
+| **P5-E.9E.4 (Erstlauf)** | **BLOCKED** |
+| **P5-E.9E.4 Re-run** | **PASS** |
 | **P5-E.9E.4B** | **PASS** |
-| **Search Runtime Evidence** | **FAIL_UNTIL_RERUN** |
-| **Staging Ref in Client Runtime** | **NICHT VERIFIZIERT** |
-| **Lokale Fixtures** | **PASS** (92/92 + 98/98) |
-| **Wiki Search Runtime Matrix** | **NICHT AUSGEFÜHRT** (STOPP) |
+| **Search Runtime Evidence** | **PARTIAL** |
+| **Staging Ref in Client Runtime** | **VERIFIZIERT** (`STAGING_REF_VERIFIED`) |
+| **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 98/98) |
+| **Wiki Search Runtime Matrix** | **AUSGEFÜHRT** (14 Queries) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **P5-E.9E.4A** | **STOPP** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging-Projekt `jzzgoiwfbuwiiyvwgwri` ist dokumentiert. **P5-E.9E.4B PASS** — `js/supabase-config.js` zeigt jetzt auf Staging; Legacy-Ref aus aktiver Runtime entfernt. **P5-E.9E.4 Re-run** kann Query-Matrix ausführen. Search Runtime Evidence bleibt **FAIL_UNTIL_RERUN**.
+**Kernaussage:** Staging-Runtime ist korrekt (`jzzgoiwfbuwiiyvwgwri`). Query-Matrix read-only ausgeführt. **Safety/No-Leak PASS**. Alle Core-Queries liefern **0 Treffer** wegen **Corpus-Fetch-Fehler** (`42501 permission denied for table profiles` bei `posts`-SELECT) — nicht wegen leerer Recall-Logik. UI zeigt fail-closed „Search unavailable, please try again.“ Search Runtime Evidence: **PARTIAL**. S-06 bleibt **OPEN_BLOCKING** (Runtime + DB/FTS).
 
 ---
 
@@ -235,4 +238,153 @@
 
 ---
 
-*Dokumentversion: P5-E.9E.4 BLOCKED + P5-E.9E.4B PASS. Re-run READY. Kein SQL. Kein DB-Write.*
+*Dokumentversion: P5-E.9E.4 BLOCKED (Erstlauf) + P5-E.9E.4B PASS + P5-E.9E.4 Re-run PASS. Search Runtime Evidence PARTIAL. Kein SQL. Kein DB-Write.*
+
+---
+
+# P5-E.9E.4 Re-run — Staging Search Query Matrix
+
+**Gate:** P5-E.9E.4 Re-run. **PASS**.
+
+**HEAD vor Re-run:** `1695cf2` — Configure staging runtime for search verification
+
+**Nutzerfreigabe:**
+> „Ja, ich gebe P5-E.9E.4 Re-run frei — Staging Search Query Matrix, read-only, kein SQL Apply, kein Staging Write, kein Production, kein Legacy, kein Push, kein Deploy, kein Launch.“
+
+---
+
+## Re-run Executive Verdict
+
+| Dimension | Verdict |
+|-----------|---------|
+| **P5-E.9E.4 Re-run** | **PASS** |
+| **Search Runtime Evidence** | **PARTIAL** |
+| **Staging Runtime** | **STAGING_REF_VERIFIED** |
+| **Recall-Treffer (Core)** | **0/11** — Corpus-Fetch blockiert |
+| **Safety/No-Leak** | **PASS** |
+| **Crash-Regression** | **Keine** |
+
+---
+
+## Staging Runtime Re-Verification
+
+| Check | Ergebnis |
+|-------|----------|
+| Config-Fixture | **21/21 PASS** |
+| `BOUNDLORE_SUPABASE_CONFIG_STATUS` | `STAGING_REF_VERIFIED` |
+| `BOUNDLORE_SUPABASE_PROJECT_REF` | `jzzgoiwfbuwiiyvwgwri` |
+| Legacy aktiv | **Nein** |
+| Production/boundlore.com | **Nein** |
+
+---
+
+## Local Fixture Results
+
+| Fixture | Ergebnis |
+|---------|----------|
+| `p5-staging-runtime-config-fixtures.html` | **21/21 PASS** |
+| `p5-search-client-hardening-fixtures.html` | **92/92 PASS** |
+| `p5-search-recall-fixtures.html` | **98/98 PASS** |
+| `/wiki/search/` lädt | **Ja** (ohne Crash) |
+
+---
+
+## Runtime Query Matrix
+
+**Server:** `http://localhost:8081` · **Pfad:** `/wiki/search/?q=<query>`
+
+**Diagnose (read-only Browser-Runtime):** `supabase.from('posts').select(...)` → HTTP 401, `error.code = 42501`, `permission denied for table profiles`. Corpus-Load schlägt fehl → UI: „Search unavailable, please try again.“ (search.js catch-Pfad).
+
+| Query | Lädt | Treffer | Top-Titel | Empty/Error | BLMETA | Unsafe HTML | Draft/QA |
+|-------|------|---------|-----------|-------------|--------|-------------|----------|
+| `monster` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `creature` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `beast` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `salamander` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `artifact` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `charm` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `basalt` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `volcanic` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `resource` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `guide` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `guild` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `zzzxxy-no-hit` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| `<img src=x onerror=alert(1)>` | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+| 150×`z` (lang) | Ja | 0 | — | Error-State | Nein | Nein | Nein |
+
+**Hinweis:** Trefferanzahl 0 reflektiert **keinen** erfolgreichen Recall-Lauf, sondern den **Fetch-Fehler** vor dem Ranking. Lokale Fixtures (92/92, 98/98) bleiben PASS.
+
+---
+
+## Safety / No-Leak Results
+
+| Check | Ergebnis |
+|-------|----------|
+| Unsafe Query → Script-Ausführung | **PASS** — kein `img[onerror]` |
+| BLMETA sichtbar | **PASS** — nicht sichtbar |
+| Draft/Pending/QA/Test in Ergebnissen | **PASS** — nicht sichtbar |
+| Rohes HTML in Snippets | **PASS** — keine Treffer gerendert |
+| Query in Input (unsafe) | Literal im Input-Feld, nicht ausgeführt |
+| Externe Provider-Reports | **PASS** — `providerSent: false` |
+
+---
+
+## Console / ErrorReporter Observations
+
+| Item | Ergebnis |
+|------|----------|
+| `BoundLoreErrorReporter` | Vorhanden auf Search-Seite |
+| `providerSent` | **false** (lokal/in-memory) |
+| Kritische Console-Crashes | **Keine** beobachtet |
+| Keys/Secrets geloggt | **Nein** |
+
+---
+
+## Search Runtime Evidence Decision
+
+| Kriterium | Bewertung |
+|-----------|-----------|
+| Staging Runtime eindeutig | **PASS** |
+| Query-Matrix ausgeführt | **PASS** |
+| Mehrheit Core-Recall-Treffer | **FAIL** — 0/11 (Fetch blockiert) |
+| `monster` → Creature-Treffer | **FAIL** — Fetch blockiert |
+| Safety/No-Leak | **PASS** |
+| Keine Crash-Regression | **PASS** |
+
+**Entscheidung: Search Runtime Evidence = PARTIAL**
+
+**Begründung:** Search lädt, Staging korrekt, Safety OK — aber Staging-`posts`-Corpus für Anon nicht lesbar (`42501 profiles`). Recall-Logik selbst nicht runtime-verifiziert gegen echte Staging-Daten.
+
+---
+
+## Re-run Limitations
+
+1. **RLS/Grant-Blocker** — `permission denied for table profiles` bei `posts`-SELECT (anon).
+2. **Kein DB/FTS-Index** — `search_documents` nicht implementiert.
+3. **Error-State vs. Empty-State** — UI unterscheidet nicht klar zwischen Fetch-Fehler und echtem 0-Treffer.
+4. **Kein SQL/Grant-Fix** in diesem Gate (read-only).
+
+---
+
+## Required Follow-up Gates (nach Re-run)
+
+| Gate | Zweck | Freigabe |
+|------|-------|----------|
+| ~~**P5-E.9E.4 Re-run**~~ | Query-Matrix | **PASS** |
+| **Staging posts read path** | RLS/Grant-Diagnose + Fix für Anon-Search-Corpus | Separates Gate — **STOPP** (SQL/Grant) |
+| **P5-E.9E.4A** | Search SQL Apply + `search_documents` | **STOPP** — Backup + Draft-Fixes |
+
+**Freigabeformulierung (4A — später):**
+> „Ja, ich gebe P5-E.9E.4A frei — Staging Search Apply nach Backup und Draft-Fixes, nur Staging, kein Production, kein Legacy.“
+
+---
+
+## Re-run Status Matrix
+
+| Item | Status |
+|------|--------|
+| P5-E.9E.4 Re-run | **PASS** |
+| Search Runtime Evidence | **PARTIAL** |
+| S-06 Search Recall | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |

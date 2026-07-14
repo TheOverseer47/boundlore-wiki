@@ -2558,7 +2558,34 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-staging-runtime-config-report.md`
 
-**Next:** P5-E.9E.4 Re-run. No push/deploy/launch.
+**Next:** P5-E.9E.4A (STOPP) oder Staging posts read path. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4 Re-run — Staging Search Query Matrix (PASS)
+
+**Milestone:** P5-E.9E.4 Re-run (read-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Staging ref verified | runtime | `jzzgoiwfbuwiiyvwgwri` | `[x]` |
+| Legacy ref not active | config | absent | `[x]` |
+| Config fixture PASS | fixture | 21/21 | `[x]` |
+| Hardening fixture PASS | fixture | 92/92 | `[x]` |
+| Recall fixture PASS | fixture | 98/98 | `[x]` |
+| `/wiki/search/` loads | wiki search | no crash | `[x]` |
+| Core queries tested | runtime | 11 queries | `[x]` |
+| unsafe query tested | runtime | no script | `[x]` |
+| BLMETA not visible | runtime | pass | `[x]` |
+| No SQL/DB write | gate | none | `[x]` |
+| Search Runtime Evidence | status | PARTIAL | `[x]` PARTIAL |
+| S-06 OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.4 Re-run | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-search-verification-report.md`
+
+**Next:** P5-E.9E.4A (STOPP). No push/deploy/launch.
 
 ---
 
