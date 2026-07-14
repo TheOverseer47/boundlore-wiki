@@ -375,4 +375,22 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 
 ---
 
-*Dokumentversion: P5-E.9E.4M + 5A–5H PASS. Kein Content Row Write.*
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Temporäre Patches revertiert | **Ja** — Final Runtime **STAGING** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| Rebuild / Writes / produktiver Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.4M + 5A–5I PASS. Kein Content Row Write.*

@@ -3478,6 +3478,38 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 177. P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run (PASS)
+
+**Milestone:** P5-E.9E.5I (Legacy Runtime Config Cutover Dry Run). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified (dry run) | **PASS** |
+| HEAD before gate `bea85f3` | **PASS** |
+| Temporary local legacy runtime dry run | **PASS** |
+| Patches reverted — `js/supabase-config.js`, `js/search.js` no diff | **PASS** |
+| Publishable key via MCP — not `.env.legacy` | **PASS** |
+| Cutover delta — temporary `isRpcAvailable()` extension (reverted) | **PASS** |
+| Fixture matrix | **PASS** — 32/32 |
+| Wiki search smoke `/wiki/search/?q=ogre` | **PASS** |
+| Final runtime config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| No rebuild / writes / productive runtime switch | **PASS** |
+| `search_documents` rows unchanged | **PASS** — 6 |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5I | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+**Fixtures:** `qa/p5-legacy-runtime-cutover-dry-run-fixtures.html`, `qa/p5-legacy-runtime-cutover-dry-run-fixtures.js`
+
+**Next:** P5-E.9E.5J S-06 Final Closure Dossier. No push/deploy/launch.
+
+---
+
 ## 176. P5-E.9E.5H — Legacy RPC-first Search Verification (PASS)
 
 **Milestone:** P5-E.9E.5H (Legacy RPC-first Search Verification). **PASS**.
@@ -3507,7 +3539,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
 
-**Next:** P5-E.9E.5I Legacy Runtime Config Cutover Dry Run. No push/deploy/launch.
+**Next:** P5-E.9E.5J S-06 Final Closure Dossier. No push/deploy/launch.
 
 ---
 

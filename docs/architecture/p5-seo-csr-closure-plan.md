@@ -418,7 +418,29 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.5C**~~ **PASS** — Final Target Decision (**LEGACY_CONDITIONAL_TARGET_CANDIDATE**)
 
-**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run
+**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5J** — S-06 Final Closure Dossier
+
+---
+
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Temporäre Patches revertiert | **Ja** — Final Runtime **STAGING** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
 
 ---
 
@@ -468,4 +490,4 @@ Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9E.5H PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX.*
+*Dokumentversion: P5-E.9D … + P5-E.9E.5I PASS. Search Runtime Evidence PARTIAL/BLOCKED_UNTIL_FIX.*

@@ -17,7 +17,7 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **Staging Ref** | `jzzgoiwfbuwiiyvwgwri` (weiterhin Runtime + Evidence) |
 | **Legacy Target Suitability (5B)** | **NEEDS_MIGRATION_DECISION** → aufgelöst als **CONDITIONAL** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run |
+| **Empfohlener nächster Gate** | **P5-E.9E.5J** — S-06 Final Closure Dossier |
 | **Legacy Search Index State (5G)** | **POPULATED** (6 rows) |
 | **Legacy Search DB/FTS (5F)** | **APPLIED_LEGACY_PASS** |
 | **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
@@ -331,10 +331,6 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 ---
 
-**Empfohlener nächster Gate:** P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run
-
----
-
 ## P5-E.9E.5H Follow-up (PASS — Legacy RPC-first Search Verification)
 
 **Gate:** P5-E.9E.5H. **PASS**.
@@ -361,6 +357,29 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 ---
 
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Wiki Search Smoke | `/wiki/search/?q=ogre` — **PASS** |
+| Temporäre Patches revertiert | `js/supabase-config.js`, `js/search.js` — **kein Diff** |
+| Publishable Key | Via Supabase MCP — **nicht** `.env.legacy` |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Final Runtime Config | **STAGING** |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| Rebuild / Writes / produktiver Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+**Fixtures:** `qa/p5-legacy-runtime-cutover-dry-run-fixtures.html`, `qa/p5-legacy-runtime-cutover-dry-run-fixtures.js`
+
+---
+
 ## Status Matrix
 
 | Item | Status |
@@ -371,11 +390,14 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | P5-E.9E.5F | **PASS** |
 | P5-E.9E.5G | **PASS** |
 | P5-E.9E.5H | **PASS** |
+| P5-E.9E.5I | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
 | Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
 | Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** |
 | Legacy Search Index State | **POPULATED** (6) |
 | Legacy RPC-first Search Verification | **VERIFIED_PASS** |
+| Legacy Runtime Cutover Dry Run | **DRY_RUN_PASS** |
+| Final Runtime Config Status | **STAGING** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** (war NEEDS_MIGRATION_DECISION) |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
@@ -385,8 +407,8 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run
+**Empfohlener nächster Gate:** P5-E.9E.5J — S-06 Final Closure Dossier
 
 ---
 
-*Dokumentversion: P5-E.9E.5C + 5D + 5E + 5F + 5G + 5H PASS. Keine Secrets.*
+*Dokumentversion: P5-E.9E.5C + 5D + 5E + 5F + 5G + 5H + 5I PASS. Keine Secrets.*

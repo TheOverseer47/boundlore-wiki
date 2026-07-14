@@ -325,4 +325,26 @@ RPC-Output-Felder: whitelisted (`id`, `source_type`, `canonical_slug`, `canonica
 
 ---
 
-*Dokumentversion: P5-E.9E.5G + 5H PASS. Keine Secrets. Kein Content Row Write. Kein Runtime-Switch.*
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Wiki Search Smoke | `/wiki/search/?q=ogre` — **PASS** |
+| Temporäre Patches revertiert | `js/supabase-config.js`, `js/search.js` — **kein Diff** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Final Runtime Config | **STAGING** |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| `search_documents` rows | **6** (unverändert) |
+| Rebuild / Writes / produktiver Runtime-Switch | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Empfohlener nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5G + 5H + 5I PASS. Keine Secrets. Kein Content Row Write. Kein produktiver Runtime-Switch.*

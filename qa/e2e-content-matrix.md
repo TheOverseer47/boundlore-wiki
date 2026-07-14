@@ -2658,6 +2658,41 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+---
+
+## P5-E.9E.5I Legacy Runtime Config Cutover Dry Run (PASS)
+
+**Milestone:** P5-E.9E.5I (Legacy Runtime Config Cutover Dry Run). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified (dry run) | verify | yes | `[x]` |
+| HEAD before gate `bea85f3` | verify | yes | `[x]` |
+| Temporary local legacy runtime dry run | scope | yes | `[x]` |
+| Patches reverted — `js/supabase-config.js`, `js/search.js` no diff | verify | yes | `[x]` |
+| Publishable key via MCP — not `.env.legacy` | verify | yes | `[x]` |
+| Cutover delta — temporary `isRpcAvailable()` (reverted) | verify | documented | `[x]` |
+| Fixture matrix | verify | 32/32 PASS | `[x]` |
+| Wiki search smoke `/wiki/search/?q=ogre` | verify | Ogre Mage hit | `[x]` |
+| Final runtime config staging | verify | `jzzgoiwfbuwiiyvwgwri` | `[x]` |
+| Legacy RPC-first Search (5H) intact | verify | yes | `[x]` |
+| No rebuild / writes / productive runtime switch | scope | none | `[x]` |
+| `search_documents` rows unchanged | verify | 6 | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| S-05 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Product Activation remains FAIL | status | FAIL | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5I | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+**Fixtures:** `qa/p5-legacy-runtime-cutover-dry-run-fixtures.html`, `qa/p5-legacy-runtime-cutover-dry-run-fixtures.js`
+
+**Next:** P5-E.9E.5J S-06 Final Closure Dossier. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5H Legacy RPC-first Search Verification (PASS)
 
 **Milestone:** P5-E.9E.5H (Legacy RPC-first Search Verification). **PASS**.

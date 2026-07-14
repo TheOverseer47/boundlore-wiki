@@ -20,7 +20,7 @@
 | **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run |
+| **Empfohlener nächster Gate** | **P5-E.9E.5J** — S-06 Final Closure Dossier |
 | **Legacy Search Index State (5G)** | **POPULATED** (6 rows) |
 | **Legacy Search DB/FTS (5F)** | **APPLIED_LEGACY_PASS** |
 | **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
@@ -434,3 +434,21 @@
 | Nächster Gate | **P5-E.9E.5I** |
 
 **Report:** `docs/architecture/p5-legacy-rpc-first-search-verification-report.md`
+
+---
+
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Temporäre Patches revertiert | **Ja** — Final Runtime **STAGING** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| Rebuild / Writes / produktiver Runtime-Switch | **Nein** |
+| Nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`

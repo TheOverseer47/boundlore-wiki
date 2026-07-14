@@ -33,7 +33,27 @@
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run
+**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
+
+---
+
+## P5-E.9E.5I — Umsetzungsnachweis (PASS — Legacy Runtime Config Cutover Dry Run)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-legacy-runtime-cutover-dry-run-report.md` |
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Wiki Search Smoke | `/wiki/search/?q=ogre` — **PASS** |
+| Temporäre Patches revertiert | **Ja** — Final Runtime **STAGING** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| Rebuild / Writes / produktiver Runtime-Switch | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5I | **PASS** |
+
+**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
 
 ---
 

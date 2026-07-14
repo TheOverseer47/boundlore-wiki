@@ -85,7 +85,7 @@ Dieses Dokument definiert die **Closure Ledger**, **Gate-Reihenfolge**, **Stop C
 | **S+-03 Sanitization — Runtime** | S+ Critical | **PARTIAL** | Fixture 45/45 + **9A.1 local mock 25/25 PASS** | Stored XSS Staging/Prod NOT RUN; **kein CLOSED ohne 9A.2** | **P5-E.9A.2** (STOPP) | Nein | Nein* | Nein | Nein | Ja |
 | **S+-04 Observation RPC Gate** | S+ Critical | **CLOSED_FOR_LOCKED_MVP** | P5-E.5 Re-run 3; fixture 17/17 | Production closure | P5-E.10 | Ja | Ja (prod) | Nein | Nein | Ja |
 | **S-05 CSR / SEO Entity Pages** | S | **OPEN_BLOCKING** (Launch) | **P5-E.9D + 9D.3B/3C Generator** | CSR-Shell; 3 SSG-Prototypen + Fixture-Generator PASS | **P5-E.9D.3D** → **9D.5** | Nein | Nein | Nein | Optional | Ja |
-| **S-06 Search Recall** | S | **OPEN_BLOCKING** | **P5-E.9E.5H PASS** — RPC Verification **VERIFIED_PASS** | Runtime Dry Run + S-06 Final | **P5-E.9E.5I** Dry Run | Nein | Nein | Nein | Nein | Ja |
+| **S-06 Search Recall** | S | **OPEN_BLOCKING** | **P5-E.9E.5I PASS** — Runtime Dry Run **DRY_RUN_PASS** | S-06 Final Closure Dossier | **P5-E.9E.5J** | Nein | Nein | Nein | Nein | Ja |
 | **S-07 Backup/Restore** | S | **PARTIAL** (Ops) | P5-STAGING.3 + **P5-E.9B.2** frischer Dump | Restore drill + Prod schedule | **P5-E.9B.3** → **9B.5** | Nein | Nein** | Nein | Nein | Ja |
 | **S-08 Monitoring / Error Tracking** | S | **OPEN_BLOCKING** (Ops) | **P5-E.9C + 9C.1 + 9C.2 Stub** | Provider integration + alerting | **P5-E.9C.3** → **9C.4** | Nein | Nein | Nein | Ja*** | Ja |
 | **S-09 Patch Mode fail-open** | S | **PARTIAL** | Release Gate ersetzt Writes | Patch Mode legacy im Repo | Dokumentation | Nein | Nein | Nein | Nein | Ja |
@@ -379,7 +379,7 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9E.5C**~~ **PASS** — Final Target Decision (**LEGACY_CONDITIONAL_TARGET_CANDIDATE**)
 
-**Empfohlener nächster Gate:** **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run
+**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
 
 **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Freigabe für Writes)
 
@@ -387,7 +387,33 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run
+**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
+
+---
+
+## 16. P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Report | `p5-legacy-runtime-cutover-dry-run-report.md` |
+| HEAD before gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Wiki Search Smoke | `/wiki/search/?q=ogre` — **PASS** |
+| Temp patches reverted | `js/supabase-config.js`, `js/search.js` — **no diff** |
+| Publishable key | Via Supabase MCP — **not** `.env.legacy` |
+| Cutover delta | Temporary `isRpcAvailable()` extension (reverted) |
+| Final runtime config | **STAGING** |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| Rebuild / Writes / productive runtime switch | **No** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5I | **PASS** |
+
+**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
 
 ---
 

@@ -18,7 +18,7 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run |
+| **Empfohlener nächster Gate** | **P5-E.9E.5J** — S-06 Final Closure Dossier |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -388,4 +388,21 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5H PASS. Kein Content Row Write.*
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Temporäre Patches revertiert | **Ja** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Final Runtime Config | **STAGING** |
+| Empfohlener nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5A–5I PASS. Kein Content Row Write.*

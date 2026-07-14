@@ -29,7 +29,7 @@
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F). Content Filter/Rebuild **PASS** (5G, 6 rows). RPC-first Search Verification **PASS** (5H). Empfohlener nächster Gate: **P5-E.9E.5I**.
+**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F). Content Filter/Rebuild **PASS** (5G, 6 rows). RPC-first Search Verification **PASS** (5H). Runtime Cutover Dry Run **PASS** (5I). Empfohlener nächster Gate: **P5-E.9E.5J**.
 
 ---
 
@@ -388,10 +388,27 @@ Content Migration (5G) **PASS** — 6 public-safe Canonicals indexed. RPC Verifi
 
 ---
 
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Temporäre Patches revertiert | **Ja** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Final Runtime Config | **STAGING** |
+| Empfohlener nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+---
+
 ## Nutzerfreigabe für P5-E.9E.4I (später)
 
 > „Ja, ich gebe P5-E.9E.4I frei — Staging Persistent Canonical Corpus Seed nach frischem Backup, 10–20 kontrollierte published Canonicals auf Staging `jzzgoiwfbuwiiyvwgwri`, Rebuild von `search_documents`, RPC-first Query-Matrix, persistenter Corpus ohne Cleanup, kein Production, kein Legacy, kein Push, kein Deploy, kein Launch.“
 
 ---
 
-*Dokumentversion: P5-E.9E.4H + 5G + 5H PASS. Plan-only. Kein SQL. Kein DB-Zugriff.*
+*Dokumentversion: P5-E.9E.4H + 5G + 5H + 5I PASS. Plan-only. Kein SQL. Kein DB-Zugriff.*

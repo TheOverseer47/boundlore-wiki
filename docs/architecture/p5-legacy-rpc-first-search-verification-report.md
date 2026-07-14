@@ -263,4 +263,35 @@ Unbekannte Keys werden sicher ignoriert. Kein SQL-Fehler mit sensiblen Details.
 
 ---
 
-*Dokumentversion: P5-E.9E.5H PASS. Read-only. Keine Secrets. Kein Write. Kein Rebuild. Kein Runtime-Switch.*
+---
+
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Arbeitsmodus | Lokaler temporärer Dry-Run auf `ohkoojpzmptdfyowdgog`; Patches **revertiert** |
+| Temporäre Patches | `js/supabase-config.js`, `js/search.js` — **kein Diff nach Revert** |
+| Publishable Key | Via Supabase MCP — **nicht** `.env.legacy` |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Fixture Matrix | **32/32 PASS** |
+| Wiki Search Smoke | `/wiki/search/?q=ogre` — **PASS** |
+| Final Runtime Config | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| `search_documents` rows | **6** (unverändert) |
+| Rebuild / Writes / produktiver Runtime-Switch | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Product Activation | **FAIL** |
+| Public Launch | **NO-GO** |
+| Empfohlener nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+**Fixtures:** `qa/p5-legacy-runtime-cutover-dry-run-fixtures.html`, `qa/p5-legacy-runtime-cutover-dry-run-fixtures.js`
+
+---
+
+*Dokumentversion: P5-E.9E.5H + 5I PASS. Read-only. Keine Secrets. Kein Write. Kein Rebuild. Kein produktiver Runtime-Switch.*

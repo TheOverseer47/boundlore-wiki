@@ -18,7 +18,7 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 
 **Legacy Fresh Backup Evidence** darf als **PASS** gewertet werden. **Restore Evidence** und **Production Backup Schedule** bleiben **OPEN**.
 
-**Nächster Gate (post-5H):** **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run.
+**Nächster Gate (post-5I):** **P5-E.9E.5J** — S-06 Final Closure Dossier.
 
 ---
 
@@ -198,6 +198,7 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 | P5-E.9E.5D | **PASS** |
 | P5-E.9E.5G | **PASS** |
 | P5-E.9E.5H | **PASS** |
+| P5-E.9E.5I | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
 | Legacy Search Index State | **POPULATED** (6 via 5G) |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
@@ -209,7 +210,7 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9E.5I — Legacy Runtime Config Cutover Dry Run
+**Empfohlener nächster Gate:** P5-E.9E.5J — S-06 Final Closure Dossier
 
 ---
 
@@ -250,4 +251,22 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 
 ---
 
-*Dokumentversion: P5-E.9E.5D + 5G + 5H PASS. Backup-Export only. Keine Secrets. Kein Restore.*
+## P5-E.9E.5I Follow-up (PASS — Legacy Runtime Config Cutover Dry Run)
+
+**Gate:** P5-E.9E.5I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Temporäre Patches revertiert | **Ja** — Final Runtime **STAGING** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| Rebuild / Writes / produktiver Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5J** |
+
+**Report:** `docs/architecture/p5-legacy-runtime-cutover-dry-run-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5D + 5G + 5H + 5I PASS. Backup-Export only. Keine Secrets. Kein Restore.*

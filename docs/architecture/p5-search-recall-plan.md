@@ -441,7 +441,27 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5I** — Legacy Runtime Config Cutover Dry Run
+**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
+
+---
+
+## P5-E.9E.5I — Umsetzungsnachweis (PASS — Legacy Runtime Config Cutover Dry Run)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-legacy-runtime-cutover-dry-run-report.md` |
+| HEAD vor Gate | `bea85f3` |
+| Fixture Matrix | **32/32 PASS** |
+| Temporäre Patches revertiert | **Ja** |
+| Cutover-Delta | Temporäre `isRpcAvailable()`-Erweiterung (revertiert) |
+| Final Runtime Config | **STAGING** |
+| Legacy RPC-first Search (5H) | **INTACT** |
+| Rebuild / Writes / produktiver Runtime-Switch | **Nein** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5I | **PASS** |
+
+**Empfohlener nächster Gate:** **P5-E.9E.5J** — S-06 Final Closure Dossier
 
 ---
 

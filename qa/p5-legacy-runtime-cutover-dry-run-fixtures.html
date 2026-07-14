@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>P5-E.9E.5I Legacy Runtime Cutover Dry Run</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #111; color: #eee; }
+    h1 { font-size: 1.25rem; }
+    .pass { color: #6f6; }
+    .fail { color: #f66; }
+    #summary { margin: 16px 0; padding: 12px; border: 1px solid #333; border-radius: 6px; }
+    #checks, #matrix { font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; }
+    .meta { color: #aaa; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>P5-E.9E.5I — Legacy Runtime Cutover Dry Run</h1>
+  <p class="meta">Requires temporary local <code>js/supabase-config.js</code> patch to Legacy dry-run mode. No keys in this fixture. Not a productive runtime switch.</p>
+  <div id="summary">Running checks...</div>
+  <div id="checks"></div>
+  <h2>Query Matrix</h2>
+  <div id="matrix"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js?v=p5-e9e5i-dryrun"></script>
+  <script src="/js/search.js?v=p5-e9e5i-dryrun"></script>
+  <script src="/qa/p5-legacy-runtime-cutover-dry-run-fixtures.js?v=p5-e9e5i"></script>
+</body>
+</html>
