@@ -3478,6 +3478,22 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 164. P5-E.9E.4I — Staging Persistent Canonical Corpus Seed (PASS)
+
+**Milestone:** P5-E.9E.4I. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Persistent Canonical Corpus | **PERSISTENT_CANONICAL_SEED_PASS** |
+| Search DB/FTS Evidence | **PASS** (12 search_documents) |
+| Search DB/FTS Runtime Evidence | **PASS** |
+| Query-Matrix | **21/21 PASS** |
+| P5-E.9E.4I | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-persistent-canonical-corpus-seed-report.md`
+
+---
+
 ## 163. P5-E.9E.4H — Search Production Content Migration Plan (PASS)
 
 **Milestone:** P5-E.9E.4H (Plan-only). **PASS**.

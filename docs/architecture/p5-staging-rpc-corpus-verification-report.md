@@ -23,6 +23,8 @@
 
 **Kernaussage:** Frischer Backup vor Write. 5 kontrollierte published Posts eingefügt, `bl_rebuild_search_documents()` → **5 Zeilen**. RPC-first Query-Matrix über lokale UI **PASS** (monster→Ember Salamander, artifact→Volcanic Heat Charm, etc.). Client-Fix: `mapRpcResult` verwirft `matched_fields`-Metadatum `search_vector` nicht mehr fälschlich. Cleanup + Rebuild verifiziert (0 Slugs, 0 Marker, 0 Search-Docs). Safety/No-Leak **PASS**.
 
+**Follow-up P5-E.9E.4I:** Persistenter Corpus (12 Canonicals) ersetzt temporären 4G-Stand. **PERSISTENT_CANONICAL_SEED_PASS**. Report: `p5-staging-persistent-canonical-corpus-seed-report.md`.
+
 ---
 
 ## HEAD / Working Tree / Apply-Scope-Bestätigung

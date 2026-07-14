@@ -15,9 +15,11 @@
 | **P5-E.9E.4F** | **PASS** |
 | **Client RPC Integration** | **RPC_CLIENT_INTEGRATED** |
 | **Search DB/FTS UI Integration** | **RPC_CLIENT_INTEGRATED** |
-| **Search DB/FTS Evidence** | **PARTIAL_EMPTY_CORPUS** |
-| **Search DB/FTS Runtime Evidence** | **PASS** (P5-E.9E.4G) |
+| **Search DB/FTS Evidence** | **PASS** (12 persistente Docs, 4I) |
+| **Search DB/FTS Runtime Evidence** | **PASS** (P5-E.9E.4I) |
 | **P5-E.9E.4G** | **PASS** — RPC Corpus Verification |
+| **P5-E.9E.4I** | **PASS** — Persistent Canonical Corpus Seed |
+| **Persistent Canonical Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** |
 | **Search Runtime Evidence (Client)** | **PASS** (Recall-Fixtures, 9E.4E) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -148,7 +150,7 @@ supabase.rpc("bl_search_public_content", {
 ## Empty Corpus Limitation
 
 - `search_documents` auf Staging: **0 Zeilen** (nach P5-E.9E.4E Cleanup)
-- DB/FTS Runtime Evidence: **PARTIAL_EMPTY_CORPUS** — kein Recall-PASS über RPC-Index
+- DB/FTS Runtime Evidence: **PASS** (P5-E.9E.4I — 12 persistente Docs, Query-Matrix 21/21)
 - Client-RPC-Integration funktioniert; Trefferbasis fehlt bis persistenter Corpus oder Production-Content
 
 ---
@@ -170,8 +172,9 @@ supabase.rpc("bl_search_public_content", {
 | P5-E.9E.4F | **PASS** |
 | Client RPC Integration | **RPC_CLIENT_INTEGRATED** |
 | Search DB/FTS UI Integration | **RPC_CLIENT_INTEGRATED** |
-| Search DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
-| Search DB/FTS Runtime Evidence | **PASS** (P5-E.9E.4G) |
+| Search DB/FTS Evidence | **PASS** (12 persistente Docs, P5-E.9E.4I) |
+| Search DB/FTS Runtime Evidence | **PASS** (P5-E.9E.4I) |
+| P5-E.9E.4I | **PASS** |
 | Search Runtime Evidence (Client) | **PASS** |
 | S-06 Search Recall | **OPEN_BLOCKING** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |

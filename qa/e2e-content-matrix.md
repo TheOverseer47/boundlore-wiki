@@ -2646,7 +2646,46 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** P5-E.9E.4I (STOPP). No push/deploy/launch.
+**Next:** P5-E.9E.4 Re-run (mit persistentem Corpus). No push/deploy/launch.
+
+---
+
+## P5-E.9E.4I — Staging Persistent Canonical Corpus Seed (PASS)
+
+**Milestone:** P5-E.9E.4I (Staging Persistent Corpus). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Fresh staging backup before write | backup | present | `[x]` |
+| Target ref `jzzgoiwfbuwiiyvwgwri` | staging | verified | `[x]` |
+| Legacy not used | staging | not legacy | `[x]` |
+| Production not used | staging | not production | `[x]` |
+| 12 controlled published Canonicals inserted | staging | 12 | `[x]` |
+| Persistent corpus intentionally not cleaned | staging | no cleanup | `[x]` |
+| `bl_rebuild_search_documents()` executed | staging | 12 rows | `[x]` |
+| Index contains persistent corpus | staging | 12 slugs | `[x]` |
+| RPC-first client used | runtime | RPC | `[x]` |
+| Query matrix passed | runtime | core+safety | `[x]` |
+| monster/creature/beast/salamander tested | runtime | Ember Salamander | `[x]` |
+| artifact/charm tested | runtime | Volcanic Heat Charm | `[x]` |
+| basalt/volcanic tested | runtime | Cinder Basalt Flats / Volcanic Heat Charm | `[x]` |
+| resource/crystal tested | runtime | Molten Ember Shard / Skyglass Crystal | `[x]` |
+| guide/guild tested | runtime | Ember Wardens / Guild of Quiet Cartographers | `[x]` |
+| unsafe query tested | runtime | 0 hits | `[x]` |
+| no BLMETA exposed | runtime | absent | `[x]` |
+| no search_text/search_vector exposed | runtime | absent | `[x]` |
+| no Profile-PII exposed | runtime | absent | `[x]` |
+| rollback plan documented | docs | yes | `[x]` |
+| no Storage/Push/Deploy/Launch | scope | none | `[x]` |
+| Persistent Canonical Corpus | status | PERSISTENT_CANONICAL_SEED_PASS | `[x]` |
+| Search DB/FTS Runtime Evidence | status | PASS | `[x]` |
+| S-06 status updated | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4I | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-persistent-canonical-corpus-seed-report.md`
+
+**Next:** P5-E.9E.4 Re-run oder Production Content Migration. No push/deploy/launch.
 
 ---
 
@@ -2678,7 +2717,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-production-content-migration-plan.md`
 
-**Next:** P5-E.9E.4I (STOPP). No push/deploy/launch.
+**Next:** P5-E.9E.4 Re-run (mit persistentem Corpus). No push/deploy/launch.
 
 ---
 

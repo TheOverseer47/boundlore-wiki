@@ -33,7 +33,19 @@
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.4I** — Staging Persistent Canonical Corpus Seed
+**Empfohlener nächster Gate:** **P5-E.9E.4 Re-run** (mit persistentem Corpus) oder Production Content Migration
+
+---
+
+## P5-E.9E.4I — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-staging-persistent-canonical-corpus-seed-report.md` |
+| Persistent Canonical Corpus | **PERSISTENT_CANONICAL_SEED_PASS** |
+| Search DB/FTS Evidence | **PASS** (12 search_documents) |
+| Search DB/FTS Runtime Evidence | **PASS** |
+| P5-E.9E.4I | **PASS** |
 
 ---
 

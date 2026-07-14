@@ -504,6 +504,22 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 44. P5-E.9E.4I Follow-up (PASS — Persistent Canonical Corpus Seed)
+
+**Gate:** P5-E.9E.4I. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Persistent Canonical Corpus | **PERSISTENT_CANONICAL_SEED_PASS** |
+| Search DB/FTS Evidence | **PASS** (12 search_documents) |
+| Search DB/FTS Runtime Evidence | **PASS** |
+| Query-Matrix | **21/21 PASS** |
+| P5-E.9E.4I | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-persistent-canonical-corpus-seed-report.md`
+
+---
+
 ## 43. P5-E.9E.4H Follow-up (PASS — Content Migration Plan)
 
 **Gate:** P5-E.9E.4H. **PASS** (Plan-only).

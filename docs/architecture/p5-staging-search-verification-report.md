@@ -20,11 +20,12 @@
 | **P5-E.9E.4E** | **PASS** — Corpus Populate |
 | **P5-E.9E.4A** | **PASS** — Search DB/FTS |
 | **P5-E.9E.4H** | **PASS** — Content Migration Plan |
-| **Empfohlener Write-Gate** | **P5-E.9E.4I** |
-| **RPC Corpus Verification** | **RPC_CORPUS_VERIFIED_CLEANED** |
-| **Search DB/FTS Runtime Evidence** | **PASS** (4G Gate) |
-| **Search Runtime Evidence** | **PASS** (Client, 9E.4E) |
-| **Search DB/FTS Evidence** | **PARTIAL_EMPTY_CORPUS** |
+| **P5-E.9E.4I** | **PASS** — Persistent Canonical Corpus Seed |
+| **RPC Corpus Verification** | **RPC_CORPUS_VERIFIED_CLEANED** (4G) |
+| **Persistent Canonical Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 posts) |
+| **Search DB/FTS Runtime Evidence** | **PASS** (4I persistent) |
+| **Search Runtime Evidence** | **PASS** (Client, 9E.4E + 4I) |
+| **Search DB/FTS Evidence** | **PASS** (12 search_documents) |
 | **Staging Ref in Client Runtime** | **VERIFIZIERT** (`STAGING_REF_VERIFIED`) |
 | **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 98/98 + 47/47) |
 | **Wiki Search Runtime Matrix** | **AUSGEFÜHRT** (14 Queries) |
@@ -32,7 +33,7 @@
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** **P5-E.9E.4E:** Kontrollierter Corpus (5 Posts) temporär populated, Query-Matrix **PASS** (monster→Ember Salamander, artifact→Volcanic Heat Charm, etc.), Cleanup verifiziert. Search Runtime Evidence: **PASS**. Staging wieder 0 published. S-06 **OPEN_BLOCKING** (DB/FTS).
+**Kernaussage:** **P5-E.9E.4I:** 12 kontrollierte published Canonicals persistent auf Staging, Rebuild → 12 `search_documents`, RPC-first Query-Matrix **21/21 PASS**. Search Runtime Evidence: **PASS**. Kein Cleanup. S-06 **OPEN_BLOCKING** (Production-Pfad offen).
 
 ---
 
@@ -390,8 +391,11 @@
 | Item | Status |
 |------|--------|
 | P5-E.9E.4 Re-run | **PASS** |
-| P5-E.9E.4D | **PASS** |
-| Search Runtime Evidence | **PARTIAL** |
+| P5-E.9E.4I | **PASS** |
+| Search Runtime Evidence | **PASS** |
+| Search DB/FTS Evidence | **PASS** (12 persistente Docs) |
+| Search DB/FTS Runtime Evidence | **PASS** |
+| Persistent Canonical Corpus | **PERSISTENT_CANONICAL_SEED_PASS** |
 | S-06 Search Recall | **OPEN_BLOCKING** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |

@@ -398,7 +398,9 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.4H**~~ **PASS** — Content Migration Plan
 
-**P5-E.9E.4I** — Staging Persistent Canonical Corpus Seed (**STOPP**)
+~~**P5-E.9E.4I**~~ **PASS** — Staging Persistent Canonical Corpus Seed
+
+**Empfohlener nächster Gate:** **P5-E.9E.4 Re-run** oder Production Content Migration
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 

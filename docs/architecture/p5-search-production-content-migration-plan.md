@@ -13,10 +13,11 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9E.4H** | **PASS** |
-| **Search technisch bewiesen** | **Ja** (4G RPC Corpus) |
-| **Persistenter Corpus** | **FEHLT** |
-| **Empfohlener nächster Write-Gate** | **P5-E.9E.4I** — Staging Persistent Canonical Corpus Seed |
-| **S-06 Search Recall** | **OPEN_BLOCKING** |
+| **P5-E.9E.4I** | **PASS** — Staging Persistent Canonical Corpus Seed |
+| **Search technisch bewiesen** | **Ja** (4G + 4I persistent) |
+| **Persistenter Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 Canonicals) |
+| **Empfohlener nächster Gate** | **P5-E.9E.4 Re-run** oder Production Content Migration |
+| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging Recall PASS; Production offen) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
@@ -47,14 +48,15 @@
 | Search DB/FTS Apply | **APPLIED_STAGING_PASS** | P5-E.9E.4A |
 | Client RPC Integration | **RPC_CLIENT_INTEGRATED** | P5-E.9E.4F |
 | RPC Corpus Verification | **RPC_CORPUS_VERIFIED_CLEANED** | P5-E.9E.4G |
-| Search DB/FTS Runtime Evidence | **PASS** (temporärer Corpus) | P5-E.9E.4G |
-| Search DB/FTS Evidence (aktuell) | **PARTIAL_EMPTY_CORPUS** | Nach 4G Cleanup |
+| Search DB/FTS Runtime Evidence | **PASS** (persistenter Corpus) | P5-E.9E.4I |
+| Search DB/FTS Evidence (aktuell) | **PASS** (12 search_documents) | P5-E.9E.4I |
+| Persistent Canonical Corpus | **PERSISTENT_CANONICAL_SEED_PASS** | P5-E.9E.4I |
 | Query-Matrix Core | **PASS** | monster→Ember Salamander, artifact→Volcanic Heat Charm, basalt→Cinder Basalt Flats, resource→Molten Ember Shard, guide/guild→Ember Wardens Field Guide |
 | Safety / No-Leak | **PASS** | Kein 42501, kein BLMETA, kein PII |
-| Staging nach Cleanup | **0 published posts**, **0 search_documents** | P5-E.9E.4G |
-| S-06 Closure | **Nicht möglich** | Kein persistenter Corpus |
+| Staging nach 4I Seed | **12 published posts**, **12 search_documents** | P5-E.9E.4I |
+| S-06 Closure | **Nicht möglich** | Production-Pfad + Launch-Kriterien offen |
 
-**Fazit:** Technischer Pfad `posts` → `bl_rebuild_search_documents()` → `bl_search_public_content` → RPC-first Client ist bewiesen. **Closure-Basis fehlt:** persistenter, kuratierter Canonical-Content.
+**Fazit:** Technischer Pfad `posts` → `bl_rebuild_search_documents()` → `bl_search_public_content` → RPC-first Client ist bewiesen. **Persistenter Staging-Corpus (4I):** 12 Canonicals, Query-Matrix 21/21 PASS. Production-Migration bleibt separater Gate.
 
 ---
 

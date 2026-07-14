@@ -14,7 +14,8 @@
 |-----------|---------|
 | **P5-E.9E.4A** | **PASS** |
 | **Search DB/FTS Apply** | **APPLIED_STAGING_PASS** |
-| **Search DB/FTS Evidence** | **PARTIAL_EMPTY_CORPUS** |
+| **Search DB/FTS Evidence** | **PASS** (12 persistente Docs, P5-E.9E.4I) |
+| **P5-E.9E.4I** | **PASS** — Persistent Canonical Corpus Seed |
 | **Search Runtime Evidence (Client)** | **PASS** (aus P5-E.9E.4E) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -215,8 +216,9 @@ Angewendete Objekte:
 |------|--------|
 | P5-E.9E.4A | **PASS** |
 | Search DB/FTS Apply | **APPLIED_STAGING_PASS** |
-| Search DB/FTS Evidence | **PARTIAL_EMPTY_CORPUS** |
-| Search DB/FTS Runtime Evidence | **PASS** (P5-E.9E.4G RPC Corpus Gate) |
+| Search DB/FTS Evidence | **PASS** (12 persistente Docs, P5-E.9E.4I) |
+| Search DB/FTS Runtime Evidence | **PASS** (P5-E.9E.4I persistent Corpus) |
+| **P5-E.9E.4I** | **PASS** — Persistent Canonical Corpus Seed |
 | **P5-E.9E.4G** | **PASS** — RPC Corpus Verification |
 | S-06 Search Recall | **OPEN_BLOCKING** |
 | Product Activation | **FAIL** |

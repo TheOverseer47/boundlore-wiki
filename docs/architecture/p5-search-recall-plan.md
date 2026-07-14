@@ -441,7 +441,19 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.4I** — Staging Persistent Canonical Corpus Seed
+**Empfohlener nächster Gate:** **P5-E.9E.4 Re-run** (mit persistentem Corpus) oder Production Content Migration
+
+---
+
+## P5-E.9E.4I — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-staging-persistent-canonical-corpus-seed-report.md` |
+| Persistent Canonical Corpus | **PERSISTENT_CANONICAL_SEED_PASS** |
+| Search DB/FTS Runtime Evidence | **PASS** |
+| Query-Matrix | **21/21 PASS** |
+| P5-E.9E.4I | **PASS** |
 
 ---
 
