@@ -504,6 +504,20 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 35. P5-E.9E.4B Follow-up (PASS — Staging Runtime Config)
+
+**Gate:** P5-E.9E.4B — Staging Runtime Config. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Report | `p5-staging-runtime-config-report.md` |
+| Staging Runtime Config | **STAGING_RUNTIME_CONFIG_PASS** |
+| Fixture | 21/21 PASS |
+| P5-E.9E.4 Re-run | **READY** |
+| P5-E.9E.4B | **PASS** |
+
+---
+
 ## 34. P5-E.9E.4 Follow-up (BLOCKED — Staging Search Verification)
 
 **Gate:** P5-E.9E.4 — Staging Search Verification. **BLOCKED**.
@@ -555,4 +569,4 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
-*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.3B PASS + P5-E.9E.4 BLOCKED. Keine Secrets. Kein DB-Write.*
+*Dokumentversion: P5-E.8D PASS + … + P5-E.9E.4 BLOCKED + P5-E.9E.4B PASS. Keine Secrets. Kein DB-Write.*

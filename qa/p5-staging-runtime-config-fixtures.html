@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>P5-E.9E.4B Staging Runtime Config Fixtures</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #111; color: #eee; }
+    h1 { font-size: 1.25rem; }
+    .pass { color: #6f6; }
+    .fail { color: #f66; }
+    #summary { margin: 16px 0; padding: 12px; border: 1px solid #333; border-radius: 6px; }
+    #checks { font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; }
+    .meta { color: #aaa; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>P5-E.9E.4B — Staging Runtime Config</h1>
+  <p class="meta">Loads productive <code>js/supabase-config.js</code>. Verifies staging ref only. No DB writes. No secrets in output.</p>
+  <div id="summary">Running checks...</div>
+  <div id="checks"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js?v=p5-e9e4b"></script>
+  <script src="/js/search-recall-utils.js?v=p5-e9e2"></script>
+  <script src="/qa/p5-staging-runtime-config-fixtures.js?v=p5-e9e4b"></script>
+</body>
+</html>

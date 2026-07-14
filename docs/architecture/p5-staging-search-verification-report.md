@@ -12,8 +12,9 @@
 
 | Dimension | Verdict |
 |-----------|---------|
-| **P5-E.9E.4** | **BLOCKED** |
-| **Search Runtime Evidence** | **FAIL** |
+| **P5-E.9E.4** | **BLOCKED** (Re-run **READY** nach 9E.4B) |
+| **P5-E.9E.4B** | **PASS** |
+| **Search Runtime Evidence** | **FAIL_UNTIL_RERUN** |
 | **Staging Ref in Client Runtime** | **NICHT VERIFIZIERT** |
 | **Lokale Fixtures** | **PASS** (92/92 + 98/98) |
 | **Wiki Search Runtime Matrix** | **NICHT AUSGEFÜHRT** (STOPP) |
@@ -22,7 +23,7 @@
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging-Projekt `jzzgoiwfbuwiiyvwgwri` ist dokumentiert und per MCP-Metadaten bestätigt, aber die **lokale Wiki-Runtime** (`js/supabase-config.js`) zeigt auf den **verbotenen Legacy-Ref** `ohkoojpzmptdfyowdgog`. Gemäß STOPP-Bedingung wurden **keine** `/wiki/search/`-Queries gegen Remote-Daten ausgeführt (Legacy-Verbot). Lokale Recall-/Hardening-Fixtures bleiben **PASS**. Vor erneuter Runtime-Verifikation ist ein **Staging-Runtime-Config-Gate** nötig.
+**Kernaussage:** Staging-Projekt `jzzgoiwfbuwiiyvwgwri` ist dokumentiert. **P5-E.9E.4B PASS** — `js/supabase-config.js` zeigt jetzt auf Staging; Legacy-Ref aus aktiver Runtime entfernt. **P5-E.9E.4 Re-run** kann Query-Matrix ausführen. Search Runtime Evidence bleibt **FAIL_UNTIL_RERUN**.
 
 ---
 
@@ -193,8 +194,9 @@
 
 | Entscheidung | Wert |
 |--------------|------|
-| **P5-E.9E.4** | **BLOCKED** |
-| **Search Runtime Evidence** | **FAIL** |
+| **P5-E.9E.4** | **BLOCKED** (Re-run **READY** nach 9E.4B) |
+| **P5-E.9E.4B** | **PASS** |
+| **Search Runtime Evidence** | **FAIL_UNTIL_RERUN** |
 | Begründung | Staging-Ref nicht in Client-Runtime; STOPP vor Legacy-Reads; Query-Matrix nicht ausführbar |
 | Lokale Fixtures | **PASS** — Recall-Logik intakt |
 | S-06 | **OPEN_BLOCKING** — Runtime + DB/FTS unvollständig |
@@ -206,8 +208,8 @@
 
 | Gate | Zweck | Freigabe |
 |------|-------|----------|
-| **P5-E.9E.4B** (empfohlen) | Staging-Runtime-Config für lokale Verifikation (z. B. `supabase-config.staging.js` oder lokaler Switch **ohne** Secrets im Repo) | Nutzerfreigabe |
-| **P5-E.9E.4** (Re-run) | Query-Matrix gegen `/wiki/search/` nach Staging-Wiring | Nach 9E.4B |
+| **P5-E.9E.4B** (~~empfohlen~~) | ~~Staging-Runtime-Config~~ | **PASS** |
+| **P5-E.9E.4** (Re-run) | Query-Matrix gegen `/wiki/search/` | **READY** |
 | **P5-E.9E.4A** | Staging Search SQL Apply + Populate | **STOPP** — Backup + Draft-Fixes + Apply-Freigabe |
 
 **Freigabeformulierung (9E.4B):**
@@ -219,8 +221,9 @@
 
 | Item | Status |
 |------|--------|
-| P5-E.9E.4 | **BLOCKED** |
-| Search Runtime Evidence | **FAIL** |
+| P5-E.9E.4 | **BLOCKED** (Re-run **READY**) |
+| P5-E.9E.4B | **PASS** |
+| Search Runtime Evidence | **FAIL_UNTIL_RERUN** |
 | Search Client Recall | **CLIENT_RECALL_HARDENED** |
 | Search SQL Draft | **DRAFT_ONLY_REVIEWED** |
 | Search DB Strategy | **DOCUMENTED** (nicht umgesetzt) |
@@ -232,4 +235,4 @@
 
 ---
 
-*Dokumentversion: P5-E.9E.4 BLOCKED. Kein SQL. Kein DB-Write. Kein Legacy-Runtime-Test. Lokale Fixtures PASS.*
+*Dokumentversion: P5-E.9E.4 BLOCKED + P5-E.9E.4B PASS. Re-run READY. Kein SQL. Kein DB-Write.*

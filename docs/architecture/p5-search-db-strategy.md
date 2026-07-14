@@ -19,7 +19,7 @@
 | **DB Search Strategy** | **DOCUMENTED** |
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (P5-E.9E.2) |
 | **Search Implementation** | **PARTIAL** — Client gehärtet; DB-Index fehlt |
-| **Search Runtime Evidence** | **FAIL** (9E.4 BLOCKED) |
+| **Search Runtime Evidence** | **FAIL_UNTIL_RERUN** |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** (separater Blocker) |
 | **Product Activation** | **FAIL** |
@@ -28,7 +28,20 @@
 
 **Kernaussage:** BoundLore sollte für MVP und Full Launch eine **dedizierte, normalisierte Public-Search-Schicht** einführen — bevorzugt **`search_documents` + RPC `bl_search_public_content`**, mit **Postgres FTS (`tsvector`)** und optional **`pg_trgm`** (bereits im Schema für Observations vorhanden). Die clientseitige `BoundLoreSearchRecall`-Utility (9E.2) bleibt als **Ergänzung, Synonym-Fallback und Fixture-Baseline**; die DB liefert die **vollständigere Trefferbasis**, bessere Skalierung und **fail-closed RLS/Release-Gate-Kontrolle**. **Kein SQL in diesem Gate.** Apply erst über explizite Folge-Gates mit Backup und Staging-Freigabe.
 
-**Empfohlener nächster Gate:** **P5-E.9E.4B** — Staging Runtime Config (vor 9E.4 Re-run)
+**Empfohlener nächster Gate:** **P5-E.9E.4 Re-run** — Staging Search Query Matrix
+
+---
+
+## P5-E.9E.4B — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `docs/architecture/p5-staging-runtime-config-report.md` |
+| Staging Runtime Config | **STAGING_RUNTIME_CONFIG_PASS** |
+| Fixture | 21/21 PASS |
+| P5-E.9E.4 Re-run | **READY** |
+| Search Runtime Evidence | **FAIL_UNTIL_RERUN** |
+| P5-E.9E.4B | **PASS** |
 
 ---
 
@@ -43,7 +56,7 @@
 | Lokale Fixtures | **92/92 + 98/98 PASS** |
 | Search Runtime Evidence | **FAIL** |
 | P5-E.9E.4 | **BLOCKED** |
-| Nächster Gate | **P5-E.9E.4B** Staging Runtime Config |
+| Nächster Gate | **P5-E.9E.4 Re-run** |
 
 ---
 
@@ -77,7 +90,7 @@
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.3B PASS + P5-E.9E.4 BLOCKED. Keine Secrets. Kein SQL ausgeführt. Kein DB-Write.*
+*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4 BLOCKED + P5-E.9E.4B PASS. Keine Secrets. Kein DB-Write.*
 
 ---
 
@@ -454,7 +467,8 @@ Abgestimmt auf `BoundLoreSearchRecall.WEIGHTS` (9E.2):
 |------|------|-----------|----------|
 | **P5-E.9E.3A** — Search SQL Draft | Nicht angewendeter SQL-Draft (`DRAFT ONLY`); Tabelle + RPC + RLS Skizze | **Nein** | Plan only |
 | **P5-E.9E.3B** — Search SQL Static Review | RLS/RPC/Leakage grep; Parität mit 9E.2 Contract | **Nein** | **PASS** — Review only |
-| **P5-E.9E.4** — Staging Search Verification | Runtime gegen Staging-Daten | Read-only bevorzugt | **BLOCKED** — Runtime → Legacy Ref |
+| **P5-E.9E.4** — Staging Search Verification | Runtime gegen Staging-Daten | Read-only bevorzugt | **BLOCKED** — Re-run **READY** nach 9E.4B |
+| **P5-E.9E.4B** — Staging Runtime Config | `supabase-config.js` → Staging | **Nein** | **PASS** |
 | **P5-E.9E.4A** — Staging Search Apply | SQL/RPC anwenden falls nötig | **Ja (Staging only)** | **STOPP** — Backup + explizite Apply-Freigabe |
 | **P5-E.9E.5** — Production Search Verification | Production Smoke | Read-only bevorzugt | **STOPP** — Production-Freigabe |
 

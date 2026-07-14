@@ -434,10 +434,22 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 | Verification Plan | Fixture-Baseline + Staging/Production Gates |
 | SQL ausgeführt | **Nein** |
 | DB Search Strategy | **DOCUMENTED** |
-| Search Runtime Evidence | **FAIL** (9E.4 BLOCKED — Runtime nicht Staging) |
+| Search Runtime Evidence | **FAIL_UNTIL_RERUN** |
 | S-06 | **OPEN_BLOCKING** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.4B** — Staging Runtime Config
+**Empfohlener nächster Gate:** **P5-E.9E.4 Re-run** — Staging Search Query Matrix
+
+---
+
+## P5-E.9E.4B — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-staging-runtime-config-report.md` |
+| Staging Runtime Config | **STAGING_RUNTIME_CONFIG_PASS** |
+| Fixture | 21/21 PASS |
+| P5-E.9E.4 Re-run | **READY** |
+| P5-E.9E.4B | **PASS** |
 
 ---
 
@@ -479,4 +491,4 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + P5-E.9E.1 PASS + P5-E.9E.2 PASS + P5-E.9E.3 PASS + P5-E.9E.3A PASS + P5-E.9E.3B PASS + P5-E.9E.4 BLOCKED. Keine Secrets. Kein DB-Write.*
+*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4 BLOCKED + P5-E.9E.4B PASS. Keine Secrets. Kein DB-Write.*

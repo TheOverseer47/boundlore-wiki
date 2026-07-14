@@ -2528,7 +2528,37 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-sql-static-review.md`
 
-**Next:** P5-E.9E.4B Staging Runtime Config. No push/deploy/launch.
+**Next:** P5-E.9E.4 Re-run Query Matrix. No push/deploy/launch.
+
+---
+
+## P5-E.9E.4B — Staging Runtime Config (PASS)
+
+**Milestone:** P5-E.9E.4B — Staging Runtime Config. **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Staging runtime config fixture exists | `p5-staging-runtime-config-fixtures.html` | present | `[x]` |
+| Active runtime ref is `jzzgoiwfbuwiiyvwgwri` | `supabase-config.js` | staging | `[x]` |
+| Legacy ref `ohkoojpzmptdfyowdgog` not active | config guard | absent | `[x]` |
+| Production not active | config | absent | `[x]` |
+| No secrets printed | fixture output | redacted | `[x]` |
+| No env changes | gate | none | `[x]` |
+| Search page loads | `/wiki/search/` | no crash | `[x]` |
+| Supabase config loads before search.js | wiki/search HTML | order | `[x]` |
+| search-recall-utils loads before search.js | wiki/search HTML | order | `[x]` |
+| Config fixture PASS | fixture | 21/21 | `[x]` |
+| No SQL executed | gate | none | `[x]` |
+| No DB write | gate | none | `[x]` |
+| No Supabase write | gate | none | `[x]` |
+| P5-E.9E.4 rerun required | status | READY | `[x]` |
+| Search Runtime Evidence | status | FAIL_UNTIL_RERUN | `[x]` |
+| Public Launch | status | NO-GO | `[x]` NO-GO |
+| P5-E.9E.4B | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-runtime-config-report.md`
+
+**Next:** P5-E.9E.4 Re-run. No push/deploy/launch.
 
 ---
 

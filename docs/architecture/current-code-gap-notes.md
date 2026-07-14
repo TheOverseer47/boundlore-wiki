@@ -3456,7 +3456,25 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-search-sql-static-review.md`
 
-**Next:** P5-E.9E.4B Staging Runtime Config. No push/deploy/launch.
+**Next:** P5-E.9E.4 Re-run Query Matrix. No push/deploy/launch.
+
+---
+
+## 155. P5-E.9E.4B — Staging Runtime Config (PASS)
+
+**Milestone:** P5-E.9E.4B — Staging Runtime Config. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| `js/supabase-config.js` → Staging | `jzzgoiwfbuwiiyvwgwri` |
+| Config Status | `STAGING_REF_VERIFIED` |
+| Fixture | 21/21 PASS |
+| P5-E.9E.4 Re-run | **READY** |
+| P5-E.9E.4B | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-runtime-config-report.md`
+
+**Next:** P5-E.9E.4 Re-run. No push/deploy/launch.
 
 ---
 
