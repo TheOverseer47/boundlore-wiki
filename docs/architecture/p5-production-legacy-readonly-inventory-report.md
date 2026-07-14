@@ -20,7 +20,8 @@
 | **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening |
+| **Empfohlener nächster Gate** | **P5-E.9E.5F** — Legacy Search DB/FTS Apply |
+| **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **Public Launch** | **NO-GO** |
 
@@ -338,8 +339,9 @@
 | Item | Status |
 |------|--------|
 | P5-E.9E.5B | **PASS** |
-| P5-E.9E.5D | **PASS** |
-| Legacy Fresh Backup Evidence | **COMPLETE** |
+| P5-E.9E.5E | **PASS** |
+| Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
+| Public Profile Leak | **CLOSED** |
 | Production / Legacy Inventory | **COMPLETE** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
@@ -351,7 +353,7 @@
 
 ---
 
-*Dokumentversion: P5-E.9E.5B PASS + 5C Decision + 5D Backup PASS. Kein Write.*
+*Dokumentversion: P5-E.9E.5B PASS + 5C + 5D + 5E. Kein Content Write.*
 
 ---
 
@@ -363,6 +365,20 @@
 | SHA256 | `3B5A5E6B59463505A42E812596BED4B41603CC0F189A18D99A5B0E1B0C852F7B` |
 | TOC | **701** entries |
 | Restore | **Nein** |
-| Nächster Gate | **P5-E.9E.5E** |
+| Nächster Gate (historisch) | **P5-E.9E.5E** |
 
 **Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
+
+---
+
+## P5-E.9E.5E Follow-up (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| `profiles_select_all` | **Entfernt** |
+| `anon SELECT profiles` | **Entfernt** |
+| Posts SELECT RLS Dependency | **Geschlossen** |
+| Search Apply | **Nein** |
+| Nächster Gate | **P5-E.9E.5F** |
+
+**Report:** `docs/architecture/p5-legacy-profile-rls-security-hardening-report.md`

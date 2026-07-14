@@ -306,10 +306,25 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 | Legacy Fresh Backup Evidence | **COMPLETE** |
 | Backup | 433,643 bytes; SHA256 dokumentiert; TOC **701** |
 | Restore / SQL Apply | **Nein** |
-| Empfohlener nächster Gate | **P5-E.9E.5E** |
+| Empfohlener nächster Gate (historisch) | **P5-E.9E.5E** |
 
 **Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
 
 ---
 
-*Dokumentversion: P5-E.9E.4M + 5A + 5B + 5C + 5D PASS. Kein DB-Write.*
+## P5-E.9E.5E Follow-up (PASS — Legacy Profile/RLS Security Hardening)
+
+**Gate:** P5-E.9E.5E. **PASS** (Policy/Grant Apply).
+
+| Item | Ergebnis |
+|------|----------|
+| `profiles_select_all` | **Entfernt** |
+| Posts SELECT RLS Dependency | **Geschlossen** |
+| Search Apply | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5F** |
+
+**Report:** `docs/architecture/p5-legacy-profile-rls-security-hardening-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.4M + 5A + 5B + 5C + 5D + 5E PASS. Kein DB-Write außer 5E Policy/Grant.*

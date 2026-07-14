@@ -17,7 +17,8 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **Staging Ref** | `jzzgoiwfbuwiiyvwgwri` (weiterhin Runtime + Evidence) |
 | **Legacy Target Suitability (5B)** | **NEEDS_MIGRATION_DECISION** → aufgelöst als **CONDITIONAL** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening |
+| **Empfohlener nächster Gate** | **P5-E.9E.5F** — Legacy Search DB/FTS Apply |
+| **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
@@ -175,7 +176,7 @@
 | 2 | ~~P5-E.9E.5B~~ | Read-only | Legacy Inventory — **PASS** |
 | 3 | ~~P5-E.9E.5C~~ | Plan-only | Final Target Decision — **PASS** |
 | 4 | ~~P5-E.9E.5D~~ | Backup Evidence | Frischer Backup `ohkoojpzmptdfyowdgog` — **PASS** |
-| 5 | **P5-E.9E.5E** | Apply (Freigabe) | Profile/RLS Security Hardening + Posts-RLS-Fix — **kein Search Apply** |
+| 5 | ~~P5-E.9E.5E~~ | Apply (Freigabe) | Profile/RLS Security Hardening — **PASS** |
 | 6 | **P5-E.9E.5F** | Apply (Freigabe) | Search DB/FTS MVP analog Staging — **keine Content-Migration** |
 | 7 | **P5-E.9E.5G** | Apply (Freigabe) | Content Cleanup / Canonical-Auswahl + Rebuild |
 | 8 | **P5-E.9E.5H** | Verification | RPC-first Query Matrix, Safety, No-Leak |
@@ -240,7 +241,8 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | Gate | Freigabe |
 |------|----------|
 | ~~**P5-E.9E.5D**~~ | Backup Legacy — **PASS** (433,643 bytes; SHA256 dokumentiert) |
-| **P5-E.9E.5E** | Security Hardening Legacy — **Ja** (Legacy-Write) |
+| ~~**P5-E.9E.5E**~~ | Security Hardening Legacy — **PASS** |
+| **P5-E.9E.5F** | Search DB/FTS Apply Legacy — **Ja** |
 | **P5-E.9E.5F–5J** | Je Gate explizit |
 | **S-05, Launch** | Separat |
 
@@ -270,13 +272,32 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 ---
 
+## P5-E.9E.5E Follow-up (PASS — Legacy Profile/RLS Security Hardening)
+
+**Gate:** P5-E.9E.5E. **PASS** (Legacy Policy/Grant Apply).
+
+| Item | Ergebnis |
+|------|----------|
+| `profiles_select_all` | **Entfernt** |
+| `anon SELECT profiles` | **Entfernt** |
+| Posts SELECT ohne `profiles`-Subquery | **Ja** — `is_admin()` |
+| Search Apply | **Nein** |
+| Runtime-Switch | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5F** |
+
+**Report:** `docs/architecture/p5-legacy-profile-rls-security-hardening-report.md`
+
+---
+
 ## Status Matrix
 
 | Item | Status |
 |------|--------|
 | P5-E.9E.5C | **PASS** |
 | P5-E.9E.5D | **PASS** |
+| P5-E.9E.5E | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
+| Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** (war NEEDS_MIGRATION_DECISION) |
 | S-06 Staging Evidence | **STAGING_CLOSED** |

@@ -33,7 +33,7 @@
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
+**Empfohlener nächster Gate:** **P5-E.9E.5F** — Legacy Search DB/FTS Apply
 
 ---
 
@@ -57,7 +57,7 @@
 | P5-E.9E.5B | **PASS** |
 | Write / Apply | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
+**Empfohlener nächster Gate:** **P5-E.9E.5F** — Legacy Search DB/FTS Apply
 
 ---
 
@@ -71,7 +71,7 @@
 | P5-E.9E.5A | **PASS** |
 | DB-Zugriff / SQL / Write | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
+**Empfohlener nächster Gate:** **P5-E.9E.5F** — Legacy Search DB/FTS Apply
 
 ---
 

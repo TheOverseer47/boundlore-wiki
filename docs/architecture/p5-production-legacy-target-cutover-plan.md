@@ -18,7 +18,7 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening |
+| **Empfohlener nächster Gate** | **P5-E.9E.5F** — Legacy Search DB/FTS Apply |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -317,10 +317,26 @@ Final Target muss erhalten (analog Staging 4A):
 | Größe / SHA256 | 433,643 bytes / `3B5A5E6B59463505A42E812596BED4B41603CC0F189A18D99A5B0E1B0C852F7B` |
 | TOC | **701** |
 | Restore / SQL Apply | **Nein** |
-| Empfohlener nächster Gate | **P5-E.9E.5E** |
+| Empfohlener nächster Gate | **P5-E.9E.5F** |
 
 **Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5D PASS. LEGACY_CONDITIONAL_TARGET_CANDIDATE. Kein Write.*
+## P5-E.9E.5E Follow-up (PASS — Legacy Profile/RLS Security Hardening)
+
+**Gate:** P5-E.9E.5E. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| `profiles_select_all` | **Entfernt** |
+| `anon SELECT profiles` | **Entfernt** |
+| Posts SELECT RLS Dependency | **Geschlossen** |
+| Search Apply | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5F** |
+
+**Report:** `docs/architecture/p5-legacy-profile-rls-security-hardening-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5A–5E PASS. Kein Write außer 5E Policy/Grant.*

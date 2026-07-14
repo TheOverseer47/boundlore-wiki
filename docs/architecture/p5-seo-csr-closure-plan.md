@@ -418,7 +418,7 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.5C**~~ **PASS** — Final Target Decision (**LEGACY_CONDITIONAL_TARGET_CANDIDATE**)
 
-**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5E** — Legacy Profile/RLS Security Hardening
+**Empfohlener nächster Gate (Search-Track):** **P5-E.9E.5F** — Legacy Search DB/FTS Apply
 
 Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 

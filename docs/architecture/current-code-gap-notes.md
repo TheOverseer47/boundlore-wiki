@@ -3478,6 +3478,31 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 173. P5-E.9E.5E — Legacy Profile/RLS Security Hardening (PASS)
+
+**Milestone:** P5-E.9E.5E (Legacy Policy/Grant Apply). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | **PASS** |
+| 5D backup baseline verified | **PASS** |
+| `profiles_select_all` removed | **PASS** |
+| `anon SELECT profiles` removed | **PASS** |
+| Posts SELECT RLS dependency fixed | **PASS** |
+| No Search Apply | **PASS** |
+| No Content writes | **PASS** |
+| No Runtime switch | **PASS** |
+| Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5E | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-profile-rls-security-hardening-report.md`
+
+**Next:** P5-E.9E.5F Legacy Search DB/FTS Apply. No push/deploy/launch.
+
+---
+
 ## 172. P5-E.9E.5D — Legacy Fresh Backup Evidence (PASS)
 
 **Milestone:** P5-E.9E.5D (Backup-Export only). **PASS**.
@@ -3498,7 +3523,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
 
-**Next:** P5-E.9E.5E Legacy Profile/RLS Security Hardening. No push/deploy/launch.
+**Next:** P5-E.9E.5F Legacy Search DB/FTS Apply. No push/deploy/launch.
 
 ---
 
@@ -3516,7 +3541,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-final-target-decision.md`
 
-**Next:** P5-E.9E.5E Legacy Profile/RLS Security Hardening. No push/deploy/launch.
+**Next:** P5-E.9E.5F Legacy Search DB/FTS Apply. No push/deploy/launch.
 
 ---
 
