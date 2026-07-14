@@ -3484,6 +3484,31 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+---
+
+## 181. P5-E.9F.3 — Entity SEO Evidence Re-run (PASS)
+
+**Milestone:** P5-E.9F.3 (Entity SEO Evidence Re-run). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| HEAD before gate `8172ba3` | **PASS** |
+| Generator re-run (Python fallback) | **PASS** — deterministic |
+| Static SEO check | **PASS** — 12/12 |
+| Local HTTP/crawl | **PASS** — 6/6 entities |
+| No-leak deep check | **PASS** |
+| CSR dependency (SSG pages) | **PASS** |
+| Entity SEO Evidence Re-run | **FIXTURE_SEO_EVIDENCE_PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.3 | **PASS** |
+
+**Report:** `docs/architecture/p5-entity-seo-evidence-rerun-report.md`
+
+**Next:** P5-E.9F.4 S-05 Closure Dossier. No push/deploy/launch.
+
+---
+
 ## 180. P5-E.9F.2 — Entity SSG / SEO Technical Closure Implementation (PASS)
 
 **Milestone:** P5-E.9F.2 (Fixture SSG technical implementation). **PASS**.

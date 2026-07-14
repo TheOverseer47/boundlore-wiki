@@ -354,7 +354,7 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 | Static Entity HTML Prototype | **PROTOTYPE_PASS** (84/84 Fixture) |
 | Entity SSG Fixture Generator | **FIXTURE_GENERATOR_PASS** |
 | Entity SSG Technical Implementation | **FIXTURE_SSG_PASS** (9F.2) |
-| Entity SEO Technical Evidence | **PARTIAL** (9F.3 pending) |
+| Entity SEO Technical Evidence | **FIXTURE_SEO_EVIDENCE_PASS** (9F.3) |
 | Entity SSG Implementation (legacy 9D) | **PARTIAL** (3 QA prototypes) |
 | Entity SSG Prototype Plan | **CREATED** |
 | Entity Prerender/SSG Decision | **DECISION DOCUMENTED** — Hybrid SSG empfohlen |
@@ -427,7 +427,24 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9F.2**~~ **PASS** — Entity SSG / SEO Technical Closure Implementation
 
-**Empfohlener nächster Gate:** **P5-E.9F.3** — Entity SEO Evidence Re-run
+~~**P5-E.9F.3**~~ **PASS** — Entity SEO Evidence Re-run
+
+**Empfohlener nächster Gate:** **P5-E.9F.4** — S-05 Closure Dossier
+
+---
+
+## P5-E.9F.3 Follow-up (PASS — Entity SEO Evidence Re-run)
+
+**Gate:** P5-E.9F.3. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Entity SEO Evidence Re-run | **FIXTURE_SEO_EVIDENCE_PASS** |
+| Static SEO + HTTP Crawl | **PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-entity-seo-evidence-rerun-report.md`
 
 ---
 
@@ -564,4 +581,4 @@ Alternativ parallel: **P5-E.9D.3D** Entity Sitemap Integration
 
 ---
 
-*Dokumentversion: P5-E.9D … + P5-E.9F.1 + P5-E.9F.2 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*
+*Dokumentversion: P5-E.9D … + P5-E.9F.1 + P5-E.9F.2 + P5-E.9F.3 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*

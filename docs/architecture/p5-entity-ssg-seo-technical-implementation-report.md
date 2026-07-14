@@ -232,7 +232,7 @@ Kein Crash. Statischer SEO-Kerninhalt im HTML vorhanden.
 |------|--------|
 | P5-E.9F.2 | **PASS** |
 | Entity SSG Technical Implementation | **FIXTURE_SSG_PASS** |
-| Entity SEO Technical Evidence | **PARTIAL** |
+| Entity SEO Technical Evidence | **FIXTURE_SEO_EVIDENCE_PASS** (9F.3) |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | S-06 Search Recall | **CLOSED** |
 | Final Runtime Config | **STAGING** |
@@ -240,12 +240,26 @@ Kein Crash. Statischer SEO-Kerninhalt im HTML vorhanden.
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.3** — Entity SEO Evidence Re-run
-
-**Manuelle Nutzerfreigabe nötig:** **Ja**
-
-> „Ja, ich gebe P5-E.9F.3 frei — Entity SEO Evidence Re-run lokal, crawl/static checks, no-leak, noindex/robots/sitemap checks, kein DB-Zugriff, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+**Empfohlener nächster Gate:** **P5-E.9F.4** — S-05 Closure Dossier
 
 ---
 
-*Dokumentversion: P5-E.9F.2 PASS. Kein DB-Zugriff. S-05 OPEN_BLOCKING. Launch NO-GO.*
+## P5-E.9F.3 Follow-up (PASS — Entity SEO Evidence Re-run)
+
+**Gate:** P5-E.9F.3. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Generator Re-run | Python fallback — deterministisch |
+| Static SEO Check | **12/12 PASS** |
+| Local HTTP/Crawl | **6/6 Entity + Sitemap + not-found PASS** |
+| No-Leak | **PASS** |
+| CSR Dependency (SSG pages) | **PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-entity-seo-evidence-rerun-report.md`
+
+---
+
+*Dokumentversion: P5-E.9F.2 + P5-E.9F.3 PASS. S-05 OPEN_BLOCKING. Launch NO-GO.*

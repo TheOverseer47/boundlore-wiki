@@ -299,38 +299,36 @@ S-05 darf erst **CLOSED** werden, wenn **alle** Kriterien erfüllt sind:
 | S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
 | Final Runtime Config Status | **STAGING** |
 | Entity SSG Technical Implementation | **FIXTURE_SSG_PASS** (9F.2) |
-| Entity SEO Technical Evidence | **PARTIAL** (9F.3 pending) |
+| Entity SEO Technical Evidence | **FIXTURE_SEO_EVIDENCE_PASS** (9F.3) |
+| Local static verification | 9F.3 Re-run **12/12 PASS** + HTTP 6/6 | **FIXTURE_SEO_EVIDENCE_PASS** | — |
 | Entity Sitemap (Fixture) | **FIXTURE_SITEMAP_PASS** — `qa/entity-ssg-sitemap.fixture.xml` |
 | Production `sitemap.xml` Entity URLs | **EXCLUDED** (korrekt) |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.3** — Entity SEO Evidence Re-run
+**Empfohlener nächster Gate:** **P5-E.9F.4** — S-05 Closure Dossier
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.3 frei — Entity SEO Evidence Re-run lokal, crawl/static checks, no-leak, noindex/robots/sitemap checks, kein DB-Zugriff, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+> „Ja, ich gebe P5-E.9F.4 frei — S-05 Closure Dossier auf Basis der verifizierten Entity SEO Fixture Evidence, read-only/plan-only, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
 
 ---
 
-## P5-E.9F.2 Follow-up (PASS — Entity SSG / SEO Technical Closure Implementation)
+## P5-E.9F.3 Follow-up (PASS — Entity SEO Evidence Re-run)
 
-**Gate:** P5-E.9F.2. **PASS**.
+**Gate:** P5-E.9F.3. **PASS**.
 
 | Item | Ergebnis |
 |------|----------|
-| HEAD vor Gate | `17d9b1d` |
-| Fixture Corpus | 6 Entities — `qa/fixtures/entity-ssg-fixtures.json` |
-| Generator | `scripts/build-entity-ssg-fixtures.mjs` (+ Python fallback) |
-| Generated Pages | 6 + `_ssg-not-found` |
-| Fixture Sitemap | `qa/entity-ssg-sitemap.fixture.xml` |
-| QA | **12/12 PASS** |
+| Entity SEO Evidence Re-run | **FIXTURE_SEO_EVIDENCE_PASS** |
+| Static SEO Check | **12/12 PASS** |
+| Local HTTP/Crawl | **6/6 PASS** |
 | S-05 SEO/CSR | **OPEN_BLOCKING** |
 | Public Launch | **NO-GO** |
 
-**Report:** `docs/architecture/p5-entity-ssg-seo-technical-implementation-report.md`
+**Report:** `docs/architecture/p5-entity-seo-evidence-rerun-report.md`
 
 ---
 
-*Dokumentversion: P5-E.9F.1 + P5-E.9F.2 PASS. S-05 OPEN_BLOCKING. Launch NO-GO.*
+*Dokumentversion: P5-E.9F.1 + P5-E.9F.2 + P5-E.9F.3 PASS. S-05 OPEN_BLOCKING. Launch NO-GO.*

@@ -2666,6 +2666,42 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+---
+
+## P5-E.9F.3 Entity SEO Evidence Re-run (PASS)
+
+**Milestone:** P5-E.9F.3 (Entity SEO Evidence Re-run). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| HEAD before gate `8172ba3` | verify | yes | `[x]` |
+| 9F.2 baseline verified | verify | yes | `[x]` |
+| Generator re-run completed | verify | yes | `[x]` |
+| Node primary path checked | verify | not in PATH | `[x]` |
+| Python fallback documented | verify | yes | `[x]` |
+| Static SEO check passes | verify | 12/12 | `[x]` |
+| Local HTTP/crawl evidence passes | verify | 6/6 | `[x]` |
+| All entity pages title/description/canonical | verify | yes | `[x]` |
+| OpenGraph + Twitter metadata | verify | yes | `[x]` |
+| Static HTML SEO core content | verify | yes | `[x]` |
+| Fixture sitemap entity URLs | verify | 6 | `[x]` |
+| Production sitemap excludes fixtures | verify | yes | `[x]` |
+| robots/noindex boundary verified | verify | yes | `[x]` |
+| No BLMETA/search_text/search_vector/PII | verify | none | `[x]` |
+| No DB/SQL/runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| Fable-5 S-05 impact documented | verify | yes | `[x]` |
+| S-05 remains OPEN_BLOCKING until 9F.4 | status | OPEN_BLOCKING | `[x]` |
+| S-06 remains CLOSED_SEARCH_EVIDENCE | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9F.3 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-entity-seo-evidence-rerun-report.md`
+
+**Next:** P5-E.9F.4 S-05 Closure Dossier. No push/deploy/launch.
+
+---
+
 ## P5-E.9F.2 Entity SSG SEO Technical Closure Implementation (PASS)
 
 **Milestone:** P5-E.9F.2 (Entity SSG / SEO Technical Closure Implementation). **PASS**.

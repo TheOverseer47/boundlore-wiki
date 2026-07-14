@@ -293,7 +293,7 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 | Gate | Scope |
 |------|-------|
 | **P5-E.9F.1** | S-05 SEO/CSR Entity Pages Closure Plan / Revalidation — **PASS** |
-| **P5-E.9F.3** | Entity SEO Evidence Re-run |
+| **P5-E.9F.4** | S-05 Closure Dossier |
 | **P5-E.9F.2** | Entity SSG / SEO Runtime Evidence |
 | **P5-E.9G** | Production Closure / Release Gate Legacy Assessment |
 | **P5-E.9H** | Productive Runtime Cutover Plan |
@@ -319,11 +319,21 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9F.3 — Entity SEO Evidence Re-run
+**Empfohlener nächster Gate:** P5-E.9F.4 — S-05 Closure Dossier
 
-**Manuelle Nutzerfreigabe nötig:** **Ja**
+---
 
-> „Ja, ich gebe P5-E.9F.3 frei — Entity SEO Evidence Re-run lokal, crawl/static checks, no-leak, noindex/robots/sitemap checks, kein DB-Zugriff, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+## P5-E.9F.3 Follow-up (PASS — Entity SEO Evidence Re-run)
+
+**Gate:** P5-E.9F.3. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Entity SEO Evidence Re-run | **FIXTURE_SEO_EVIDENCE_PASS** |
+| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Empfohlener nächster Gate | **P5-E.9F.4** |
+
+**Report:** `docs/architecture/p5-entity-seo-evidence-rerun-report.md`
 
 ---
 
@@ -341,4 +351,4 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 
 ---
 
-*Dokumentversion: P5-E.9E.5J + P5-E.9F.1 + P5-E.9F.2 PASS. S-06 CLOSED. S-05 OPEN_BLOCKING. Launch NO-GO.*
+*Dokumentversion: P5-E.9E.5J + P5-E.9F.1 + P5-E.9F.2 + P5-E.9F.3 PASS. S-06 CLOSED. S-05 OPEN_BLOCKING. Launch NO-GO.*
