@@ -17,7 +17,8 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **Staging Ref** | `jzzgoiwfbuwiiyvwgwri` (weiterhin Runtime + Evidence) |
 | **Legacy Target Suitability (5B)** | **NEEDS_MIGRATION_DECISION** → aufgelöst als **CONDITIONAL** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5F** — Legacy Search DB/FTS Apply |
+| **Empfohlener nächster Gate** | **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild |
+| **Legacy Search DB/FTS (5F)** | **APPLIED_LEGACY_PASS** |
 | **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
@@ -177,7 +178,7 @@
 | 3 | ~~P5-E.9E.5C~~ | Plan-only | Final Target Decision — **PASS** |
 | 4 | ~~P5-E.9E.5D~~ | Backup Evidence | Frischer Backup `ohkoojpzmptdfyowdgog` — **PASS** |
 | 5 | ~~P5-E.9E.5E~~ | Apply (Freigabe) | Profile/RLS Security Hardening — **PASS** |
-| 6 | **P5-E.9E.5F** | Apply (Freigabe) | Search DB/FTS MVP analog Staging — **keine Content-Migration** |
+| 6 | ~~P5-E.9E.5F~~ | Apply (Freigabe) | Search DB/FTS MVP — **PASS** (empty index) |
 | 7 | **P5-E.9E.5G** | Apply (Freigabe) | Content Cleanup / Canonical-Auswahl + Rebuild |
 | 8 | **P5-E.9E.5H** | Verification | RPC-first Query Matrix, Safety, No-Leak |
 | 9 | **P5-E.9E.5I** | Runtime Dry Run | Lokal auf Legacy — kein Deploy |
@@ -242,7 +243,8 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 |------|----------|
 | ~~**P5-E.9E.5D**~~ | Backup Legacy — **PASS** (433,643 bytes; SHA256 dokumentiert) |
 | ~~**P5-E.9E.5E**~~ | Security Hardening Legacy — **PASS** |
-| **P5-E.9E.5F** | Search DB/FTS Apply Legacy — **Ja** |
+| ~~**P5-E.9E.5F**~~ | Search DB/FTS Apply Legacy — **PASS** |
+| **P5-E.9E.5G** | Content Cleanup + Rebuild — **Ja** |
 | **P5-E.9E.5F–5J** | Je Gate explizit |
 | **S-05, Launch** | Separat |
 
@@ -289,6 +291,23 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 
 ---
 
+## P5-E.9E.5F Follow-up (PASS — Legacy Search DB/FTS Apply)
+
+**Gate:** P5-E.9E.5F. **PASS** (Search DDL only; empty index).
+
+| Item | Ergebnis |
+|------|----------|
+| 5F Backup | 435,449 bytes; SHA256 dokumentiert |
+| Search objects | **Present** |
+| Rebuild ausgeführt | **Nein** |
+| `search_documents` rows | **0** |
+| 5E Security | **Intact** |
+| Empfohlener nächster Gate | **P5-E.9E.5G** |
+
+**Report:** `docs/architecture/p5-legacy-search-db-fts-apply-report.md`
+
+---
+
 ## Status Matrix
 
 | Item | Status |
@@ -296,8 +315,10 @@ Runtime darf erst auf `ohkoojpzmptdfyowdgog` zeigen, wenn:
 | P5-E.9E.5C | **PASS** |
 | P5-E.9E.5D | **PASS** |
 | P5-E.9E.5E | **PASS** |
+| P5-E.9E.5F | **PASS** |
 | Legacy Fresh Backup Evidence | **COMPLETE** |
 | Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
+| Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | Legacy Target Suitability | **CONDITIONAL** (war NEEDS_MIGRATION_DECISION) |
 | S-06 Staging Evidence | **STAGING_CLOSED** |

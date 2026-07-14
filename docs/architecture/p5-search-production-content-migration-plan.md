@@ -29,7 +29,7 @@
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Content-Migration auf Legacy folgt 5F–5G. Empfohlener nächster Gate: **P5-E.9E.5F** — Legacy Search DB/FTS Apply.
+**Kernaussage:** Staging Search **STAGING_CLOSED**. Legacy ist **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C). Legacy Backup **COMPLETE** (5D). Profile/RLS **HARDENED** (5E). Search DB/FTS **APPLIED** (5F, empty index). Content-Migration/Rebuild folgt **5G**. Empfohlener nächster Gate: **P5-E.9E.5G**.
 
 ---
 
@@ -337,7 +337,7 @@ Nur: `title`, `canonical_slug`, `canonical_url`, `excerpt`, `category`, `score`,
 |------|----------|
 | Final Target | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** — `ohkoojpzmptdfyowdgog` |
 | Content Source Decision | **Offen** — 5B Inventory + 5C Decision |
-| Empfohlener nächster Gate | **P5-E.9E.5F** |
+| Empfohlener nächster Gate | **P5-E.9E.5G** |
 
 **Report:** `docs/architecture/p5-production-legacy-target-cutover-plan.md`
 

@@ -18,7 +18,7 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 
 **Legacy Fresh Backup Evidence** darf als **PASS** gewertet werden. **Restore Evidence** und **Production Backup Schedule** bleiben **OPEN**.
 
-**Nächster Gate (post-5E):** **P5-E.9E.5F** — Legacy Search DB/FTS Apply (separate Nutzerfreigabe).
+**Nächster Gate (post-5F):** **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild.
 
 ---
 
@@ -184,7 +184,7 @@ Ein **frischer, verifizierter Legacy-Backup-Nachweis** wurde erzeugt:
 | Gate | Freigabe |
 |------|----------|
 | ~~**P5-E.9E.5E**~~ | Profile/RLS Security Hardening — **PASS** |
-| **P5-E.9E.5F** | Search DB/FTS Apply — **Ja** |
+| **P5-E.9E.5G** | Content Cleanup + Rebuild — **Ja** |
 | **P5-E.9E.5G–5J** | Je Gate explizit |
 | **Restore Evidence** | Separates Gate |
 | **S-05, Launch** | Separat |

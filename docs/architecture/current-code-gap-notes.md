@@ -3478,6 +3478,32 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 174. P5-E.9E.5F — Legacy Search DB/FTS Apply (PASS)
+
+**Milestone:** P5-E.9E.5F (Legacy Search DDL). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Target ref verified | **PASS** |
+| 5D backup baseline verified | **PASS** |
+| Fresh 5F backup created | **PASS** — 435,449 bytes |
+| 5E security hardening intact | **PASS** |
+| Search DDL applied | **PASS** |
+| `search_documents` exists, empty | **PASS** |
+| Rebuild not executed | **PASS** |
+| RPC smoke `monster` → 0 hits | **PASS** |
+| No content writes | **PASS** |
+| Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** |
+| S-06 Final Status | **OPEN_BLOCKING** |
+| Public Launch | **NO-GO** |
+| P5-E.9E.5F | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-search-db-fts-apply-report.md`
+
+**Next:** P5-E.9E.5G Legacy Content Cleanup + Rebuild. No push/deploy/launch.
+
+---
+
 ## 173. P5-E.9E.5E — Legacy Profile/RLS Security Hardening (PASS)
 
 **Milestone:** P5-E.9E.5E (Legacy Policy/Grant Apply). **PASS**.
@@ -3499,7 +3525,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-legacy-profile-rls-security-hardening-report.md`
 
-**Next:** P5-E.9E.5F Legacy Search DB/FTS Apply. No push/deploy/launch.
+**Next:** P5-E.9E.5G Legacy Content Cleanup + Rebuild. No push/deploy/launch.
 
 ---
 
@@ -3523,7 +3549,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-legacy-fresh-backup-evidence-report.md`
 
-**Next:** P5-E.9E.5F Legacy Search DB/FTS Apply. No push/deploy/launch.
+**Next:** P5-E.9E.5G Legacy Content Cleanup + Rebuild. No push/deploy/launch.
 
 ---
 
@@ -3541,7 +3567,7 @@ The future Draft Inspector / Preview must **NOT**:
 
 **Report:** `docs/architecture/p5-final-target-decision.md`
 
-**Next:** P5-E.9E.5F Legacy Search DB/FTS Apply. No push/deploy/launch.
+**Next:** P5-E.9E.5G Legacy Content Cleanup + Rebuild. No push/deploy/launch.
 
 ---
 

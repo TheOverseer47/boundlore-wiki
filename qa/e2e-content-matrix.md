@@ -2654,6 +2654,45 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+---
+
+## P5-E.9E.5F — Legacy Search DB FTS Apply (PASS)
+
+**Milestone:** P5-E.9E.5F (Legacy Search DDL). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | apply | yes | `[x]` |
+| Staging ref not used | apply | yes | `[x]` |
+| 5D backup baseline verified | apply | yes | `[x]` |
+| fresh 5F backup created | apply | yes | `[x]` |
+| 5E security hardening still verified | apply | yes | `[x]` |
+| Search DDL applied | apply | yes | `[x]` |
+| `search_documents` exists | apply | yes | `[x]` |
+| RLS active on `search_documents` | apply | yes | `[x]` |
+| Search indexes exist | apply | yes | `[x]` |
+| `bl_search_public_content(text,jsonb)` exists | apply | yes | `[x]` |
+| `bl_rebuild_search_documents()` exists | apply | yes | `[x]` |
+| no rebuild executed | scope | none | `[x]` |
+| `search_documents` empty until 5G | apply | 0 rows | `[x]` |
+| no direct anon/public SELECT on `search_documents` | grant | none | `[x]` |
+| no public/anon profile SELECT regression | security | none | `[x]` |
+| no content writes | scope | none | `[x]` |
+| no inserts/updates/deletes on data rows | scope | none | `[x]` |
+| no runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.5F | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-legacy-search-db-fts-apply-report.md`
+
+**5F Backup:** `backups/legacy/p5-e9e5f-search-ddl-prewrite-20260714-154126.dump` — SHA256 `70ACDE6722B89D8F5F05C6D3B430F3DC309CA8F86EEDE865B2A5202C6FD2EE13` — **not committed**.
+
+**Next:** P5-E.9E.5G Legacy Content Cleanup + Rebuild. No push/deploy/launch.
+
+---
+
 ## P5-E.9E.5E — Legacy Profile RLS Security Hardening (PASS)
 
 **Milestone:** P5-E.9E.5E (Legacy Policy/Grant Apply). **PASS**.

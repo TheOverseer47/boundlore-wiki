@@ -20,7 +20,8 @@
 | **Production / Legacy Target Decision** | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** (5C) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** (unverändert) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5F** — Legacy Search DB/FTS Apply |
+| **Empfohlener nächster Gate** | **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild |
+| **Legacy Search DB/FTS (5F)** | **APPLIED_LEGACY_PASS** |
 | **Legacy Profile/RLS Security (5E)** | **HARDENED_LEGACY_PASS** |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **Public Launch** | **NO-GO** |
@@ -339,9 +340,8 @@
 | Item | Status |
 |------|--------|
 | P5-E.9E.5B | **PASS** |
-| P5-E.9E.5E | **PASS** |
-| Legacy Profile/RLS Security | **HARDENED_LEGACY_PASS** |
-| Public Profile Leak | **CLOSED** |
+| P5-E.9E.5F | **PASS** |
+| Legacy Search DB/FTS | **APPLIED_LEGACY_PASS** |
 | Production / Legacy Inventory | **COMPLETE** |
 | Final Target Decision | **LEGACY_CONDITIONAL_TARGET_CANDIDATE** |
 | S-06 Staging Evidence | **STAGING_CLOSED** |
@@ -379,6 +379,20 @@
 | `anon SELECT profiles` | **Entfernt** |
 | Posts SELECT RLS Dependency | **Geschlossen** |
 | Search Apply | **Nein** |
-| Nächster Gate | **P5-E.9E.5F** |
+| Nächster Gate (historisch) | **P5-E.9E.5F** |
 
 **Report:** `docs/architecture/p5-legacy-profile-rls-security-hardening-report.md`
+
+---
+
+## P5-E.9E.5F Follow-up (PASS — Legacy Search DB/FTS Apply)
+
+**Gate:** P5-E.9E.5F. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Search DDL applied | **Ja** |
+| Rebuild executed | **Nein** |
+| Nächster Gate | **P5-E.9E.5G** |
+
+**Report:** `docs/architecture/p5-legacy-search-db-fts-apply-report.md`

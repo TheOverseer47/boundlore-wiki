@@ -16,7 +16,7 @@
 | **Legacy Profile/RLS Security** | **HARDENED_LEGACY_PASS** |
 | **Public Profile Leak** | **CLOSED** (5B-Finding behoben) |
 | **Posts RLS Dependency (SELECT-Pfad)** | **CLOSED** (analog Staging 4D) |
-| **Legacy Search DB/FTS** | **NOT_APPLIED** (erwartet — Gate 5F) |
+| **Legacy Search DB/FTS** | **APPLIED_LEGACY_PASS** (5F) |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -182,12 +182,12 @@
 
 | Risiko | Status | Nächster Gate |
 |--------|--------|---------------|
-| Search MVP fehlt auf Legacy | **Offen** | **P5-E.9E.5F** |
+| Search MVP auf Legacy | **DDL applied (5F)**; Index **leer** bis 5G | **P5-E.9E.5G** |
 | UPDATE/DELETE-Policies auf `posts` mit Invoker-`profiles`-Subquery | **Offen** (außerhalb 5E SELECT-Scope) | Optional späteres Gate |
 | `anon` hat weiterhin INSERT/UPDATE/DELETE Table-Grants auf `profiles` | **Residual** — RLS blockiert, aber Grants breit | Optional Grant-Härtung |
 | Content QA/BLMETA | **Offen** | **P5-E.9E.5G** |
 | Release Gate fehlt | **Offen** | Separates Apply-Gate |
-| S-06 Final / Launch | **Offen** | 5F–5J + Launch |
+| S-06 Final / Launch | **Offen** | 5G–5J + Launch |
 
 ---
 
@@ -195,7 +195,7 @@
 
 | Gate | Freigabe |
 |------|----------|
-| **P5-E.9E.5F** | Legacy Search DB/FTS Apply — **Ja** (separat) |
+| ~~**P5-E.9E.5F**~~ | Legacy Search DB/FTS Apply — **PASS** |
 | **P5-E.9E.5G** | Content Cleanup + Rebuild — **Ja** |
 | **P5-E.9E.5H–5J** | Verification / Dry Run / S-06 Final |
 | **S-05, Launch** | Separat |

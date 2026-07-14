@@ -18,7 +18,7 @@
 | **Final Target Ref** | `ohkoojpzmptdfyowdgog` (conditional — nicht aktiv) |
 | **S-06 Staging Evidence** | **STAGING_CLOSED** |
 | **S-06 Final Status** | **OPEN_BLOCKING** |
-| **Empfohlener nächster Gate** | **P5-E.9E.5F** — Legacy Search DB/FTS Apply |
+| **Empfohlener nächster Gate** | **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild |
 | **Legacy Fresh Backup Evidence (5D)** | **COMPLETE** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
@@ -339,4 +339,18 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5E PASS. Kein Write außer 5E Policy/Grant.*
+## P5-E.9E.5F Follow-up (PASS — Legacy Search DB/FTS Apply)
+
+**Gate:** P5-E.9E.5F. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Search DB/FTS | **APPLIED_LEGACY_PASS** |
+| Rebuild | **Nein** |
+| Empfohlener nächster Gate | **P5-E.9E.5G** |
+
+**Report:** `docs/architecture/p5-legacy-search-db-fts-apply-report.md`
+
+---
+
+*Dokumentversion: P5-E.9E.5A–5F PASS. Kein Content Write.*

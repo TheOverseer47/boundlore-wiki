@@ -321,10 +321,23 @@ js/search.js — RPC-first BoundLoreSearch.runRpcSearch
 | `profiles_select_all` | **Entfernt** |
 | Posts SELECT RLS Dependency | **Geschlossen** |
 | Search Apply | **Nein** |
-| Empfohlener nächster Gate | **P5-E.9E.5F** |
+| Empfohlener nächster Gate | **P5-E.9E.5G** |
 
-**Report:** `docs/architecture/p5-legacy-profile-rls-security-hardening-report.md`
+**Report:** `docs/architecture/p5-legacy-search-db-fts-apply-report.md`
 
 ---
 
-*Dokumentversion: P5-E.9E.4M + 5A + 5B + 5C + 5D + 5E PASS. Kein DB-Write außer 5E Policy/Grant.*
+## P5-E.9E.5F Follow-up (PASS — Legacy Search DB/FTS Apply)
+
+**Gate:** P5-E.9E.5F. **PASS** (Search DDL; empty index).
+
+| Item | Ergebnis |
+|------|----------|
+| Search DB/FTS | **APPLIED_LEGACY_PASS** |
+| Rebuild | **Nein** |
+| `search_documents` rows | **0** |
+| Empfohlener nächster Gate | **P5-E.9E.5G** |
+
+---
+
+*Dokumentversion: P5-E.9E.4M + 5A–5F PASS. Kein Content Write.*

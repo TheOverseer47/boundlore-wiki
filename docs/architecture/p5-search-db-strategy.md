@@ -33,7 +33,7 @@
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.5F** — Legacy Search DB/FTS Apply
+**Empfohlener nächster Gate:** **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild
 
 ---
 
@@ -57,7 +57,7 @@
 | P5-E.9E.5B | **PASS** |
 | Write / Apply | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5F** — Legacy Search DB/FTS Apply
+**Empfohlener nächster Gate:** **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild
 
 ---
 
@@ -71,7 +71,7 @@
 | P5-E.9E.5A | **PASS** |
 | DB-Zugriff / SQL / Write | **Nein** |
 
-**Empfohlener nächster Gate:** **P5-E.9E.5F** — Legacy Search DB/FTS Apply
+**Empfohlener nächster Gate:** **P5-E.9E.5G** — Legacy Content Cleanup + Rebuild
 
 ---
 
