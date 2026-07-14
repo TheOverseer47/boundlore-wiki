@@ -504,6 +504,18 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 39. P5-E.9E.4E Follow-up (PASS — Corpus Populate)
+
+**Gate:** P5-E.9E.4E. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Corpus Populate | **POPULATED_VERIFIED_CLEANED** |
+| Search Runtime Evidence | **PASS** |
+| P5-E.9E.4E | **PASS** |
+
+---
+
 ## 38. P5-E.9E.4D Follow-up (PASS — Posts RLS Fix Applied)
 
 **Gate:** P5-E.9E.4D. **PASS**.

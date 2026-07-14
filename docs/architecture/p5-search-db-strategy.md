@@ -19,7 +19,7 @@
 | **DB Search Strategy** | **DOCUMENTED** |
 | **Search Client Recall** | **CLIENT_RECALL_HARDENED** (P5-E.9E.2) |
 | **Search Implementation** | **PARTIAL** — Client gehärtet; DB-Index fehlt |
-| **Search Runtime Evidence** | **PARTIAL** (9E.4D: 42501 behoben; Corpus leer) |
+| **Search Runtime Evidence** | **PASS** (9E.4E Corpus Populate) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** (separater Blocker) |
 | **Product Activation** | **FAIL** |
@@ -29,6 +29,17 @@
 **Kernaussage:** BoundLore sollte für MVP und Full Launch eine **dedizierte, normalisierte Public-Search-Schicht** einführen — bevorzugt **`search_documents` + RPC `bl_search_public_content`**, mit **Postgres FTS (`tsvector`)** und optional **`pg_trgm`** (bereits im Schema für Observations vorhanden). Die clientseitige `BoundLoreSearchRecall`-Utility (9E.2) bleibt als **Ergänzung, Synonym-Fallback und Fixture-Baseline**; die DB liefert die **vollständigere Trefferbasis**, bessere Skalierung und **fail-closed RLS/Release-Gate-Kontrolle**. **Kein SQL in diesem Gate.** Apply erst über explizite Folge-Gates mit Backup und Staging-Freigabe.
 
 **Empfohlener nächster Gate:** Staging Corpus Populate oder **P5-E.9E.4A** (STOPP)
+
+---
+
+## P5-E.9E.4E — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-staging-search-corpus-populate-report.md` |
+| Corpus Populate | **POPULATED_VERIFIED_CLEANED** |
+| Search Runtime Evidence | **PASS** |
+| P5-E.9E.4E | **PASS** |
 
 ---
 

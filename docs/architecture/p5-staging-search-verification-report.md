@@ -17,8 +17,8 @@
 | **P5-E.9E.4 (Erstlauf)** | **BLOCKED** |
 | **P5-E.9E.4 Re-run** | **PASS** |
 | **P5-E.9E.4B** | **PASS** |
-| **P5-E.9E.4D** | **PASS** — Posts RLS Fix applied |
-| **Search Runtime Evidence** | **PARTIAL** (42501 behoben; Staging-Corpus leer) |
+| **P5-E.9E.4E** | **PASS** — Corpus Populate |
+| **Search Runtime Evidence** | **PASS** |
 | **Staging Ref in Client Runtime** | **VERIFIZIERT** (`STAGING_REF_VERIFIED`) |
 | **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 98/98) |
 | **Wiki Search Runtime Matrix** | **AUSGEFÜHRT** (14 Queries) |
@@ -27,7 +27,7 @@
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** Staging-Runtime korrekt. **P5-E.9E.4D:** RLS-Fix + `posts` anon SELECT angewendet — **kein 42501 mehr**. Search lädt; Corpus **0 published posts** auf Staging → 0 Runtime-Treffer, Empty-State OK. Safety/No-Leak **PASS**. Search Runtime Evidence: **PARTIAL**. S-06 **OPEN_BLOCKING** (kein Recall gegen echte Daten + DB/FTS offen).
+**Kernaussage:** **P5-E.9E.4E:** Kontrollierter Corpus (5 Posts) temporär populated, Query-Matrix **PASS** (monster→Ember Salamander, artifact→Volcanic Heat Charm, etc.), Cleanup verifiziert. Search Runtime Evidence: **PASS**. Staging wieder 0 published. S-06 **OPEN_BLOCKING** (DB/FTS).
 
 ---
 

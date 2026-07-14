@@ -14,7 +14,7 @@
 |-----------|---------|
 | **P5-E.9E.4D** | **PASS** |
 | **Posts RLS Dependency Fix** | **APPLIED_STAGING_PASS** |
-| **Search Runtime Evidence** | **PARTIAL** |
+| **Search Runtime Evidence** | **PASS** (9E.4E Corpus Populate) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |

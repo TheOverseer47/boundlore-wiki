@@ -441,6 +441,17 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
+## P5-E.9E.4E — Umsetzungsnachweis (PASS)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-staging-search-corpus-populate-report.md` |
+| Corpus Populate | **POPULATED_VERIFIED_CLEANED** |
+| Search Runtime Evidence | **PASS** |
+| P5-E.9E.4E | **PASS** |
+
+---
+
 ## P5-E.9E.4D — Umsetzungsnachweis (PASS)
 
 | Item | Ergebnis |
@@ -525,4 +536,4 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4D PASS. Search Runtime Evidence PARTIAL.*
+*Dokumentversion: P5-E.9E PASS + … + P5-E.9E.4E PASS. Search Runtime Evidence PASS.*

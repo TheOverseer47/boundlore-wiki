@@ -3478,6 +3478,20 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 159. P5-E.9E.4E — Staging Search Corpus Populate (PASS)
+
+**Milestone:** P5-E.9E.4E. **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Corpus Populate | **POPULATED_VERIFIED_CLEANED** |
+| Search Runtime Evidence | **PASS** |
+| P5-E.9E.4E | **PASS** |
+
+**Report:** `docs/architecture/p5-staging-search-corpus-populate-report.md`
+
+---
+
 ## 158. P5-E.9E.4D — Posts RLS Policy Dependency Fix (PASS)
 
 **Milestone:** P5-E.9E.4D. **PASS**.

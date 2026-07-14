@@ -392,9 +392,9 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9E.4C**~~ **PASS** — Read Path Fix Draft
 
-~~**P5-E.9E.4D**~~ **PASS** — Posts RLS Fix applied
+~~**P5-E.9E.4E**~~ **PASS** — Search Runtime Evidence **PASS**
 
-**Staging Corpus Populate** — Recall gegen echte Daten
+**P5-E.9E.4A** — Search DB Apply (**STOPP**)
 
 **P5-E.9E.4A** — Staging Search Apply (**STOPP**)
 
