@@ -319,7 +319,23 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** P5-E.9F.4 — S-05 Closure Dossier
+**Empfohlener nächster Gate:** P5-E.9F.5 — Real-Content Entity SEO Source Decision / Read-only Inventory
+
+---
+
+## P5-E.9F.4 Follow-up (PASS — S-05 Closure Dossier / Decision)
+
+**Gate:** P5-E.9F.4. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| S-05 Decision | **Option B** — PARTIAL_TECHNICAL_EVIDENCE |
+| Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| S-06 Search Recall | **CLOSED** (unverändert) |
+| Empfohlener nächster Gate | **P5-E.9F.5** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-closure-dossier.md`
 
 ---
 
@@ -351,4 +367,4 @@ Evidence 5G–5I ist vollständig, widerspruchsfrei und deckt alle Closure-Krite
 
 ---
 
-*Dokumentversion: P5-E.9E.5J + P5-E.9F.1 + P5-E.9F.2 + P5-E.9F.3 PASS. S-06 CLOSED. S-05 OPEN_BLOCKING. Launch NO-GO.*
+*Dokumentversion: P5-E.9E.5J + P5-E.9F.1 + P5-E.9F.2 + P5-E.9F.3 + P5-E.9F.4 PASS. S-06 CLOSED. S-05 PARTIAL_TECHNICAL_EVIDENCE. Launch NO-GO.*

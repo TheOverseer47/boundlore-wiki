@@ -233,14 +233,24 @@ Kein Crash. Statischer SEO-Kerninhalt im HTML vorhanden.
 | P5-E.9F.2 | **PASS** |
 | Entity SSG Technical Implementation | **FIXTURE_SSG_PASS** |
 | Entity SEO Technical Evidence | **FIXTURE_SEO_EVIDENCE_PASS** (9F.3) |
-| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **PARTIAL_TECHNICAL_EVIDENCE** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
 | S-06 Search Recall | **CLOSED** |
 | Final Runtime Config | **STAGING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.4** — S-05 Closure Dossier
+**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
+
+---
+
+## P5-E.9F.4 Follow-up (PASS — S-05 Closure Dossier / Decision)
+
+**Gate:** P5-E.9F.4. **PASS**. S-05 **Option B** — PARTIAL_TECHNICAL_EVIDENCE; Entity SEO **CLOSED_TECHNICAL_FIXTURE**.
+
+**Report:** `docs/architecture/p5-s05-seo-csr-closure-dossier.md`
 
 ---
 
@@ -255,11 +265,13 @@ Kein Crash. Statischer SEO-Kerninhalt im HTML vorhanden.
 | Local HTTP/Crawl | **6/6 Entity + Sitemap + not-found PASS** |
 | No-Leak | **PASS** |
 | CSR Dependency (SSG pages) | **PASS** |
-| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| S-05 SEO/CSR | **PARTIAL_TECHNICAL_EVIDENCE** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
 | Public Launch | **NO-GO** |
 
 **Report:** `docs/architecture/p5-entity-seo-evidence-rerun-report.md`
 
 ---
 
-*Dokumentversion: P5-E.9F.2 + P5-E.9F.3 PASS. S-05 OPEN_BLOCKING. Launch NO-GO.*
+*Dokumentversion: P5-E.9F.2 + P5-E.9F.3 + P5-E.9F.4 PASS. S-05 PARTIAL_TECHNICAL_EVIDENCE. Launch NO-GO.*

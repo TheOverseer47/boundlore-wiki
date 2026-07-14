@@ -381,9 +381,9 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9E.5J**~~ **PASS** — S-06 Final Search Closure Dossier (**CLOSED_SEARCH_EVIDENCE**)
 
-~~**P5-E.9F.3**~~ **PASS** — Entity SEO Evidence Re-run
+~~**P5-E.9F.4**~~ **PASS** — S-05 Closure Dossier (**PARTIAL_TECHNICAL_EVIDENCE**)
 
-**Empfohlener nächster Gate:** **P5-E.9F.4** — S-05 Closure Dossier
+**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
 
 **P5-E.9A.2** — S+-03 Staging Stored Payload Evidence (**STOPP** — separate Freigabe für Writes)
 
@@ -391,7 +391,21 @@ Weiterhin: **kein Push, kein Deploy, kein Launch, kein Production-Apply.**
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9F.2** — Entity SSG / SEO Technical Closure Implementation
+## 21. P5-E.9F.4 Follow-up (PASS — S-05 Closure Dossier / Decision)
+
+**Gate:** P5-E.9F.4. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Report | `p5-s05-seo-csr-closure-dossier.md` |
+| S-05 Decision | **Option B** — PARTIAL_TECHNICAL_EVIDENCE |
+| Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| S-06 Final Status | **CLOSED_SEARCH_EVIDENCE** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.4 | **PASS** |
+
+**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision
 
 ---
 

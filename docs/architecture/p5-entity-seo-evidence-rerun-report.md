@@ -15,7 +15,9 @@
 | **P5-E.9F.3** | **PASS** |
 | **Entity SEO Evidence Re-run** | **FIXTURE_SEO_EVIDENCE_PASS** |
 | **Entity SEO Technical Evidence** | **FIXTURE_SEO_EVIDENCE_PASS** (9F.2 + 9F.3) |
-| **S-05 SEO/CSR** | **OPEN_BLOCKING** (bis 9F.4 Closure Dossier) |
+| **S-05 SEO/CSR** | **PARTIAL_TECHNICAL_EVIDENCE** |
+| **S-05 Fable-5 Launch Blocker** | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| **Entity SEO Technical Evidence** | **CLOSED_TECHNICAL_FIXTURE** |
 | **S-06 Search Recall** | **CLOSED** |
 | **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
 | **Final Runtime Config** | **STAGING** |
@@ -230,7 +232,7 @@ Alle 6 Seiten enthalten statisch (ohne JS):
 | Item | Status |
 |------|--------|
 | Fable-5 S-05 (SEO/CSR Entity Pages) | **Technisch weiter adressiert** — Fixture SEO Evidence PASS |
-| S-05 Final Status | **OPEN_BLOCKING** bis **P5-E.9F.4** Closure Dossier |
+| S-05 Final Status | **PARTIAL_TECHNICAL_EVIDENCE** — 9F.4 Option B |
 | S-06 Search Recall | **CLOSED** (unverändert) |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
@@ -242,7 +244,7 @@ Alle 6 Seiten enthalten statisch (ohne JS):
 
 1. Nur Fixture-Content — kein Real-Content aus Legacy/Production
 2. CSR-Live-Pfad `/wiki/post/?slug=` unverändert Thin-Shell für echte Entities
-3. **P5-E.9F.4** S-05 Closure Dossier noch ausstehend
+3. **P5-E.9F.4** S-05 Closure Dossier — **Option B** (PARTIAL, nicht Full Closure)
 4. Production `sitemap.xml` ohne Entity-URLs (korrekt bis Launch/Real-Content)
 5. Launch-Indexierung explizit NO-GO
 
@@ -252,8 +254,8 @@ Alle 6 Seiten enthalten statisch (ohne JS):
 
 | Gate | Scope |
 |------|-------|
-| **P5-E.9F.4** | S-05 Closure Dossier — schließt S-05 nur wenn Evidence reicht |
-| Danach | Real-Content Export, Production Closure, Runtime Cutover, Launch |
+| **P5-E.9F.5** | Real-Content Entity SEO Source Decision |
+| **P5-E.9F.6–9F.8** | Real-Content SSG Apply, Evidence Re-run, Final Closure |
 
 ---
 
@@ -263,20 +265,29 @@ Alle 6 Seiten enthalten statisch (ohne JS):
 |------|--------|
 | P5-E.9F.3 | **PASS** |
 | Entity SEO Evidence Re-run | **FIXTURE_SEO_EVIDENCE_PASS** |
-| Entity SEO Technical Evidence | **FIXTURE_SEO_EVIDENCE_PASS** |
-| S-05 SEO/CSR | **OPEN_BLOCKING** |
+| Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** (9F.4) |
+| S-05 SEO/CSR | **PARTIAL_TECHNICAL_EVIDENCE** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
 | S-06 Search Recall | **CLOSED** |
 | Final Runtime Config | **STAGING** |
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.4** — S-05 Closure Dossier
+**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.4 frei — S-05 Closure Dossier auf Basis der verifizierten Entity SEO Fixture Evidence, read-only/plan-only, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+> „Ja, ich gebe P5-E.9F.5 frei — Real-Content Entity SEO Source Decision / Read-only Inventory, read-only nur mit Freigabe, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
 
 ---
 
-*Dokumentversion: P5-E.9F.3 PASS. Kein DB-Zugriff. S-05 OPEN_BLOCKING. Launch NO-GO.*
+## P5-E.9F.4 Follow-up (PASS — S-05 Closure Dossier / Decision)
+
+**Gate:** P5-E.9F.4. **PASS**. S-05 **nicht** vollständig geschlossen — Option B.
+
+**Report:** `docs/architecture/p5-s05-seo-csr-closure-dossier.md`
+
+---
+
+*Dokumentversion: P5-E.9F.3 + P5-E.9F.4 PASS. S-05 PARTIAL_TECHNICAL_EVIDENCE. Launch NO-GO.*

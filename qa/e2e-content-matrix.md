@@ -2668,6 +2668,37 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9F.4 S-05 Closure Dossier (PASS)
+
+**Milestone:** P5-E.9F.4 (S-05 Closure Dossier / Decision). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| HEAD before gate `fec45d9` | verify | yes | `[x]` |
+| Closure dossier exists | verify | yes | `[x]` |
+| 9F.2 evidence included | verify | yes | `[x]` |
+| 9F.3 evidence included | verify | yes | `[x]` |
+| Fable-5 S-05 requirement documented | verify | yes | `[x]` |
+| Closure criteria evaluated | verify | yes | `[x]` |
+| CSR dependency assessed | verify | yes | `[x]` |
+| Real-content/runtime gap assessed | verify | yes | `[x]` |
+| S-05 decision documented | verify | Option B | `[x]` |
+| Fable-5 impact documented | verify | yes | `[x]` |
+| What-this-does-not-approve documented | verify | yes | `[x]` |
+| No DB access / no SQL / no writes | scope | none | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-06 remains CLOSED_SEARCH_EVIDENCE | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| Product Activation remains FAIL | status | FAIL | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9F.4 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-closure-dossier.md`
+
+**Next:** P5-E.9F.5 Real-Content Entity SEO Source Decision. No push/deploy/launch.
+
+---
+
 ## P5-E.9F.3 Entity SEO Evidence Re-run (PASS)
 
 **Milestone:** P5-E.9F.3 (Entity SEO Evidence Re-run). **PASS**.

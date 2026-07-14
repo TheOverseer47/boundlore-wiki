@@ -462,6 +462,21 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
+## P5-E.9F.4 Follow-up (PASS — S-05 Closure Dossier / Decision)
+
+**Gate:** P5-E.9F.4. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| S-05 Decision | **Option B** — PARTIAL_TECHNICAL_EVIDENCE |
+| Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Empfohlener nächster Gate | **P5-E.9F.5** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-closure-dossier.md`
+
+---
+
 ## P5-E.9F.3 Follow-up (PASS — Entity SEO Evidence Re-run)
 
 **Gate:** P5-E.9F.3. **PASS**.
@@ -476,4 +491,4 @@ Final Target muss erhalten (analog Staging 4A):
 
 ---
 
-*Dokumentversion: P5-E.9E.5A–5I + 5J + 9F.1 + 9F.2 + 9F.3 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 OPEN_BLOCKING.*
+*Dokumentversion: P5-E.9E.5A–5I + 5J + 9F.1 + 9F.2 + 9F.3 + 9F.4 PASS. S-06 CLOSED_SEARCH_EVIDENCE. S-05 PARTIAL_TECHNICAL_EVIDENCE.*

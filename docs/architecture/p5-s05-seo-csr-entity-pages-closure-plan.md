@@ -13,7 +13,9 @@
 | Dimension | Verdict |
 |-----------|---------|
 | **P5-E.9F.1** | **PASS** (Plan/Revalidation only) |
-| **S-05 SEO/CSR** | **OPEN_BLOCKING** |
+| **S-05 SEO/CSR** | **PARTIAL_TECHNICAL_EVIDENCE** |
+| **S-05 Fable-5 Launch Blocker** | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| **Entity SEO Technical Evidence** | **CLOSED_TECHNICAL_FIXTURE** |
 | **S-06 Search Recall** | **CLOSED** |
 | **S-06 Final Status** | **CLOSED_SEARCH_EVIDENCE** |
 | **Final Runtime Config Status** | **STAGING** (`jzzgoiwfbuwiiyvwgwri`) |
@@ -307,11 +309,27 @@ S-05 darf erst **CLOSED** werden, wenn **alle** Kriterien erfüllt sind:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.4** — S-05 Closure Dossier
+**Empfohlener nächster Gate:** **P5-E.9F.5** — Real-Content Entity SEO Source Decision / Read-only Inventory
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.4 frei — S-05 Closure Dossier auf Basis der verifizierten Entity SEO Fixture Evidence, read-only/plan-only, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+> „Ja, ich gebe P5-E.9F.5 frei — Real-Content Entity SEO Source Decision / Read-only Inventory, read-only nur mit Freigabe, kein produktiver Runtime-Switch, kein Staging-Write, kein Push, kein Deploy, kein Launch.“
+
+---
+
+## P5-E.9F.4 Follow-up (PASS — S-05 Closure Dossier / Decision)
+
+**Gate:** P5-E.9F.4. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| S-05 Decision | **Option B** — PARTIAL_TECHNICAL_EVIDENCE |
+| Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| S-06 Search Recall | **CLOSED** (unverändert) |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-s05-seo-csr-closure-dossier.md`
 
 ---
 
@@ -324,11 +342,6 @@ S-05 darf erst **CLOSED** werden, wenn **alle** Kriterien erfüllt sind:
 | Entity SEO Evidence Re-run | **FIXTURE_SEO_EVIDENCE_PASS** |
 | Static SEO Check | **12/12 PASS** |
 | Local HTTP/Crawl | **6/6 PASS** |
-| S-05 SEO/CSR | **OPEN_BLOCKING** |
-| Public Launch | **NO-GO** |
-
-**Report:** `docs/architecture/p5-entity-seo-evidence-rerun-report.md`
-
----
-
-*Dokumentversion: P5-E.9F.1 + P5-E.9F.2 + P5-E.9F.3 PASS. S-05 OPEN_BLOCKING. Launch NO-GO.*
+| S-05 SEO/CSR | **PARTIAL_TECHNICAL_EVIDENCE** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
