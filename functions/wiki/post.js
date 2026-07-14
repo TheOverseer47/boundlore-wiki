@@ -26,10 +26,14 @@ function methodNotAllowed() {
   });
 }
 
-function redirect307(location) {
+function redirect307(targetUrl) {
   return new Response(null, {
     status: 307,
-    headers: mergeHeaders(NO_STORE, mergeHeaders(ROBOTS_NOINDEX, { Location: location })),
+    headers: {
+      Location: targetUrl,
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": "noindex",
+    },
   });
 }
 
@@ -137,5 +141,6 @@ export async function onRequest(context) {
     return notFoundResponse(context, method, 404);
   }
 
-  return redirect307(canonicalPath);
+  const targetUrl = new URL(canonicalPath, request.url).toString();
+  return redirect307(targetUrl);
 }

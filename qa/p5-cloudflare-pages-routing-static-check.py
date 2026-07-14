@@ -46,6 +46,19 @@ def main() -> None:
         fail("forbidden binding in function")
     if "password" in fn_text.lower() or "secret" in fn_text.lower():
         fail("possible secret in function")
+    if "redirect307" not in fn_text or "Location" not in fn_text:
+        fail("redirect response missing Location header construction")
+    if "new URL(canonicalPath" not in fn_text and "new URL(" not in fn_text:
+        fail("redirect Location not built from request.url same-origin base")
+    if re.search(r"status:\s*30[18]", fn_text):
+        fail("permanent redirect status detected")
+    for host in ("boundlore.com", "www.boundlore.com", "lnf-boundlore.pages.dev", "inf-boundlore.pages.dev"):
+        if host in fn_text:
+            fail(f"hardcoded production/preview host in function: {host}")
+    call_probe = fn_text.find("await canonicalAssetExists")
+    call_redirect = fn_text.find("return redirect307")
+    if call_probe < 0 or call_redirect < 0 or call_probe > call_redirect:
+        fail("asset probe must precede redirect307 call")
     ok("Function scope limited to legacy /wiki/post")
 
     redirects = ROOT / "_redirects"

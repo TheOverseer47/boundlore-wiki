@@ -76,6 +76,7 @@ class MockResponse:
         self.status = status
         self.ok = 200 <= status < 300
         self._body = body
+        self.headers: dict[str, str] = {}
 
     async def text(self) -> str:
         return self._body
@@ -136,9 +137,11 @@ async def model_on_request(context: MockContext) -> MockResponse:
     except RuntimeError:
         return MockResponse(503, "")
 
+    request_url = urlparse(context.request.url)
+    target = f"{request_url.scheme}://{request_url.netloc}{canonical}"
     resp = MockResponse(307, "")
     resp.headers = {
-        "Location": canonical,
+        "Location": target,
         "Cache-Control": "no-store",
         "X-Robots-Tag": "noindex",
     }
@@ -185,22 +188,78 @@ async def run_matrix() -> int:
             failures += 1
             print(f"[p5-cloudflare-pages-function-check] FAIL: {label} expected {expect} got {status}", file=sys.stderr)
 
+    def expect_redirect_headers(resp: MockResponse, request_url: str) -> bool:
+        loc = resp.headers.get("Location", "")
+        parsed_req = urlparse(request_url)
+        parsed_loc = urlparse(loc)
+        if resp.status != 307:
+            return False
+        if not loc:
+            return False
+        if parsed_loc.scheme != "https":
+            return False
+        if parsed_loc.netloc != parsed_req.netloc:
+            return False
+        if parsed_loc.path != "/wiki/post/ogre-mage/":
+            return False
+        if parsed_loc.query or parsed_loc.fragment:
+            return False
+        if "no-store" not in resp.headers.get("Cache-Control", ""):
+            return False
+        if "noindex" not in resp.headers.get("X-Robots-Tag", ""):
+            return False
+        return True
+
     await check("no query pass-through", "https://x/wiki/post/", "GET", 200, lambda _r, c: c.next_called)
-    await check("known slug redirect", "https://x/wiki/post/?slug=ogre-mage", "GET", 307, lambda r, _c: r.headers.get("Location") == "/wiki/post/ogre-mage/")
-    await check("redirect path-only", "https://x/wiki/post/?slug=ogre-mage", "GET", 307, lambda r, _c: not str(r.headers.get("Location", "")).startswith("http"))
-    await check("unknown slug", "https://x/wiki/post/?slug=does-not-exist-99999", "GET", 404)
-    await check("invalid uppercase", "https://x/wiki/post/?slug=OGRE-MAGE", "GET", 400)
-    await check("extra param", "https://x/wiki/post/?slug=ogre-mage&utm=1", "GET", 404)
-    await check("double slug", "https://x/wiki/post/?slug=a&slug=b", "GET", 404)
-    await check("open redirect attempt", "https://x/wiki/post/?slug=javascript:alert(1)", "GET", 400)
-    await check("POST blocked", "https://x/wiki/post/?slug=ogre-mage", "POST", 405)
-    await check("HEAD redirect", "https://x/wiki/post/?slug=ogre-mage", "HEAD", 307)
-    await check("HEAD no body on 404", "https://x/wiki/post/?slug=nope-999", "HEAD", 404, lambda r, _c: r._body in ("", None))
+    await check(
+        "known slug redirect GET",
+        "https://x/wiki/post/?slug=ogre-mage",
+        "GET",
+        307,
+        lambda r, _c: expect_redirect_headers(r, "https://x/wiki/post/?slug=ogre-mage"),
+    )
+    await check(
+        "known slug redirect HEAD",
+        "https://x/wiki/post/?slug=ogre-mage",
+        "HEAD",
+        307,
+        lambda r, _c: expect_redirect_headers(r, "https://x/wiki/post/?slug=ogre-mage") and r._body in ("", None),
+    )
+    await check(
+        "preview host absolute Location",
+        "https://example-preview.lnf-boundlore.pages.dev/wiki/post/?slug=ogre-mage",
+        "GET",
+        307,
+        lambda r, _c: r.headers.get("Location")
+        == "https://example-preview.lnf-boundlore.pages.dev/wiki/post/ogre-mage/",
+    )
+    await check(
+        "handler parity trailing slash",
+        "https://x/wiki/post/?slug=ogre-mage",
+        "GET",
+        307,
+        lambda r, _c: expect_redirect_headers(r, "https://x/wiki/post/?slug=ogre-mage"),
+    )
+    await check("unknown slug", "https://x/wiki/post/?slug=does-not-exist-99999", "GET", 404, lambda r, _c: not r.headers.get("Location"))
+    await check("invalid uppercase", "https://x/wiki/post/?slug=OGRE-MAGE", "GET", 400, lambda r, _c: not r.headers.get("Location"))
+    await check("extra param", "https://x/wiki/post/?slug=ogre-mage&utm=1", "GET", 404, lambda r, _c: not r.headers.get("Location"))
+    await check("double slug", "https://x/wiki/post/?slug=a&slug=b", "GET", 404, lambda r, _c: not r.headers.get("Location"))
+    await check("open redirect attempt", "https://x/wiki/post/?slug=javascript:alert(1)", "GET", 400, lambda r, _c: not r.headers.get("Location"))
+    await check(
+        "open redirect next param",
+        "https://x/wiki/post/?slug=ogre-mage&next=https://example.com",
+        "GET",
+        404,
+        lambda r, _c: not r.headers.get("Location"),
+    )
+    await check("POST blocked", "https://x/wiki/post/?slug=ogre-mage", "POST", 405, lambda r, _c: not r.headers.get("Location"))
+    await check("HEAD no body on 404", "https://x/wiki/post/?slug=nope-999", "HEAD", 404, lambda r, _c: r._body in ("", None) and not r.headers.get("Location"))
     await check(
         "asset probe failure",
         "https://x/wiki/post/?slug=ogre-mage",
         "GET",
         503,
+        lambda r, _c: not r.headers.get("Location"),
         assets_override=MockAssets(set(), fail=True),
     )
 
@@ -208,8 +267,11 @@ async def run_matrix() -> int:
     if "?" in loc or "#" in loc or loc.startswith("//"):
         failures += 1
         print("[p5-cloudflare-pages-function-check] FAIL: Location contains query/fragment", file=sys.stderr)
+    elif not loc.startswith("https://"):
+        failures += 1
+        print("[p5-cloudflare-pages-function-check] FAIL: Location is not absolute HTTPS", file=sys.stderr)
     else:
-        print("[p5-cloudflare-pages-function-check] PASS: Location is safe path-only")
+        print("[p5-cloudflare-pages-function-check] PASS: Location is safe absolute HTTPS URL")
 
     return failures
 
@@ -229,10 +291,20 @@ def static_checks() -> int:
         "noindex",
         "405",
         "503",
+        "new URL(canonicalPath",
     ):
         if needle not in text:
             failures += 1
             print(f"[p5-cloudflare-pages-function-check] FAIL: function missing {needle}", file=sys.stderr)
+    for forbidden in (
+        "boundlore.com",
+        "www.boundlore.com",
+        "lnf-boundlore.pages.dev",
+        "inf-boundlore.pages.dev",
+    ):
+        if forbidden in text:
+            failures += 1
+            print(f"[p5-cloudflare-pages-function-check] FAIL: hardcoded host {forbidden}", file=sys.stderr)
     if "supabase" in text.lower() or "fetch(" in text.replace("assets.fetch", ""):
         if re.search(r"\bfetch\s*\(", text) and "assets.fetch" not in text:
             failures += 1

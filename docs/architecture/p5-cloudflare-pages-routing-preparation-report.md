@@ -230,7 +230,7 @@ All prior gates' checks **PASS** (2026-07-14):
 | `boundlore.com` | `/` | **200** | Server: cloudflare |
 | `boundlore.com` | `/wiki/post/?slug=ogre-mage` | **200** | No redirect (old deploy — CSR shell) |
 | `boundlore.com` | `/wiki/post/does-not-exist-99999/` | **404** | Cache-Control: no-store |
-| `inf-boundlore.pages.dev` | `/` | **UNREACHABLE** from gate machine | Empty/c timeout response |
+| `lnf-boundlore.pages.dev` | `/` | **UNREACHABLE** from gate machine (P5-E.9G.3) | Empty/c timeout response |
 
 No `X-Robots-Tag` observed on sampled responses. Entity pages retain `noindex` meta locally.
 
@@ -256,7 +256,7 @@ Cloudflare recommends `exit 0` for static projects with Functions when build com
 
 1. Dedicated **non-main** branch (e.g. `preview/p5-e9g3-ssg-routes`)
 2. **Never** push to `main`
-3. Preview URL: `*.inf-boundlore.pages.dev` only
+3. Preview URL: `*.lnf-boundlore.pages.dev` only (belegter Hostsuffix; nicht `*.inf-boundlore.pages.dev`)
 4. **No** custom domain mapping for preview branch
 5. Verify `X-Robots-Tag: noindex` on preview
 6. Entity `noindex` meta preserved
@@ -297,7 +297,7 @@ Before any preview push, manually confirm:
 1. **JavaScript runtime test** — `node --check` + mock in V8 or Wrangler local dev
 2. **Cloudflare Functions build support** — verify empty build command works with `functions/`
 3. **Preview branch push authorization** — separate gate, non-main only
-4. **Remote proof** on `*.inf-boundlore.pages.dev` after preview deploy
+4. **Remote proof** on `*.lnf-boundlore.pages.dev` after preview deploy
 5. **Case sensitivity** on Linux Workers runtime
 6. **CDN cache** behavior for 307/404 from Function
 
@@ -341,7 +341,7 @@ py -3 qa/local-ssg-route-preview.py --test
 curl.exe -sI -X GET https://boundlore.com/
 curl.exe -sI -X GET https://boundlore.com/wiki/post/?slug=ogre-mage
 curl.exe -sI -X GET https://boundlore.com/wiki/post/does-not-exist-99999/
-curl.exe -sI -X GET https://inf-boundlore.pages.dev/   # unreachable/empty
+curl.exe -sI -X GET https://lnf-boundlore.pages.dev/   # unreachable/empty (P5-E.9G.3 baseline)
 ```
 
 ---
