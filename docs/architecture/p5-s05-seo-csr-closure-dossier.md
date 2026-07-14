@@ -317,11 +317,11 @@ Alle 6 Fixture-SSG-Seiten enthalten statisch (ohne JS):
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
+**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.6 frei — Real-Content Entity SSG Apply / Export auf Basis der Hybrid-Source-Decision (wiki_entities + posts), privileged read-only Export, kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
+> „Ja, ich gebe P5-E.9F.7 frei — Real-Content Entity SEO Evidence Re-run, crawl/static checks auf exportierte echte Entity-Seiten, kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
 
 ---
 
@@ -341,4 +341,22 @@ Alle 6 Fixture-SSG-Seiten enthalten statisch (ohne JS):
 
 ---
 
-*Dokumentversion: P5-E.9F.4 + P5-E.9F.5 PASS. S-05 PARTIAL. Launch NO-GO.*
+## P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
+
+**Gate:** P5-E.9F.6. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Real-content SSG pages | **5** entities exported |
+| BLMETA strip / sanitizer | **PASS** |
+| Fixture quarantine | **9** pages |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** (unverändert) |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
+
+**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+
+---
+
+*Dokumentversion: P5-E.9F.4 + P5-E.9F.5 + P5-E.9F.6 PASS. S-05 PARTIAL. Launch NO-GO.*

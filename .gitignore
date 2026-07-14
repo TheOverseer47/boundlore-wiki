@@ -9,3 +9,7 @@
 
 # Local staging backups (P5-STAGING.3) — never commit dumps
 backups/
+
+# P5-E.9F.6 raw legacy export (contains BLMETA) — never commit
+qa/fixtures/.real-content-export-raw.json
+qa/fixtures/real-content-export/

@@ -242,7 +242,15 @@ Kein Crash. Statischer SEO-Kerninhalt im HTML vorhanden.
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
+**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+
+---
+
+## P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
+
+**Gate:** P5-E.9F.6. **PASS**. Five real-content entity SSG pages; sanitizer/BLMETA strip PASS.
+
+**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
 
 ---
 

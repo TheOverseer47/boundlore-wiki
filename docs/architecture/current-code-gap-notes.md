@@ -3486,6 +3486,32 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 184. P5-E.9F.6 — Real-Content Entity SSG Export (PASS)
+
+**Milestone:** P5-E.9F.6 (Real-Content Entity SSG Apply / Export). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| HEAD before gate `19e3663` | **PASS** |
+| Target ref `ohkoojpzmptdfyowdgog` | **PASS** |
+| Read-only export | **PASS** — 5 entities |
+| Sanitized export JSON | **PASS** |
+| BLMETA strip | **PASS** |
+| Real entity pages | **PASS** — 5 slugs |
+| Fixture quarantine | **PASS** — 9 pages |
+| QA check | **PASS** |
+| Local HTTP crawl | **PASS** |
+| No DB write / no runtime switch | **PASS** |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.6 | **PASS** |
+
+**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
+
+**Next:** P5-E.9F.7 Real-Content Entity SEO Evidence Re-run. No push/deploy/launch.
+
+---
+
 ## 183. P5-E.9F.5 — Real-Content Entity SEO Source Inventory (PASS)
 
 **Milestone:** P5-E.9F.5 (Read-only Legacy Inventory + Source Decision). **PASS**.

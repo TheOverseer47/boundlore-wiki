@@ -383,7 +383,26 @@ Für **Unlock oder Public Launch mit Uploads:** Storage DB Closure **zwingend** 
 
 ~~**P5-E.9F.5**~~ **PASS** — Real-Content Entity SEO Source Inventory
 
-**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
+~~**P5-E.9F.6**~~ **PASS** — Real-Content Entity SSG Export
+
+**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+
+---
+
+## 23. P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
+
+**Gate:** P5-E.9F.6. **PASS**.
+
+| Item | Result |
+|------|--------|
+| Real-content pages | **5** |
+| BLMETA strip | **PASS** |
+| Fixture quarantine | **9** pages |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Public Launch | **NO-GO** |
+| P5-E.9F.6 | **PASS** |
+
+**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
 
 ---
 

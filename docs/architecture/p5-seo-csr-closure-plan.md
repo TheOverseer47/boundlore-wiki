@@ -429,7 +429,25 @@ Für eine **öffentliche, aber locked/read-only** Site — **ohne** Entity-Detai
 
 ~~**P5-E.9F.5**~~ **PASS** — Real-Content Entity SEO Source Inventory (**HYBRID_WIKI_ENTITIES_PLUS_POSTS**)
 
-**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
+~~**P5-E.9F.6**~~ **PASS** — Real-Content Entity SSG Export (**5 pages**)
+
+**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+
+---
+
+## P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
+
+**Gate:** P5-E.9F.6. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Read-only export | **5 entities** from `ohkoojpzmptdfyowdgog` |
+| BLMETA strip | **PASS** |
+| Fixture quarantine | **9 pages** → `qa/fixtures/ssg-entity-pages/` |
+| S-05 Fable-5 Launch Blocker | **OPEN_BLOCKING_REAL_CONTENT_RUNTIME** |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
 
 ---
 

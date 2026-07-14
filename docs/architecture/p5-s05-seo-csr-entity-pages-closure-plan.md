@@ -309,7 +309,15 @@ S-05 darf erst **CLOSED** werden, wenn **alle** Kriterien erfüllt sind:
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
+**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
+
+---
+
+## P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
+
+**Gate:** P5-E.9F.6. **PASS**. Five real-content entity pages; fixture quarantine; BLMETA strip PASS. S-05 remains **OPEN_BLOCKING_REAL_CONTENT_RUNTIME**.
+
+**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
 
 ---
 

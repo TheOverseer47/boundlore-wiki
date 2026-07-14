@@ -2668,6 +2668,48 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 ---
 
+## P5-E.9F.6 Real-Content Entity SSG Export
+
+**Milestone:** P5-E.9F.6 (Real-Content Entity SSG Apply / Export). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Target ref `ohkoojpzmptdfyowdgog` verified | verify | yes | `[x]` |
+| Read-only guard documented | verify | yes | `[x]` |
+| Hybrid source decision used | verify | HYBRID_WIKI_ENTITIES_PLUS_POSTS | `[x]` |
+| Read-only export completed | verify | 5 entities | `[x]` |
+| No DB write | scope | none | `[x]` |
+| Sanitized export produced | verify | yes | `[x]` |
+| BLMETA stripped | verify | yes | `[x]` |
+| Real entity pages generated | verify | 5 pages | `[x]` |
+| Fixture pages removed/quarantined from production-like path | verify | 9 quarantined | `[x]` |
+| Metadata present | verify | yes | `[x]` |
+| Canonical uses entity slug | verify | yes | `[x]` |
+| OG/Twitter present | verify | yes | `[x]` |
+| Static body present | verify | yes | `[x]` |
+| No CSR-only core | verify | yes | `[x]` |
+| Sitemap artifact generated | verify | yes | `[x]` |
+| Root sitemap decision documented | verify | unchanged | `[x]` |
+| Not-found/fail-closed present | verify | yes | `[x]` |
+| QA check PASS | verify | yes | `[x]` |
+| Local HTTP crawl PASS | verify | yes | `[x]` |
+| No BLMETA | verify | yes | `[x]` |
+| No search_text/search_vector | verify | yes | `[x]` |
+| No PII | verify | yes | `[x]` |
+| No secrets | verify | yes | `[x]` |
+| No runtime switch | scope | none | `[x]` |
+| No Push/Deploy/Launch | scope | none | `[x]` |
+| S-05 remains open until 9F.7/9F.8 | status | OPEN_BLOCKING_REAL_CONTENT_RUNTIME | `[x]` |
+| S-06 remains CLOSED_SEARCH_EVIDENCE | status | CLOSED_SEARCH_EVIDENCE | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9F.6 | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
+
+**Next:** P5-E.9F.7 Real-Content Entity SEO Evidence Re-run. No push/deploy/launch.
+
+---
+
 ## P5-E.9F.5 Real Content Entity SEO Source Inventory (PASS)
 
 **Milestone:** P5-E.9F.5 (Real-Content Entity SEO Source Inventory). **PASS**.

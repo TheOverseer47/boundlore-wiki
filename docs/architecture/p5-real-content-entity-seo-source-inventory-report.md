@@ -337,6 +337,8 @@ P5-E.9F.4 entschied **Option B**: Fixture SSG/SEO technisch geschlossen (`CLOSED
 | Item | Status |
 |------|--------|
 | P5-E.9F.5 | **PASS** |
+| P5-E.9F.6 | **PASS** |
+| Real-Content Entity SSG Export | **PASS** — 5 pages |
 | Real-Content Entity Source Decision | **HYBRID_WIKI_ENTITIES_PLUS_POSTS** |
 | Entity SEO Technical Evidence | **CLOSED_TECHNICAL_FIXTURE** |
 | S-05 SEO/CSR | **PARTIAL_TECHNICAL_EVIDENCE** |
@@ -347,12 +349,28 @@ P5-E.9F.4 entschied **Option B**: Fixture SSG/SEO technisch geschlossen (`CLOSED
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
 
-**Empfohlener nächster Gate:** **P5-E.9F.6** — Real-Content Entity SSG Apply / Export
+**Empfohlener nächster Gate:** **P5-E.9F.7** — Real-Content Entity SEO Evidence Re-run
 
 **Manuelle Nutzerfreigabe nötig:** **Ja**
 
-> „Ja, ich gebe P5-E.9F.6 frei — Real-Content Entity SSG Apply / Export auf Basis der Hybrid-Source-Decision (wiki_entities + posts), privileged read-only Export, kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
+> „Ja, ich gebe P5-E.9F.7 frei — Real-Content Entity SEO Evidence Re-run, crawl/static checks auf exportierte echte Entity-Seiten, kein Launch, kein produktiver Runtime-Switch, kein Push, kein Deploy.“
 
 ---
 
-*Dokumentversion: P5-E.9F.5 PASS. Read-only Legacy Inventory. Kein Write. Launch NO-GO.*
+## P5-E.9F.6 Follow-up (PASS — Real-Content Entity SSG Export)
+
+**Gate:** P5-E.9F.6. **PASS**.
+
+| Item | Ergebnis |
+|------|----------|
+| Real-content pages | **5** — `wiki/post/<entity-slug>/` |
+| Sanitized export | `qa/fixtures/real-content-entity-ssg-export.json` |
+| Fixture quarantine | **9** fixture/prototype pages moved |
+| S-05 | **PARTIAL** — open until 9F.7/9F.8 |
+| Public Launch | **NO-GO** |
+
+**Report:** `docs/architecture/p5-real-content-entity-ssg-export-report.md`
+
+---
+
+*Dokumentversion: P5-E.9F.6 PASS. Read-only export + local SSG. Kein Write. Launch NO-GO.*
