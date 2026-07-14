@@ -2646,7 +2646,46 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-search-db-fts-staging-apply-report.md`
 
-**Next:** P5-E.9E.4 Re-run (mit persistentem Corpus). No push/deploy/launch.
+**Next:** P5-E.9E.4J (read-only). No push/deploy/launch.
+
+---
+
+## P5-E.9E.4J — Persistent Staging Search Re-run (PASS)
+
+**Milestone:** P5-E.9E.4J (read-only). **PASS**.
+
+| Test | Target | Expected | Result |
+|------|--------|----------|--------|
+| Target ref `jzzgoiwfbuwiiyvwgwri` | staging | verified | `[x]` |
+| Legacy not active | staging | not legacy | `[x]` |
+| Production not used | staging | not production | `[x]` |
+| No inserts | scope | none | `[x]` |
+| No rebuild | scope | none | `[x]` |
+| No cleanup | scope | none | `[x]` |
+| No SQL apply | scope | none | `[x]` |
+| No DB write | scope | none | `[x]` |
+| RPC-first client verified | runtime | RPC | `[x]` |
+| Persistent corpus query matrix passed | runtime | 27/27 | `[x]` |
+| monster/creature/beast/salamander tested | runtime | Ember Salamander | `[x]` |
+| artifact/charm tested | runtime | Volcanic Heat Charm | `[x]` |
+| basalt/volcanic tested | runtime | Cinder Basalt Flats / Volcanic Heat Charm | `[x]` |
+| resource/crystal tested | runtime | Molten Ember Shard / Skyglass Crystal | `[x]` |
+| guide/guild tested | runtime | Ember Wardens / Guild of Quiet Cartographers | `[x]` |
+| unsafe query tested | runtime | 0 hits | `[x]` |
+| no BLMETA exposed | runtime | absent | `[x]` |
+| no search_text/search_vector exposed | runtime | absent | `[x]` |
+| no marker visible in UI | runtime | absent | `[x]` |
+| no Profile-PII exposed | runtime | absent | `[x]` |
+| no Storage/Push/Deploy/Launch | scope | none | `[x]` |
+| Persistent Staging Search Re-run | status | PARTIAL (MARKER_SEARCHABLE_RISK) | `[x]` |
+| Search DB/FTS Runtime Evidence | status | STAGING_PASS | `[x]` |
+| S-06 remains OPEN_BLOCKING | status | OPEN_BLOCKING | `[x]` |
+| Public Launch remains NO-GO | status | NO-GO | `[x]` |
+| P5-E.9E.4J | gate | PASS | **PASS** |
+
+**Report:** `docs/architecture/p5-persistent-staging-search-rerun-report.md`
+
+**Next:** Production Content Migration. No push/deploy/launch.
 
 ---
 
@@ -2685,7 +2724,7 @@ Executable checklist for P0/P1 content architecture milestones. Pattern follows 
 
 **Report:** `docs/architecture/p5-staging-persistent-canonical-corpus-seed-report.md`
 
-**Next:** P5-E.9E.4 Re-run oder Production Content Migration. No push/deploy/launch.
+**Next:** P5-E.9E.4J erledigt. No push/deploy/launch.
 
 ---
 

@@ -441,7 +441,19 @@ S-06 wird **CLOSED** erst nach: **9E.1** (Fixture) + **9E.2** (Client Hardening)
 
 ---
 
-**Empfohlener nächster Gate:** **P5-E.9E.4 Re-run** (mit persistentem Corpus) oder Production Content Migration
+**Empfohlener nächster Gate:** Production Content Migration oder Marker-Feld-Follow-up
+
+---
+
+## P5-E.9E.4J — Umsetzungsnachweis (PASS — Read-only Re-run)
+
+| Item | Ergebnis |
+|------|----------|
+| Report | `p5-persistent-staging-search-rerun-report.md` |
+| Persistent Staging Search Re-run | **PARTIAL** (MARKER_SEARCHABLE_RISK) |
+| Query-Matrix | **27/27 PASS** |
+| Search DB/FTS Runtime Evidence | **STAGING_PASS** |
+| P5-E.9E.4J | **PASS** |
 
 ---
 

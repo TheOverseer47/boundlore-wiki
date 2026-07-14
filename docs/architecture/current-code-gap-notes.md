@@ -3478,6 +3478,21 @@ The future Draft Inspector / Preview must **NOT**:
 
 ---
 
+## 165. P5-E.9E.4J — Persistent Staging Search Re-run (PASS)
+
+**Milestone:** P5-E.9E.4J (read-only). **PASS**.
+
+| Check | Result |
+|-------|--------|
+| Persistent Staging Search Re-run | **PARTIAL** (MARKER_SEARCHABLE_RISK) |
+| Search DB/FTS Runtime Evidence | **STAGING_PASS** |
+| Query-Matrix | **27/27 PASS** |
+| P5-E.9E.4J | **PASS** |
+
+**Report:** `docs/architecture/p5-persistent-staging-search-rerun-report.md`
+
+---
+
 ## 164. P5-E.9E.4I — Staging Persistent Canonical Corpus Seed (PASS)
 
 **Milestone:** P5-E.9E.4I. **PASS**.

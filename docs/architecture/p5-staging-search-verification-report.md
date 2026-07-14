@@ -23,17 +23,16 @@
 | **P5-E.9E.4I** | **PASS** — Persistent Canonical Corpus Seed |
 | **RPC Corpus Verification** | **RPC_CORPUS_VERIFIED_CLEANED** (4G) |
 | **Persistent Canonical Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 posts) |
-| **Search DB/FTS Runtime Evidence** | **PASS** (4I persistent) |
-| **Search Runtime Evidence** | **PASS** (Client, 9E.4E + 4I) |
-| **Search DB/FTS Evidence** | **PASS** (12 search_documents) |
-| **Staging Ref in Client Runtime** | **VERIFIZIERT** (`STAGING_REF_VERIFIED`) |
-| **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 98/98 + 47/47) |
-| **Wiki Search Runtime Matrix** | **AUSGEFÜHRT** (14 Queries) |
+| **P5-E.9E.4J** | **PASS** — Persistent Staging Search Re-run |
+| **Persistent Staging Search Re-run** | **PARTIAL** (MARKER_SEARCHABLE_RISK) |
+| **Search DB/FTS Runtime Evidence** | **STAGING_PASS** (4J) |
+| **Lokale Fixtures** | **PASS** (21/21 + 92/92 + 48/48 + 48/48) |
+| **Wiki Search Runtime Matrix** | **AUSGEFÜHRT** (27 Queries, 4J) |
 | **S-06 Search Recall** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
-**Kernaussage:** **P5-E.9E.4I:** 12 kontrollierte published Canonicals persistent auf Staging, Rebuild → 12 `search_documents`, RPC-first Query-Matrix **21/21 PASS**. Search Runtime Evidence: **PASS**. Kein Cleanup. S-06 **OPEN_BLOCKING** (Production-Pfad offen).
+**Kernaussage:** **P5-E.9E.4J:** Read-only Re-run gegen persistenten Corpus — Query-Matrix **27/27 PASS**. Fixtures PASS. **MARKER_SEARCHABLE_RISK** dokumentiert. S-06 **OPEN_BLOCKING** (Staging **STAGING_PASS**).
 
 ---
 

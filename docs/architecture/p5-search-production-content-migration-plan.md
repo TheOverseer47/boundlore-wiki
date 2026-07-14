@@ -16,8 +16,9 @@
 | **P5-E.9E.4I** | **PASS** — Staging Persistent Canonical Corpus Seed |
 | **Search technisch bewiesen** | **Ja** (4G + 4I persistent) |
 | **Persistenter Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** (12 Canonicals) |
-| **Empfohlener nächster Gate** | **P5-E.9E.4 Re-run** oder Production Content Migration |
-| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging Recall PASS; Production offen) |
+| **P5-E.9E.4J** | **PASS** — Persistent Staging Search Re-run (read-only) |
+| **Empfohlener nächster Gate** | Production Content Migration oder Marker-Feld-Follow-up |
+| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_PASS**; Production offen) |
 | **S-05 SEO/CSR** | **OPEN_BLOCKING** |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |

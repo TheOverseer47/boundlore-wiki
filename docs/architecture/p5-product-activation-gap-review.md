@@ -504,6 +504,21 @@ Storage DB-Closure bleibt **DEFERRED**, ist für **Product Activation im locked 
 
 ---
 
+## 45. P5-E.9E.4J Follow-up (PASS — Persistent Staging Search Re-run)
+
+**Gate:** P5-E.9E.4J. **PASS** (read-only).
+
+| Item | Ergebnis |
+|------|----------|
+| Persistent Staging Search Re-run | **PARTIAL** (MARKER_SEARCHABLE_RISK) |
+| Search DB/FTS Runtime Evidence | **STAGING_PASS** |
+| Query-Matrix | **27/27 PASS** |
+| P5-E.9E.4J | **PASS** |
+
+**Report:** `docs/architecture/p5-persistent-staging-search-rerun-report.md`
+
+---
+
 ## 44. P5-E.9E.4I Follow-up (PASS — Persistent Canonical Corpus Seed)
 
 **Gate:** P5-E.9E.4I. **PASS**.

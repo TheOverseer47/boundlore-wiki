@@ -15,8 +15,8 @@
 | **P5-E.9E.4I** | **PASS** |
 | **Persistent Canonical Corpus** | **PERSISTENT_CANONICAL_SEED_PASS** |
 | **Search DB/FTS Evidence** | **PASS** (12 persistente Docs) |
-| **Search DB/FTS Runtime Evidence** | **PASS** |
-| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging PASS; Production-Pfad offen) |
+| **Search DB/FTS Runtime Evidence** | **STAGING_PASS** (4J Re-run) |
+| **S-06 Search Recall** | **OPEN_BLOCKING** (Staging **STAGING_PASS**; Production offen) |
 | **Product Activation** | **FAIL** |
 | **Public Launch** | **NO-GO** |
 
@@ -251,6 +251,10 @@
 | Production Closure | **NOT CLOSED** |
 | Product Activation | **FAIL** |
 | Public Launch | **NO-GO** |
+
+---
+
+**Follow-up P5-E.9E.4J:** Read-only Re-run **PASS** — Query-Matrix 27/27. **MARKER_SEARCHABLE_RISK** (Marker RPC-indexiert, nicht in UI). Report: `p5-persistent-staging-search-rerun-report.md`.
 
 ---
 
