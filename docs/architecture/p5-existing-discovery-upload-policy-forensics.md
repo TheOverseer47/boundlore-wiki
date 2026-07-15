@@ -6,7 +6,7 @@
 
 **Production target:** `ohkoojpzmptdfyowdgog` (`TheOverseer47's Project`)
 
-**Decision:** `CONDITIONALLY_SAFE_TO_AUTHOR_EXISTING_POLICY_TRANSFORMATION`
+**Decision:** `SAFE_TO_AUTHOR_EXISTING_POLICY_RELEASE_LOCK_TRANSFORMATION`
 
 ## 1. Executive result
 
@@ -30,12 +30,11 @@ Read-only production catalog evidence proves:
 - the frontend has one discovery-bucket upload implementation, and every path
   it creates begins with the current session user's UUID.
 
-The database and application evidence therefore supports authoring the exact
-existing-policy transformation. The decision remains conditional because the
-Supabase Dashboard's **existing-policy edit** flow has not yet been visually
-proven to expose the complete current expression and a lossless final SQL
-review before save. R3 proved a SQL preview for new policies, but not this
-existing-policy edit path.
+The database and application evidence supports authoring the exact
+existing-policy transformation. Subsequent user-provided no-save Dashboard
+evidence proved that the production project's existing-policy editor exposes
+the complete current expression and generates a lossless `ALTER POLICY` review
+before a separate Save action.
 
 No SQL, policy, function, bucket, storage object, application file, remote Git
 ref, deployment, runtime configuration, or release-gate state was changed in
@@ -446,39 +445,25 @@ combined with the complete existing predicate using `AND`.
   earlier restrictive-policy approach;
 - zero save actions occurred and production remained unchanged.
 
-### Not yet proven
+### Proven by no-save existing-policy review
 
-- `discovery_upload_authenticated` is selectable for edit rather than only
-  delete/recreate;
-- the edit form displays the complete current `WITH CHECK` expression without
-  truncation;
-- policy name, behavior, command, and role remain visible and fixed/preservable;
-- a complete final SQL preview is available before save;
-- UI normalization preserves the nested `AND` grouping and UID/path predicate;
-- the UI changes exactly one existing policy in exactly one save action.
+User-provided Dashboard evidence and URL confirmation proved:
 
-The official documentation reviewed for E.1 confirms RLS and permissive-policy
-semantics but does not provide sufficient current evidence for this exact
-hosted Dashboard edit workflow. An authenticated Dashboard browser inspection
-was intentionally not performed by this agent.
+- project URL targets exactly `ohkoojpzmptdfyowdgog`;
+- `discovery_upload_authenticated` is directly editable;
+- the editor displays the full catalog-normalized current `WITH CHECK`;
+- target role remains `authenticated`;
+- the helper conjunction is accepted without losing bucket/UID grouping;
+- `Review` is separate from `Save policy`;
+- generated SQL contains exactly one `ALTER POLICY` on
+  `storage.objects.discovery_upload_authenticated`;
+- generated SQL retains the complete original bucket/UID predicate and adds
+  exactly `public.bl_can_create_user_content(auth.uid())` with `AND`;
+- generated SQL is enclosed by `BEGIN` and `COMMIT`;
+- no second policy, role change, owner change, grant, function change, bucket
+  change, or object operation is present.
 
-### Required no-save UI preflight for the next gate
-
-Before authoring can be promoted to an apply worksheet, a user-side screenshot
-or transcription must prove all of the following without clicking Save:
-
-1. project ref is `ohkoojpzmptdfyowdgog`;
-2. selected policy is exactly `discovery_upload_authenticated`;
-3. behavior is `PERMISSIVE`;
-4. command is `INSERT`;
-5. role is `authenticated`;
-6. the complete existing bucket and UID/path expression is visible;
-7. the editor accepts the additional helper conjunction;
-8. the final review SQL changes only this policy and preserves all invariants.
-
-If the UI hides/truncates the original expression, rebuilds the policy with a
-different role/operation, loses grouping, touches another policy, or lacks a
-complete review, stop with `UNSAFE_TO_EXTEND_EXISTING_POLICY` and do not save.
+No Save action occurred while collecting this evidence.
 
 ## 14. Repository regression consideration for E.2
 
@@ -493,26 +478,21 @@ not broaden the one-policy production apply scope.
 
 ## 15. Decision
 
-### `CONDITIONALLY_SAFE_TO_AUTHOR_EXISTING_POLICY_TRANSFORMATION`
+### `SAFE_TO_AUTHOR_EXISTING_POLICY_RELEASE_LOCK_TRANSFORMATION`
 
 Database semantics, current production catalog state, helper fail-closed
 behavior, parallel-policy inventory, bucket isolation, and all frontend upload
 paths support the transformation.
 
-The only remaining condition is no-save evidence that the hosted Supabase
-Dashboard can edit the existing policy with complete, lossless review. Until
-that evidence exists:
-
-- no SQL transformation may be applied;
-- no Dashboard save may occur;
-- no policy may be deleted/recreated;
-- no runtime upload test may occur;
-- no release unlock may occur.
+The hosted Supabase Dashboard existing-policy editor and its complete lossless
+review are proven. Authoring is safe and has been completed locally. This PASS
+does not authorize a Production Save, runtime upload test, policy
+delete/recreate, or release unlock.
 
 ## 16. Next gate boundary
 
-If the no-save Dashboard preflight is successful, the next permitted gate is
-P5-E.9G.8E.2, local transformation authoring only. It may prepare:
+The no-save Dashboard preflight succeeded. P5-E.9G.8E.2 local transformation
+authoring may prepare:
 
 - exact before/after policy text;
 - one-policy transformation SQL or exact Dashboard worksheet;

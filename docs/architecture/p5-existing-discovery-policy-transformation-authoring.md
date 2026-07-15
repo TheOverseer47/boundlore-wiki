@@ -192,6 +192,25 @@ Hard stop before Save if:
 - SQL review is incomplete;
 - any other object is included.
 
+### Recorded no-save review evidence
+
+User-provided Dashboard evidence confirms the editor was opened under:
+
+`https://supabase.com/dashboard/project/ohkoojpzmptdfyowdgog/storage/files/policies`
+
+The generated review contains exactly:
+
+- `BEGIN` and `COMMIT`;
+- one `ALTER POLICY "discovery_upload_authenticated"`;
+- table `"storage"."objects"`;
+- the complete prior bucket and UID/path predicate;
+- one additional
+  `public.bl_can_create_user_content(auth.uid())` conjunction;
+- no second policy or unrelated operation.
+
+The review presents a separate `Save policy` button. It was not clicked while
+collecting E.1/E.2 evidence.
+
 ## 9. Post-edit verification contract for E.3/E.4
 
 A separately authorized later gate must verify immediately after exactly one
