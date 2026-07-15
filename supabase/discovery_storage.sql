@@ -1,6 +1,7 @@
 -- discovery_storage.sql
 -- Creates storage bucket + RLS policies for discovery file uploads.
 -- Run in Supabase SQL Editor as an owner role.
+-- Requires public.bl_can_create_user_content(uuid) from release_gate_lock.sql.
 
 begin;
 
@@ -27,6 +28,7 @@ to authenticated
 with check (
   bucket_id = 'discovery-uploads'
   and split_part(name, '/', 1) = auth.uid()::text
+  and public.bl_can_create_user_content(auth.uid())
 );
 
 -- Public read for all discovery files.
