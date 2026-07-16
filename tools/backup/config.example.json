@@ -1,0 +1,51 @@
+{
+  "format_version": "1.0.0",
+  "comment": "EXAMPLE ONLY — no credentials, no live endpoints, no real bucket names.",
+  "defaults": {
+    "dry_run": true,
+    "synthetic": true,
+    "no_network": true,
+    "allow_external_upload": false,
+    "allow_production_read": false,
+    "allow_delete": false
+  },
+  "guards": {
+    "forbidden_project_refs": [
+      "REPLACE_WITH_STAGING_REF_NEVER_DEFAULT"
+    ],
+    "require_explicit_project_ref_for_live": true,
+    "forbid_output_inside_repository": true,
+    "require_encryption_before_upload": true,
+    "release_gate_expected_locked": true
+  },
+  "storage_bucket_allowlist": [
+    "avatars",
+    "discovery-uploads",
+    "report-screenshots"
+  ],
+  "encryption": {
+    "method": "age",
+    "recipient_public_key_placeholder": "age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "note": "Put the real age recipient outside the repo. Never store private keys here."
+  },
+  "transfer": {
+    "provider": "wasabi-s3-compatible",
+    "endpoint_placeholder": "https://s3.REGION.wasabisys.com",
+    "region_placeholder": "eu-central-2",
+    "bucket_placeholder": "YOUR_PRIVATE_BACKUP_BUCKET",
+    "prefix_placeholder": "boundlore/backups/",
+    "note": "Fill only in a protected local runtime context. Do not commit real values."
+  },
+  "database": {
+    "preferred_tool": "pg_dump",
+    "components": [
+      "roles",
+      "pre-data",
+      "data",
+      "post-data",
+      "extensions_inventory",
+      "policy_inventory",
+      "release_gate_state"
+    ]
+  }
+}

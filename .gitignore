@@ -1,2 +1,7 @@
 # Local VS Code workspace settings
 .vscode/
+
+# Python cache
+**/__pycache__/
+*.py[cod]
+
