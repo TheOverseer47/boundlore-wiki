@@ -54,10 +54,12 @@
     <p><strong>Email:</strong> <span id="profEmail"></span></p>
     <p><strong>Role:</strong> <span id="profRole"></span></p>
     <p><strong>Member since:</strong> <span id="profJoined"></span></p>
-    <label for="avatarUrlInput" style="display:block;margin-top:12px;">Avatar URL</label>
-    <input id="avatarUrlInput" class="form-input" type="url" placeholder="https://..." />
-    <button id="saveAvatarBtn" type="button" class="btn-contribute" style="margin-top:10px;">Save Avatar</button>
-    <p id="avatarSaveMsg" style="margin-top:8px;color:var(--text-muted);"></p>
+    <div id="accountAvatarPatchHost">
+      <label for="avatarUrlInput" style="display:block;margin-top:12px;">Avatar URL</label>
+      <input id="avatarUrlInput" class="form-input" type="url" placeholder="https://..." />
+      <button id="saveAvatarBtn" type="button" class="btn-contribute" style="margin-top:10px;">Save Avatar</button>
+      <p id="avatarSaveMsg" style="margin-top:8px;color:var(--text-muted);"></p>
+    </div>
   </div>
 
   <div class="form-box" style="margin-bottom:24px;">
@@ -89,7 +91,7 @@
   </div>
 
   <div class="form-box">
-    <button id="logoutBtn2" class="form-submit" style="background:#e05555;">Log Out</button>
+    <button id="logoutBtn2" type="button" class="form-submit" style="background:#e05555;">Log Out</button>
   </div>
 
 </div>
@@ -187,8 +189,9 @@ async function loadAccount() {
 
   if (saveAvatarBtn) saveAvatarBtn.setAttribute("data-bl-patch-control", "1");
   if (avatarInput) avatarInput.setAttribute("data-bl-patch-control", "1");
-  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode.bindControls) {
-    WikiPatchMode.bindControls(["#saveAvatarBtn", "#avatarUrlInput"], document.getElementById("accountContent") || document.body);
+  var avatarPatchHost = document.getElementById("accountAvatarPatchHost");
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode.bindControls && avatarPatchHost) {
+    WikiPatchMode.bindControls(["#saveAvatarBtn", "#avatarUrlInput"], avatarPatchHost);
   } else if (saveAvatarBtn) {
     saveAvatarBtn.disabled = true;
     saveAvatarBtn.setAttribute("aria-disabled", "true");

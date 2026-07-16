@@ -118,6 +118,20 @@ def main() -> None:
     delete_chunk = account_html.split("requestDeleteBtn")[1].split("renderMyPosts")[0]
     check("assertCanSubmit" not in delete_chunk, "account delete-request recovery not patch-blocked")
     check("assertCanSubmit" not in support_js, "support reports not patch-blocked")
+
+    # Account logout scope: narrow bind host + explicit button type
+    check('id="accountAvatarPatchHost"' in account_html, "account has narrow avatar patch host")
+    check(
+        'WikiPatchMode.bindControls(["#saveAvatarBtn", "#avatarUrlInput"], avatarPatchHost)' in account_html
+        or "bindControls([\"#saveAvatarBtn\", \"#avatarUrlInput\"], avatarPatchHost)" in account_html,
+        "account binds patch-mode to avatar host only",
+    )
+    check('bindControls(["#saveAvatarBtn", "#avatarUrlInput"], document.getElementById("accountContent")' not in account_html,
+          "account does not bind patch-mode to full accountContent")
+    check('id="logoutBtn2"' in account_html and 'type="button"' in account_html.split('id="logoutBtn2"')[1][:80],
+          "logoutBtn2 has explicit type=button")
+    logout_chunk = account_html.split('id="logoutBtn2"')[1].split("loadAccount")[0]
+    check("assertCanSubmit" not in logout_chunk, "logout handler has no assertCanSubmit")
     check("service_role" not in cfg.lower(), "no service_role in supabase-config")
     check("loadWikiPatchModeGuard" not in cfg, "no dynamic optional patch-mode loader")
     check("patch-mode.js" not in cfg, "supabase-config does not inject patch-mode")
