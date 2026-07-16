@@ -85,7 +85,30 @@ def main() -> None:
     check("finally" in text and "finally" in live, "cleanup finally")
     check("high_level" not in live.lower() or "upload" in live.lower(), "upload path present")
     check("Invoke-LiveProductionSnapshotSequence" in text, "live sequence invoked from runner")
+    check('DatabaseConnectionMode = "Direct"' in text or "$DatabaseConnectionMode = \"Direct\"" in text or 'DatabaseConnectionMode = "Direct"' in text, "Direct default mode")
+    check("ValidateSet(\"Direct\", \"SessionPooler\")" in text or "ValidateSet('Direct', 'SessionPooler')" in text or 'ValidateSet("Direct", "SessionPooler")' in text, "SessionPooler explicit only")
+    check("-DatabaseConnectionMode $DatabaseConnectionMode" in text, "mode passed to live sequence")
+    check("PGSSLMODE" in live and "require" in live, "live PGSSLMODE=require")
+    check("Assert-ProductionDbConnectionIdentity" in live, "connection identity assert")
+    check("Resolve-ReleaseGateFailureStopCode" in live, "gate failure classifier")
+    check("STOP_PRODUCTION_DB_CONNECTION_FAILED" in live and "STOP_PRODUCTION_DB_CONNECTION_FAILED" in stops, "connection failed stop")
+    check("STOP_RELEASE_GATE_QUERY_FAILED" in live and "STOP_RELEASE_GATE_QUERY_FAILED" in stops, "query failed stop")
+    check("STOP_RELEASE_GATE_NOT_LOCKED" in live, "gate not locked stop")
+    check(".pooler.supabase.com" in live, "pooler suffix guard")
+    check("6543" in live, "port 6543 blocked")
+    check('postgres.{0}' in live or "postgres.$ExpectedProductionRef" in live or 'postgres.{0}"' in live, "pooler user format")
+    # Gate before export: release gate block appears before custom dump file write
+    gate_idx = live.find("Release gate start")
+    dump_idx = live.find("database\\database.custom")
+    if dump_idx < 0:
+        dump_idx = live.find("database.custom")
+    if gate_idx < 0:
+        gate_idx = live.find("RELEASE_GATE_LOCKED_PASS")
+    check(gate_idx >= 0 and dump_idx >= 0 and gate_idx < dump_idx, "release gate before export")
+    check("automatic fallback" not in live.lower() and "auto-fallback" not in live.lower(), "no automatic fallback")
 
+    # First param() block may be nested; scan full runner for mode param
+    check("DatabaseConnectionMode" in text, "DatabaseConnectionMode param present")
     param = text.split("param(")[1].split(")")[0]
     for needle in ("Password", "Secret", "AccessKey", "ServiceRole", "ConnectionString"):
         check(needle not in param, f"no credential param {needle}")

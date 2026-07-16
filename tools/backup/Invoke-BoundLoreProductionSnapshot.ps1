@@ -46,7 +46,11 @@ param(
   [string]$WasabiEndpoint = "s3.eu-central-2.wasabisys.com",
   [string]$MockVeraCryptRoot = "",
   [string]$EvidencePath = "",
-  [string]$OutputDirectory = ""
+  [string]$OutputDirectory = "",
+
+  # Explicit DB path only — default Direct; SessionPooler never auto-selected.
+  [ValidateSet("Direct", "SessionPooler")]
+  [string]$DatabaseConnectionMode = "Direct"
 )
 
 Set-StrictMode -Version Latest
@@ -277,7 +281,7 @@ if ($liveIntent -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests) 
   }
   # Minimal W5-A1 arming: only after full confirmation set
   $GateAllowsLiveNetwork = $true
-  Invoke-LiveProductionSnapshotSequence -WorkspaceRoot $wsRoot -RecipientFile $ProductionRecipientFile -ArchiveRoot $archRoot -Prefix $WasabiProductionPrefix
+  Invoke-LiveProductionSnapshotSequence -WorkspaceRoot $wsRoot -RecipientFile $ProductionRecipientFile -ArchiveRoot $archRoot -Prefix $WasabiProductionPrefix -DatabaseConnectionMode $DatabaseConnectionMode
 }
 
 if (-not $NoNetwork -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests -and -not $LiveExecution) {

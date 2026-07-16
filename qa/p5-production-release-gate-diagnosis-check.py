@@ -62,7 +62,14 @@ def main() -> None:
     check("AGE-SECRET-KEY" not in text, "no age secret")
 
     check("Invoke-PgChild" in live, "live Invoke-PgChild present")
-    check("PGSSLMODE" not in live, "live path currently lacks PGSSLMODE (repair candidate)")
+    check("PGSSLMODE" in live and "require" in live, "live path enforces PGSSLMODE=require")
+    check("STOP_PRODUCTION_DB_CONNECTION_FAILED" in live, "connection failure stop separated")
+    check("STOP_RELEASE_GATE_QUERY_FAILED" in live, "query failure stop separated")
+    check("STOP_RELEASE_GATE_NOT_LOCKED" in live, "unlocked gate stop retained")
+    check("DatabaseConnectionMode" in live, "explicit connection mode in live sequence")
+    check('.pooler.supabase.com' in live, "session pooler host guard")
+    check("6543" in live, "transaction pooler port blocked")
+    check("fallback" not in live.lower() or "no automatic" in live.lower() or "never auto" in live.lower() or "SessionPooler" in live, "no silent pooler fallback wording")
 
     proc = subprocess.run(
         [

@@ -19,6 +19,7 @@ function Invoke-PgChild {
   $psi.CreateNoWindow = $true
   if ($psi.EnvironmentVariables.ContainsKey("PGPASSWORD")) { [void]$psi.EnvironmentVariables.Remove("PGPASSWORD") }
   $psi.EnvironmentVariables["PGPASSWORD"] = $Password
+  $psi.EnvironmentVariables["PGSSLMODE"] = "require"
   $psi.EnvironmentVariables["PGOPTIONS"] = "-c default_transaction_read_only=on -c lock_timeout=5s -c statement_timeout=300000"
   $quoted = foreach ($a in $Arguments) {
     if ($a -match '[\s"]') { '"' + ($a -replace '"', '\"') + '"' } else { $a }
@@ -36,15 +37,84 @@ function Invoke-PgChild {
   return [pscustomobject]@{ ExitCode = $p.ExitCode; StdOut = $stdout; StdErr = $stderr }
 }
 
+function Resolve-ReleaseGateFailureStopCode {
+  param([string]$StdErr, [int]$ExitCode)
+  if ($ExitCode -eq 0) { return "STOP_RELEASE_GATE_NOT_LOCKED" }
+  $e = ($StdErr | Out-String)
+  if ($e -match "(?i)relation .* does not exist|42P01|permission denied|42501|syntax error|column .* does not exist") {
+    return "STOP_RELEASE_GATE_QUERY_FAILED"
+  }
+  return "STOP_PRODUCTION_DB_CONNECTION_FAILED"
+}
+
+function Assert-ProductionDbConnectionIdentity {
+  param(
+    [string]$Mode,
+    [string]$PgHost,
+    [string]$PgPortIn,
+    [string]$PgDatabase,
+    [string]$PgUser
+  )
+  $hostNorm = $PgHost.Trim().ToLowerInvariant()
+  $userNorm = $PgUser.Trim()
+  $dbNorm = $PgDatabase.Trim()
+  $portNorm = $PgPortIn.Trim()
+  $forbiddenDirect = ("db.{0}.supabase.co" -f $ExpectedProductionRef)
+  $expectedPoolerUser = ("postgres.{0}" -f $ExpectedProductionRef)
+  # Fail-closed staging literal (also matched via $ForbiddenStagingRef from parent).
+  $stagingLiteral = "jzzgoiwfbuwiiyvwgwri"
+  $blob = ("{0}|{1}|{2}|{3}" -f $hostNorm, $userNorm, $dbNorm, $portNorm)
+
+  if ($blob -match $ForbiddenStagingRef -or $blob -match $stagingLiteral -or $hostNorm -match [regex]::Escape($ForbiddenStagingRef) -or $userNorm -match [regex]::Escape($ForbiddenStagingRef)) {
+    Stop-Code "STOP_STAGING_TARGET" "staging identity detected"
+  }
+  if ($hostNorm -match "://" -or $hostNorm -match "@" -or $hostNorm -match "/" -or $hostNorm -match ":") {
+    Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "DB host must be a bare hostname"
+  }
+  if ($portNorm -eq "6543") {
+    Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "transaction pooler port 6543 forbidden"
+  }
+
+  if ($Mode -eq "SessionPooler") {
+    if (-not $hostNorm.EndsWith(".pooler.supabase.com")) {
+      Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "SessionPooler host must end with .pooler.supabase.com"
+    }
+    if ($hostNorm -eq $forbiddenDirect -or $hostNorm -match "^db\..+\.supabase\.co$") {
+      Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "direct host forbidden in SessionPooler mode"
+    }
+    if ($portNorm -ne "5432") {
+      Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "SessionPooler requires port 5432"
+    }
+    if ($dbNorm -ne "postgres") {
+      Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "SessionPooler requires database postgres"
+    }
+    if ($userNorm -ne $expectedPoolerUser) {
+      Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "SessionPooler requires postgres.<production-ref> user"
+    }
+    return
+  }
+
+  # Direct (default): host must prove production ref; never silently redirect to pooler.
+  if ($hostNorm.EndsWith(".pooler.supabase.com")) {
+    Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "pooler host requires -DatabaseConnectionMode SessionPooler"
+  }
+  if ($hostNorm -notmatch [regex]::Escape($ExpectedProductionRef)) {
+    Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "DB host does not prove production ref"
+  }
+}
+
 function Invoke-LiveProductionSnapshotSequence {
   param(
     [string]$WorkspaceRoot,
     [string]$RecipientFile,
     [string]$ArchiveRoot,
-    [string]$Prefix
+    [string]$Prefix,
+    [ValidateSet("Direct", "SessionPooler")]
+    [string]$DatabaseConnectionMode = "Direct"
   )
 
   Write-Host "LIVE_SEQUENCE_START"
+  Write-Host ("DATABASE_CONNECTION_MODE=" + $DatabaseConnectionMode)
 
   # --- Interactive non-secret ---
   Write-Host "Enter Production DB host (hidden not required):"
@@ -89,14 +159,7 @@ function Invoke-LiveProductionSnapshotSequence {
   $secPg.Dispose(); $secSr.Dispose(); $secAk.Dispose(); $secSk.Dispose()
 
   try {
-    # Identity
-    $blob = ("{0}|{1}|{2}|{3}" -f $PgHost, $PgUser, $PgDatabase, $PgPortIn)
-    if ($blob -match $ForbiddenStagingRef -or $PgHost -match "jzzgoiwfbuwiiyvwgwri") {
-      Stop-Code "STOP_STAGING_TARGET" "staging identity detected"
-    }
-    if ($PgHost -notmatch [regex]::Escape($ExpectedProductionRef)) {
-      Stop-Code "STOP_PROJECT_IDENTITY_UNVERIFIED" "DB host does not prove production ref"
-    }
+    Assert-ProductionDbConnectionIdentity -Mode $DatabaseConnectionMode -PgHost $PgHost -PgPortIn $PgPortIn -PgDatabase $PgDatabase -PgUser $PgUser
 
     $psql = (Get-Command psql).Source
     $pgDump = (Get-Command pg_dump).Source
@@ -127,12 +190,15 @@ function Invoke-LiveProductionSnapshotSequence {
         (Join-Path $work "evidence")
       )) { New-Item -ItemType Directory -Force -Path $d | Out-Null }
 
-    $connArgs = @("-h", $PgHost, "-p", $PgPortIn, "-U", $PgUser, "-d", $PgDatabase)
+    $connArgs = @("-h", $PgHost.Trim(), "-p", $PgPortIn.Trim(), "-U", $PgUser.Trim(), "-d", $PgDatabase.Trim())
 
-    # Release gate start
+    # Release gate start — must pass before any export
     $gateSql = "SELECT id, contribution_locked FROM public.release_gate WHERE id = 1;"
     $gate = Invoke-PgChild -Exe $psql -Password $pgPass -Arguments ($connArgs + @("-v", "ON_ERROR_STOP=1", "-t", "-A", "-F", ",", "-c", $gateSql))
-    if ($gate.ExitCode -ne 0) { Stop-Code "STOP_RELEASE_GATE_NOT_LOCKED" "gate query failed" }
+    if ($gate.ExitCode -ne 0) {
+      $stop = Resolve-ReleaseGateFailureStopCode -StdErr $gate.StdErr -ExitCode $gate.ExitCode
+      Stop-Code $stop "release gate pre-export failed"
+    }
     $gateLine = ($gate.StdOut -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -First 1)
     if ($gateLine -notmatch '^1,t' -and $gateLine -notmatch '^1,true') {
       Stop-Code "STOP_RELEASE_GATE_NOT_LOCKED" "contribution_locked not true"
@@ -235,6 +301,10 @@ SELECT json_build_object(
     # End baseline + release gate
     $endCounts = Invoke-PgChild -Exe $psql -Password $pgPass -Arguments ($connArgs + @("-v", "ON_ERROR_STOP=1", "-t", "-A", "-c", $countSql))
     $gate2 = Invoke-PgChild -Exe $psql -Password $pgPass -Arguments ($connArgs + @("-v", "ON_ERROR_STOP=1", "-t", "-A", "-F", ",", "-c", $gateSql))
+    if ($gate2.ExitCode -ne 0) {
+      $stop2 = Resolve-ReleaseGateFailureStopCode -StdErr $gate2.StdErr -ExitCode $gate2.ExitCode
+      Stop-Code $stop2 "release gate post-export failed"
+    }
     $gateLine2 = ($gate2.StdOut -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -First 1)
     if ($gateLine2 -notmatch '^1,t' -and $gateLine2 -notmatch '^1,true') {
       Stop-Code "STOP_RELEASE_GATE_NOT_LOCKED" "gate unlocked during export"
