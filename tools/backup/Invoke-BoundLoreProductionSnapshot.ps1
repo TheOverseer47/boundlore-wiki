@@ -188,8 +188,10 @@ function Test-AllLiveGuardsPresent {
   if (-not $ConfirmLocalEncryptedArchiveCopy -and -not $ConfirmLocalArtifactPath) { $missing += "ConfirmLocalEncryptedArchiveCopy" }
   if (-not $ConfirmUserAuthorizedSnapshot) { $missing += "ConfirmUserAuthorizedSnapshot" }
   if (-not $ProductionRecipientFile) { $missing += "ProductionRecipientFile" }
-  # Unary comma forces Object[] even when empty or single-element (PS 5.1 unwrap).
-  return , @($missing)
+  # Emit guard-name strings for the pipeline. Caller normalizes with @(...).
+  # Do NOT use a unary-comma return of the whole array: that nests Object[] when
+  # the caller also wraps with @() and yields a false missing-guards stop.
+  return @($missing)
 }
 
 function Invoke-RcloneChildLocal {
@@ -244,8 +246,18 @@ if ($ConfirmProductionProjectRef -and $ConfirmProductionProjectRef -ne $Expected
 $liveIntent = $LiveExecution -or (-not $PreflightOnly) -or (-not $Synthetic) -or (-not $NoNetwork) -or $AllowProductionRead -or $AllowSupabaseStorageRead -or $AllowExternalWasabiUpload
 if ($liveIntent -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests) {
   $missing = @(Test-AllLiveGuardsPresent)
+  # Reject accidental nested Object[] from a future unary-comma regression.
+  foreach ($item in $missing) {
+    if ($item -is [System.Array] -and -not ($item -is [string])) {
+      Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" "missing guards structure invalid (nested array)"
+    }
+  }
   if ((Get-StrictCount $missing) -gt 0) {
-    Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" ("missing guards: " + ($missing -join ","))
+    $names = @($missing | ForEach-Object { [string]$_ } | Where-Object { $_ -and $_ -ne "System.Object[]" })
+    if ((Get-StrictCount $names) -eq 0) {
+      Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" "missing guards structure invalid"
+    }
+    Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" ("missing guards: " + ($names -join ", "))
   }
   try {
     $null = Test-ProductionRecipientFile $ProductionRecipientFile
