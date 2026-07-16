@@ -119,6 +119,25 @@ def main() -> None:
     check("STOP_RELEASE_GATE_NOT_LOCKED" in db or "STOP_RELEASE_GATE_NOT_LOCKED" in live, "release gate")
     check("role_passwords_included = $false" in db or "role_passwords_included = $false" in live, "no password hashes")
 
+    # Documented production schema allowlist (9) — fail-closed on unknowns
+    for schema in (
+        "public",
+        "auth",
+        "storage",
+        "extensions",
+        "graphql_public",
+        "realtime",
+        "graphql",
+        "supabase_migrations",
+        "vault",
+    ):
+        check(schema in text and schema in stops, f"schema allowlist includes {schema}")
+    check("unexpected_schema" in text, "negative unexpected_schema fixture")
+    check('"unknown schema: "' in live or "unknown schema: " in live, "live stop names unknown schema")
+    gate_schema = live.find("Schema inventory")
+    dump_custom = live.find("database.custom")
+    check(gate_schema >= 0 and dump_custom > gate_schema, "schema inventory before dump")
+
     check('GATE_ALLOWS_LIVE_NETWORK = False' in stor, "storage live disarmed")
     check('"upload": False' in stor, "no upload capability")
     check('"delete": False' in stor, "no delete capability")

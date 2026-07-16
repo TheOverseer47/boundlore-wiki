@@ -48,6 +48,9 @@ def main() -> None:
     check("jzzgoiwfbuwiiyvwgwri" in text, "staging ref blocked")
     check("STOP_STAGING_TARGET" in text, "staging stop")
     check("STOP_UNKNOWN_DATABASE_SCHEMA" in text, "unknown schema stop")
+    for schema in ("graphql", "supabase_migrations", "vault", "graphql_public"):
+        check(schema in text and schema in stops, f"documented schema {schema}")
+    check("unexpected_schema" in text, "unexpected_schema negative")
     check("STOP_UNKNOWN_STORAGE_BUCKET" in text, "unknown bucket stop")
     check("avatars" in text and "discovery-uploads" in text and "report-screenshots" in text, "bucket allowlist")
     check("trial-integration/" in text and "STOP_REMOTE_SCOPE_NOT_AUTHORIZED" in text, "trial prefix forbidden for production")

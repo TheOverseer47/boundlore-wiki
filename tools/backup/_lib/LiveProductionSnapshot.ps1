@@ -218,7 +218,7 @@ ORDER BY 1;
     foreach ($s in $schemas) {
       if ($SystemSchemas -contains $s) { continue }
       if ($SchemaAllowlist -notcontains $s) {
-        Stop-Code "STOP_UNKNOWN_DATABASE_SCHEMA" "unknown schema"
+        Stop-Code "STOP_UNKNOWN_DATABASE_SCHEMA" ("unknown schema: " + $s)
       }
     }
 

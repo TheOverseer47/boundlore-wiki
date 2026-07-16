@@ -67,7 +67,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $ExpectedProductionRef = "ohkoojpzmptdfyowdgog"
 $ForbiddenStagingRef = "jzzgoiwfbuwiiyvwgwri"
 $BucketAllowlist = @("avatars", "discovery-uploads", "report-screenshots")
-$SchemaAllowlist = @("public", "auth", "storage", "extensions", "graphql_public", "realtime")
+$SchemaAllowlist = @("public", "auth", "storage", "extensions", "graphql_public", "realtime", "graphql", "supabase_migrations", "vault")
 $SystemSchemas = @("pg_catalog", "information_schema", "pg_toast")
 $TrialPrefixForbidden = "trial-integration/"
 $VeraDrive = "V:"
@@ -333,8 +333,10 @@ if ($RunNegativeTests) {
     Remove-Item -Force $errF, $outF -EA SilentlyContinue
     if ($p.ExitCode -ne 0 -and $blob -match [regex]::Escape($c.Code)) { $neg += "PASS $($c.Code)" } else { $neg += "FAIL $($c.Code)" }
   }
-  try { Assert-SchemaInventory @("public", "evil"); $neg += "FAIL STOP_UNKNOWN_DATABASE_SCHEMA" }
-  catch { if ("$_" -match "STOP_UNKNOWN_DATABASE_SCHEMA") { $neg += "PASS STOP_UNKNOWN_DATABASE_SCHEMA" } else { $neg += "FAIL schema" } }
+  try { Assert-SchemaInventory @("public", "unexpected_schema"); $neg += "FAIL STOP_UNKNOWN_DATABASE_SCHEMA" }
+  catch { if ("$_" -match "STOP_UNKNOWN_DATABASE_SCHEMA" -and "$_" -match "unexpected_schema") { $neg += "PASS STOP_UNKNOWN_DATABASE_SCHEMA" } else { $neg += "FAIL schema" } }
+  try { Assert-SchemaInventory $SchemaAllowlist; $neg += "PASS documented-schema-allowlist" }
+  catch { $neg += "FAIL documented-schema-allowlist" }
   try { Assert-BucketInventory @("avatars", "other"); $neg += "FAIL STOP_UNKNOWN_STORAGE_BUCKET" }
   catch { if ("$_" -match "STOP_UNKNOWN_STORAGE_BUCKET") { $neg += "PASS STOP_UNKNOWN_STORAGE_BUCKET" } else { $neg += "FAIL bucket" } }
   try { Assert-VeraCryptWorkspace "D:\UnsafePlaintextWorkspace\not-allowed"; $neg += "FAIL STOP_PLAINTEXT_OR_MOUNT" }
@@ -399,7 +401,7 @@ try {
   Set-Content (Join-Path $db "roles.sql") "-- roles; role_passwords_included=false`n" -Encoding UTF8
   [IO.File]::WriteAllBytes((Join-Path $db "database.custom"), [Text.Encoding]::ASCII.GetBytes("PGDUMP_CUSTOM_SYNTH"))
   Set-Content (Join-Path $db "database-toc.txt") "TOC synth`n" -Encoding UTF8
-  '{"schemas":["public","auth","storage","extensions","graphql_public","realtime"]}' | Set-Content (Join-Path $db "schema-inventory.json") -Encoding UTF8
+  '{"schemas":["public","auth","storage","extensions","graphql_public","realtime","graphql","supabase_migrations","vault"]}' | Set-Content (Join-Path $db "schema-inventory.json") -Encoding UTF8
   '{"extensions":[{"name":"pgcrypto"}]}' | Set-Content (Join-Path $db "extensions-inventory.json") -Encoding UTF8
   '{"rls":true,"security_definer":"inventoried"}' | Set-Content (Join-Path $db "security-inventory.json") -Encoding UTF8
   '{"contribution_locked":true,"release_gate_expected_locked":true}' | Set-Content (Join-Path $db "validation-baseline.json") -Encoding UTF8

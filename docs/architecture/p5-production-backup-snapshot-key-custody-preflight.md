@@ -41,7 +41,10 @@ Planned tools: `pg_dumpall --roles-only --no-role-passwords` and `pg_dump -Fc` w
 
 ## 8. Supabase-specific Database Coverage
 
-Allowlist starts with: `public`, `auth`, `storage`, `extensions`, `graphql_public`, `realtime`. Later live gate must discover schemas read-only and stop on unknown non-system schemas (`STOP_UNKNOWN_DATABASE_SCHEMA`).
+Allowlist (documented Production inventory): `public`, `auth`, `storage`, `extensions`,
+`graphql_public`, `realtime`, `graphql`, `supabase_migrations`, `vault`. Live gate discovers
+schemas read-only and stops on unknown non-system schemas (`STOP_UNKNOWN_DATABASE_SCHEMA`,
+message includes the schema name).
 
 ## 9. Storage Binary Coverage
 

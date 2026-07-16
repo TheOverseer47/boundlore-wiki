@@ -58,7 +58,17 @@ KNOWN_STAGING_REF = "jzzgoiwfbuwiiyvwgwri"
 BUCKET_ALLOWLIST = ("avatars", "discovery-uploads", "report-screenshots")
 
 # Non-system schemas expected for later read-only discovery; unknown others stop.
-SCHEMA_ALLOWLIST = ("public", "auth", "storage", "extensions", "graphql_public", "realtime")
+SCHEMA_ALLOWLIST = (
+    "public",
+    "auth",
+    "storage",
+    "extensions",
+    "graphql_public",
+    "realtime",
+    "graphql",
+    "supabase_migrations",
+    "vault",
+)
 
 MANIFEST_REQUIRED_KEYS = (
     "format_version",
