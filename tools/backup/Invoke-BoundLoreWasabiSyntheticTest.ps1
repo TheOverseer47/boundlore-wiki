@@ -267,7 +267,7 @@ try {
     backup_id                = $backupId
     created_at_utc           = ([DateTime]::UtcNow.ToString("o"))
     components               = @("database", "storage", "configuration")
-    file_count               = $files.Count
+    file_count               = @($files).Count
     package_size_bytes       = [int64]$plainSize
     checksum_algorithm       = "SHA-256"
     encryption_method        = "age"
@@ -483,11 +483,11 @@ try {
       Stop-Code "FAIL_DECRYPTION_OR_PACKAGE_VALIDATION" "hash $rel"
     }
   }
-  $restoredFiles = Get-ChildItem -Path (Join-Path $restoredDir "pkg") -Recurse -File
-  if ($restoredFiles.Count -ne $rm.file_count) {
+  $restoredFiles = @(Get-ChildItem -Path (Join-Path $restoredDir "pkg") -Recurse -File)
+  if ((@($restoredFiles).Count) -ne $rm.file_count) {
     # file_count was pre-manifest; after archive includes manifest+sha256 — compare to restored tree vs original post-manifest count
-    $origCount = (Get-ChildItem -Path $source -Recurse -File).Count
-    if ($restoredFiles.Count -ne $origCount) {
+    $origCount = @(Get-ChildItem -Path $source -Recurse -File).Count
+    if ((@($restoredFiles).Count) -ne $origCount) {
       Stop-Code "FAIL_DECRYPTION_OR_PACKAGE_VALIDATION" "file count"
     }
   }

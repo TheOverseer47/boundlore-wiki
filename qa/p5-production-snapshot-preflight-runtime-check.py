@@ -61,7 +61,11 @@ def main() -> None:
     check(proc.returncode == 0, "synthetic offline exit 0")
     blob = proc.stdout + proc.stderr
     check("SYNTHETIC_OFFLINE_PASS" in blob, "SYNTHETIC_OFFLINE_PASS")
-    check("PASS_SYNTHETIC_OFFLINE_PRODUCTION_SHAPE" in blob, "validation status")
+    check(
+        "PASS_SYNTHETIC_OFFLINE_PRODUCTION_SHAPE" in blob
+        or "PASS_SYNTHETIC_OFFLINE_PRODUCTION_SNAPSHOT_RUNNER" in blob,
+        "validation status",
+    )
     check('"external_requests":0' in blob or '"external_requests": 0' in blob or '"external_requests":  0' in blob, "synth external 0")
     check('"wasabi_requests":0' in blob or '"wasabi_requests": 0' in blob or '"wasabi_requests":  0' in blob, "wasabi 0")
     check('"supabase_requests":0' in blob or '"supabase_requests": 0' in blob or '"supabase_requests":  0' in blob, "supabase 0")

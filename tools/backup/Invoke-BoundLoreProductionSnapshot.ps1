@@ -1,14 +1,15 @@
 <#
 .SYNOPSIS
-  P5-E.10B-W5-P2 — Production snapshot runner (fail-closed; live path implemented, network reserved for W5-A1).
+  P5-E.10B-W5-A1 — Controlled production snapshot runner (fail-closed).
 
 .DESCRIPTION
   Safe defaults: PreflightOnly + Synthetic + NoNetwork.
-  LiveExecution requires every confirmation switch. Network-backed live export/upload
-  is implemented but gated behind $GateAllowsLiveNetwork=$false until W5-A1.
+  LiveExecution requires every confirmation switch. Live network is armed only after
+  the full confirmation set validates ($GateAllowsLiveNetwork starts false).
 
   Never accepts credentials as parameters. Never mounts VeraCrypt. Never prints
-  full age recipients or secrets.
+  full age recipients or secrets. Child modules remain STOP_LIVE_NETWORK_RESERVED
+  until BOUNDLORE_LIVE_NETWORK_ARMED=1 is set for a single live child process.
 #>
 [CmdletBinding()]
 param(
@@ -35,21 +36,28 @@ param(
   [switch]$ConfirmUserAuthorizedSnapshot,
 
   # Paths only — never credentials
-  [string]$OutputDirectory = "",
   [string]$ProductionRecipientFile = "",
+  [string]$ProductionRecipientPath = "",
   [string]$LocalEncryptedArchiveDirectory = "",
+  [string]$LocalEncryptedArchiveRoot = "",
+  [string]$VeraCryptWorkspaceRoot = "",
   [string]$WasabiProductionPrefix = "production-snapshots/",
   [string]$WasabiRegion = "eu-central-2",
   [string]$WasabiEndpoint = "s3.eu-central-2.wasabisys.com",
   [string]$MockVeraCryptRoot = "",
-  [string]$EvidencePath = ""
+  [string]$EvidencePath = "",
+  [string]$OutputDirectory = ""
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# W5-P2: live network sequence is present in code but never armed.
+# W5-A1: live network remains disarmed until full confirmation set is validated below.
+# Child exporters remain STOP_LIVE_NETWORK_RESERVED until BOUNDLORE_LIVE_NETWORK_ARMED=1.
 $GateAllowsLiveNetwork = $false
+
+if ($ProductionRecipientPath -and -not $ProductionRecipientFile) { $ProductionRecipientFile = $ProductionRecipientPath }
+if ($LocalEncryptedArchiveRoot -and -not $LocalEncryptedArchiveDirectory) { $LocalEncryptedArchiveDirectory = $LocalEncryptedArchiveRoot }
 
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $ExpectedProductionRef = "ohkoojpzmptdfyowdgog"
@@ -66,6 +74,8 @@ if (-not $EvidencePath) {
   $EvidencePath = Join-Path $RepoRoot "qa\evidence\p5-e10b-w5-production-snapshot.json"
 }
 
+$BackupToolsDir = $PSScriptRoot
+
 function Stop-Code([string]$Code, [string]$Message) {
   Write-Error ("{0}: {1}" -f $Code, $Message)
   exit 1
@@ -80,6 +90,14 @@ function Get-Sha256Text([string]$Text) {
 
 function Get-Sha256File([string]$Path) {
   return (Get-FileHash -Algorithm SHA256 -Path $Path).Hash.ToLowerInvariant()
+}
+
+# PowerShell 5.1 + StrictMode: empty/single pipeline results unwrap; scalars have no .Count.
+# Note: @($null).Count is 1 in Windows PowerShell — treat $null as 0 for collection semantics.
+function Get-StrictCount {
+  param($Value)
+  if ($null -eq $Value) { return 0 }
+  return @($Value).Count
 }
 
 function ConvertFrom-SecureStringPlain([Security.SecureString]$Secure) {
@@ -143,7 +161,7 @@ function Test-ProductionRecipientFile([string]$Path) {
     throw "FAIL_PRIVATE_KEY_PRESENT_IN_PUBLIC_RECIPIENT_FILE: private key material in recipient file"
   }
   $lines = @($raw -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -and -not $_.StartsWith("#") })
-  if ($lines.Count -ne 1) {
+  if ((Get-StrictCount $lines) -ne 1) {
     throw "STOP_PRODUCTION_KEY_RECIPIENT_INVALID: expected exactly one recipient line"
   }
   $rec = $lines[0]
@@ -170,7 +188,8 @@ function Test-AllLiveGuardsPresent {
   if (-not $ConfirmLocalEncryptedArchiveCopy -and -not $ConfirmLocalArtifactPath) { $missing += "ConfirmLocalEncryptedArchiveCopy" }
   if (-not $ConfirmUserAuthorizedSnapshot) { $missing += "ConfirmUserAuthorizedSnapshot" }
   if (-not $ProductionRecipientFile) { $missing += "ProductionRecipientFile" }
-  return $missing
+  # Unary comma forces Object[] even when empty or single-element (PS 5.1 unwrap).
+  return , @($missing)
 }
 
 function Invoke-RcloneChildLocal {
@@ -193,23 +212,8 @@ function Invoke-RcloneChildLocal {
   return [pscustomobject]@{ ExitCode = $p.ExitCode; StdOut = $stdout; StdErr = $stderr }
 }
 
-# --- Live path (implemented; network armed only when GateAllowsLiveNetwork) ---
-function Invoke-LiveProductionSnapshotSequence {
-  param(
-    [string]$WorkRoot,
-    [string]$RecipientFile,
-    [string]$ArchiveDir,
-    [string]$Prefix
-  )
-  # Identity / release gate / inventories would run read-only here.
-  # DB: pg_dumpall --roles-only --no-role-passwords + pg_dump -Fc via PGPASSWORD child env only.
-  # Storage: Export-BoundLoreStorage.py with SecureString service role in child env only.
-  # Package -> single .age -> local encrypted copy -> rclone copyto upload-only (no GetObject).
-  if (-not $GateAllowsLiveNetwork) {
-    Stop-Code "STOP_LIVE_NETWORK_RESERVED" "live Supabase/Wasabi network execution is reserved for W5-A1"
-  }
-  Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" "unreachable without GateAllowsLiveNetwork"
-}
+# Live sequence (W5-A1). Child exporters stay STOP_LIVE_NETWORK_RESERVED until armed.
+. (Join-Path $PSScriptRoot "_lib\LiveProductionSnapshot.ps1")
 
 # --- Normalize ---
 if ($NoPreflightOnly) { $PreflightOnly = $false }
@@ -220,7 +224,6 @@ $DeleteImplemented = $false
 $GetObjectInSnapshotPath = $false
 $BucketCreateImplemented = $false
 $LiveDumpImplemented = $false
-$LiveDumpNetworkArmed = $GateAllowsLiveNetwork
 
 if ($DeleteImplemented -or $GetObjectInSnapshotPath -or $BucketCreateImplemented -or $LiveDumpImplemented) {
   Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" "forbidden capability"
@@ -240,31 +243,33 @@ if ($ConfirmProductionProjectRef -and $ConfirmProductionProjectRef -ne $Expected
 
 $liveIntent = $LiveExecution -or (-not $PreflightOnly) -or (-not $Synthetic) -or (-not $NoNetwork) -or $AllowProductionRead -or $AllowSupabaseStorageRead -or $AllowExternalWasabiUpload
 if ($liveIntent -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests) {
-  $missing = Test-AllLiveGuardsPresent
-  if ($missing.Count -gt 0) {
+  $missing = @(Test-AllLiveGuardsPresent)
+  if ((Get-StrictCount $missing) -gt 0) {
     Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" ("missing guards: " + ($missing -join ","))
   }
   try {
-    $recInfo = Test-ProductionRecipientFile $ProductionRecipientFile
+    $null = Test-ProductionRecipientFile $ProductionRecipientFile
   } catch {
     Stop-Code (($_.Exception.Message -split ":")[0]) $_.Exception.Message
   }
   if (-not $ConfirmReleaseGateLocked) {
     Stop-Code "STOP_RELEASE_GATE_NOT_LOCKED" "release gate must be locked"
   }
-  try {
-    $work = if ($OutputDirectory) { $OutputDirectory } else { Join-Path $VeraDrive "BoundLoreProductionSnapshot\pending" }
-    [void](Assert-VeraCryptWorkspace $work)
-  } catch {
-    $code = (($_.ToString()) -split ":")[0]
-    Stop-Code $code $_.ToString()
+  $wsRoot = if ($VeraCryptWorkspaceRoot) { $VeraCryptWorkspaceRoot } else { Join-Path $VeraDrive "BoundLoreProductionSnapshot" }
+  $archRoot = if ($LocalEncryptedArchiveDirectory) { $LocalEncryptedArchiveDirectory } else { "" }
+  if (-not $archRoot) {
+    Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" "LocalEncryptedArchiveRoot required for live run"
   }
-  # Implemented live sequence entry — network reserved
-  Invoke-LiveProductionSnapshotSequence -WorkRoot $work -RecipientFile $ProductionRecipientFile -ArchiveDir $LocalEncryptedArchiveDirectory -Prefix $WasabiProductionPrefix
+  if (-not (Test-Path "$VeraDrive\")) {
+    Stop-Code "STOP_VERACRYPT_WORKSPACE_NOT_MOUNTED" "V: not mounted"
+  }
+  # Minimal W5-A1 arming: only after full confirmation set
+  $GateAllowsLiveNetwork = $true
+  Invoke-LiveProductionSnapshotSequence -WorkspaceRoot $wsRoot -RecipientFile $ProductionRecipientFile -ArchiveRoot $archRoot -Prefix $WasabiProductionPrefix
 }
 
-if (-not $NoNetwork -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests) {
-  Stop-Code "STOP_NETWORK_FORBIDDEN" "network not authorized in W5-P2 offline rehearsal"
+if (-not $NoNetwork -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests -and -not $LiveExecution) {
+  Stop-Code "STOP_NETWORK_FORBIDDEN" "network not authorized without LiveExecution"
 }
 
 # --- Default preflight ---
@@ -276,12 +281,13 @@ if ($PreflightOnly -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTest
     no_network = [bool]$NoNetwork
     live_execution_default = $false
     live_network_armed = $false
+    live_dump_authorized = $false
+    live_dump_implemented = $false
     veracrypt_drive = $VeraDrive
     production_prefix = "production-snapshots/"
     trial_prefix_forbidden = $TrialPrefixForbidden
     getobject_in_snapshot_path = $false
     delete_implemented = $false
-    live_dump_implemented = $false
     production_key_created_by_runner = $false
     role_passwords_included = $false
     plaintext_upload_allowed = $false
@@ -334,8 +340,9 @@ if ($RunNegativeTests) {
   catch { if ("$_" -match "STOP_PRODUCTION_KEY_RECIPIENT_MISSING") { $neg += "PASS STOP_PRODUCTION_KEY_RECIPIENT_MISSING" } else { $neg += "FAIL missrec" } }
 
   $failed = @($neg | Where-Object { $_ -like "FAIL*" })
-  @{ negative_tests = $neg; failures = $failed.Count; validation_status = $(if ($failed.Count -eq 0) { "PASS_NEGATIVE_TESTS" } else { "FAIL_NEGATIVE_TESTS" }); external_requests = 0 } | ConvertTo-Json -Depth 5
-  if ($failed.Count -gt 0) { exit 1 }
+  $failCount = Get-StrictCount $failed
+  @{ negative_tests = $neg; failures = $failCount; validation_status = $(if ($failCount -eq 0) { "PASS_NEGATIVE_TESTS" } else { "FAIL_NEGATIVE_TESTS" }); external_requests = 0 } | ConvertTo-Json -Depth 5
+  if ($failCount -gt 0) { exit 1 }
   Write-Host "NEGATIVE_TESTS_PASS"
   if (-not $RunSyntheticOfflineTest) { exit 0 }
 }
@@ -473,7 +480,7 @@ try {
     production_identity_confirmed = $true
     project_ref = "REDACTED"
     release_gate_locked = $true
-    schema_count = $SchemaAllowlist.Count
+    schema_count = (Get-StrictCount $SchemaAllowlist)
     bucket_allowlist = $BucketAllowlist
     object_counts = @{ avatars = 1; "discovery-uploads" = 1; "report-screenshots" = 1 }
     dump_format = "custom+roles"

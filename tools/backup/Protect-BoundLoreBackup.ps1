@@ -96,7 +96,7 @@ $targets += Get-ChildItem -Path (Join-Path $pkg "database") -File -ErrorAction S
   Where-Object { $_.Extension -in @(".sql", ".dump") -and $_.Name -notlike "*.age" -and $_.Name -notlike "*.sha256" }
 $targets += Get-ChildItem -Path (Join-Path $pkg "configuration") -Filter "*.json" -File -ErrorAction SilentlyContinue
 
-if (-not $targets -or $targets.Count -eq 0) {
+if (-not $targets -or (@($targets).Count -eq 0)) {
   Stop-Code "STOP_MANIFEST_INCOMPLETE" "No encryptable database/configuration files found"
 }
 
