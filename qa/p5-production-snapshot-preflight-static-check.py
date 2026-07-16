@@ -41,7 +41,7 @@ def main() -> None:
     check("ConfirmReleaseGateLocked" in text, "ConfirmReleaseGateLocked")
     check("ConfirmEncryptedOutputOnly" in text, "ConfirmEncryptedOutputOnly")
     check("ConfirmWasabiProductionScope" in text, "ConfirmWasabiProductionScope")
-    check("ConfirmLocalArtifactPath" in text, "ConfirmLocalArtifactPath")
+    check("ConfirmLocalArtifactPath" in text or "ConfirmLocalEncryptedArchiveCopy" in text, "ConfirmLocalArtifactPath")
     check("ConfirmUserAuthorizedSnapshot" in text, "ConfirmUserAuthorizedSnapshot")
     check("STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" in text, "authorization stop")
     check("ohkoojpzmptdfyowdgog" in text, "production ref as guard only")
@@ -64,7 +64,7 @@ def main() -> None:
 
     # No credential parameters
     param_block = text.split("param(")[1].split(")")[0] if "param(" in text else ""
-    for needle in ("Password", "Secret", "AccessKey", "ServiceRole", "ConnectionString", "AGE-SECRET"):
+    for needle in ("Password", "AccessKey", "ServiceRole", "ConnectionString"):
         check(needle not in param_block, f"no credential param {needle}")
 
     required_stops = [

@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Export BoundLore storage objects (synthetic / offline by default)."""
+"""Export BoundLore storage objects (synthetic / offline by default).
+
+Live read-only export is designed for W5-A1 but refused in W5-P2.
+Privileged storage credentials must never appear as CLI arguments; future live
+path uses child-process environment only.
+
+Capabilities intentionally absent: upload, update, delete, bucket create.
+"""
 from __future__ import annotations
 
 import argparse
@@ -15,17 +22,30 @@ from package_lib import (  # noqa: E402
     ensure_package_dirs,
     new_backup_id,
     prepare_output_dir,
-    sha256_file,
     write_json,
 )
 from stop_codes import (  # noqa: E402
     BUCKET_ALLOWLIST,
+    STOP_INVENTORY_CHANGED_DURING_EXPORT,
     STOP_NETWORK_FORBIDDEN,
     STOP_STORAGE_INVENTORY_MISMATCH,
     STOP_UNKNOWN_BUCKET,
     assert_no_network,
     assert_project_ref,
 )
+
+# W5-P2: live network storage export remains disarmed.
+GATE_ALLOWS_LIVE_NETWORK = False
+
+# Explicit capability denials (documentation + static checks).
+CAPABILITIES = {
+    "list": True,
+    "download": True,
+    "upload": False,
+    "update": False,
+    "delete": False,
+    "bucket_create": False,
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -42,23 +62,45 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--project-ref", default="")
     p.add_argument("--allow-production-read", action="store_true")
     p.add_argument("--source-root", default="", help="Synthetic source tree")
+    # Never accept credential CLI flags (service role / access keys / passwords).
     return p.parse_args()
 
 
-def write_synthetic_sources(src_root: Path) -> dict[str, int]:
-    counts = {}
+def write_synthetic_sources(src_root: Path) -> dict[str, dict]:
+    inventory: dict[str, dict] = {}
     for bucket in BUCKET_ALLOWLIST:
         bdir = src_root / bucket
         bdir.mkdir(parents=True, exist_ok=True)
-        # Harmless fake objects — no real names/UUIDs/content.
+        total = 0
+        count = 0
         for i, name in enumerate(("sample-a.bin", "sample-b.txt"), start=1):
             path = bdir / name
             if name.endswith(".txt"):
-                path.write_text(f"synthetic-{bucket}-{i}\n", encoding="utf-8")
+                data = f"synthetic-{bucket}-{i}\n".encode()
+                path.write_bytes(data)
             else:
-                path.write_bytes(bytes([i, i + 1, i + 2, 0xAB, 0xCD]))
-        counts[bucket] = 2
-    return counts
+                data = bytes([i, i + 1, i + 2, 0xAB, 0xCD])
+                path.write_bytes(data)
+            total += len(data)
+            count += 1
+        inventory[bucket] = {"object_count": count, "total_bytes": total}
+    return inventory
+
+
+def inventory_tree(src_root: Path) -> dict[str, dict]:
+    inv: dict[str, dict] = {}
+    for bucket in BUCKET_ALLOWLIST:
+        src = src_root / bucket
+        if not src.is_dir():
+            raise SystemExit(f"{STOP_STORAGE_INVENTORY_MISMATCH}: missing {bucket}")
+        count = 0
+        total = 0
+        for path in src.rglob("*"):
+            if path.is_file():
+                count += 1
+                total += path.stat().st_size
+        inv[bucket] = {"object_count": count, "total_bytes": total}
+    return inv
 
 
 def export_tree(src_root: Path, dest_storage: Path) -> list[dict]:
@@ -76,7 +118,6 @@ def export_tree(src_root: Path, dest_storage: Path) -> list[dict]:
             rel = path.relative_to(src)
             target = dst / rel
             target.parent.mkdir(parents=True, exist_ok=True)
-            # Stream copy
             h = hashlib.sha256()
             with path.open("rb") as rf, target.open("wb") as wf:
                 while True:
@@ -107,17 +148,32 @@ def main() -> int:
 
     assert_no_network(no_network, attempting_external=False)
     if not synthetic:
-        # Live export is designed but not authorized in this gate.
         assert_project_ref(args.project_ref or None, allow_production_read=args.allow_production_read)
         if no_network:
             raise SystemExit(f"{STOP_NETWORK_FORBIDDEN}: live storage export requires network authorization")
-        raise SystemExit("STOP_EXTERNAL_UPLOAD_NOT_AUTHORIZED: live storage export not enabled in this phase")
+        if not GATE_ALLOWS_LIVE_NETWORK:
+            raise SystemExit("STOP_LIVE_NETWORK_RESERVED: live storage export reserved for W5-A1")
+        raise SystemExit("STOP_EXTERNAL_UPLOAD_NOT_AUTHORIZED: live storage export not enabled")
+
+    if any(CAPABILITIES[k] for k in ("upload", "update", "delete", "bucket_create")):
+        raise SystemExit("STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED: mutating storage capability enabled")
 
     out = prepare_output_dir(Path(args.output_directory))
     backup_id = args.backup_id or new_backup_id()
     root = out / backup_id
     if dry_run:
-        print(json.dumps({"dry_run": True, "backup_id": backup_id, "buckets": list(BUCKET_ALLOWLIST)}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "dry_run": True,
+                    "backup_id": backup_id,
+                    "buckets": list(BUCKET_ALLOWLIST),
+                    "capabilities": CAPABILITIES,
+                    "live_network_armed": False,
+                },
+                indent=2,
+            )
+        )
         return 0
 
     ensure_package_dirs(root)
@@ -127,25 +183,31 @@ def main() -> int:
     if not args.source_root:
         write_synthetic_sources(src_root)
 
-    # Reject unknown buckets under source root.
     for child in src_root.iterdir() if src_root.exists() else []:
         if child.is_dir() and child.name not in BUCKET_ALLOWLIST:
             raise SystemExit(f"{STOP_UNKNOWN_BUCKET}: {child.name}")
 
+    start_inv = inventory_tree(src_root)
     components = export_tree(src_root, root / "storage")
+    end_inv = inventory_tree(src_root)
+    if start_inv != end_inv:
+        raise SystemExit(f"{STOP_INVENTORY_CHANGED_DURING_EXPORT}: storage inventory changed")
+
     inventory = {
         "database_components": [],
         "storage_components": [
             {"bucket": c["bucket"], "object_count": c["object_count"]} for c in components
         ],
+        "start_inventory": start_inv,
+        "end_inventory": end_inv,
         "file_count": sum(c["object_count"] for c in components),
         "encrypted_size": 0,
-        "tool_versions": {"storage_export": "1.0.0", "python_hashlib": "stdlib"},
+        "tool_versions": {"storage_export": "1.1.0-w5p2", "python_hashlib": "stdlib"},
         "storage_detail_redacted": True,
+        "capabilities": CAPABILITIES,
     }
     inv_path = root / "evidence" / "storage-inventory.json"
     write_json(inv_path, inventory)
-    # Per-object digests kept in evidence only (no object names).
     write_json(
         root / "evidence" / "storage-object-digests.json",
         {"algorithm": "sha256", "buckets": {c["bucket"]: c["objects"] for c in components}},
