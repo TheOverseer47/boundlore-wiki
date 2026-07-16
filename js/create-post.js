@@ -44,8 +44,48 @@ const DISCOVERY_PLACEHOLDER_VALUES = [
   "asdf", "qwerty", "test", "todo", "none", "n/a", "na", "unknown", "idk", "???", "12345"
 ];
 const DISCOVERY_SKIP_VALUES = ["unclear", "no", "not observed", "unknown", "not sure"];
+let createSubmitInFlight = false;
+
+function patchModeUserMessage(err) {
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode && typeof WikiPatchMode.getUserMessage === "function") {
+    return WikiPatchMode.getUserMessage(err);
+  }
+  return "This action cannot be used right now for safety reasons.";
+}
+
+async function enforcePatchModeBeforeWriteCP(errorEl) {
+  try {
+    if (typeof WikiPatchMode === "undefined" || typeof WikiPatchMode.assertCanSubmit !== "function") {
+      var missing = new Error(patchModeUserMessage({ code: "PATCH_MODE_UNAVAILABLE" }));
+      missing.code = "PATCH_MODE_UNAVAILABLE";
+      throw missing;
+    }
+    await WikiPatchMode.assertCanSubmit();
+    return true;
+  } catch (err) {
+    if (errorEl) {
+      errorEl.textContent = patchModeUserMessage(err);
+      errorEl.style.display = "block";
+    }
+    return false;
+  }
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const createForm = document.getElementById("createPostForm");
+  if (createForm && typeof WikiPatchMode !== "undefined" && WikiPatchMode.bindForm) {
+    WikiPatchMode.bindForm(createForm);
+  } else if (createForm) {
+    const submitBtn = createForm.querySelector("button[type='submit']");
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute("aria-disabled", "true");
+    }
+  }
+  document.addEventListener("bl-patch-mode-change", function() {
+    initTutorialGateCP();
+  });
+
   quillEditor = new Quill("#postEditor", {
     theme: "snow",
     modules: {
@@ -402,9 +442,12 @@ function setPostType(type) {
 
 async function handleSubmit(e) {
   e.preventDefault();
+  if (createSubmitInFlight) return;
   const errorEl = document.getElementById("formError");
   errorEl.style.display = "none";
   const submitBtn = document.querySelector("#createPostForm button[type='submit']");
+
+  if (!(await enforcePatchModeBeforeWriteCP(errorEl))) return;
 
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData.session) {
@@ -640,6 +683,7 @@ async function handleSubmit(e) {
       errorEl.style.display = "block";
       return;
     }
+    if (!(await enforcePatchModeBeforeWriteCP(errorEl))) return;
     const uploadResult = await uploadDiscoveryFiles(userId, files);
     if (uploadResult.error) {
       errorEl.textContent = uploadResult.error;
@@ -659,10 +703,14 @@ async function handleSubmit(e) {
 
   payload.content = injectPostMetaCP(payload.content, postMeta);
 
+  if (!(await enforcePatchModeBeforeWriteCP(errorEl))) return;
+
+  createSubmitInFlight = true;
   if (submitBtn) submitBtn.disabled = true;
 
   const { data, error } = await supabase.from("posts").insert(payload).select().single();
 
+  createSubmitInFlight = false;
   if (submitBtn) submitBtn.disabled = false;
 
   if (error) {
@@ -739,6 +787,9 @@ function refreshWikiSubcategoryOptions(presetValue) {
 
 async function uploadDiscoveryFiles(userId, files) {
   const uploaded = [];
+  if (!(await enforcePatchModeBeforeWriteCP(null))) {
+    return { error: patchModeUserMessage({ code: "PATCH_MODE_UNAVAILABLE" }) };
+  }
 
   for (const file of files) {
     const cleanedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");

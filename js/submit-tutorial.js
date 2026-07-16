@@ -5,8 +5,48 @@
 
   if (!checkbox || !button || !status) return;
 
+  function patchModeUserMessage(err) {
+    if (typeof WikiPatchMode !== "undefined" && WikiPatchMode && typeof WikiPatchMode.getUserMessage === "function") {
+      return WikiPatchMode.getUserMessage(err);
+    }
+    return "This action cannot be used right now for safety reasons.";
+  }
+
+  async function enforcePatchModeBeforeWrite() {
+    try {
+      if (typeof WikiPatchMode === "undefined" || typeof WikiPatchMode.assertCanSubmit !== "function") {
+        var missing = new Error(patchModeUserMessage({ code: "PATCH_MODE_UNAVAILABLE" }));
+        missing.code = "PATCH_MODE_UNAVAILABLE";
+        throw missing;
+      }
+      await WikiPatchMode.assertCanSubmit();
+      return true;
+    } catch (err) {
+      status.textContent = patchModeUserMessage(err);
+      return false;
+    }
+  }
+
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode.bindControls) {
+    button.setAttribute("data-bl-patch-control", "1");
+    WikiPatchMode.bindControls(["#tutorialConfirmBtn"], button.parentElement || document.body);
+  } else {
+    button.disabled = true;
+    button.setAttribute("aria-disabled", "true");
+  }
+
   checkbox.addEventListener("change", function() {
+    if (typeof WikiPatchMode !== "undefined" && WikiPatchMode.isSubmissionAllowed && !WikiPatchMode.isSubmissionAllowed()) {
+      button.disabled = true;
+      return;
+    }
     button.disabled = !checkbox.checked;
+  });
+
+  document.addEventListener("bl-patch-mode-change", function() {
+    if (typeof WikiPatchMode !== "undefined" && WikiPatchMode.isSubmissionAllowed && WikiPatchMode.isSubmissionAllowed()) {
+      button.disabled = !(checkbox.checked || button.dataset.accepted === "1");
+    }
   });
 
   function getReturnTo() {
@@ -47,9 +87,12 @@
     const returnTo = getReturnTo();
 
     if (button.dataset.accepted === "1") {
+      if (!(await enforcePatchModeBeforeWrite())) return;
       window.location.href = returnTo;
       return;
     }
+
+    if (!(await enforcePatchModeBeforeWrite())) return;
 
     button.disabled = true;
     status.textContent = "Saving confirmation...";
@@ -58,6 +101,11 @@
     const user = sessionData && sessionData.session ? sessionData.session.user : null;
     if (!user) {
       status.textContent = "Status: please log in first, then confirm this tutorial.";
+      button.disabled = false;
+      return;
+    }
+
+    if (!(await enforcePatchModeBeforeWrite())) {
       button.disabled = false;
       return;
     }

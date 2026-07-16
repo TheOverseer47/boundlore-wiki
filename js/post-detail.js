@@ -8,10 +8,50 @@ let currentPost = null;
 let currentUserId = null;
 let isAdmin = false;
 let postImageViewer = null;
+let postMutationInFlight = false;
+
+function patchModeUserMessagePD(err) {
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode && typeof WikiPatchMode.getUserMessage === "function") {
+    return WikiPatchMode.getUserMessage(err);
+  }
+  return "This action cannot be used right now for safety reasons.";
+}
+
+async function enforcePatchModeBeforeWritePD() {
+  try {
+    if (typeof WikiPatchMode === "undefined" || typeof WikiPatchMode.assertCanSubmit !== "function") {
+      var missing = new Error(patchModeUserMessagePD({ code: "PATCH_MODE_UNAVAILABLE" }));
+      missing.code = "PATCH_MODE_UNAVAILABLE";
+      throw missing;
+    }
+    await WikiPatchMode.assertCanSubmit();
+    return true;
+  } catch (err) {
+    alert(patchModeUserMessagePD(err));
+    return false;
+  }
+}
 
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
+  const commentBox = document.getElementById("commentFormBox");
+  if (commentBox && typeof WikiPatchMode !== "undefined" && WikiPatchMode.bindForm) {
+    var commentBtn = document.getElementById("btnSubmitComment");
+    if (commentBtn) commentBtn.setAttribute("data-bl-patch-control", "1");
+    WikiPatchMode.bindForm(commentBox, { captureSubmit: false });
+  }
+  var upvote = document.getElementById("btnUpvote");
+  var downvote = document.getElementById("btnDownvote");
+  if (upvote) upvote.setAttribute("data-bl-patch-control", "1");
+  if (downvote) downvote.setAttribute("data-bl-patch-control", "1");
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode.bindControls) {
+    WikiPatchMode.bindControls(
+      ["#btnUpvote", "#btnDownvote"],
+      document.querySelector(".bl-post-rating-widget") || document.body
+    );
+  }
+
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
   const postId = params.get("id");
@@ -666,6 +706,8 @@ async function handleReaction(postId, reaction) {
     alert("Please log in to rate posts.");
     return;
   }
+  if (postMutationInFlight) return;
+  if (!(await enforcePatchModeBeforeWritePD())) return;
 
   const { data: existing, error: existingErr } = await supabase
     .from("post_reactions")
@@ -680,7 +722,10 @@ async function handleReaction(postId, reaction) {
     return;
   }
 
+  if (!(await enforcePatchModeBeforeWritePD())) return;
+
   let writeError = null;
+  postMutationInFlight = true;
 
   if (existing && existing.reaction === reaction) {
     const { error } = await supabase.from("post_reactions").delete().eq("id", existing.id);
@@ -692,6 +737,8 @@ async function handleReaction(postId, reaction) {
     const { error } = await supabase.from("post_reactions").insert({ post_id: postId, user_id: currentUserId, reaction });
     writeError = error;
   }
+
+  postMutationInFlight = false;
 
   if (writeError) {
     if (writeError.code === "42501") {
@@ -772,6 +819,7 @@ function enableCommentEdit(comment, postId) {
   document.getElementById(`saveEdit-${comment.id}`).onclick = async () => {
     const newText = document.getElementById(`editArea-${comment.id}`).value.trim();
     if (!newText) return;
+    if (!(await enforcePatchModeBeforeWritePD())) return;
     await supabase.from("comments").update({ content: newText }).eq("id", comment.id);
     loadComments(postId);
   };
@@ -779,6 +827,7 @@ function enableCommentEdit(comment, postId) {
 
 async function deleteComment(commentId, postId) {
   if (!confirm("Delete this comment?")) return;
+  if (!(await enforcePatchModeBeforeWritePD())) return;
   await supabase.from("comments").delete().eq("id", commentId);
   loadComments(postId);
 }
@@ -790,14 +839,20 @@ function wireCommentForm(postId) {
       alert("Please log in to comment.");
       return;
     }
+    if (postMutationInFlight) return;
     const text = document.getElementById("newCommentText").value.trim();
     if (!text) return;
+    if (!(await enforcePatchModeBeforeWritePD())) return;
 
+    postMutationInFlight = true;
+    btn.disabled = true;
     const { error } = await supabase.from("comments").insert({
       post_id: postId,
       author_id: currentUserId,
       content: text,
     });
+    postMutationInFlight = false;
+    btn.disabled = false;
 
     if (error) {
       alert("Failed to post comment: " + error.message);

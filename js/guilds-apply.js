@@ -1,6 +1,31 @@
 document.addEventListener("DOMContentLoaded", initGuildsApplyPage);
 let guildSubmitInFlight = false;
 
+function patchModeUserMessageGA(err) {
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode && typeof WikiPatchMode.getUserMessage === "function") {
+    return WikiPatchMode.getUserMessage(err);
+  }
+  return "This action cannot be used right now for safety reasons.";
+}
+
+async function enforcePatchModeBeforeWriteGA(errorEl) {
+  try {
+    if (typeof WikiPatchMode === "undefined" || typeof WikiPatchMode.assertCanSubmit !== "function") {
+      var missing = new Error(patchModeUserMessageGA({ code: "PATCH_MODE_UNAVAILABLE" }));
+      missing.code = "PATCH_MODE_UNAVAILABLE";
+      throw missing;
+    }
+    await WikiPatchMode.assertCanSubmit();
+    return true;
+  } catch (err) {
+    if (errorEl) {
+      errorEl.textContent = patchModeUserMessageGA(err);
+      errorEl.style.display = "block";
+    }
+    return false;
+  }
+}
+
 async function initGuildsApplyPage() {
   if (typeof renderCategoryPosts === "function") {
     renderCategoryPosts("guilds");
@@ -8,6 +33,15 @@ async function initGuildsApplyPage() {
 
   const form = document.getElementById("guildApplyForm");
   if (!form) return;
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode.bindForm) {
+    WikiPatchMode.bindForm(form);
+  } else {
+    const submitBtn = document.getElementById("guildApplySubmit");
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute("aria-disabled", "true");
+    }
+  }
 
   form.addEventListener("submit", handleGuildApplicationSubmit);
 }
@@ -26,6 +60,8 @@ async function handleGuildApplicationSubmit(event) {
 
   err.style.display = "none";
   ok.style.display = "none";
+
+  if (!(await enforcePatchModeBeforeWriteGA(err))) return;
 
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData || !sessionData.session) {
@@ -72,6 +108,13 @@ async function handleGuildApplicationSubmit(event) {
   guildSubmitInFlight = true;
   submitBtn.disabled = true;
   submitBtn.textContent = "Submitting...";
+
+  if (!(await enforcePatchModeBeforeWriteGA(err))) {
+    guildSubmitInFlight = false;
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Guild Application";
+    return;
+  }
 
   const title = guildName + " - Guild Recruitment";
   const postHtml = buildGuildPostHtml({

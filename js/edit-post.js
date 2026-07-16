@@ -32,6 +32,32 @@ const EDIT_DISCOVERY_PLACEHOLDER_VALUES = [
   "asdf", "qwerty", "test", "todo", "none", "n/a", "na", "idk", "???", "12345"
 ];
 const EDIT_DISCOVERY_SKIP_VALUES = ["unclear", "no", "not observed", "unknown", "not sure"];
+let editSubmitInFlight = false;
+
+function patchModeUserMessageEP(err) {
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode && typeof WikiPatchMode.getUserMessage === "function") {
+    return WikiPatchMode.getUserMessage(err);
+  }
+  return "This action cannot be used right now for safety reasons.";
+}
+
+async function enforcePatchModeBeforeWriteEP(errorEl) {
+  try {
+    if (typeof WikiPatchMode === "undefined" || typeof WikiPatchMode.assertCanSubmit !== "function") {
+      var missing = new Error(patchModeUserMessageEP({ code: "PATCH_MODE_UNAVAILABLE" }));
+      missing.code = "PATCH_MODE_UNAVAILABLE";
+      throw missing;
+    }
+    await WikiPatchMode.assertCanSubmit();
+    return true;
+  } catch (err) {
+    if (errorEl) {
+      errorEl.textContent = patchModeUserMessageEP(err);
+      errorEl.style.display = "block";
+    }
+    return false;
+  }
+}
 
 document.addEventListener("DOMContentLoaded", initEditPost);
 
@@ -39,6 +65,15 @@ async function initEditPost() {
   const loading = document.getElementById("editLoadingBox");
   const denied = document.getElementById("editDeniedBox");
   const form = document.getElementById("editPostForm");
+  if (form && typeof WikiPatchMode !== "undefined" && WikiPatchMode.bindForm) {
+    WikiPatchMode.bindForm(form);
+  } else if (form) {
+    const submitBtn = form.querySelector("button[type='submit']");
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute("aria-disabled", "true");
+    }
+  }
 
   editQuill = new Quill("#editPostEditor", {
     theme: "snow",
@@ -338,11 +373,14 @@ function setEditPostType(type) {
 
 async function handleEditSubmit(e) {
   e.preventDefault();
+  if (editSubmitInFlight) return;
 
   const errEl = document.getElementById("editFormError");
   const okEl = document.getElementById("editFormOk");
   errEl.style.display = "none";
   okEl.style.display = "none";
+
+  if (!(await enforcePatchModeBeforeWriteEP(errEl))) return;
 
   if (!editPost) {
     errEl.textContent = "Post context missing.";
@@ -542,6 +580,12 @@ async function handleEditSubmit(e) {
     updates.content = injectPostMetaEP(updates.content, meta);
   }
 
+  if (!(await enforcePatchModeBeforeWriteEP(errEl))) return;
+
+  editSubmitInFlight = true;
+  const submitBtn = document.querySelector("#editPostForm button[type='submit']");
+  if (submitBtn) submitBtn.disabled = true;
+
   let updateQuery = supabase.from("posts").update(updates);
   if (editIsAdmin) {
     updateQuery = updateQuery.eq("id", editPost.id);
@@ -550,6 +594,9 @@ async function handleEditSubmit(e) {
   }
 
   const { error } = await updateQuery;
+
+  editSubmitInFlight = false;
+  if (submitBtn) submitBtn.disabled = false;
 
   if (error) {
     errEl.textContent = "Failed to save changes: " + error.message;

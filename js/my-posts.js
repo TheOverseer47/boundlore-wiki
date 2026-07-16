@@ -55,8 +55,22 @@ async function renderMyPosts(userId) {
   });
 
   container.querySelectorAll('[data-action="delete-own"]').forEach(function(btn) {
+    btn.setAttribute("data-bl-patch-control", "1");
     btn.addEventListener("click", async function() {
       if (!confirm("Delete this post permanently?")) return;
+      try {
+        if (typeof WikiPatchMode === "undefined" || typeof WikiPatchMode.assertCanSubmit !== "function") {
+          alert("This action cannot be used right now for safety reasons.");
+          return;
+        }
+        await WikiPatchMode.assertCanSubmit();
+      } catch (err) {
+        var msg = (typeof WikiPatchMode !== "undefined" && WikiPatchMode.getUserMessage)
+          ? WikiPatchMode.getUserMessage(err)
+          : "This action cannot be used right now for safety reasons.";
+        alert(msg);
+        return;
+      }
       const { error } = await supabase
         .from("posts")
         .delete()
@@ -71,6 +85,16 @@ async function renderMyPosts(userId) {
       renderMyPosts(userId);
     });
   });
+  if (typeof WikiPatchMode !== "undefined" && WikiPatchMode.initialize) {
+    WikiPatchMode.initialize().then(function(state) {
+      if (!state || state.state !== "allowed") {
+        container.querySelectorAll('[data-action="delete-own"]').forEach(function(btn) {
+          btn.disabled = true;
+          btn.setAttribute("aria-disabled", "true");
+        });
+      }
+    });
+  }
 }
 
 function escapeHtmlMP(str) {

@@ -1834,6 +1834,10 @@ a:hover { color: var(--gold-light); }
   border-radius: 6px;
 }
 
+.bl-patch-mode-status {
+  margin-bottom: 12px;
+}
+
 /* ===== Scroll Performance Mode =====
    Enabled from js/main.js for Chrome/low-powered setups to reduce jank while scrolling. */
 html.perf-mode,
