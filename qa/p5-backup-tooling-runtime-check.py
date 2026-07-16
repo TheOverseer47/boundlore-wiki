@@ -48,13 +48,25 @@ def run(cmd: list[str], *, expect_ok: bool = True) -> subprocess.CompletedProces
 def main() -> None:
     check(True, "runtime checker performs no Wasabi/Supabase calls of its own")
 
-    # Full synthetic package test
+    # Full synthetic package test (real age + local rclone when tools present)
     proc = run([sys.executable, str(TOOLS / "Test-BoundLoreBackupPackage.py")])
-    check(proc.returncode == 0, "synthetic package dry-run exit 0")
-    check("PASS_SYNTHETIC_DRY_RUN" in proc.stdout, "synthetic summary status")
+    check(proc.returncode == 0, "synthetic package test exit 0")
+    check(
+        "PASS_REAL_OFFLINE_AGE_RCLONE" in proc.stdout or "PASS_SYNTHETIC_DRY_RUN" in proc.stdout,
+        "synthetic summary status",
+    )
     check('"external_requests": 0' in proc.stdout, "external_requests 0")
     check('"wasabi_requests": 0' in proc.stdout, "wasabi_requests 0")
     check('"supabase_requests": 0' in proc.stdout, "supabase_requests 0")
+    if "PASS_REAL_OFFLINE_AGE_RCLONE" in proc.stdout:
+        check('"wrong_key_rejected": true' in proc.stdout, "wrong-key rejected")
+        check('"rclone_remote_used": false' in proc.stdout, "no rclone remote")
+        check('"encryption_method": "age"' in proc.stdout, "age encryption method")
+
+    # Tool presence probes (versions only)
+    for tool, flag in (("age", "--version"), ("age-keygen", "--version"), ("rclone", "version")):
+        probe = run([tool, flag])
+        check(probe.returncode == 0, f"{tool} runnable")
 
     # Manifest dry-run outside repo
     with tempfile.TemporaryDirectory(prefix="bl-manifest-") as td:

@@ -79,7 +79,10 @@ def main() -> None:
 
     protect = read("tools/backup/Protect-BoundLoreBackup.ps1")
     check("STOP_ENCRYPTION_UNAVAILABLE" in protect, "protect fails closed without crypto tool")
+    check("PerformLocalEncryption" in protect, "protect has explicit local encryption gate")
+    check("STOP_EXTERNAL_UPLOAD_NOT_AUTHORIZED" in protect, "protect still blocks without local encrypt flag")
     check("unencrypted" not in protect.lower() or "Never continues unencrypted" in protect, "no unsafe unencrypted continue")
+    check("AGE-SECRET-KEY" in protect and "must not" in protect.lower(), "protect rejects private key as recipient")
 
     db = read("tools/backup/Export-BoundLoreDatabase.ps1")
     check("STOP_STAGING_TARGET" in db, "db export blocks staging")
