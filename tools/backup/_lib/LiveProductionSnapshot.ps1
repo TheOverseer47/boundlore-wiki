@@ -5,6 +5,7 @@
 # WasabiRegion, WasabiEndpoint, RemoteName, EvidencePath, VeraDrive
 
 . (Join-Path $PSScriptRoot "StorageExportDiagnostics.ps1")
+. (Join-Path $PSScriptRoot "UploadDiagnostics.ps1")
 
 function Invoke-PgChild {
   param(
@@ -400,11 +401,37 @@ SELECT json_build_object(
     if ((Get-Sha256File $localCopy) -ne $encHash) { Stop-Code "STOP_LOCAL_ENCRYPTED_COPY_FAILED" "hash mismatch" }
     Write-Host "LOCAL_ENCRYPTED_COPY_PASS"
 
-    # Wasabi upload once + list-only size check (credentials retained until list completes)
-    $cfgDir = Join-Path $env:TEMP ("rclone-w5a1-" + [Guid]::NewGuid().ToString("N"))
-    New-Item -ItemType Directory -Force -Path $cfgDir | Out-Null
-    $cfg = Join-Path $cfgDir "rclone-empty.conf"
-    Set-Content -Path $cfg -Value "" -Encoding ASCII -NoNewline
+    # Wasabi upload once + list-only size check (credentials retained until list completes).
+    # Write-only principal: PutObject + ListBucket; no GetObject.
+    # rclone v1.74.4 --s3-no-head: skip post-upload HEAD integrity check (needs GetObject/HeadObject).
+    # --immutable removed: it forces a destination existence stat (HEAD) incompatible with write-only IAM.
+    # Collision safety: timestamped backup-id keys; parent verifies via ListBucket size/count only.
+    $cfgDir = $null
+    $uploadMarkedPass = $false
+    $akCheck = Test-UploadCredentialOuterWhitespace $ak
+    $skCheck = Test-UploadCredentialOuterWhitespace $sk
+    if (-not $akCheck.Ok -or -not $skCheck.Ok) {
+      $ak = $null; $sk = $null
+      Stop-Code "STOP_UPLOAD_CREDENTIAL_REJECTED" (Format-UploadStopEnvelope -Code "STOP_UPLOAD_CREDENTIAL_REJECTED" -Phase "credential-bind" -ExitCode 1 -Http $null -Kind "InvalidCredential" -Retryable $false -RemoteState "NOT_UPLOADED")
+    }
+
+    # Source validate (.age under ArchiveRoot only)
+    if (-not (Test-Path -LiteralPath $localCopy)) {
+      Stop-Code "STOP_UPLOAD_SOURCE_INVALID" (Format-UploadStopEnvelope -Code "STOP_UPLOAD_SOURCE_INVALID" -Phase "source-validate" -ExitCode 1 -Http $null -Kind "SourceError" -Retryable $false -RemoteState "NOT_UPLOADED")
+    }
+    if (-not $localCopy.EndsWith(".age", [StringComparison]::OrdinalIgnoreCase)) {
+      Stop-Code "STOP_UPLOAD_SOURCE_NOT_ENCRYPTED" (Format-UploadStopEnvelope -Code "STOP_UPLOAD_SOURCE_NOT_ENCRYPTED" -Phase "source-validate" -ExitCode 1 -Http $null -Kind "SourceError" -Retryable $false -RemoteState "NOT_UPLOADED")
+    }
+    $localItem = Get-Item -LiteralPath $localCopy
+    if ($localItem.Length -le 0 -or $localItem.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+      Stop-Code "STOP_UPLOAD_SOURCE_INVALID" (Format-UploadStopEnvelope -Code "STOP_UPLOAD_SOURCE_INVALID" -Phase "source-validate" -ExitCode 1 -Http $null -Kind "SourceError" -Retryable $false -RemoteState "NOT_UPLOADED")
+    }
+    $archiveRootFull = [IO.Path]::GetFullPath($ArchiveRoot)
+    $localFull = [IO.Path]::GetFullPath($localCopy)
+    if (-not $localFull.StartsWith($archiveRootFull.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase) -and $localFull -ne $archiveRootFull) {
+      Stop-Code "STOP_UPLOAD_SOURCE_INVALID" (Format-UploadStopEnvelope -Code "STOP_UPLOAD_SOURCE_INVALID" -Phase "source-validate" -ExitCode 1 -Http $null -Kind "ScopeError" -Retryable $false -RemoteState "NOT_UPLOADED")
+    }
+
     $objectKey = ($Prefix.TrimEnd("/") + "/" + $backupId + "/" + $finalAgeName)
     if ($objectKey -match "trial-integration" -or $objectKey.Contains("..")) {
       Stop-Code "STOP_EXTERNAL_TARGET_MISMATCH" "bad object key"
@@ -412,64 +439,170 @@ SELECT json_build_object(
     $remoteTarget = "{0}:{1}/{2}" -f $RemoteName, $Bucket1, $objectKey
     $listTarget = "{0}:{1}/{2}" -f $RemoteName, $Bucket1, ($Prefix.TrimEnd("/") + "/" + $backupId)
 
-    function Invoke-RcloneEphemeral([string[]]$RArgs) {
+    function Invoke-RcloneEphemeral {
+      param(
+        [string[]]$RArgs,
+        [string]$Phase,
+        [string]$CommandKind
+      )
       $psi = New-Object Diagnostics.ProcessStartInfo
       $psi.FileName = $rcloneBin
       $psi.UseShellExecute = $false
       $psi.RedirectStandardOutput = $true
       $psi.RedirectStandardError = $true
       $psi.CreateNoWindow = $true
+
+      # Scrub ambient AWS/rclone credentials from the child environment only.
+      foreach ($drop in @(
+          "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN",
+          "AWS_PROFILE", "AWS_DEFAULT_PROFILE", "AWS_REGION", "AWS_DEFAULT_REGION",
+          "AWS_ENDPOINT_URL", "AWS_CONFIG_FILE", "AWS_SHARED_CREDENTIALS_FILE",
+          "RCLONE_S3_ACCESS_KEY_ID", "RCLONE_S3_SECRET_ACCESS_KEY",
+          "RCLONE_S3_SESSION_TOKEN", "RCLONE_S3_REGION", "RCLONE_S3_ENDPOINT",
+          "RCLONE_S3_PROFILE", "RCLONE_S3_ENV_AUTH"
+        )) {
+        if ($psi.EnvironmentVariables.ContainsKey($drop)) {
+          [void]$psi.EnvironmentVariables.Remove($drop)
+        }
+      }
+      $toRemove = @()
+      foreach ($entry in $psi.EnvironmentVariables.Keys) {
+        $name = [string]$entry
+        if ($name.StartsWith("RCLONE_CONFIG_", [StringComparison]::OrdinalIgnoreCase) -and
+            -not $name.StartsWith(("RCLONE_CONFIG_{0}_" -f $RemoteName.ToUpperInvariant()), [StringComparison]::OrdinalIgnoreCase)) {
+          $toRemove += $name
+        }
+      }
+      foreach ($name in $toRemove) {
+        [void]$psi.EnvironmentVariables.Remove($name)
+      }
+
       $psi.EnvironmentVariables["RCLONE_CONFIG"] = $cfg
-      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_TYPE" -f $RemoteName.ToUpperInvariant())] = "s3"
-      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_PROVIDER" -f $RemoteName.ToUpperInvariant())] = "Wasabi"
-      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_ACCESS_KEY_ID" -f $RemoteName.ToUpperInvariant())] = $ak
-      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_SECRET_ACCESS_KEY" -f $RemoteName.ToUpperInvariant())] = $sk
-      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_REGION" -f $RemoteName.ToUpperInvariant())] = $WasabiRegion
-      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_ENDPOINT" -f $RemoteName.ToUpperInvariant())] = $WasabiEndpoint
-      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_NO_CHECK_BUCKET" -f $RemoteName.ToUpperInvariant())] = "true"
-      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_FORCE_PATH_STYLE" -f $RemoteName.ToUpperInvariant())] = "true"
-      $psi.Arguments = (($RArgs | ForEach-Object { if ($_ -match '[\s"]') { '"' + $_ + '"' } else { $_ } }) -join " ")
+      $rn = $RemoteName.ToUpperInvariant()
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_TYPE" -f $rn)] = "s3"
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_PROVIDER" -f $rn)] = "Wasabi"
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_ACCESS_KEY_ID" -f $rn)] = $ak
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_SECRET_ACCESS_KEY" -f $rn)] = $sk
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_REGION" -f $rn)] = $WasabiRegion
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_ENDPOINT" -f $rn)] = $WasabiEndpoint
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_NO_CHECK_BUCKET" -f $rn)] = "true"
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_FORCE_PATH_STYLE" -f $rn)] = "true"
+      # Write-only: skip post-upload HEAD integrity (rclone help: --s3-no-head).
+      $psi.EnvironmentVariables[("RCLONE_CONFIG_{0}_NO_HEAD" -f $rn)] = "true"
+
+      $psi.Arguments = (($RArgs | ForEach-Object { if ($_ -match '[\s"]') { '"' + ($_ -replace '"', '\"') + '"' } else { $_ } }) -join " ")
+      $started = [DateTime]::UtcNow
       $proc = New-Object Diagnostics.Process
       $proc.StartInfo = $psi
-      [void]$proc.Start()
+      $startedOk = $false
+      try {
+        $startedOk = $proc.Start()
+      } catch {
+        return [pscustomobject]@{
+          ExitCode = 1
+          StdOut = ""
+          StdErr = "process start failed"
+          Phase = $Phase
+          CommandKind = $CommandKind
+          Started = $started
+          Completed = [DateTime]::UtcNow
+        }
+      }
+      if (-not $startedOk) {
+        return [pscustomobject]@{
+          ExitCode = 1
+          StdOut = ""
+          StdErr = "process start returned false"
+          Phase = $Phase
+          CommandKind = $CommandKind
+          Started = $started
+          Completed = [DateTime]::UtcNow
+        }
+      }
       $o = $proc.StandardOutput.ReadToEnd()
       $e = $proc.StandardError.ReadToEnd()
       $proc.WaitForExit()
-      return [pscustomobject]@{ ExitCode = $proc.ExitCode; StdOut = $o; StdErr = $e }
+      return [pscustomobject]@{
+        ExitCode = $proc.ExitCode
+        StdOut = $o
+        StdErr = $e
+        Phase = $Phase
+        CommandKind = $CommandKind
+        Started = $started
+        Completed = [DateTime]::UtcNow
+      }
     }
 
-    $up = Invoke-RcloneEphemeral @(
-      "copyto", $localCopy, $remoteTarget,
-      "--retries", "1", "--low-level-retries", "1",
-      "--transfers", "1", "--checkers", "1",
-      "--immutable", "--s3-upload-cutoff", "100Mi"
-    )
-    if ($up.ExitCode -ne 0) {
-      Stop-Code "STOP_REMOTE_UPLOAD_NOT_AUTHORIZED" "upload failed (no retry)"
-    }
-    Write-Host "WASABI_PRODUCTION_UPLOAD_PASS"
+    try {
+      $cfgDir = Join-Path $env:TEMP ("rclone-w5a1-" + [Guid]::NewGuid().ToString("N"))
+      New-Item -ItemType Directory -Force -Path $cfgDir | Out-Null
+      $cfg = Join-Path $cfgDir "rclone-empty.conf"
+      Set-Content -Path $cfg -Value "" -Encoding ASCII -NoNewline
 
-    # List-only (no copy/get from remote)
-    $ls = Invoke-RcloneEphemeral @("lsl", $listTarget, "--retries", "1", "--low-level-retries", "1")
-    $ak = $null
-    $sk = $null
-    if ($ls.ExitCode -ne 0) {
-      Stop-Code "STOP_UPLOAD_COUNT_NOT_PROVEN" "list failed after upload"
-    }
-    $lsLines = @($ls.StdOut -split "`r?`n" | Where-Object { $_.Trim() })
-    $lsCount = @($lsLines).Count
-    if ($lsCount -ne 1) {
-      Stop-Code "STOP_UPLOAD_COUNT_NOT_PROVEN" ("expected 1 remote object, got " + $lsCount)
-    }
-    # rclone lsl format: size date time name
-    $parts = $lsLines[0].Trim() -split "\s+", 4
-    $remoteSize = [int64]$parts[0]
-    if ($remoteSize -ne $encSize) {
-      Stop-Code "STOP_UPLOAD_COUNT_NOT_PROVEN" "remote size mismatch"
-    }
-    Write-Host "REMOTE_SIZE_VERIFICATION_PASS"
+      # --s3-no-head on CLI as well (belt-and-suspenders with NO_HEAD env).
+      # No --immutable (destination HEAD/stat). Retries fixed at 1 — no parent retry.
+      $up = Invoke-RcloneEphemeral -Phase "object-upload" -CommandKind "copyto" -RArgs @(
+        "copyto", $localCopy, $remoteTarget,
+        "--retries", "1", "--low-level-retries", "1", "--retries-sleep", "0",
+        "--timeout", "60s", "--contimeout", "30s",
+        "--transfers", "1", "--checkers", "1",
+        "--s3-no-head", "--s3-upload-cutoff", "100Mi"
+      )
+      if ($up.ExitCode -ne 0) {
+        $diag = Resolve-UploadFailure -Stdout $up.StdOut -Stderr $up.StdErr -ExitCode $up.ExitCode -Phase "object-upload" -CommandKind "copyto" -ExtraSecrets @($ak, $sk, $Bucket1, $objectKey, $WasabiEndpoint)
+        $up = $null
+        Stop-Code $diag.Code $diag.Message
+      }
+      $up = $null
+      $uploadMarkedPass = $true
+      Write-Host "WASABI_PRODUCTION_UPLOAD_PASS"
 
-    Remove-Item -Recurse -Force $cfgDir -EA SilentlyContinue
+      # List-only verification (no GetObject / copy / download)
+      $ls = Invoke-RcloneEphemeral -Phase "remote-size-verify" -CommandKind "lsl" -RArgs @(
+        "lsl", $listTarget,
+        "--retries", "1", "--low-level-retries", "1", "--retries-sleep", "0",
+        "--timeout", "60s", "--contimeout", "30s"
+      )
+      if ($ls.ExitCode -ne 0) {
+        $diag = Resolve-UploadFailure -Stdout $ls.StdOut -Stderr $ls.StdErr -ExitCode $ls.ExitCode -Phase "remote-size-verify" -CommandKind "lsl" -UploadAlreadyMarkedPass $true -ExtraSecrets @($ak, $sk, $Bucket1, $objectKey, $WasabiEndpoint)
+        $ls = $null
+        Stop-Code $diag.Code $diag.Message
+      }
+      $lsLines = @($ls.StdOut -split "`r?`n" | Where-Object { $_.Trim() })
+      $lsOutSafe = $null
+      $ls.StdOut = $null
+      $ls.StdErr = $null
+      $lsCount = @($lsLines).Count
+      if ($lsCount -ne 1) {
+        $diag = Resolve-UploadFailure -Stdout "" -Stderr ("expected 1 remote object, got " + $lsCount) -ExitCode 1 -Phase "remote-size-verify" -CommandKind "lsl" -UploadAlreadyMarkedPass $true
+        Stop-Code $diag.Code $diag.Message
+      }
+      # rclone lsl format: size date time name — never echo the name
+      $parts = $lsLines[0].Trim() -split "\s+", 4
+      $remoteSize = [int64]$parts[0]
+      $lsLines = $null
+      if ($remoteSize -ne $encSize) {
+        $diag = Resolve-UploadFailure -Stdout "" -Stderr "remote size mismatch" -ExitCode 1 -Phase "remote-size-verify" -CommandKind "lsl" -UploadAlreadyMarkedPass $true
+        Stop-Code $diag.Code $diag.Message
+      }
+      Write-Host "REMOTE_SIZE_VERIFICATION_PASS"
+    }
+    finally {
+      $ak = $null
+      $sk = $null
+      if ($cfgDir -and (Test-Path -LiteralPath $cfgDir)) {
+        try {
+          Remove-Item -Recurse -Force -LiteralPath $cfgDir -ErrorAction Stop
+        } catch {
+          if ($uploadMarkedPass) {
+            Write-Host ("BL_UPLOAD_STOP|STOP_UPLOAD_CONFIG_CLEANUP_FAILED|phase=config-cleanup|exit=1|kind=ProcessError|retryable=false|remote_state=UPLOADED_UNVERIFIED")
+          } else {
+            # Do not obscure a prior upload failure; still report cleanup issue neutrally.
+            Write-Host ("BL_UPLOAD_STOP|STOP_UPLOAD_CONFIG_CLEANUP_FAILED|phase=config-cleanup|exit=1|kind=ProcessError|retryable=false|remote_state=UNKNOWN")
+          }
+        }
+      }
+    }
 
     $objHash = Get-Sha256Text $objectKey
     $refHash = Get-Sha256Text $ExpectedProductionRef
