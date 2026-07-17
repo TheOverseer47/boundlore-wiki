@@ -79,6 +79,11 @@ ALLOWED_KINDS = frozenset(
 # Injectable for offline tests — real runtime uses urllib.request.urlopen.
 _urlopen: Callable[..., Any] = urllib.request.urlopen
 
+# Recursion / pagination guards (tested offline; never emit prefix/object names).
+MAX_PREFIX_DEPTH = 64
+LIST_PAGE_LIMIT = 100
+LIST_OFFSET_HARD_CAP = 100000
+
 
 class StorageStop(Exception):
     """Internal typed stop — converted to a single BL_STORAGE_STOP envelope."""
@@ -104,6 +109,102 @@ def _safe_bucket(bucket: str | None) -> str | None:
     if bucket and bucket in BUCKET_ALLOWLIST:
         return bucket
     return None
+
+
+def join_storage_path(prefix: str, name: str) -> str:
+    """Join Supabase object path segments with '/' only (never os.path / backslash).
+
+    Raises ValueError for empty name, NUL, '.', '..', or empty segments after join.
+    Does not print paths — callers convert ValueError into a redacted envelope.
+    """
+    if name is None or not isinstance(name, str):
+        raise ValueError("invalid_name")
+    raw_name = name.replace("\\", "/")
+    raw_prefix = (prefix or "").replace("\\", "/")
+    if "\x00" in raw_name or "\x00" in raw_prefix:
+        raise ValueError("nul")
+    # Strip one leading/trailing slash from each side before join.
+    left = raw_prefix.strip("/")
+    right = raw_name.strip("/")
+    if not right:
+        raise ValueError("empty_name")
+    joined = right if not left else f"{left}/{right}"
+    # Collapse accidental double slashes without changing segment meaning.
+    while "//" in joined:
+        joined = joined.replace("//", "/")
+    segments = joined.split("/")
+    if any(seg in ("", ".", "..") for seg in segments):
+        raise ValueError("bad_segment")
+    return joined
+
+
+def is_prefix_entry(entry: Any) -> bool | None:
+    """Classify a Storage list entry.
+
+    Returns:
+      True  — virtual folder / prefix (do not download)
+      False — downloadable object
+      None  — structurally ambiguous / invalid (caller must fail-closed)
+
+    Canonical prefix rule (Supabase):
+      dict with non-empty name AND id is None AND metadata is None.
+
+    Compatibility: a trailing '/' on name is also accepted as a prefix signal
+    when id and metadata are both None. A trailing '/' with a non-null id or
+    non-null metadata is ambiguous → None (fail-closed).
+
+    Empty objects (size=0) with a real id remain objects.
+    """
+    if not isinstance(entry, dict):
+        return None
+    name = entry.get("name")
+    if not isinstance(name, str) or not name.strip() or "\x00" in name:
+        return None
+    # Backslash, drive letter, or UNC shapes are invalid remote names.
+    if "\\" in name or name.startswith("//") or (len(name) >= 2 and name[1] == ":"):
+        return None
+
+    eid = entry.get("id", None)
+    meta = entry.get("metadata", None)
+    name_is_slash_folder = name.endswith("/")
+
+    if eid is None and meta is None:
+        return True
+    if name_is_slash_folder:
+        # Slash with object identity is ambiguous — do not guess.
+        return None
+    if eid is not None:
+        if meta is not None and not isinstance(meta, dict):
+            return None
+        return False
+    if meta is not None:
+        if not isinstance(meta, dict):
+            return None
+        return False
+    return None
+
+
+def _legacy_slash_only_would_treat_as_object(entry: dict[str, Any]) -> bool:
+    """Document RED behaviour of the pre-repair classifier (slash-only).
+
+    Used only by offline red/green proof — not used in production paths.
+    """
+    name = entry.get("name")
+    if not name:
+        return False
+    return not str(name).endswith("/")
+
+
+def _normalize_prefix_key(prefix: str) -> str:
+    return (prefix or "").replace("\\", "/").strip("/")
+
+
+def _list_api_prefix(prefix: str) -> str:
+    """Prefix string sent to Storage list API (non-empty prefixes end with '/')."""
+    key = _normalize_prefix_key(prefix)
+    if not key:
+        return ""
+    return key + "/"
 
 
 def emit_parent_stop(
@@ -222,158 +323,257 @@ def _decode_json(data: bytes, *, phase: str, bucket: str | None = None) -> Any:
         )
 
 
-def list_bucket(base: str, bucket: str, headers: dict[str, str]) -> list[dict[str, Any]]:
-    objects: list[dict[str, Any]] = []
-    offset = 0
-    limit = 100
-    while True:
-        payload = json.dumps({"prefix": "", "limit": limit, "offset": offset}).encode("utf-8")
-        url = f"{base}/storage/v1/object/list/{quote(bucket)}"
-        status, data = _request(
-            "POST", url, headers, payload, phase="object-list", bucket=bucket
+def _object_from_entry(
+    entry: dict[str, Any], *, full_path: str, bucket: str
+) -> dict[str, Any]:
+    meta = entry.get("metadata")
+    if meta is None:
+        meta = {}
+    if not isinstance(meta, dict):
+        emit_parent_stop(
+            STOP_STORAGE_EXPORT_INCOMPLETE,
+            phase="object-list",
+            bucket=_safe_bucket(bucket),
+            kind="RuntimeError",
         )
-        if status != 200:
-            emit_parent_stop(
-                STOP_STORAGE_EXPORT_INCOMPLETE,
-                phase="object-list",
-                http=status,
-                bucket=_safe_bucket(bucket),
-                kind="HTTPError",
-            )
-        page = _decode_json(data, phase="object-list", bucket=bucket)
-        if not isinstance(page, list):
-            emit_parent_stop(
-                STOP_STORAGE_EXPORT_INCOMPLETE,
-                phase="object-list",
-                bucket=_safe_bucket(bucket),
-                kind="ValueError",
-            )
+    try:
+        size = int(meta.get("size") or 0)
+    except (TypeError, ValueError):
+        emit_parent_stop(
+            STOP_STORAGE_EXPORT_INCOMPLETE,
+            phase="object-list",
+            bucket=_safe_bucket(bucket),
+            kind="ValueError",
+        )
+    return {
+        "name": full_path,
+        "id": entry.get("id"),
+        "updated_at": entry.get("updated_at"),
+        "created_at": entry.get("created_at"),
+        "size": size,
+        "mimetype": meta.get("mimetype") or "application/octet-stream",
+    }
+
+
+def _list_prefix_page(
+    base: str,
+    bucket: str,
+    headers: dict[str, str],
+    *,
+    prefix: str,
+    offset: int,
+    limit: int,
+) -> list[Any]:
+    api_prefix = _list_api_prefix(prefix)
+    payload = json.dumps(
+        {"prefix": api_prefix, "limit": limit, "offset": offset}
+    ).encode("utf-8")
+    url = f"{base}/storage/v1/object/list/{quote(bucket)}"
+    status, data = _request(
+        "POST", url, headers, payload, phase="object-list", bucket=bucket
+    )
+    if status != 200:
+        emit_parent_stop(
+            STOP_STORAGE_EXPORT_INCOMPLETE,
+            phase="object-list",
+            http=status,
+            bucket=_safe_bucket(bucket),
+            kind="HTTPError",
+        )
+    page = _decode_json(data, phase="object-list", bucket=bucket)
+    if not isinstance(page, list):
+        emit_parent_stop(
+            STOP_STORAGE_EXPORT_INCOMPLETE,
+            phase="object-list",
+            bucket=_safe_bucket(bucket),
+            kind="ValueError",
+        )
+    return page
+
+
+def _traverse_prefix(
+    base: str,
+    bucket: str,
+    headers: dict[str, str],
+    *,
+    prefix: str,
+    depth: int,
+    visited: set[str],
+) -> list[dict[str, Any]]:
+    """Recursively inventory objects under one prefix. Never downloads prefixes."""
+    if depth > MAX_PREFIX_DEPTH:
+        emit_parent_stop(
+            STOP_STORAGE_EXPORT_INCOMPLETE,
+            phase="object-list",
+            bucket=_safe_bucket(bucket),
+            kind="RuntimeError",
+        )
+    key = _normalize_prefix_key(prefix)
+    if key in visited:
+        emit_parent_stop(
+            STOP_STORAGE_EXPORT_INCOMPLETE,
+            phase="object-list",
+            bucket=_safe_bucket(bucket),
+            kind="RuntimeError",
+        )
+    visited.add(key)
+
+    objects: list[dict[str, Any]] = []
+    child_prefixes: list[str] = []
+    seen_names: set[str] = set()
+    offset = 0
+    limit = LIST_PAGE_LIMIT
+
+    while True:
+        page = _list_prefix_page(
+            base, bucket, headers, prefix=prefix, offset=offset, limit=limit
+        )
         if not page:
             break
         for item in page:
-            if not isinstance(item, dict):
-                continue
-            name = item.get("name")
-            if not name or str(name).endswith("/"):
-                if name and str(name).endswith("/"):
-                    objects.extend(_list_prefix(base, bucket, headers, str(name)))
-                continue
-            meta = item.get("metadata") or {}
-            try:
-                size = (
-                    int(meta.get("size") or 0)
-                    if isinstance(meta, dict)
-                    else 0
+            kind = is_prefix_entry(item)
+            if kind is None:
+                emit_parent_stop(
+                    STOP_STORAGE_EXPORT_INCOMPLETE,
+                    phase="object-list",
+                    bucket=_safe_bucket(bucket),
+                    kind="RuntimeError",
                 )
-            except (TypeError, ValueError):
+            assert isinstance(item, dict)
+            raw_name = str(item["name"]).rstrip("/")
+            try:
+                full = join_storage_path(prefix, raw_name)
+            except ValueError:
                 emit_parent_stop(
                     STOP_STORAGE_EXPORT_INCOMPLETE,
                     phase="object-list",
                     bucket=_safe_bucket(bucket),
                     kind="ValueError",
                 )
-            objects.append(
-                {
-                    "name": str(name),
-                    "id": item.get("id"),
-                    "updated_at": item.get("updated_at"),
-                    "created_at": item.get("created_at"),
-                    "size": size,
-                    "mimetype": (meta.get("mimetype") if isinstance(meta, dict) else None)
-                    or "application/octet-stream",
-                }
-            )
+            if full in seen_names:
+                emit_parent_stop(
+                    STOP_STORAGE_EXPORT_INCOMPLETE,
+                    phase="object-list",
+                    bucket=_safe_bucket(bucket),
+                    kind="RuntimeError",
+                )
+            seen_names.add(full)
+            if kind is True:
+                child_prefixes.append(full)
+            else:
+                objects.append(
+                    _object_from_entry(item, full_path=full, bucket=bucket)
+                )
         if len(page) < limit:
             break
         offset += limit
-        if offset > 100000:
+        if offset > LIST_OFFSET_HARD_CAP:
             emit_parent_stop(
                 STOP_STORAGE_EXPORT_INCOMPLETE,
                 phase="object-list",
                 bucket=_safe_bucket(bucket),
                 kind="RuntimeError",
             )
-    return objects
 
-
-def _list_prefix(
-    base: str, bucket: str, headers: dict[str, str], prefix: str
-) -> list[dict[str, Any]]:
-    objects: list[dict[str, Any]] = []
-    offset = 0
-    limit = 100
-    while True:
-        payload = json.dumps({"prefix": prefix, "limit": limit, "offset": offset}).encode("utf-8")
-        url = f"{base}/storage/v1/object/list/{quote(bucket)}"
-        status, data = _request(
-            "POST", url, headers, payload, phase="object-list", bucket=bucket
+    # Deterministic recursion order (never emit names on failure).
+    for child in sorted(child_prefixes):
+        objects.extend(
+            _traverse_prefix(
+                base,
+                bucket,
+                headers,
+                prefix=child,
+                depth=depth + 1,
+                visited=visited,
+            )
         )
-        if status != 200:
-            emit_parent_stop(
-                STOP_STORAGE_EXPORT_INCOMPLETE,
-                phase="object-list",
-                http=status,
-                bucket=_safe_bucket(bucket),
-                kind="HTTPError",
-            )
-        page = _decode_json(data, phase="object-list", bucket=bucket)
-        if not isinstance(page, list) or not page:
-            break
-        for item in page:
-            if not isinstance(item, dict):
-                continue
-            name = item.get("name")
-            if not name:
-                continue
-            full = prefix + str(name) if not str(name).startswith(prefix) else str(name)
-            if full.endswith("/"):
-                objects.extend(_list_prefix(base, bucket, headers, full))
-                continue
-            meta = item.get("metadata") or {}
-            try:
-                size = int(meta.get("size") or 0) if isinstance(meta, dict) else 0
-            except (TypeError, ValueError):
-                emit_parent_stop(
-                    STOP_STORAGE_EXPORT_INCOMPLETE,
-                    phase="object-list",
-                    bucket=_safe_bucket(bucket),
-                    kind="ValueError",
-                )
-            objects.append(
-                {
-                    "name": full,
-                    "updated_at": item.get("updated_at"),
-                    "created_at": item.get("created_at"),
-                    "size": size,
-                    "mimetype": (meta.get("mimetype") if isinstance(meta, dict) else None)
-                    or "application/octet-stream",
-                }
-            )
-        if len(page) < limit:
-            break
-        offset += limit
     return objects
+
+
+def list_bucket(base: str, bucket: str, headers: dict[str, str]) -> list[dict[str, Any]]:
+    """Inventory all downloadable objects in a bucket (flat remote paths)."""
+    if bucket not in BUCKET_ALLOWLIST:
+        emit_parent_stop(STOP_UNKNOWN_STORAGE_BUCKET, phase="object-list")
+    objs = _traverse_prefix(
+        base,
+        bucket,
+        headers,
+        prefix="",
+        depth=0,
+        visited=set(),
+    )
+    # Deterministic inventory order for drift compare.
+    objs.sort(key=lambda o: o["name"])
+    return objs
+
+
+def validate_remote_object_path(object_name: str) -> str:
+    """Validate a fully-qualified remote object path. Raises ValueError on abuse."""
+    if not isinstance(object_name, str) or not object_name:
+        raise ValueError("empty")
+    if "\x00" in object_name:
+        raise ValueError("nul")
+    if "\\" in object_name:
+        raise ValueError("backslash")
+    if object_name.startswith(("/", "\\")) or object_name.startswith("//"):
+        raise ValueError("absolute")
+    if len(object_name) >= 2 and object_name[1] == ":":
+        raise ValueError("drive")
+    normalized = object_name.replace("\\", "/")
+    segments = normalized.split("/")
+    if any(seg in ("", ".", "..") for seg in segments):
+        raise ValueError("segment")
+    if normalized.endswith("/"):
+        raise ValueError("prefix_path")
+    return normalized
+
+
+def assert_dest_under_bucket_root(dest: Path, bucket_root: Path) -> None:
+    """Ensure local write target stays under the bucket output directory."""
+    try:
+        dest_res = dest.resolve()
+        root_res = bucket_root.resolve()
+        dest_res.relative_to(root_res)
+    except (OSError, ValueError):
+        raise ValueError("path_escape")
 
 
 def download_object(
-    base: str, bucket: str, object_name: str, headers: dict[str, str], dest: Path
+    base: str,
+    bucket: str,
+    object_name: str,
+    headers: dict[str, str],
+    dest: Path,
+    *,
+    bucket_root: Path | None = None,
 ) -> dict[str, Any]:
-    normalized = object_name.replace("\\", "/")
-    if ".." in normalized.split("/") or object_name.startswith(("/", "\\")):
+    if bucket not in BUCKET_ALLOWLIST:
+        emit_parent_stop(
+            STOP_STORAGE_EXPORT_INCOMPLETE,
+            phase="object-download",
+            kind="ValueError",
+        )
+    try:
+        safe_name = validate_remote_object_path(object_name)
+    except ValueError:
         emit_parent_stop(
             STOP_STORAGE_EXPORT_INCOMPLETE,
             phase="object-download",
             bucket=_safe_bucket(bucket),
             kind="ValueError",
         )
-    if ":" in Path(object_name).name:
-        emit_parent_stop(
-            STOP_STORAGE_EXPORT_INCOMPLETE,
-            phase="object-download",
-            bucket=_safe_bucket(bucket),
-            kind="ValueError",
-        )
-    url = f"{base}/storage/v1/object/{quote(bucket)}/{quote(object_name, safe='/')}"
+    if bucket_root is not None:
+        try:
+            assert_dest_under_bucket_root(dest, bucket_root)
+        except ValueError:
+            emit_parent_stop(
+                STOP_STORAGE_EXPORT_INCOMPLETE,
+                phase="object-download",
+                bucket=_safe_bucket(bucket),
+                kind="ValueError",
+            )
+    # Encode once; keep path separators as '/'.
+    url = f"{base}/storage/v1/object/{quote(bucket)}/{quote(safe_name, safe='/')}"
     dl_headers = {
         "Authorization": headers["Authorization"],
         "apikey": headers["apikey"],
@@ -441,7 +641,7 @@ def download_object(
         )
     return {
         "relpath_redacted": True,
-        "encoded_name_sha256": hashlib.sha256(object_name.encode("utf-8")).hexdigest(),
+        "encoded_name_sha256": hashlib.sha256(safe_name.encode("utf-8")).hexdigest(),
         "size": size,
         "sha256": h.hexdigest(),
         "mime_guess": "application/octet-stream",
@@ -511,7 +711,10 @@ def _run_export(project_ref: str, out_dir: Path, inv_out: Path) -> int:
             )
         for o in objs:
             local_name = hashlib.sha256(o["name"].encode()).hexdigest() + ".bin"
-            meta = download_object(base, bucket, o["name"], headers, bdir / local_name)
+            dest = bdir / local_name
+            meta = download_object(
+                base, bucket, o["name"], headers, dest, bucket_root=bdir
+            )
             meta["source_name_sha256"] = hashlib.sha256(o["name"].encode()).hexdigest()
             meta["mimetype"] = o.get("mimetype")
             exported.append(meta)

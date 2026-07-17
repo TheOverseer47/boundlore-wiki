@@ -58,3 +58,14 @@ Existing export artefacts untouched.
 ## 8. Final Decision
 
 `PASS_STRUCTURED_STORAGE_CHILD_ENVELOPES_REPAIRED_OFFLINE` after offline QA + local commit.
+
+## 9. Follow-on (prefix traversal)
+
+A subsequent live run after envelopes surfaced:
+
+`phase=object-download http=400 bucket=discovery-uploads kind=HTTPError`
+
+That defect is addressed offline in
+`docs/architecture/p5-production-storage-prefix-traversal-repair.md`
+(Option A: prefix classification + slash-safe join). No live retry is implied by
+this envelope gate alone.
