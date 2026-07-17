@@ -2,6 +2,8 @@
 """Live read-only Supabase Storage export (armed only via BOUNDLORE_LIVE_NETWORK_ARMED=1).
 
 Uses stdlib only. Allowed: list + download. Forbidden: upload/update/delete.
+Errors are redacted: phase + HTTP status + allowlisted bucket only — never object paths,
+Authorization/apikey headers, JWTs, or response bodies.
 """
 from __future__ import annotations
 
@@ -56,8 +58,12 @@ def _request(
         with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
             return resp.status, resp.read()
     except urllib.error.HTTPError as exc:
-        data = exc.read() if hasattr(exc, "read") else b""
-        return exc.code, data
+        # Discard response body — never surface payloads in diagnostics.
+        try:
+            _ = exc.read() if hasattr(exc, "read") else b""
+        except Exception:
+            pass
+        return exc.code, b""
 
 
 def list_bucket(base: str, bucket: str, headers: dict[str, str]) -> list[dict[str, Any]]:
@@ -70,7 +76,9 @@ def list_bucket(base: str, bucket: str, headers: dict[str, str]) -> list[dict[st
         url = f"{base}/storage/v1/object/list/{quote(bucket)}"
         status, data = _request("POST", url, headers, payload)
         if status != 200:
-            raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: list {bucket} HTTP {status}")
+            raise SystemExit(
+                f"{STOP_STORAGE_EXPORT_INCOMPLETE}: object-list HTTP {status} bucket={bucket}"
+            )
         page = json.loads(data.decode("utf-8") or "[]")
         if not isinstance(page, list):
             raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: unexpected list payload")
@@ -118,7 +126,9 @@ def _list_prefix(
         url = f"{base}/storage/v1/object/list/{quote(bucket)}"
         status, data = _request("POST", url, headers, payload)
         if status != 200:
-            raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: list prefix HTTP {status}")
+            raise SystemExit(
+                f"{STOP_STORAGE_EXPORT_INCOMPLETE}: object-list HTTP {status} bucket={bucket}"
+            )
         page = json.loads(data.decode("utf-8") or "[]")
         if not page:
             break
@@ -170,7 +180,7 @@ def download_object(
         with urllib.request.urlopen(req, timeout=300, context=ctx) as resp:
             if getattr(resp, "status", 200) != 200:
                 raise SystemExit(
-                    f"{STOP_STORAGE_EXPORT_INCOMPLETE}: download HTTP {resp.status}"
+                    f"{STOP_STORAGE_EXPORT_INCOMPLETE}: object-download HTTP {resp.status} bucket={bucket}"
                 )
             with dest.open("wb") as wf:
                 while True:
@@ -181,7 +191,9 @@ def download_object(
                     h.update(chunk)
                     size += len(chunk)
     except urllib.error.HTTPError as exc:
-        raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: download HTTP {exc.code}") from exc
+        raise SystemExit(
+            f"{STOP_STORAGE_EXPORT_INCOMPLETE}: object-download HTTP {exc.code} bucket={bucket}"
+        ) from None
     return {
         "relpath_redacted": True,
         "encoded_name_sha256": hashlib.sha256(object_name.encode("utf-8")).hexdigest(),
@@ -191,16 +203,7 @@ def download_object(
     }
 
 
-def main() -> int:
-    _require_armed()
-    if len(sys.argv) < 4:
-        raise SystemExit(
-            "usage: Export-BoundLoreStorageLive.py <project-ref> <output-storage-dir> <inventory-json-out>"
-        )
-    project_ref = sys.argv[1]
-    out_dir = Path(sys.argv[2])
-    inv_out = Path(sys.argv[3])
-
+def _run_export(project_ref: str, out_dir: Path, inv_out: Path) -> int:
     if project_ref == KNOWN_STAGING_REF:
         raise SystemExit("STOP_STAGING_TARGET: staging ref forbidden")
     if project_ref != KNOWN_PRODUCTION_REF:
@@ -218,7 +221,7 @@ def main() -> int:
     # List buckets (GET)
     status, data = _request("GET", f"{base}/storage/v1/bucket", headers)
     if status != 200:
-        raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: bucket list HTTP {status}")
+        raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: bucket-list HTTP {status}")
     buckets = json.loads(data.decode("utf-8"))
     names = [b.get("name") for b in buckets if isinstance(b, dict)]
     for n in names:
@@ -271,8 +274,14 @@ def main() -> int:
             raise SystemExit(f"{STOP_INVENTORY_CHANGED_DURING_EXPORT}: recount {bucket}")
 
     inv = {
-        "start_inventory": {k: {"object_count": v["object_count"], "total_bytes": v["total_bytes"]} for k, v in start.items()},
-        "end_inventory": {k: {"object_count": v["object_count"], "total_bytes": v["total_bytes"]} for k, v in end.items()},
+        "start_inventory": {
+            k: {"object_count": v["object_count"], "total_bytes": v["total_bytes"]}
+            for k, v in start.items()
+        },
+        "end_inventory": {
+            k: {"object_count": v["object_count"], "total_bytes": v["total_bytes"]}
+            for k, v in end.items()
+        },
         "storage_components": [
             {"bucket": c["bucket"], "object_count": c["object_count"]} for c in components
         ],
@@ -281,11 +290,38 @@ def main() -> int:
     }
     inv_out.parent.mkdir(parents=True, exist_ok=True)
     inv_out.write_text(json.dumps(inv, indent=2) + "\n", encoding="utf-8")
-    # Scrub key from env expectation — parent clears
     print(json.dumps({"ok": True, "buckets": list(BUCKET_ALLOWLIST), "inventory": str(inv_out)}))
     return 0
 
 
+def main() -> int:
+    _require_armed()
+    if len(sys.argv) < 4:
+        raise SystemExit(
+            "usage: Export-BoundLoreStorageLive.py <project-ref> <output-storage-dir> <inventory-json-out>"
+        )
+    project_ref = sys.argv[1]
+    out_dir = Path(sys.argv[2])
+    inv_out = Path(sys.argv[3])
+    try:
+        return _run_export(project_ref, out_dir, inv_out)
+    except SystemExit:
+        raise
+    except urllib.error.URLError:
+        raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: network URLError") from None
+    except TimeoutError:
+        raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: network timeout") from None
+    except ssl.SSLError:
+        raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: SSL failure") from None
+    except json.JSONDecodeError:
+        raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: invalid JSON response") from None
+    except OSError:
+        raise SystemExit(f"{STOP_STORAGE_EXPORT_INCOMPLETE}: local filesystem error") from None
+    except Exception:
+        raise SystemExit(
+            f"{STOP_STORAGE_EXPORT_INCOMPLETE}: unclassified storage child failure"
+        ) from None
+
+
 if __name__ == "__main__":
-    # Clear accidental argv secrets (none expected)
     raise SystemExit(main())

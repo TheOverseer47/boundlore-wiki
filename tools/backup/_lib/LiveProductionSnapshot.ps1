@@ -4,6 +4,8 @@
 # ForbiddenStagingRef, BucketAllowlist, SchemaAllowlist, SystemSchemas, RepoRoot,
 # WasabiRegion, WasabiEndpoint, RemoteName, EvidencePath, VeraDrive
 
+. (Join-Path $PSScriptRoot "StorageExportDiagnostics.ps1")
+
 function Invoke-PgChild {
   param(
     [string]$Exe,
@@ -288,13 +290,17 @@ SELECT json_build_object(
     $pSt = New-Object Diagnostics.Process
     $pSt.StartInfo = $psiSt
     [void]$pSt.Start()
-    $null = $pSt.StandardOutput.ReadToEnd()
-    $null = $pSt.StandardError.ReadToEnd()
+    $stOut = $pSt.StandardOutput.ReadToEnd()
+    $stErr = $pSt.StandardError.ReadToEnd()
     $pSt.WaitForExit()
     $stCode = $pSt.ExitCode
     $srKey = $null
+    if ($psiSt.EnvironmentVariables.ContainsKey("SUPABASE_SERVICE_ROLE_KEY")) {
+      [void]$psiSt.EnvironmentVariables.Remove("SUPABASE_SERVICE_ROLE_KEY")
+    }
     if ($stCode -ne 0) {
-      Stop-Code "STOP_STORAGE_EXPORT_INCOMPLETE" ("storage export exit=" + $stCode)
+      $diag = Resolve-StorageChildFailure -Stdout $stOut -Stderr $stErr -ExitCode $stCode
+      Stop-Code $diag.Code $diag.Message
     }
     Write-Host "STORAGE_EXPORT_PASS"
 
