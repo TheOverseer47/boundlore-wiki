@@ -11,21 +11,23 @@ Prior markers included `RELEASE_GATE_LOCKED_PASS`, `PRODUCTION_IDENTITY_PASS`, a
 `DATABASE_EXPORT_PASS`. Storage wrote **0** files. Manifest, age encryption, local
 `.age` copy, Wasabi upload, read-back, and restore did not start.
 
-## 2. Diagnostic Gap
+## 2. Diagnostic Gap (first fix)
 
 `LiveProductionSnapshot.ps1` discarded storage-child stdout/stderr (`$null = …ReadToEnd()`),
-so only the numeric exit code reached the operator. The Python exporter already emitted
-redacted stopcodes that were never shown.
+so only the numeric exit code reached the operator.
 
-## 3. Repair
+**Repaired on `fb4d0d2`:** streams captured into `$stOut`/`$stErr` and passed through
+`Resolve-StorageChildFailure`.
 
-- Capture child stdout/stderr into locals.
-- Redact via `Protect-StorageDiagnosticText` before any operator-facing message.
-- Map known child stopcodes through `Resolve-StorageChildFailure`.
-- Preserve HTTP phase labels: `bucket-list`, `object-list`, `object-download` + status
-  (+ allowlisted bucket name when needed).
-- Unclassified child failures remain fail-closed:
-  `STOP_STORAGE_EXPORT_INCOMPLETE: unclassified storage child failure`.
+## 3. Follow-up Gap (envelope)
+
+A later authorized run still yielded:
+
+`STOP_STORAGE_EXPORT_INCOMPLETE: unclassified storage child failure`
+
+Cause: child exit ≠ 0 without a parent-recognized structured line. See
+`docs/architecture/p5-production-storage-child-envelope-repair.md` for the
+`BL_STORAGE_STOP|…` envelope repair.
 
 ## 4. Redaction Rules
 
@@ -40,17 +42,16 @@ Removed from diagnostics:
 Allowed:
 
 - Stopcode names
-- Phase labels and HTTP status codes
-- Allowlisted bucket names
+- Envelope phase / http / allowlisted bucket / kind
+- Harmless metadata: exit-code, stdout-bytes, stderr-bytes, sentinel-detected
 
 ## 5. Safety Boundary
 
 No new Production access, snapshot retry, dump, storage call, Wasabi, VeraCrypt mount,
-or artifact inspection/mutation. Existing Production export artefacts on V: left untouched
-(V: was not mounted during this repair).
+or artifact inspection/mutation during diagnostic repairs.
 
 A further Production snapshot still requires a new explicit user authorization.
 
 ## 6. Final Decision
 
-`PASS_STORAGE_EXPORT_DIAGNOSTICS_REPAIRED_OFFLINE` after offline QA and local commit.
+See envelope repair doc for current verdict after structured child envelopes land.
