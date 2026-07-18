@@ -22,7 +22,7 @@ Automatic Wasabi upload remains **DEFERRED** after the PutObject-403 / request-s
 
 ## 3. BAT launcher
 
-Source: `tools/backup/launcher/BoundLore-Create-Encrypted-Backup.bat`  
+Source: `tools/backup/launcher/BoundLore-Create-Encrypted-Backup.bat`
 Install: `D:\BoundLoreBackups\Launcher\BoundLore-Create-Encrypted-Backup.bat`
 
 Thin wrapper only:
@@ -79,7 +79,7 @@ Exit code **0** means the **local** authorized job completed; remote upload rema
 
 ## 7. Handoff file
 
-Path: `D:\BoundLoreBackups\ManualUploadHandoffs\<backup-id>.txt`  
+Path: `D:\BoundLoreBackups\ManualUploadHandoffs\<backup-id>.txt`
 Atomic create (`CreateNew`); existing file → `STOP_MANUAL_UPLOAD_HANDOFF_ALREADY_EXISTS`.
 
 Fields: `BACKUP_ID`, `ARCHIVE_FILE`, `ARCHIVE_BYTES`, `ARCHIVE_SHA256`, `LOCAL_ARCHIVE_PATH`, `REMOTE_RELATIVE_PATH`, `UPLOAD_MODE=MANUAL_BROWSER`, `UPLOAD_STATUS=AWAITING_MANUAL_WASABI_UPLOAD`, `CREATED_UTC`, plus short manual instructions.

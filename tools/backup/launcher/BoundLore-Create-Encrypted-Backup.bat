@@ -2,7 +2,7 @@
 setlocal EnableExtensions
 echo BOUNDLORE_MANUAL_UPLOAD_BACKUP_LAUNCHER
 echo.
-REM Thin launcher only — no backup logic, no secrets, no network.
+REM Thin launcher only — no backup logic, no credentials, no network.
 set "ORCH=%~dp0Invoke-BoundLoreManualUploadBackup.ps1"
 if not exist "%ORCH%" (
   echo STOP_LAUNCHER_ORCHESTRATOR_MISSING: orchestrator not found next to this BAT.
