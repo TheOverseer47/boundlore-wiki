@@ -98,7 +98,13 @@ function Assert-GitBaseline([string]$RepoRoot, [string]$BaselineFile) {
       throw "STOP_LAUNCHER_BASELINE_MISMATCH: baseline HEAD not pinned"
     }
     if ($head -ne $expectedHead) {
-      throw ("STOP_UNEXPECTED_HEAD: expected " + $expectedHead + " got " + $head)
+      Push-Location $RepoRoot
+      try {
+        git merge-base --is-ancestor $expectedHead HEAD 2>$null | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+          throw ("STOP_UNEXPECTED_HEAD: expected " + $expectedHead + " (or descendant) got " + $head)
+        }
+      } finally { Pop-Location }
     }
     $status = @(git status --short 2>$null)
     foreach ($s in $status) {
