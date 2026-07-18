@@ -6,6 +6,7 @@
 
 . (Join-Path $PSScriptRoot "StorageExportDiagnostics.ps1")
 . (Join-Path $PSScriptRoot "UploadDiagnostics.ps1")
+. (Join-Path $PSScriptRoot "ManualUploadHandoff.ps1")
 
 function Invoke-PgChild {
   param(
@@ -113,11 +114,16 @@ function Invoke-LiveProductionSnapshotSequence {
     [string]$ArchiveRoot,
     [string]$Prefix,
     [ValidateSet("Direct", "SessionPooler")]
-    [string]$DatabaseConnectionMode = "Direct"
+    [string]$DatabaseConnectionMode = "Direct",
+    [switch]$ManualWasabiUpload
   )
 
   Write-Host "LIVE_SEQUENCE_START"
   Write-Host ("DATABASE_CONNECTION_MODE=" + $DatabaseConnectionMode)
+  if ($ManualWasabiUpload) {
+    Write-Host "REMOTE_UPLOAD_MODE=MANUAL"
+    Write-Host "AUTOMATIC_WASABI_UPLOAD=DEFERRED"
+  }
 
   # --- Interactive non-secret ---
   Write-Host "Enter Production DB host (hidden not required):"
@@ -129,15 +135,18 @@ function Invoke-LiveProductionSnapshotSequence {
   $PgDatabase = Read-Host
   Write-Host "Enter Production DB user:"
   $PgUser = Read-Host
-  Write-Host "Enter Wasabi Production bucket name:"
-  $Bucket1 = Read-Host
-  Write-Host "Re-enter Wasabi Production bucket name:"
-  $Bucket2 = Read-Host
-  if ($Bucket1 -ne $Bucket2 -or [string]::IsNullOrWhiteSpace($Bucket1)) {
-    Stop-Code "STOP_REMOTE_SCOPE_NOT_AUTHORIZED" "bucket confirmation mismatch"
-  }
-  if ($Bucket1 -match "trial-integration" -or $Bucket1 -match "trial") {
-    Stop-Code "STOP_REMOTE_SCOPE_NOT_AUTHORIZED" "trial bucket/scope forbidden"
+  $Bucket1 = $null
+  if (-not $ManualWasabiUpload) {
+    Write-Host "Enter Wasabi Production bucket name:"
+    $Bucket1 = Read-Host
+    Write-Host "Re-enter Wasabi Production bucket name:"
+    $Bucket2 = Read-Host
+    if ($Bucket1 -ne $Bucket2 -or [string]::IsNullOrWhiteSpace($Bucket1)) {
+      Stop-Code "STOP_REMOTE_SCOPE_NOT_AUTHORIZED" "bucket confirmation mismatch"
+    }
+    if ($Bucket1 -match "trial-integration" -or $Bucket1 -match "trial") {
+      Stop-Code "STOP_REMOTE_SCOPE_NOT_AUTHORIZED" "trial bucket/scope forbidden"
+    }
   }
   Write-Host "Type PRODUCTION_BACKUP_SCOPE to confirm:"
   $scopeAck = Read-Host
@@ -150,16 +159,25 @@ function Invoke-LiveProductionSnapshotSequence {
   $secPg = Read-Host -AsSecureString
   Write-Host "Enter Supabase Storage service-role key (hidden):"
   $secSr = Read-Host -AsSecureString
-  Write-Host "Enter Wasabi Access Key ID (hidden):"
-  $secAk = Read-Host -AsSecureString
-  Write-Host "Enter Wasabi Secret Access Key (hidden):"
-  $secSk = Read-Host -AsSecureString
+  $secAk = $null
+  $secSk = $null
+  if (-not $ManualWasabiUpload) {
+    Write-Host "Enter Wasabi Access Key ID (hidden):"
+    $secAk = Read-Host -AsSecureString
+    Write-Host "Enter Wasabi Secret Access Key (hidden):"
+    $secSk = Read-Host -AsSecureString
+  }
 
   $pgPass = ConvertFrom-SecureStringPlain $secPg
   $srKey = ConvertFrom-SecureStringPlain $secSr
-  $ak = ConvertFrom-SecureStringPlain $secAk
-  $sk = ConvertFrom-SecureStringPlain $secSk
-  $secPg.Dispose(); $secSr.Dispose(); $secAk.Dispose(); $secSk.Dispose()
+  $ak = $null
+  $sk = $null
+  if (-not $ManualWasabiUpload) {
+    $ak = ConvertFrom-SecureStringPlain $secAk
+    $sk = ConvertFrom-SecureStringPlain $secSk
+    $secAk.Dispose(); $secSk.Dispose()
+  }
+  $secPg.Dispose(); $secSr.Dispose()
 
   try {
     Assert-ProductionDbConnectionIdentity -Mode $DatabaseConnectionMode -PgHost $PgHost -PgPortIn $PgPortIn -PgDatabase $PgDatabase -PgUser $PgUser
@@ -169,7 +187,10 @@ function Invoke-LiveProductionSnapshotSequence {
     $pgDumpall = (Get-Command pg_dumpall).Source
     $pgRestore = (Get-Command pg_restore).Source
     $ageBin = (Get-Command age).Source
-    $rcloneBin = (Get-Command rclone).Source
+    $rcloneBin = $null
+    if (-not $ManualWasabiUpload) {
+      $rcloneBin = (Get-Command rclone).Source
+    }
 
     $utc = [DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")
     $backupId = "boundlore-production-snapshot-$utc"
@@ -401,13 +422,52 @@ SELECT json_build_object(
     if ((Get-Sha256File $localCopy) -ne $encHash) { Stop-Code "STOP_LOCAL_ENCRYPTED_COPY_FAILED" "hash mismatch" }
     Write-Host "LOCAL_ENCRYPTED_COPY_PASS"
 
+    $objectKey = ($Prefix.TrimEnd("/") + "/" + $backupId + "/" + $finalAgeName)
+    if ($objectKey -match "trial-integration" -or $objectKey.Contains("..")) {
+      Stop-Code "STOP_EXTERNAL_TARGET_MISMATCH" "bad object key"
+    }
+
+    $cfgDir = $null
+    $uploadMarkedPass = $false
+    $handPath = $null
+    $manualModeCompleted = $false
+
+    if ($ManualWasabiUpload) {
+      if ($ak -or $sk -or $Bucket1) {
+        Stop-Code "STOP_CREDENTIAL_PERSISTENCE_RISK" "manual mode must not carry Wasabi credentials"
+      }
+      try {
+        $handPath = New-BoundLoreManualUploadHandoff `
+          -BackupId $backupId `
+          -ArchiveFileName $finalAgeName `
+          -ArchiveBytes $encSize `
+          -ArchiveSha256 $encHash `
+          -LocalArchivePath $localCopy `
+          -RemoteRelativePath $objectKey
+      } catch {
+        $msg = "$_"
+        if ($msg -match "STOP_MANUAL_UPLOAD_HANDOFF_ALREADY_EXISTS") {
+          Stop-Code "STOP_MANUAL_UPLOAD_HANDOFF_ALREADY_EXISTS" $msg
+        }
+        Stop-Code "STOP_MANUAL_UPLOAD_HANDOFF_FAILED" $msg
+      }
+      if (-not (Test-BoundLoreManualHandoffTextSafe (Get-Content -LiteralPath $handPath -Raw -Encoding UTF8))) {
+        Stop-Code "STOP_MANUAL_UPLOAD_HANDOFF_FAILED" "handoff failed secret scan"
+      }
+      Write-Host "REMOTE_UPLOAD_MODE=MANUAL"
+      Write-Host "MANUAL_WASABI_UPLOAD_REQUIRED"
+      Write-Host "MANUAL_UPLOAD_HANDOFF_CREATED_PASS"
+      Write-Host "LOCAL_BACKUP_READY_FOR_MANUAL_UPLOAD"
+      Write-Host "AUTOMATIC_WASABI_UPLOAD=DEFERRED"
+      Write-Host "READBACK_RESTORE_VALIDATION=OPEN"
+      Write-Host "S-07=OPEN"
+      $manualModeCompleted = $true
+    } else {
     # Wasabi upload once + list-only size check (credentials retained until list completes).
     # Write-only principal: PutObject + ListBucket; no GetObject.
     # rclone v1.74.4 --s3-no-head: skip post-upload HEAD integrity check (needs GetObject/HeadObject).
     # --immutable removed: it forces a destination existence stat (HEAD) incompatible with write-only IAM.
     # Collision safety: timestamped backup-id keys; parent verifies via ListBucket size/count only.
-    $cfgDir = $null
-    $uploadMarkedPass = $false
     $akCheck = Test-UploadCredentialOuterWhitespace $ak
     $skCheck = Test-UploadCredentialOuterWhitespace $sk
     if (-not $akCheck.Ok -or -not $skCheck.Ok) {
@@ -432,10 +492,6 @@ SELECT json_build_object(
       Stop-Code "STOP_UPLOAD_SOURCE_INVALID" (Format-UploadStopEnvelope -Code "STOP_UPLOAD_SOURCE_INVALID" -Phase "source-validate" -ExitCode 1 -Http $null -Kind "ScopeError" -Retryable $false -RemoteState "NOT_UPLOADED")
     }
 
-    $objectKey = ($Prefix.TrimEnd("/") + "/" + $backupId + "/" + $finalAgeName)
-    if ($objectKey -match "trial-integration" -or $objectKey.Contains("..")) {
-      Stop-Code "STOP_EXTERNAL_TARGET_MISMATCH" "bad object key"
-    }
     $remoteTarget = "{0}:{1}/{2}" -f $RemoteName, $Bucket1, $objectKey
     $listTarget = "{0}:{1}/{2}" -f $RemoteName, $Bucket1, ($Prefix.TrimEnd("/") + "/" + $backupId)
 
@@ -603,9 +659,15 @@ SELECT json_build_object(
         }
       }
     }
+    } # end automatic Wasabi upload branch
 
     $objHash = Get-Sha256Text $objectKey
     $refHash = Get-Sha256Text $ExpectedProductionRef
+    $verdict = if ($manualModeCompleted) {
+      "PASS_CONTROLLED_PRODUCTION_SNAPSHOT_LOCAL_ENCRYPTED_MANUAL_UPLOAD_HANDOFF"
+    } else {
+      "PASS_CONTROLLED_READ_ONLY_PRODUCTION_SNAPSHOT_ENCRYPTED_UPLOAD_VERIFIED"
+    }
     $evidence = [ordered]@{
       gate_id = "P5-E.10B-W5-A1"
       created_at_utc = ([DateTime]::UtcNow.ToString("o"))
@@ -643,14 +705,15 @@ SELECT json_build_object(
       encrypted_archive_sha256 = $encHash
       local_encrypted_copy_present = $true
       local_hash_match = $true
+      remote_upload_mode = $(if ($manualModeCompleted) { "MANUAL" } else { "AUTOMATIC" })
       wasabi_provider = "Wasabi"
       wasabi_region = "eu-central-2"
-      wasabi_bucket = "REDACTED"
+      wasabi_bucket = $(if ($manualModeCompleted) { "NOT_USED_MANUAL_MODE" } else { "REDACTED" })
       wasabi_prefix_class = "production-snapshots/"
       object_name_redacted_or_hashed = $objHash
-      upload_invocations = 1
-      remote_object_count = 1
-      remote_size_match = $true
+      upload_invocations = $(if ($manualModeCompleted) { 0 } else { 1 })
+      remote_object_count = $(if ($manualModeCompleted) { 0 } else { 1 })
+      remote_size_match = $(if ($manualModeCompleted) { $false } else { $true })
       remote_readback = "NOT_PERFORMED"
       restore = "NOT_PERFORMED"
       plaintext_uploaded = $false
@@ -659,9 +722,13 @@ SELECT json_build_object(
       supabase_mutation = $false
       credentials_persisted = $false
       rclone_config_persisted = $false
+      rclone_invoked = $(if ($manualModeCompleted) { $false } else { $true })
+      automatic_wasabi_upload = $(if ($manualModeCompleted) { "DEFERRED" } else { "PERFORMED" })
+      s07_status = "OPEN"
+      manual_upload_handoff_created = [bool]$manualModeCompleted
       local_cleanup = "PENDING"
       manual_veracrypt_dismount_required = $true
-      verdict = "PASS_CONTROLLED_READ_ONLY_PRODUCTION_SNAPSHOT_ENCRYPTED_UPLOAD_VERIFIED"
+      verdict = $verdict
     }
 
     # Cleanup plaintext under V: (retain .age on V: briefly then remove; local D: copy retained)
@@ -678,7 +745,12 @@ SELECT json_build_object(
     [IO.File]::WriteAllText($EvidencePath, (($evidence | ConvertTo-Json -Depth 8) + [Environment]::NewLine), $utf8)
 
     Write-Host "LOCAL_CLEANUP_PASS"
-    Write-Host "W5_A1_PRODUCTION_SNAPSHOT_PASS"
+    if ($manualModeCompleted) {
+      Write-Host "W5_A1_PRODUCTION_SNAPSHOT_LOCAL_PASS"
+      Write-Host "MANUAL_WASABI_UPLOAD_REQUIRED"
+    } else {
+      Write-Host "W5_A1_PRODUCTION_SNAPSHOT_PASS"
+    }
     Write-Host ("EVIDENCE_WRITTEN=qa/evidence/p5-e10b-w5-production-snapshot.json")
     Write-Host "MANUAL_VERACRYPT_DISMOUNT_REQUIRED"
     exit 0

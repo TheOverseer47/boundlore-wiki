@@ -22,6 +22,7 @@ param(
   [switch]$RunSyntheticOfflineTest,
   [switch]$RunNegativeTests,
   [switch]$LiveExecution,
+  [switch]$ManualWasabiUpload,
 
   [switch]$AllowProductionRead,
   [switch]$AllowSupabaseStorageRead,
@@ -179,11 +180,16 @@ function Test-ProductionRecipientFile([string]$Path) {
 }
 
 function Test-AllLiveGuardsPresent {
+  param([switch]$ForManualWasabiUpload)
   $missing = @()
   if (-not $LiveExecution) { $missing += "LiveExecution" }
   if (-not $AllowProductionRead) { $missing += "AllowProductionRead" }
   if (-not $AllowSupabaseStorageRead) { $missing += "AllowSupabaseStorageRead" }
-  if (-not $AllowExternalWasabiUpload) { $missing += "AllowExternalWasabiUpload" }
+  if ($ForManualWasabiUpload) {
+    if (-not $ManualWasabiUpload) { $missing += "ManualWasabiUpload" }
+  } else {
+    if (-not $AllowExternalWasabiUpload) { $missing += "AllowExternalWasabiUpload" }
+  }
   if ($ConfirmProductionProjectRef -ne $ExpectedProductionRef) { $missing += "ConfirmProductionProjectRef" }
   if (-not $ConfirmReleaseGateLocked) { $missing += "ConfirmReleaseGateLocked" }
   if (-not $ConfirmEncryptedOutputOnly) { $missing += "ConfirmEncryptedOutputOnly" }
@@ -247,9 +253,13 @@ if ($ConfirmProductionProjectRef -and $ConfirmProductionProjectRef -ne $Expected
   Stop-Code "STOP_WRONG_PROJECT" "unexpected project ref"
 }
 
-$liveIntent = $LiveExecution -or (-not $PreflightOnly) -or (-not $Synthetic) -or (-not $NoNetwork) -or $AllowProductionRead -or $AllowSupabaseStorageRead -or $AllowExternalWasabiUpload
+if ($ManualWasabiUpload -and $AllowExternalWasabiUpload) {
+  Stop-Code "STOP_PRODUCTION_SNAPSHOT_NOT_AUTHORIZED" "ManualWasabiUpload conflicts with AllowExternalWasabiUpload"
+}
+
+$liveIntent = $LiveExecution -or (-not $PreflightOnly) -or (-not $Synthetic) -or (-not $NoNetwork) -or $AllowProductionRead -or $AllowSupabaseStorageRead -or $AllowExternalWasabiUpload -or $ManualWasabiUpload
 if ($liveIntent -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests) {
-  $missing = @(Test-AllLiveGuardsPresent)
+  $missing = @(Test-AllLiveGuardsPresent -ForManualWasabiUpload:$ManualWasabiUpload)
   # Reject accidental nested Object[] from a future unary-comma regression.
   foreach ($item in $missing) {
     if ($item -is [System.Array] -and -not ($item -is [string])) {
@@ -279,9 +289,9 @@ if ($liveIntent -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests) 
   if (-not (Test-Path "$VeraDrive\")) {
     Stop-Code "STOP_VERACRYPT_WORKSPACE_NOT_MOUNTED" "V: not mounted"
   }
-  # Minimal W5-A1 arming: only after full confirmation set
+  # Minimal W5-A1 arming: only after full confirmation set (DB/storage; Wasabi deferred in manual mode)
   $GateAllowsLiveNetwork = $true
-  Invoke-LiveProductionSnapshotSequence -WorkspaceRoot $wsRoot -RecipientFile $ProductionRecipientFile -ArchiveRoot $archRoot -Prefix $WasabiProductionPrefix -DatabaseConnectionMode $DatabaseConnectionMode
+  Invoke-LiveProductionSnapshotSequence -WorkspaceRoot $wsRoot -RecipientFile $ProductionRecipientFile -ArchiveRoot $archRoot -Prefix $WasabiProductionPrefix -DatabaseConnectionMode $DatabaseConnectionMode -ManualWasabiUpload:$ManualWasabiUpload
 }
 
 if (-not $NoNetwork -and -not $RunSyntheticOfflineTest -and -not $RunNegativeTests -and -not $LiveExecution) {

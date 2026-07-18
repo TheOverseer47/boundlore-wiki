@@ -300,7 +300,8 @@ if ($c1 -eq 1 -and $c2 -eq 2) { 'JSON_COUNT_PASS' } else { "JSON_COUNT_FAIL $c1 
         "return , @($missing)" not in text and "return ,@($missing)" not in text,
         "no unary-comma nest",
     )
-    check("$missing = @(Test-AllLiveGuardsPresent)" in text, "guards call wrapped")
+    check("$missing = @(Test-AllLiveGuardsPresent" in text, "guards call wrapped")
+    check("-ForManualWasabiUpload:$ManualWasabiUpload" in text, "manual guard mode forwarded")
     check("System.Object[]" in text, "nested-array message rejection present")
 
     print(f"[p5-production-snapshot-count-regression-check] checks={CHECKS} failures={len(FAILURES)}")

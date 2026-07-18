@@ -1,0 +1,2 @@
+BRANCH=review/p5-e10b-w5-a1-controlled-production-snapshot
+HEAD=PLACEHOLDER_UPDATE_AFTER_COMMIT
