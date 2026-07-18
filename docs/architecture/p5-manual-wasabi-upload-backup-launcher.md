@@ -1,4 +1,4 @@
-# P5-E.10B-W5-A7 — Manual Wasabi Upload Backup Launcher
+# P5-E.10B-W5-A7 / A8-R1 — Manual Wasabi Upload Backup Launcher
 
 ## 1. Project decision
 
@@ -20,6 +20,20 @@ Automatic Wasabi upload remains **DEFERRED** after the PutObject-403 / request-s
 | S-07 | **OPEN** |
 | Product activation | Not granted by this gate alone |
 
+## 2b. A8-R1 — first BAT stop (repository root)
+
+The first controlled BAT launch stopped immediately with:
+
+`STOP_LAUNCHER_BASELINE_MISMATCH: cannot locate repository root; set BOUNDLORE_REPO_ROOT`
+
+That stop occurred **before** production identity, SessionPooler, DB/storage export, snapshot, age, or Wasabi handoff. No production run started.
+
+The one-time A8 live authorization was nonetheless **consumed** by that BAT start. A new real BAT/production run requires a **fresh explicit authorization**.
+
+**Root cause:** the installed orchestrator under `D:\BoundLoreBackups\Launcher\` tried to find the repo by walking `..\..\..` from `tools/backup/launcher` layout. That relative layout does not exist at the install path, so it required `BOUNDLORE_REPO_ROOT`. The installer never wrote a local repo-root config.
+
+**Repair:** installer writes `repo-root.txt` at install time; orchestrator resolves fail-closed without requiring a manual env var for normal operation.
+
 ## 3. BAT launcher
 
 Source: `tools/backup/launcher/BoundLore-Create-Encrypted-Backup.bat`
@@ -31,7 +45,7 @@ Thin wrapper only:
 - Starts sibling `Invoke-BoundLoreManualUploadBackup.ps1` with `-NoProfile`
 - Propagates exit code
 - Holds the window with `pause`
-- No secrets, no network, no backup logic
+- No credentials, no network, no backup logic, no repository search
 
 ## 4. PowerShell orchestrator
 
@@ -39,16 +53,35 @@ Source: `tools/backup/launcher/Invoke-BoundLoreManualUploadBackup.ps1`
 
 Checks (live path):
 
-1. `V:` mounted; workspace identity under `V:\BoundLoreProductionSnapshot` (same VeraCrypt rule as runner)
-2. Free space on `V:` / `D:`
-3. Toolchain: `age`, `psql`, `pg_dump`, `pg_dumpall`, `pg_restore`, `tar` (**not** rclone)
-4. Git branch + pinned HEAD from `expected-git-baseline.txt`
-5. Worktree allowlist for known protected untracked artefacts
-6. Exclusive lock `boundlore-backup.lock`
-7. Confirmation gesture `CREATE_LOCAL_ENCRYPTED_BACKUP_ONLY`
-8. Starts runner with `-ManualWasabiUpload` (never `-AllowExternalWasabiUpload`)
+1. Resolve and validate repository root (see §4b) — before any further phases
+2. `V:` mounted; workspace identity under `V:\BoundLoreProductionSnapshot` (same VeraCrypt rule as runner)
+3. Free space on `V:` / `D:`
+4. Toolchain: `age`, `psql`, `pg_dump`, `pg_dumpall`, `pg_restore`, `tar` (**not** rclone)
+5. Git branch + pinned HEAD from `expected-git-baseline.txt` (pinned commit **or descendant** on the review branch)
+6. Worktree allowlist for known protected untracked artefacts
+7. Exclusive lock `boundlore-backup.lock`
+8. Confirmation gesture `CREATE_LOCAL_ENCRYPTED_BACKUP_ONLY`
+9. Starts runner with `-ManualWasabiUpload` (never `-AllowExternalWasabiUpload`)
 
 VeraCrypt mount/dismount remains **manual**.
+
+### 4b. Repository root resolution
+
+Installed config: `D:\BoundLoreBackups\Launcher\repo-root.txt`
+
+Format: exactly one line, absolute local Windows path, UTF-8 no BOM, no quotes, no env expansion, no UNC/relative/wildcards.
+
+Priority:
+
+1. `-RepoRoot` (tests / controlled calls only) → `REPO_ROOT_SOURCE=PARAMETER`
+2. Local `repo-root.txt` beside the orchestrator → `REPO_ROOT_SOURCE=LOCAL_CONFIG`
+3. Optional process env `BOUNDLORE_REPO_ROOT` → `REPO_ROOT_SOURCE=PROCESS_ENV`
+
+Normal operation uses the local config. Operators do **not** set `BOUNDLORE_REPO_ROOT` for routine runs. The process env is an optional fallback only; the launcher never writes User/Machine environment variables.
+
+Validation before later phases: path exists as a local directory, not a reparse point, `.git` present, required runner/launcher sources present, `git rev-parse --show-toplevel` matches exactly, then branch/HEAD/worktree checks. Failures use `STOP_LAUNCHER_BASELINE_MISMATCH` with non-sensitive `reason=` subclasses (`repo-config-missing`, `repo-path-invalid`, `git-root-mismatch`, `branch-mismatch`, `head-not-allowed`, `worktree-unexpected`). Full user paths are not written into stop codes.
+
+No parent-directory or drive-wide search.
 
 ## 5. Manual Wasabi upload switch
 
@@ -88,11 +121,11 @@ No bucket name, keys, ARNs, connection strings, or plaintext.
 
 ## 8. Log model
 
-`D:\BoundLoreBackups\Logs\manual-backup-<timestamp>.log` — UTC phase/PASS/FAIL/stop/exit/branch/commit only. No secrets or raw stderr dumps.
+`D:\BoundLoreBackups\Logs\manual-backup-<timestamp>.log` — UTC phase/PASS/FAIL/stop/exit/branch/commit and `REPO_ROOT_SOURCE=*` only. No secrets, no full repo path dump, no raw stderr dumps.
 
 ## 9. Secret protection
 
-No secrets in BAT, orchestrator, installer, baseline, or handoff. Runner still uses interactive SecureString for DB + storage only in manual mode (no Wasabi keys).
+No secrets in BAT, orchestrator, installer, baseline, `repo-root.txt`, or handoff. Runner still uses interactive SecureString for DB + storage only in manual mode (no Wasabi keys).
 
 ## 10. Lock model
 
@@ -116,9 +149,15 @@ Gated behind `if (-not $ManualWasabiUpload)`.
 
 ## 15. Install paths
 
-`tools/backup/Install-BoundLoreManualUploadLauncher.ps1` copies BAT, orchestrator, and `expected-git-baseline.txt` to `D:\BoundLoreBackups\Launcher\` after hash verify. Existing files require `-ConfirmInstallAck REPLACE_LAUNCHER_FILES`. Installer never runs the BAT.
+`tools/backup/Install-BoundLoreManualUploadLauncher.ps1`:
 
-Set `BOUNDLORE_REPO_ROOT` when launching from the installed copy so the orchestrator can find the repository.
+- Validates installer git toplevel
+- Copies BAT, orchestrator, baseline, and `LauncherRepoRoot.ps1` to `D:\BoundLoreBackups\Launcher\`
+- Writes `repo-root.txt` with that validated absolute repo path
+- Hash-verifies copies
+- Never runs the BAT, never needs `V:`, never touches Production handoffs/archives or Logs content
+
+Existing files require `-ConfirmInstallAck REPLACE_LAUNCHER_FILES`.
 
 ## 16. Cleanup
 
@@ -126,7 +165,9 @@ Same VeraCrypt plaintext wipe after local hash-confirmed copy as the automatic p
 
 ## 17. Offline test matrix
 
-Covered by `Test-BoundLoreManualUploadBackup.ps1`, orchestrator `-OfflineSelfTest`, installer `-OfflineTempInstallTest`, and `qa/p5-manual-wasabi-upload-backup-launcher-check.py`, plus existing runner/upload/storage offline suites.
+Covered by `Test-BoundLoreManualUploadBackup.ps1`, orchestrator `-OfflineSelfTest` / `-RepoRootResolutionSelfTest`, installer `-OfflineTempInstallTest`, and `qa/p5-manual-wasabi-upload-backup-launcher-check.py`, plus existing runner/upload/storage offline suites.
+
+Repo-root markers: `LAUNCHER_REPO_ROOT_RESOLUTION_OFFLINE_PASS`, `NO_REAL_NETWORK_INVOKED_PASS`, `NO_PRODUCTION_RUN_INVOKED_PASS`.
 
 ## 18. Status lines
 
@@ -139,8 +180,10 @@ S-07=OPEN
 
 ## 19. Next operational step
 
+Requires a **new explicit live authorization** (A8 live auth already consumed):
+
 1. Mount `V:`
-2. Run installed BAT (after baseline HEAD pin matches repo)
+2. Run installed BAT (repo-root.txt present; no manual `BOUNDLORE_REPO_ROOT` needed)
 3. Complete SecureString prompts for DB + storage only
 4. Upload the new `.age` manually using the handoff relative path
 5. Compare filename + bytes in the dashboard

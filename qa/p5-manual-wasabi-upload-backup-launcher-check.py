@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static checks for P5-E.10B-W5-A7 manual Wasabi upload backup launcher."""
+"""Static checks for P5-E.10B-W5-A7/A8 manual Wasabi upload backup launcher."""
 from __future__ import annotations
 
 import re
@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RUNNER = ROOT / "tools" / "backup" / "Invoke-BoundLoreProductionSnapshot.ps1"
 LIVE = ROOT / "tools" / "backup" / "_lib" / "LiveProductionSnapshot.ps1"
 HAND = ROOT / "tools" / "backup" / "_lib" / "ManualUploadHandoff.ps1"
+REPO_LIB = ROOT / "tools" / "backup" / "_lib" / "LauncherRepoRoot.ps1"
 ORCH = ROOT / "tools" / "backup" / "launcher" / "Invoke-BoundLoreManualUploadBackup.ps1"
 BAT = ROOT / "tools" / "backup" / "launcher" / "BoundLore-Create-Encrypted-Backup.bat"
 INST = ROOT / "tools" / "backup" / "Install-BoundLoreManualUploadLauncher.ps1"
@@ -34,13 +35,15 @@ def main() -> None:
     runner = RUNNER.read_text(encoding="utf-8")
     live = LIVE.read_text(encoding="utf-8")
     hand = HAND.read_text(encoding="utf-8")
+    repo_lib = REPO_LIB.read_text(encoding="utf-8")
     orch = ORCH.read_text(encoding="utf-8")
     bat = BAT.read_text(encoding="utf-8", errors="replace")
     inst = INST.read_text(encoding="utf-8")
     stops = STOPS.read_text(encoding="utf-8")
+    doc = DOC.read_text(encoding="utf-8") if DOC.is_file() else ""
 
     check(RUNNER.is_file() and LIVE.is_file() and HAND.is_file(), "core files present")
-    check(ORCH.is_file() and BAT.is_file() and INST.is_file(), "launcher files present")
+    check(ORCH.is_file() and BAT.is_file() and INST.is_file() and REPO_LIB.is_file(), "launcher files present")
     check("ManualWasabiUpload" in runner, "runner switch")
     check("ForManualWasabiUpload" in runner, "manual guard path")
     check("ManualWasabiUpload conflicts with AllowExternalWasabiUpload" in runner, "conflict guard")
@@ -64,6 +67,17 @@ def main() -> None:
     check("OfflineTempInstallTest" in inst, "installer temp test")
     check("REPLACE_LAUNCHER_FILES" in inst, "installer replace ack")
     check("INSTALLER_DID_NOT_EXECUTE_BAT" in inst, "installer no bat exec")
+    check("repo-root.txt" in inst and "Write-BoundLoreRepoRootConfigFile" in inst, "installer writes repo-root")
+    check("Resolve-BoundLoreLauncherRepoRoot" in repo_lib, "resolve helper")
+    check("Assert-BoundLoreLauncherRepoRoot" in repo_lib, "assert helper")
+    check('Source = "PARAMETER"' in repo_lib, "param source")
+    check('Source = "LOCAL_CONFIG"' in repo_lib, "local config source")
+    check('Source = "PROCESS_ENV"' in repo_lib, "process env source")
+    check("Resolve-BoundLoreLauncherRepoRoot" in orch, "orch uses resolve")
+    check("cannot locate repository root; set BOUNDLORE_REPO_ROOT" not in orch, "no hard env requirement message")
+    check("SetEnvironmentVariable" not in orch and "SetEnvironmentVariable" not in inst, "no persistent env writer")
+    check("repo-root.txt" in doc and "A8-R1" in doc, "docs cover A8 repair")
+    check("BOUNDLORE_REPO_ROOT" in doc and "optional" in doc.lower(), "docs env optional")
     # Manual chunk must not invoke rclone
     parts = live.split("if ($ManualWasabiUpload) {", 1)
     check(len(parts) == 2, "manual if present")
@@ -74,7 +88,6 @@ def main() -> None:
         check("WASABI_PRODUCTION_UPLOAD_PASS" not in manual, "manual branch no upload pass")
         check("REMOTE_SIZE_VERIFICATION_PASS" not in manual, "manual branch no remote verify pass")
         check("New-BoundLoreManualUploadHandoff" in manual, "manual creates handoff")
-    check(DOC.is_file() or True, "doc optional at static time")  # filled later
     check("Get-Command rclone" in live, "rclone still required for automatic path")
     check("if (-not $ManualWasabiUpload)" in live and "Get-Command rclone" in live, "rclone gated")
 

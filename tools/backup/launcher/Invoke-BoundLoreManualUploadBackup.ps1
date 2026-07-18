@@ -3,18 +3,21 @@
   BoundLore manual-upload backup orchestrator (local launcher).
 
 .DESCRIPTION
-  Validates V:, free space, toolchain, git baseline, worktree allowlist, lock,
+  Resolves repository root (parameter > repo-root.txt > process env), validates
+  V:, free space, toolchain, git baseline, worktree allowlist, lock,
   confirmation gesture, then starts Invoke-BoundLoreProductionSnapshot.ps1 with
   -ManualWasabiUpload. Never mounts VeraCrypt, never calls Wasabi/rclone.
 
-  -OfflineSelfTest runs stubbed offline checks only (no Production, no V: required
-  when BOUNDLORE_OFFLINE_* roots are set).
+  -OfflineSelfTest / -RepoRootResolutionSelfTest run stubbed offline checks only
+  (no Production, no V: required when BOUNDLORE_OFFLINE_* roots are set).
 #>
 [CmdletBinding()]
 param(
   [switch]$OfflineSelfTest,
+  [switch]$RepoRootResolutionSelfTest,
   [switch]$SkipConfirmation,
-  [string]$RepoRootOverride = "",
+  [Alias("RepoRootOverride")]
+  [string]$RepoRoot = "",
   [string]$RunnerStubPath = ""
 )
 
@@ -26,6 +29,17 @@ $ConfirmGesture = "CREATE_LOCAL_ENCRYPTED_BACKUP_ONLY"
 $VeraDrive = "V:"
 $MinVFree = 2GB
 $MinDFree = 1GB
+
+# Installed sibling copy first; repository source under tools/backup/_lib second.
+$LauncherRepoRootLib = Join-Path $PSScriptRoot "LauncherRepoRoot.ps1"
+if (-not (Test-Path -LiteralPath $LauncherRepoRootLib)) {
+  $LauncherRepoRootLib = Join-Path (Split-Path $PSScriptRoot -Parent) "_lib\LauncherRepoRoot.ps1"
+}
+if (-not (Test-Path -LiteralPath $LauncherRepoRootLib)) {
+  Write-Host "STOP_LAUNCHER_BASELINE_MISMATCH: reason=repo-config-missing"
+  exit 1
+}
+. $LauncherRepoRootLib
 
 function Get-LauncherRoot {
   if ($env:BOUNDLORE_OFFLINE_LAUNCHER_ROOT -and $env:BOUNDLORE_OFFLINE_LAUNCHER_ROOT.Trim()) {
@@ -86,7 +100,7 @@ function Assert-GitBaseline([string]$RepoRoot, [string]$BaselineFile) {
     $branch = (git branch --show-current 2>$null | Out-String).Trim()
     $head = (git rev-parse --short HEAD 2>$null | Out-String).Trim()
     if ($branch -ne $ExpectedBranch) {
-      throw ("STOP_WRONG_BRANCH: got " + $branch)
+      throw ("STOP_LAUNCHER_BASELINE_MISMATCH: reason=branch-mismatch")
     }
     $expectedHead = $null
     if (Test-Path -LiteralPath $BaselineFile) {
@@ -95,12 +109,12 @@ function Assert-GitBaseline([string]$RepoRoot, [string]$BaselineFile) {
       }
     }
     if (-not $expectedHead -or $expectedHead -eq "PLACEHOLDER_UPDATE_AFTER_COMMIT") {
-      throw "STOP_LAUNCHER_BASELINE_MISMATCH: baseline HEAD not pinned"
+      throw "STOP_LAUNCHER_BASELINE_MISMATCH: reason=head-not-allowed"
     }
     if ($head -ne $expectedHead) {
       git merge-base --is-ancestor $expectedHead HEAD 2>$null | Out-Null
       if ($LASTEXITCODE -ne 0) {
-        throw ("STOP_UNEXPECTED_HEAD: expected " + $expectedHead + " (or descendant) got " + $head)
+        throw "STOP_LAUNCHER_BASELINE_MISMATCH: reason=head-not-allowed"
       }
     }
     $status = @(git status --short 2>$null)
@@ -109,11 +123,11 @@ function Assert-GitBaseline([string]$RepoRoot, [string]$BaselineFile) {
       if (-not $t) { continue }
       if ($t.StartsWith("??")) {
         if (-not (Test-AllowedUntracked $t)) {
-          throw ("STOP_DIRTY_WORKTREE_UNEXPECTED: untracked " + $t)
+          throw "STOP_LAUNCHER_BASELINE_MISMATCH: reason=worktree-unexpected"
         }
         continue
       }
-      throw ("STOP_DIRTY_WORKTREE_UNEXPECTED: " + $t)
+      throw "STOP_LAUNCHER_BASELINE_MISMATCH: reason=worktree-unexpected"
     }
     return @{ Branch = $branch; Head = $head }
   } finally { Pop-Location }
@@ -169,8 +183,121 @@ function Exit-BackupLock($LockStream, [string]$LockPath, [bool]$Remove) {
   }
 }
 
-# --- Offline self-test (no Production / no real runner) ---
-if ($OfflineSelfTest) {
+function Invoke-RepoRootResolutionSelfTest {
+  $failures = New-Object System.Collections.Generic.List[string]
+  $tmp = Join-Path $env:TEMP ("bl-a8-repo-" + [Guid]::NewGuid().ToString("N"))
+  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+  $launcherDir = Join-Path $tmp "Launcher With Spaces"
+  New-Item -ItemType Directory -Force -Path $launcherDir | Out-Null
+  $cfg = Join-Path $launcherDir "repo-root.txt"
+
+  # Discover real repo for positive cases (this script under tools/backup/launcher).
+  $realRepo = $null
+  try {
+    $probe = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
+    if (Test-Path (Join-Path $probe ".git")) { $realRepo = Assert-BoundLoreLauncherRepoRoot -RepoRoot $probe }
+  } catch { [void]$failures.Add("selftest-real-repo") }
+
+  function Expect-Fail([scriptblock]$Block, [string]$ReasonSub, [string]$Name) {
+    try {
+      & $Block
+      [void]$failures.Add($Name + "-should-fail")
+    } catch {
+      if ("$_" -notmatch [regex]::Escape($ReasonSub)) { [void]$failures.Add($Name + "-code") }
+    }
+  }
+
+  # 1 missing config + no env + no param
+  Expect-Fail { [void](Resolve-BoundLoreLauncherRepoRoot -RepoRoot "" -LauncherDirectory $launcherDir -ProcessEnvValue "") } "repo-config-missing" "missing-config"
+
+  # empty file
+  [IO.File]::WriteAllText($cfg, "")
+  Expect-Fail { [void](Read-BoundLoreRepoRootConfigFile -ConfigPath $cfg) } "repo-path-invalid" "empty-file"
+
+  # multi-line
+  [IO.File]::WriteAllText($cfg, "C:\a`r`nC:\b`r`n")
+  Expect-Fail { [void](Read-BoundLoreRepoRootConfigFile -ConfigPath $cfg) } "repo-path-invalid" "multi-line"
+
+  # relative
+  [IO.File]::WriteAllText($cfg, "relative\path`n")
+  Expect-Fail { [void](Read-BoundLoreRepoRootConfigFile -ConfigPath $cfg) } "repo-path-invalid" "relative"
+
+  # UNC
+  [IO.File]::WriteAllText($cfg, "\\server\share\repo`n")
+  Expect-Fail { [void](Read-BoundLoreRepoRootConfigFile -ConfigPath $cfg) } "repo-path-invalid" "unc"
+
+  # nonexistent
+  [IO.File]::WriteAllText($cfg, "Z:\BoundLoreDoesNotExist-RepoRoot-A8`n")
+  try {
+    $r = Resolve-BoundLoreLauncherRepoRoot -RepoRoot "" -LauncherDirectory $launcherDir -ProcessEnvValue ""
+    try { [void](Assert-BoundLoreLauncherRepoRoot -RepoRoot $r.Path); [void]$failures.Add("nonexistent-should-fail") }
+    catch { if ("$_" -notmatch "repo-path-invalid") { [void]$failures.Add("nonexistent-code") } }
+  } catch { if ("$_" -notmatch "repo-path-invalid|repo-config") { [void]$failures.Add("nonexistent-resolve") } }
+
+  # outer whitespace
+  [IO.File]::WriteAllText($cfg, " C:\Users\Julius\Documents\GitHub\boundlore-wiki `n")
+  Expect-Fail { [void](Read-BoundLoreRepoRootConfigFile -ConfigPath $cfg) } "repo-path-invalid" "whitespace"
+
+  # quotes
+  [IO.File]::WriteAllText($cfg, "`"C:\Users\Julius\Documents\GitHub\boundlore-wiki`"`n")
+  Expect-Fail { [void](Read-BoundLoreRepoRootConfigFile -ConfigPath $cfg) } "repo-path-invalid" "quotes"
+
+  if ($realRepo) {
+    # correct config
+    [void](Write-BoundLoreRepoRootConfigFile -ConfigPath $cfg -RepoRoot $realRepo)
+    $ok = Resolve-BoundLoreLauncherRepoRoot -RepoRoot "" -LauncherDirectory $launcherDir -ProcessEnvValue ""
+    if ($ok.Source -ne "LOCAL_CONFIG") { [void]$failures.Add("source-local-config") }
+    [void](Assert-BoundLoreLauncherRepoRoot -RepoRoot $ok.Path)
+
+    # parameter wins over file
+    $paramWin = Resolve-BoundLoreLauncherRepoRoot -RepoRoot $realRepo -LauncherDirectory $launcherDir -ProcessEnvValue "C:\Windows"
+    if ($paramWin.Source -ne "PARAMETER") { [void]$failures.Add("param-priority") }
+
+    # file wins over env
+    $fileWin = Resolve-BoundLoreLauncherRepoRoot -RepoRoot "" -LauncherDirectory $launcherDir -ProcessEnvValue "C:\Windows"
+    if ($fileWin.Source -ne "LOCAL_CONFIG") { [void]$failures.Add("file-over-env") }
+
+    # env fallback when no file
+    Remove-Item -LiteralPath $cfg -Force
+    $envWin = Resolve-BoundLoreLauncherRepoRoot -RepoRoot "" -LauncherDirectory $launcherDir -ProcessEnvValue $realRepo
+    if ($envWin.Source -ne "PROCESS_ENV") { [void]$failures.Add("env-fallback") }
+    [void](Assert-BoundLoreLauncherRepoRoot -RepoRoot $envWin.Path)
+
+    # wrong path that exists but is not this git repo (use TEMP)
+    $fake = Join-Path $tmp "not-a-repo"
+    New-Item -ItemType Directory -Force -Path $fake | Out-Null
+    Expect-Fail { [void](Assert-BoundLoreLauncherRepoRoot -RepoRoot $fake) } "repo-path-invalid" "wrong-repo"
+  }
+
+  # no persistent env mutation
+  $before = [Environment]::GetEnvironmentVariable("BOUNDLORE_REPO_ROOT", "User")
+  $beforeMachine = [Environment]::GetEnvironmentVariable("BOUNDLORE_REPO_ROOT", "Machine")
+  $env:BOUNDLORE_REPO_ROOT = "C:\process-only-should-not-persist"
+  Remove-Item Env:\BOUNDLORE_REPO_ROOT -EA SilentlyContinue
+  $after = [Environment]::GetEnvironmentVariable("BOUNDLORE_REPO_ROOT", "User")
+  $afterMachine = [Environment]::GetEnvironmentVariable("BOUNDLORE_REPO_ROOT", "Machine")
+  if ($before -ne $after -or $beforeMachine -ne $afterMachine) { [void]$failures.Add("persistent-env-changed") }
+
+  Remove-Item -Recurse -Force $tmp -EA SilentlyContinue
+
+  if ($failures.Count -gt 0) {
+    Write-Host ("REPO_ROOT_RESOLUTION_SELFTEST_FAIL:" + ($failures -join ","))
+    return 1
+  }
+  Write-Host "LAUNCHER_REPO_ROOT_RESOLUTION_OFFLINE_PASS"
+  Write-Host "NO_REAL_NETWORK_INVOKED_PASS"
+  Write-Host "NO_PRODUCTION_RUN_INVOKED_PASS"
+  return 0
+}
+
+# --- Offline self-tests ---
+if ($RepoRootResolutionSelfTest -or $OfflineSelfTest) {
+  $rr = Invoke-RepoRootResolutionSelfTest
+  if ($RepoRootResolutionSelfTest -and -not $OfflineSelfTest) {
+    exit $rr
+  }
+  if ($rr -ne 0) { exit $rr }
+
   $failures = @()
   $tmp = Join-Path $env:TEMP ("bl-a7-orch-" + [Guid]::NewGuid().ToString("N"))
   New-Item -ItemType Directory -Force -Path $tmp | Out-Null
@@ -181,7 +308,6 @@ if ($OfflineSelfTest) {
 
   . (Join-Path (Split-Path $PSScriptRoot -Parent) "_lib\ManualUploadHandoff.ps1")
 
-  # Handoff happy + no-overwrite
   $hp = New-BoundLoreManualUploadHandoff -BackupId "boundlore-production-snapshot-test" -ArchiveFileName "boundlore-production-snapshot-test.age" -ArchiveBytes 1234 -ArchiveSha256 ("a" * 64) -LocalArchivePath "D:\BoundLoreBackups\EncryptedArchives\boundlore-production-snapshot-test.age" -RemoteRelativePath "production-snapshots/boundlore-production-snapshot-test/boundlore-production-snapshot-test.age"
   if (-not (Test-Path $hp)) { $failures += "handoff-create" }
   if (-not (Test-BoundLoreManualHandoffTextSafe (Get-Content $hp -Raw))) { $failures += "handoff-safe" }
@@ -192,7 +318,6 @@ if ($OfflineSelfTest) {
     if ("$_" -notmatch "STOP_MANUAL_UPLOAD_HANDOFF_ALREADY_EXISTS") { $failures += "handoff-overwrite-code" }
   }
 
-  # Lock exclusive
   $lp = Get-LockPath
   $s1 = Enter-BackupLock $lp
   try {
@@ -203,7 +328,6 @@ if ($OfflineSelfTest) {
   }
   if (Test-Path $lp) { $failures += "lock-not-removed" }
 
-  # Confirmation reject
   if ($ConfirmGesture -ne "CREATE_LOCAL_ENCRYPTED_BACKUP_ONLY") { $failures += "gesture" }
 
   $bat = Join-Path $PSScriptRoot "BoundLore-Create-Encrypted-Backup.bat"
@@ -225,6 +349,7 @@ if ($OfflineSelfTest) {
   Write-Host "NO_REAL_NETWORK_INVOKED_PASS"
   Write-Host "NO_PRODUCTION_RUN_INVOKED_PASS"
   Write-Host "NO_WASABI_OR_RCLONE_INVOKED_PASS"
+  Write-Host "LAUNCHER_REPO_ROOT_RESOLUTION_OFFLINE_PASS"
   exit 0
 }
 
@@ -239,23 +364,18 @@ $lockOwned = $false
 try {
   Write-RedactedLog $logPath "START MANUAL_UPLOAD_ORCHESTRATOR"
 
-  $repoRoot = if ($RepoRootOverride) { $RepoRootOverride } else {
-    # Prefer repo relative to this script: tools/backup/launcher -> repo root
-    [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
-  }
-  if (-not (Test-Path (Join-Path $repoRoot "tools\backup\Invoke-BoundLoreProductionSnapshot.ps1"))) {
-    # Installed under D:\...\Launcher — locate repo via sibling expected baseline or fail
-    $probe = Join-Path $PSScriptRoot "..\..\..\tools\backup\Invoke-BoundLoreProductionSnapshot.ps1"
-    if (Test-Path $probe) {
-      $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
-    } else {
-      # Installation copy: require BOUNDLORE_REPO_ROOT
-      if ($env:BOUNDLORE_REPO_ROOT -and (Test-Path $env:BOUNDLORE_REPO_ROOT)) {
-        $repoRoot = [IO.Path]::GetFullPath($env:BOUNDLORE_REPO_ROOT)
-      } else {
-        Stop-Orchestrator "STOP_LAUNCHER_BASELINE_MISMATCH" "cannot locate repository root; set BOUNDLORE_REPO_ROOT" $logPath
-      }
-    }
+  # Repository root: PARAMETER > repo-root.txt > process BOUNDLORE_REPO_ROOT.
+  # No parent-directory walk. No persistent env mutation.
+  try {
+    $resolved = Resolve-BoundLoreLauncherRepoRoot -RepoRoot $RepoRoot -LauncherDirectory $PSScriptRoot -ProcessEnvValue ($env:BOUNDLORE_REPO_ROOT)
+    $repoRoot = Assert-BoundLoreLauncherRepoRoot -RepoRoot $resolved.Path
+    Write-RedactedLog $logPath ("REPO_ROOT_SOURCE=" + $resolved.Source)
+    Write-Host ("REPO_ROOT_SOURCE=" + $resolved.Source)
+  } catch {
+    $msg = "$_"
+    $reason = "repo-path-invalid"
+    if ($msg -match "reason=([a-z0-9\-]+)") { $reason = $Matches[1] }
+    Stop-Orchestrator "STOP_LAUNCHER_BASELINE_MISMATCH" ("reason=" + $reason) $logPath
   }
 
   $baselineFile = Join-Path $PSScriptRoot "expected-git-baseline.txt"
@@ -267,7 +387,13 @@ try {
   Write-RedactedLog $logPath "PASS V_MOUNT"
   try { Assert-ToolchainManual } catch { Stop-Orchestrator (($_.Exception.Message -split ":")[0]) $_.Exception.Message $logPath }
   Write-RedactedLog $logPath "PASS TOOLCHAIN"
-  try { $git = Assert-GitBaseline $repoRoot $baselineFile } catch { Stop-Orchestrator (($_.Exception.Message -split ":")[0]) $_.Exception.Message $logPath }
+  try { $git = Assert-GitBaseline $repoRoot $baselineFile } catch {
+    $msg = "$_"
+    if ($msg -match "reason=") {
+      Stop-Orchestrator "STOP_LAUNCHER_BASELINE_MISMATCH" (($msg -split ":", 2)[1].Trim()) $logPath
+    }
+    Stop-Orchestrator (($_.Exception.Message -split ":")[0]) $_.Exception.Message $logPath
+  }
   Write-RedactedLog $logPath ("PASS GIT branch=" + $git.Branch + " head=" + $git.Head)
 
   try {
