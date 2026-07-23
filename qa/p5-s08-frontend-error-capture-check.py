@@ -275,24 +275,56 @@ def productive_html_paths() -> list[Path]:
     return sorted(out)
 
 
-# Portable Node from A3-R1 (outside repo). Used only for `node --check`.
-PORTABLE_NODE = Path(r"D:\BoundLoreTools\NodePortable\runtime\node-v24.18.0-win-x64\node.exe")
+# Syntax proof for A3 JS files.
+# After A3-C1 the temporary portable Node under D:\BoundLoreTools\NodePortable
+# was intentionally removed. Prefer a live `node --check` when any node.exe
+# is available; otherwise reuse the documented A3-R1 parser proof only if the
+# three product JS files still match commit 1693d6d exactly.
+import shutil
+import subprocess
+
 A3_JS_FILES = (
     CLIENT,
     PRIVACY,
     FUNCTION,
 )
 
+PRIOR_NODE_CHECK_GATE = "P5-E.10B-S08-A3"
+PRIOR_NODE_CHECK_COMMIT = "1693d6d"
+PRIOR_NODE_CHECK_RESULT = "PASS"
+PRIOR_NODE_VERSION = "v24.18.0"
+PRIOR_NODE_FILES = 3
 
-def node_check_file(path: Path) -> tuple[bool, str]:
-    """Parser-based syntax check via portable node --check (no script execution)."""
-    import subprocess
+# Populated by test_a3_js_syntax_validation for reporting.
+SYNTAX_STATUS: dict[str, str] = {
+    "CURRENT_NODE_CHECK": "NOT_AVAILABLE",
+    "PRIOR_NODE_CHECK_REUSED": "NO",
+    "SYNTAX_VALIDATION": "FAIL",
+}
 
-    if not PORTABLE_NODE.is_file():
-        return False, "portable_node_missing"
+
+def _git(*args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(ROOT), *args],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+
+
+def _find_node_exe() -> Path | None:
+    which = shutil.which("node")
+    if which:
+        return Path(which)
+    return None
+
+
+def node_check_file(node_exe: Path, path: Path) -> tuple[bool, str]:
+    """Parser-based syntax check via `node --check` (no script execution)."""
     try:
         proc = subprocess.run(
-            [str(PORTABLE_NODE), "--check", str(path)],
+            [str(node_exe), "--check", str(path)],
             capture_output=True,
             text=True,
             timeout=30,
@@ -307,12 +339,116 @@ def node_check_file(path: Path) -> tuple[bool, str]:
     return True, "ok"
 
 
-def test_a3_js_syntax_via_node_check() -> None:
-    check(PORTABLE_NODE.is_file(), "portable node.exe present for syntax checks")
+def _blob_id_at_commit(commit: str, rel: str) -> str | None:
+    proc = _git("ls-tree", commit, "--", rel)
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return None
+    # format: <mode> blob <sha>\t<path>
+    parts = proc.stdout.strip().split()
+    if len(parts) < 3 or parts[1] != "blob":
+        return None
+    return parts[2]
+
+
+def _hash_object(path: Path) -> str | None:
+    proc = _git("hash-object", "--", str(path.relative_to(ROOT).as_posix()))
+    if proc.returncode != 0:
+        # Fall back to absolute path for hash-object
+        proc = _git("hash-object", "--", str(path))
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return None
+    return proc.stdout.strip()
+
+
+def classify_js_vs_prior_commit(path: Path) -> str:
+    """Return MATCHES_PRIOR_CHECKED_COMMIT | MODIFIED_SINCE_PRIOR_CHECK | MISSING | GIT_PROOF_UNAVAILABLE."""
+    if not path.is_file():
+        return "MISSING"
+    rel = path.relative_to(ROOT).as_posix()
+
+    commit_ok = _git("rev-parse", "--verify", f"{PRIOR_NODE_CHECK_COMMIT}^{{commit}}")
+    if commit_ok.returncode != 0:
+        return "GIT_PROOF_UNAVAILABLE"
+
+    prior_blob = _blob_id_at_commit(PRIOR_NODE_CHECK_COMMIT, rel)
+    if not prior_blob:
+        return "MISSING"
+
+    current_blob = _hash_object(path)
+    if not current_blob:
+        return "GIT_PROOF_UNAVAILABLE"
+    if current_blob != prior_blob:
+        return "MODIFIED_SINCE_PRIOR_CHECK"
+
+    # Worktree / index / commit range must all be clean for these files.
+    if _git("diff", "--quiet", "--", rel).returncode != 0:
+        return "MODIFIED_SINCE_PRIOR_CHECK"
+    if _git("diff", "--cached", "--quiet", "--", rel).returncode != 0:
+        return "MODIFIED_SINCE_PRIOR_CHECK"
+    if _git("diff", "--quiet", PRIOR_NODE_CHECK_COMMIT, "--", rel).returncode != 0:
+        return "MODIFIED_SINCE_PRIOR_CHECK"
+
+    return "MATCHES_PRIOR_CHECKED_COMMIT"
+
+
+def test_a3_js_syntax_validation() -> None:
+    """Syntax proof: live node --check, or prior A3 proof if blobs unchanged."""
+    print(f"[p5-s08-frontend-error-capture-check] PRIOR_NODE_CHECK_GATE={PRIOR_NODE_CHECK_GATE}")
+    print(f"[p5-s08-frontend-error-capture-check] PRIOR_NODE_CHECK_COMMIT={PRIOR_NODE_CHECK_COMMIT}")
+    print(f"[p5-s08-frontend-error-capture-check] PRIOR_NODE_CHECK_RESULT={PRIOR_NODE_CHECK_RESULT}")
+    print(f"[p5-s08-frontend-error-capture-check] PRIOR_NODE_VERSION={PRIOR_NODE_VERSION}")
+    print(f"[p5-s08-frontend-error-capture-check] PRIOR_NODE_FILES={PRIOR_NODE_FILES}")
+
+    node_exe = _find_node_exe()
+    if node_exe is not None:
+        all_ok = True
+        for path in A3_JS_FILES:
+            ok, detail = node_check_file(node_exe, path)
+            rel = path.relative_to(ROOT).as_posix()
+            check(ok, f"node --check PASS: {rel}" if ok else f"node --check FAIL: {rel}: {detail}")
+            all_ok = all_ok and ok
+        SYNTAX_STATUS["CURRENT_NODE_CHECK"] = "PASS" if all_ok else "FAIL"
+        SYNTAX_STATUS["PRIOR_NODE_CHECK_REUSED"] = "NO"
+        SYNTAX_STATUS["SYNTAX_VALIDATION"] = "PASS" if all_ok else "FAIL"
+        check(all_ok, "SYNTAX_VALIDATION via CURRENT_NODE_CHECK")
+        print("[p5-s08-frontend-error-capture-check] CURRENT_NODE_CHECK=PASS" if all_ok else "[p5-s08-frontend-error-capture-check] CURRENT_NODE_CHECK=FAIL")
+        print("[p5-s08-frontend-error-capture-check] PRIOR_NODE_CHECK_REUSED=NO")
+        print(
+            "[p5-s08-frontend-error-capture-check] SYNTAX_VALIDATION="
+            + ("PASS" if all_ok else "FAIL")
+        )
+        return
+
+    SYNTAX_STATUS["CURRENT_NODE_CHECK"] = "NOT_AVAILABLE"
+    print("[p5-s08-frontend-error-capture-check] CURRENT_NODE_CHECK=NOT_AVAILABLE")
+
+    states: dict[str, str] = {}
     for path in A3_JS_FILES:
-        ok, detail = node_check_file(path)
         rel = path.relative_to(ROOT).as_posix()
-        check(ok, f"node --check PASS: {rel}" if ok else f"node --check FAIL: {rel}: {detail}")
+        state = classify_js_vs_prior_commit(path)
+        states[rel] = state
+        check(state == "MATCHES_PRIOR_CHECKED_COMMIT", f"{rel} prior-commit state={state}")
+        print(f"[p5-s08-frontend-error-capture-check] {rel}={state}")
+
+    reuse_ok = all(v == "MATCHES_PRIOR_CHECKED_COMMIT" for v in states.values())
+    # Collective range check (all three files vs prior commit).
+    rels = [p.relative_to(ROOT).as_posix() for p in A3_JS_FILES]
+    range_clean = _git("diff", "--quiet", PRIOR_NODE_CHECK_COMMIT, "--", *rels).returncode == 0
+    check(range_clean, "collective diff vs prior-checked commit is empty")
+
+    if reuse_ok and range_clean and PRIOR_NODE_CHECK_RESULT == "PASS":
+        SYNTAX_STATUS["PRIOR_NODE_CHECK_REUSED"] = "YES"
+        SYNTAX_STATUS["SYNTAX_VALIDATION"] = "PASS_PRIOR_PROOF"
+        check(True, "SYNTAX_VALIDATION=PASS_PRIOR_PROOF")
+        print("[p5-s08-frontend-error-capture-check] PRIOR_NODE_CHECK_REUSED=YES")
+        print("[p5-s08-frontend-error-capture-check] SYNTAX_VALIDATION=PASS_PRIOR_PROOF")
+        return
+
+    SYNTAX_STATUS["PRIOR_NODE_CHECK_REUSED"] = "NO"
+    SYNTAX_STATUS["SYNTAX_VALIDATION"] = "FAIL"
+    check(False, "SYNTAX_VALIDATION unavailable without node and without prior-proof match")
+    print("[p5-s08-frontend-error-capture-check] PRIOR_NODE_CHECK_REUSED=NO")
+    print("[p5-s08-frontend-error-capture-check] SYNTAX_VALIDATION=FAIL")
 
 
 def test_client_static() -> None:
@@ -609,7 +745,7 @@ def test_no_protected_touched_in_diff_names() -> None:
 
 
 def main() -> int:
-    test_a3_js_syntax_via_node_check()
+    test_a3_js_syntax_validation()
     test_client_static()
     test_server_model()
     test_wiring_and_static_security()
