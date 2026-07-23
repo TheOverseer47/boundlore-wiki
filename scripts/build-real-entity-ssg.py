@@ -157,7 +157,7 @@ def render_page(entity: dict) -> str:
   <link rel="stylesheet" href="../../../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
-  <script src="/js/error-reporter.js?v=p5-e9c2"></script>
+  <script src="/js/error-reporter.js?v=s08-a3-v1" defer></script>
   <script type="application/ld+json">
 {cw}
   </script>
